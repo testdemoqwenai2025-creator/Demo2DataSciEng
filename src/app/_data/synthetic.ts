@@ -688,6 +688,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["vision", "vit", "cnn", "convolution", "attention", "lora", "pgvector", "patterns", "genai"],
   },
+  {
+    id: "ADR-027",
+    title: "Adopt DDPM (Denoising Diffusion Probabilistic Models) for synthetic image generation and data augmentation",
+    status: "accepted",
+    date: "FY27-Q4",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-026 adopted ViT+CNN hybrid for image understanding (encoding images → embeddings). The reverse direction — generating synthetic images from embeddings or text — needs its own architecture decision. Three families compete: GANs (adversarial, fast sampling, mode collapse), VAEs (amortised, likelihood-based, blurry), and diffusion models (slow sampling, SOTA quality, probabilistic). Since ADR-026 stores image embeddings in pgvector (ADR-022), we need a generator that can condition on those embeddings to produce synthetic dashboards, synthetic invoices for testing, and synthetic training data for the OCR model. Diffusion is the right choice: it scales with compute (same matmul infrastructure as ADR-026), supports LoRA fine-tuning (ADR-023), and the score-matching objective is robust. The forward diffusion q(x_t|x_0) = N(√ᾱ_t x_0, (1-ᾱ_t) I) has a closed form; the reverse p_θ(x_{t-1}|x_t) is what the U-Net learns; the SDE formulation dx = f(x,t)dt + g(t)dw unifies discrete and continuous-time variants.",
+    decision:
+      "Adopt DDPM (Denoising Diffusion Probabilistic Models) for all synthetic image generation tasks. The training objective is the simplified DDPM loss: L = E[||ε - ε_θ(√ᾱ_t x_0 + √(1-ᾱ_t) ε, t)||²] where ε_θ is a U-Net (connected to ADR-026's CNN backbone for the encoder/decoder). Sampling uses DDIM (Denoising Diffusion Implicit Models) for 10-50 step sampling instead of 1000-step DDPM. Conditional generation uses classifier-free guidance: ε̃ = ε_θ(x,t,∅) + w·(ε_θ(x,t,c) - ε_θ(x,t,∅)). The score-based formulation s_θ(x,t) = -ε_θ(x,t)/√(1-ᾱ_t) connects to the continuous-time SDE: dx = -½β_t x dt + √β_t dw (forward) and reverse-time SDE for sampling. Noise schedule: cosine (Nichol & Dhariwal 2021) over linear for better sample quality at low resolutions. LoRA (ADR-023) adapts the U-Net for platform-specific imagery (dashboard screenshots, invoice layouts). Generated images embed via ADR-026's ViT into pgvector (ADR-022) — synthetic data IS queryable.",
+    consequences:
+      "+ SOTA quality — beats GAN on FID for platform image types (dashboards, charts, invoices). + Probabilistic — can estimate likelihood, useful for OOD detection on input images. + Same matmul/GPU infrastructure as ADR-026 — no new hardware. + LoRA (ADR-023) works for diffusion U-Nets. + Connects to ADR-024 semantic layer: text → embedding → diffusion → image → ViT → embedding → pgvector. + Synthetic data avoids GDPR PII (no real customer data in test envs). − Sampling is slow (10-50 steps even with DDIM, vs 1-step GAN). − Training is compute-heavy (needs A100s, ~500 GPU-hours for stable training). − Tuning noise schedule requires iteration — cosine schedule is good but not always optimal.",
+    alternatives: [
+      "GAN (StyleGAN-3) — fast 1-step sampling, but mode collapse + no likelihood estimate",
+      "VAE (VQ-VAE-3) — amortised 1-step sampling, but blurry outputs and lower FID",
+      "Normalizing flows — exact likelihood, but expensive in 2D image space",
+      "Autoregressive (ImageGPT, DALL-E 1) — pixel-by-pixel, too slow for our 1024×1024 targets",
+    ],
+    tags: ["diffusion", "ddpm", "ddim", "score-matching", "unet", "sde", "lora", "synthetic-data", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

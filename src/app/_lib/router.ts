@@ -41,13 +41,14 @@ export type PageId =
   | "transformer"
   | "comp-sci-materials"
   | "gen-ai-patterns"
-  | "computer-vision";
+  | "computer-vision"
+  | "diffusion-models";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models";
   icon: string;
   description: string;
 }
@@ -332,6 +333,14 @@ export const PAGES: PageMeta[] = [
     group: "Computer Vision",
     icon: "Image",
     description: "Animated convolution kernel, 2D convolution math, max pooling, convolutional backpropagation, ViT patch embedding, low-level PyTorch Conv2d/LeNet/VisionTransformer/HybridViT. From LeNet to ViT-22B.",
+  },
+  {
+    id: "diffusion-models",
+    label: "Diffusion Models — DDPM, DDIM, Score Matching, SDEs",
+    shortLabel: "Diffusion Models",
+    group: "Diffusion Models",
+    icon: "Waves",
+    description: "Forward/reverse diffusion math, U-Net with time embedding, DDPM trainer, DDIM sampler, classifier-free guidance, Langevin dynamics, low-level PyTorch. From thermodynamics to image generation.",
   },
 ];
 
