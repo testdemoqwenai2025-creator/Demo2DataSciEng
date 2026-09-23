@@ -1,0 +1,252 @@
+/home/z/my-project/src/app/_pages/cicd.tsx:198:        eyebrow="Delivery — CI/CD & DevOps"
+/home/z/my-project/src/app/_pages/cicd.tsx:199:        title="Git, GitHub Actions, Terraform, dbt slim CI"
+/home/z/my-project/src/app/_pages/cicd.tsx:200:        description="Every change is shipped via PR with state-aware dbt CI, Terraform plan, schema-registry PR for drift, and OIDC-based workload identity (no long-lived secrets). Production promotion is gated by a manual approval and idempotent — re-runs are safe."
+/home/z/my-project/src/app/_pages/cicd.tsx:211:        <KpiCard label="PR merge → prod (median)" value="2h 11m" delta="−43%" deltaTone="up" hint="state-aware CI" />
+/home/z/my-project/src/app/_pages/cicd.tsx:212:        <KpiCard label="CI runtime (dbt slim)" value="4m 18s" delta="−67%" deltaTone="up" hint="vs full run" />
+/home/z/my-project/src/app/_pages/cicd.tsx:213:        <KpiCard label="Production deploys / wk" value="14" delta="+6 YoY" deltaTone="up" hint="with rollback runbook" />
+/home/z/my-project/src/app/_pages/cicd.tsx:214:        <KpiCard label="Mean rollback time" value="6 min" delta="P95" deltaTone="flat" hint="git revert + dbt build" />
+/home/z/my-project/src/app/_pages/cicd.tsx:219:        title="Git workflow — trunk-based with short-lived branches"
+/home/z/my-project/src/app/_pages/cicd.tsx:220:        description="Long-lived branches are forbidden. Every PR is a single feature, slim CI runs only changed models + downstream, and a daily staging run keeps the staging environment warm."
+/home/z/my-project/src/app/_pages/cicd.tsx:228:        title="Pipelines — at a glance"
+/home/z/my-project/src/app/_pages/cicd.tsx:229:        description="Six pipelines cover the entire delivery surface: dbt CI, Terraform plan/apply, Snowflake migrate, Databricks asset bundle deploy, and prod promotion."
+/home/z/my-project/src/app/_pages/cicd.tsx:263:        title="Terraform — Snowflake as code"
+/home/z/my-project/src/app/_pages/cicd.tsx:264:        description="Every Snowflake object (databases, schemas, warehouses, roles, grants, resource monitors) is provisioned via Terraform. Manual SQL changes are forbidden."
+/home/z/my-project/src/app/_pages/cicd.tsx:272:        title="Production promotion — gated workflow"
+/home/z/my-project/src/app/_pages/cicd.tsx:273:        description="OIDC for auth (no long-lived secrets), state-aware build, docs published to internal site, Slack notification on success."
+/home/z/my-project/src/app/_pages/cicd.tsx:282:          title="FinOps — FY24 vs FY25 (synthetic)"
+/home/z/my-project/src/app/_pages/cicd.tsx:283:          description="Platform cost tracking is fully attributed to workload. Photon, Z-ORDER and cluster pools drove a 19% cost-per-TB reduction YoY."
+/home/z/my-project/src/app/_pages/cicd.tsx:285:          badge="Synthetic"
+/home/z/my-project/src/app/_pages/cicd.tsx:303:                <ReBar dataKey="fy24" fill="var(--chart-2)" name="FY24" radius={[4, 4, 0, 0]} />
+/home/z/my-project/src/app/_pages/cicd.tsx:304:                <ReBar dataKey="fy25" fill="var(--chart-1)" name="FY25" radius={[4, 4, 0, 0]} />
+/home/z/my-project/src/app/_pages/cicd.tsx:310:          title="DevOps practices"
+/home/z/my-project/src/app/_pages/cicd.tsx:328:        <SectionCard title="Secrets & identity" icon={<ShieldCheck className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/cicd.tsx:337:        <SectionCard title="Reproducibility" icon={<Layers className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/cicd.tsx:346:        <SectionCard title="Reliability" icon={<Server className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/dbt.tsx:304:        eyebrow="Transformation layer"
+/home/z/my-project/src/app/_pages/dbt.tsx:306:        description="The dbt project is the heart of the platform's single-source-of-truth promise. 312 models across staging → intermediate → marts → serving, with 1,184 tests, SCD2 snapshots, a MetricFlow semantic layer, slim CI and full docs."
+/home/z/my-project/src/app/_pages/dbt.tsx:317:        <KpiCard label="Models" value={String(DBT_PROJECT.models)} hint="staging→serving" />
+/home/z/my-project/src/app/_pages/dbt.tsx:318:        <KpiCard label="Tests" value={String(DBT_PROJECT.tests)} hint="8.4 per model avg" />
+/home/z/my-project/src/app/_pages/dbt.tsx:319:        <KpiCard label="Sources" value={String(DBT_PROJECT.sources)} hint="14 systems" />
+/home/z/my-project/src/app/_pages/dbt.tsx:320:        <KpiCard label="Snapshots" value={String(DBT_PROJECT.snapshots)} hint="SCD2 history" />
+/home/z/my-project/src/app/_pages/dbt.tsx:321:        <KpiCard label="Macros" value={String(DBT_PROJECT.macros)} hint="reusable logic" />
+/home/z/my-project/src/app/_pages/dbt.tsx:322:        <KpiCard label="Exposures" value={String(DBT_PROJECT.exposures)} hint="BI + rETL" />
+/home/z/my-project/src/app/_pages/dbt.tsx:323:        <KpiCard label="Docs coverage" value={DBT_PROJECT.docsCoverage} hint="auto-generated" />
+/home/z/my-project/src/app/_pages/dbt.tsx:324:        <KpiCard label="CI runtime" value={DBT_PROJECT.ciMinutesPerRun} hint="slim + state-aware" />
+/home/z/my-project/src/app/_pages/dbt.tsx:330:          title="Model breakdown by layer"
+/home/z/my-project/src/app/_pages/dbt.tsx:331:          description="Each layer has one responsibility. Models are prohibited from skipping layers (enforced by a CI lint rule)."
+/home/z/my-project/src/app/_pages/dbt.tsx:359:          title="Lineage DAG"
+/home/z/my-project/src/app/_pages/dbt.tsx:360:          description="Sources flow up to exposures. dbt docs renders an interactive graph; the structure below is the canonical shape."
+/home/z/my-project/src/app/_pages/dbt.tsx:369:        title="Layer responsibilities"
+/home/z/my-project/src/app/_pages/dbt.tsx:370:        description="Hard conventions enforced via CI lint rules + CODEOWNERS per folder."
+/home/z/my-project/src/app/_pages/dbt.tsx:392:          description="Customer segment and loyalty tier changes trigger a new dimension row. Surrogate key generated via `dbt_utils.generate_surrogate_key` so downstream facts stay point-in-time correct."
+/home/z/my-project/src/app/_pages/dbt.tsx:400:          description="Every model has a YAML entry: not_null + unique + relationships + freshness + RLS context. CI fails the PR if a model has zero tests."
+/home/z/my-project/src/app/_pages/dbt.tsx:409:        title="Semantic layer (MetricFlow)"
+/home/z/my-project/src/app/_pages/dbt.tsx:410:        description="Measures, dimensions, entities and derived metrics are defined once in YAML. Both Tableau and Hightouch read from this layer — no parallel metric definitions can drift."
+/home/z/my-project/src/app/_pages/dbt.tsx:433:        description="State-aware `dbt build --select state:modified+` runs only changed models and downstream. Cuts CI runtime from 14m to ~4m on a typical PR."
+/home/z/my-project/src/app/_pages/dbt.tsx:449:        <SectionCard title="Testing strategy" icon={<TestTube className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/dbt.tsx:457:        <SectionCard title="Promotion flow" icon={<GitCommit className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/tableau.tsx:84:        eyebrow="Analytics enablement"
+/home/z/my-project/src/app/_pages/tableau.tsx:85:        title="Tableau & analytics"
+/home/z/my-project/src/app/_pages/tableau.tsx:86:        description="Tableau sits on top of Snowflake's governed SECURE VIEWS. Certified datasets are flagged, uncertified are hidden from executive views, RLS is enforced via Snowflake session context, and the semantic layer is shared with Hightouch so metrics cannot drift between BI and reverse-ETL."
+/home/z/my-project/src/app/_pages/tableau.tsx:104:        <SectionCard title="Revenue & orders trend" icon={<BarChart3 className="h-5 w-5" />} badge="Synthetic">
+/home/z/my-project/src/app/_pages/tableau.tsx:131:                <Area yAxisId="rev" type="monotone" dataKey="revenue" stroke="var(--chart-1)" strokeWidth={2} fill="url(#trev)" name="Revenue (£M)" />
+/home/z/my-project/src/app/_pages/tableau.tsx:132:                <Area yAxisId="ord" type="monotone" dataKey="orders" stroke="var(--chart-2)" strokeWidth={2} fill="url(#tord)" name="Orders (M)" />
+/home/z/my-project/src/app/_pages/tableau.tsx:138:        <SectionCard title="Channel mix" icon={<BarChart3 className="h-5 w-5" />} badge="Synthetic">
+/home/z/my-project/src/app/_pages/tableau.tsx:160:        <SectionCard title="Customer ARPU by segment" icon={<Users className="h-5 w-5" />} badge="Synthetic">
+/home/z/my-project/src/app/_pages/tableau.tsx:187:        title="Row-level security — Snowflake + Tableau"
+/home/z/my-project/src/app/_pages/tableau.tsx:188:        description="RLS is enforced at the Snowflake layer, never in Tableau. The Tableau service user logs in via SSO, the SSO attributes drive `SET ROW_ACCESS_REGION`, and every SECURE VIEW automatically filters rows."
+/home/z/my-project/src/app/_pages/tableau.tsx:196:        title="Dataset certification matrix"
+/home/z/my-project/src/app/_pages/tableau.tsx:197:        description="Tableau Catalog flags every published dataset as Certified / In review / Self-service. Only Certified dashboards appear in the executive landing zone."
+/home/z/my-project/src/app/_pages/tableau.tsx:235:        <SectionCard title="Self-service enablement" icon={<Layers className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/tableau.tsx:244:        <SectionCard title="Performance & cost" icon={<Gauge className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/tableau.tsx:253:        <SectionCard title="Embedded & alerts" icon={<FileText className="h-5 w-5" />}>
+/home/z/my-project/src/app/_components/app-shell.tsx:32:    <nav aria-label="Platform sections" className="flex flex-col gap-6">
+/home/z/my-project/src/app/_components/app-shell.tsx:84:            aria-label="Open navigation"
+/home/z/my-project/src/app/_components/app-shell.tsx:124:              <Button variant="ghost" size="icon" aria-label="Open navigation" onClick={() => setMobileOpen(true)}>
+/home/z/my-project/src/app/_components/theme-toggle.tsx:24:      aria-label="Toggle colour theme"
+/home/z/my-project/src/app/_components/code-block.tsx:47:          aria-label="Copy code"
+/home/z/my-project/src/app/_pages/governance.tsx:143:        eyebrow="Governance · DQ · Lineage · Observability"
+/home/z/my-project/src/app/_pages/governance.tsx:144:        title="Unity Catalogue + Monte Carlo + OpenLineage"
+/home/z/my-project/src/app/_pages/governance.tsx:145:        description="The platform treats governance as a first-class engineering concern, not a compliance afterthought. Unity Catalogue provides column-level RBAC + PII tagging; Monte Carlo detects freshness / volume / schema anomalies; OpenLineage ties it all together end-to-end."
+/home/z/my-project/src/app/_pages/governance.tsx:156:        <KpiCard label="Trust score" value="98.4 / 100" delta="+4.2pts" deltaTone="up" hint="DQ + observability" />
+/home/z/my-project/src/app/_pages/governance.tsx:157:        <KpiCard label="DQ rules" value="1,184" delta="8.4 / model" deltaTone="up" hint="dbt + GE" />
+/home/z/my-project/src/app/_pages/governance.tsx:158:        <KpiCard label="PII columns tagged" value="2,140" delta="100% coverage" deltaTone="up" hint="Unity Catalogue" />
+/home/z/my-project/src/app/_pages/governance.tsx:159:        <KpiCard label="Anomalies caught (30d)" value="11" hint="auto-quarantined" />
+/home/z/my-project/src/app/_pages/governance.tsx:164:        title="Unity Catalogue — RBAC grants"
+/home/z/my-project/src/app/_pages/governance.tsx:165:        description="Every catalog grant is Terraform-managed. Group membership syncs from Azure AD via SCIM."
+/home/z/my-project/src/app/_pages/governance.tsx:197:        title="Unity Catalogue — PII tags + dynamic view redaction"
+/home/z/my-project/src/app/_pages/governance.tsx:198:        description="PII is tagged, then surfaced via a `_masked` view that conditionally reveals columns based on the current role. The same tags drive Hightouch masking and Tableau access."
+/home/z/my-project/src/app/_pages/governance.tsx:206:        title="Data quality rules — fct_orders + dim_customer"
+/home/z/my-project/src/app/_pages/governance.tsx:207:        description="Rules span not_null, unique, relationships, accepted_range, freshness, regex and business-rule checks. CI fails the PR if any new model has zero tests."
+/home/z/my-project/src/app/_pages/governance.tsx:250:        title="Observability signals (last 24h — synthetic)"
+/home/z/my-project/src/app/_pages/governance.tsx:251:        description="Freshness breaches, schema drift, volume anomalies and DQ breaches flow into Datadog. Critical signals auto-quarantine the affected table and page on-call."
+/home/z/my-project/src/app/_pages/governance.tsx:284:        title="OpenLineage event (emitted by dbt on every run)"
+/home/z/my-project/src/app/_pages/governance.tsx:285:        description="Lineage is captured at the column level. Every dbt run, Airflow task, and Spark job emits a lineage event consumed by Marquez + Monte Carlo."
+/home/z/my-project/src/app/_pages/governance.tsx:293:        title="Monte Carlo monitors (YAML-defined)"
+/home/z/my-project/src/app/_pages/governance.tsx:294:        description="Monitors are versioned in Git, applied via Terraform. Severity → notification routing is declared, not coded."
+/home/z/my-project/src/app/_pages/governance.tsx:302:        <SectionCard title="Access & security" icon={<Lock className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/governance.tsx:311:        <SectionCard title="Lineage" icon={<GitBranch className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/governance.tsx:320:        <SectionCard title="Audit & compliance" icon={<ShieldCheck className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/snowflake.tsx:144:        eyebrow="Serving warehouse"
+/home/z/my-project/src/app/_pages/snowflake.tsx:145:        title="Snowflake & SQL — governed serving layer"
+/home/z/my-project/src/app/_pages/snowflake.tsx:146:        description="Snowflake sits between Databricks Lakehouse and the BI / reverse-ETL consumers. It is sized for concurrency, secured with row-level + column-level policies, and instrumented end-to-end with resource monitors and tags."
+/home/z/my-project/src/app/_pages/snowflake.tsx:157:        <KpiCard label="Warehouses" value="5" hint="WH_ANALYTICS → WH_GOLD_SERVING" />
+/home/z/my-project/src/app/_pages/snowflake.tsx:158:        <KpiCard label="P95 BI latency" value="1.4s" delta="-67%" deltaTone="up" hint="vs FY24 baseline" />
+/home/z/my-project/src/app/_pages/snowflake.tsx:159:        <KpiCard label="Concurrent users peak" value="212" delta="+253%" deltaTone="up" hint="Black Friday peak" />
+/home/z/my-project/src/app/_pages/snowflake.tsx:160:        <KpiCard label="Credits / TB" value="0.42" delta="-19%" deltaTone="up" hint="FinOps optimisation" />
+/home/z/my-project/src/app/_pages/snowflake.tsx:165:        title="Warehouse sizing matrix"
+/home/z/my-project/src/app/_pages/snowflake.tsx:166:        description="Every warehouse is provisioned via Terraform and right-sized for its workload pattern. Multi-cluster autoscale handles concurrency spikes; auto-suspend caps idle cost."
+/home/z/my-project/src/app/_pages/snowflake.tsx:200:          title="Warehouse DDL (Terraform-managed)"
+/home/z/my-project/src/app/_pages/snowflake.tsx:201:          description="Provisioned via terraform/snowflake/warehouses.tf — never edited by hand."
+/home/z/my-project/src/app/_pages/snowflake.tsx:203:          badge="HCL"
+/home/z/my-project/src/app/_pages/snowflake.tsx:209:          title="Performance lift (synthetic)"
+/home/z/my-project/src/app/_pages/snowflake.tsx:210:          description="Before/after on key BI workloads after cluster keys + search optimisation."
+/home/z/my-project/src/app/_pages/snowflake.tsx:212:          badge="Synthetic"
+/home/z/my-project/src/app/_pages/snowflake.tsx:240:        title="RBAC hierarchy & grants"
+/home/z/my-project/src/app/_pages/snowflake.tsx:241:        description="Snowflake roles are SCIM-provisioned from Azure AD. Principle of least privilege + dynamic RLS via `current_region()` keeps market-scoped data scoped."
+/home/z/my-project/src/app/_pages/snowflake.tsx:278:        title="Gold serving view — fct_orders_serving"
+/home/z/my-project/src/app/_pages/snowflake.tsx:279:        description="The single, governed, BI-facing definition of an order. Every Tableau dashboard and Hightouch sync reads from this view — there is no second copy."
+/home/z/my-project/src/app/_pages/snowflake.tsx:302:          title="Integration with the wider platform"
+/home/z/my-project/src/app/_pages/snowflake.tsx:314:          title="Operational excellence"
+/home/z/my-project/src/app/_pages/orchestration.tsx:38:    description="Bronze→Silver→Gold pipeline for sales mart + dbt run + Tableau refresh",
+/home/z/my-project/src/app/_pages/orchestration.tsx:71:        sql="SELECT dbt_build('sales_mart', target='prod')",
+/home/z/my-project/src/app/_pages/orchestration.tsx:73:        warehouse="WH_DBT_TRANSFORM",
+/home/z/my-project/src/app/_pages/orchestration.tsx:126:        sql="SELECT dbt_build('fct_orders', target='prod')",
+/home/z/my-project/src/app/_pages/orchestration.tsx:127:        warehouse="WH_DBT_TRANSFORM",
+/home/z/my-project/src/app/_pages/orchestration.tsx:162:        eyebrow="Delivery — orchestration"
+/home/z/my-project/src/app/_pages/orchestration.tsx:163:        title="Airflow (batch) + Dagster (asset-based)"
+/home/z/my-project/src/app/_pages/orchestration.tsx:164:        description="Airflow drives the daily Bronze→Gold batch; Dagster treats every table as a typed asset with upstream dependencies and freshness sensors. Idempotent retries, SLA monitoring, exponential backoff and circuit-breakers keep the pipeline boring."
+/home/z/my-project/src/app/_pages/orchestration.tsx:175:        <KpiCard label="Active DAGs" value="38" hint="across 6 DAG groups" />
+/home/z/my-project/src/app/_pages/orchestration.tsx:176:        <KpiCard label="Daily runs" value="412" delta="+18% YoY" deltaTone="up" hint="batch + sensor" />
+/home/z/my-project/src/app/_pages/orchestration.tsx:177:        <KpiCard label="Success rate (30d)" value="99.7%" delta="+1.2pp" deltaTone="up" hint="retries included" />
+/home/z/my-project/src/app/_pages/orchestration.tsx:178:        <KpiCard label="Mean runtime (Gold)" value="38 min" delta="−27% vs FY24" deltaTone="up" hint="P95" />
+/home/z/my-project/src/app/_pages/orchestration.tsx:183:        title="Recent pipeline runs"
+/home/z/my-project/src/app/_pages/orchestration.tsx:184:        description="Synthetic 24h snapshot — every run is observable in Airflow UI + Datadog."
+/home/z/my-project/src/app/_pages/orchestration.tsx:227:        title="SLA monitoring matrix"
+/home/z/my-project/src/app/_pages/orchestration.tsx:228:        description="Every DAG has a freshness SLA owned by the business. Breaches page on-call via PagerDuty and trigger an automated backfill when possible."
+/home/z/my-project/src/app/_pages/orchestration.tsx:269:        title="Airflow DAG — gold_sales_mart"
+/home/z/my-project/src/app/_pages/orchestration.tsx:270:        description="Bronze→Silver→Gold with idempotent retries, exponential backoff, SLA callbacks and circuit-breaker on_failure."
+/home/z/my-project/src/app/_pages/orchestration.tsx:278:        title="Dagster asset graph — typed assets"
+/home/z/my-project/src/app/_pages/orchestration.tsx:279:        description="Dagster treats every Bronze / Silver / Gold table as a typed asset with explicit upstream deps. The UI shows lineage natively; sensors trigger backfill on upstream delay."
+/home/z/my-project/src/app/_pages/orchestration.tsx:287:        <SectionCard title="Idempotency & retries" icon={<RefreshCw className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/orchestration.tsx:296:        <SectionCard title="Sensors & backfills" icon={<Activity className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/orchestration.tsx:305:        <SectionCard title="Alerts & on-call" icon={<AlertTriangle className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/databricks.tsx:32:    comment="Conformed customer across Salesforce + Shopify, deduplicated by email hash",
+/home/z/my-project/src/app/_pages/databricks.tsx:172:        eyebrow="Lakehouse — storage & compute"
+/home/z/my-project/src/app/_pages/databricks.tsx:173:        title="Databricks · Spark · Delta Lake · Medallion"
+/home/z/my-project/src/app/_pages/databricks.tsx:174:        description="Databricks is the engine room of the platform: PySpark + Spark SQL workloads, Delta Lake for ACID + time travel, and the Bronze→Silver→Gold medallion pattern as the canonical data flow. Photon runtime, cluster pools and Unity Catalogue keep it fast, cheap and governed."
+/home/z/my-project/src/app/_pages/databricks.tsx:192:        title="Medallion architecture — Bronze · Silver · Gold"
+/home/z/my-project/src/app/_pages/databricks.tsx:193:        description="Each layer has a single responsibility. The flow is unidirectional and idempotent — re-running a Silver job for a date partition never rewrites history unless explicitly versioned."
+/home/z/my-project/src/app/_pages/databricks.tsx:246:          title="PySpark DLT — Silver customer conformance"
+/home/z/my-project/src/app/_pages/databricks.tsx:247:          description="Delta Live Tables with expectations. PII rows go to a quarantine table; non-PII conformance is reproducible and idempotent."
+/home/z/my-project/src/app/_pages/databricks.tsx:249:          badge="PySpark + DLT"
+/home/z/my-project/src/app/_pages/databricks.tsx:255:          title="Delta Lake + Spark SQL — Bronze→Silver"
+/home/z/my-project/src/app/_pages/databricks.tsx:256:          description="Plain SQL for ad-hoc investigations and to materialise hot Silver tables with Z-ORDER + CDF + retention."
+/home/z/my-project/src/app/_pages/databricks.tsx:258:          badge="Spark SQL"
+/home/z/my-project/src/app/_pages/databricks.tsx:267:          title="Cluster policy — transform_gold"
+/home/z/my-project/src/app/_pages/databricks.tsx:268:          description="Provisioned via Databricks asset bundles from Git. Photon + enhanced autoscaler + cluster pools keep startup latency under 30s and cost predictable."
+/home/z/my-project/src/app/_pages/databricks.tsx:270:          badge="Asset bundle"
+/home/z/my-project/src/app/_pages/databricks.tsx:276:          title="Performance lift (synthetic)"
+/home/z/my-project/src/app/_pages/databricks.tsx:277:          description="Photon + Z-ORDER + cluster pools combined drove a 2.4× runtime reduction and 31% cost-per-task reduction YoY."
+/home/z/my-project/src/app/_pages/databricks.tsx:279:          badge="Synthetic"
+/home/z/my-project/src/app/_pages/databricks.tsx:305:        <SectionCard title="Integrations" icon={<GitBranch className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/databricks.tsx:314:        <SectionCard title="Governance" icon={<ShieldCheck className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/databricks.tsx:323:        <SectionCard title="Operational excellence" icon={<Cpu className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:134:        eyebrow="Ingestion & activation"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:135:        title="Fivetran (ELT) + Hightouch (reverse-ETL)"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:136:        description="Fivetran ingests 14 source systems (3.1B rows / month) into Bronze with schema-on-read CDC. Hightouch pushes governed audiences back into Salesforce, Klaviyo, Meta Ads and HubSpot — every audience is a SQL model on Snowflake, versioned in Git, PII-tagged and audit-logged."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:147:        <KpiCard label="Source systems" value="14" delta="onboarded in 6 months" deltaTone="up" hint="ELT" />
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:148:        <KpiCard label="Rows / month" value="3.1B" delta="+22% YoY" deltaTone="up" hint="Bronze ingest" />
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:149:        <KpiCard label="Median freshness" value="9 min" delta="−37% vs FY24" deltaTone="up" hint="Bronze→Gold SLA" />
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:150:        <KpiCard label="Reverse-ETL audiences" value="5" delta="+3 in pipeline" deltaTone="up" hint="Activated segments" />
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:155:        title="Fivetran — source connectors"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:156:        description="Every source is provisioned via Terraform / API. Schema drift auto-PRs to a schema registry repo. Bronze is append-only, schema-on-read."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:191:          title="Fivetran API — programmatic onboarding"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:192:          description="New sources are onboarded in minutes via Terraform + Fivetran REST API, with sync frequency set per source class."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:194:          badge="Python"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:200:          title="Hightouch — VIP audience SQL model"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:201:          description="Audiences are SQL models in Snowflake, version-controlled in Git. Every sync upserts by a stable business key (e.g. salesforce_account_id)."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:203:          badge="SQL"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:211:        title="Reverse-ETL activations (Hightouch)"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:212:        description="Each activation has an owner, a PII classification and an SLA. Sync cadence is matched to the upstream dbt run so audiences are never stale."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:244:        title="Hightouch sync definition (declarative)"
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:245:        description="Every sync is defined as a YAML file in Git. PII columns are auto-masked; failures page on-call; success posts to Slack."
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:253:        <SectionCard title="Freshness SLA" icon={<Zap className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:262:        <SectionCard title="Schema drift handling" icon={<Workflow className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/fivetran-hightouch.tsx:271:        <SectionCard title="Governance" icon={<ShieldCheck className="h-5 w-5" />}>
+/home/z/my-project/src/app/_pages/home.tsx:151:          eyebrow="Executive snapshot"
+/home/z/my-project/src/app/_pages/home.tsx:152:          title="Outcomes the platform delivers"
+/home/z/my-project/src/app/_pages/home.tsx:153:          description="Synthetic KPIs reflecting how the platform improved freshness, trust, cost discipline and self-service adoption across the business."
+/home/z/my-project/src/app/_pages/home.tsx:172:          eyebrow="The ten pillars"
+/home/z/my-project/src/app/_pages/home.tsx:173:          title="Every page maps to a specific technology & scope"
+/home/z/my-project/src/app/_pages/home.tsx:174:          description="The platform is intentionally modular: each page below is a dedicated solution view you can navigate to for design, code snippets, metrics and integration details."
+/home/z/my-project/src/app/_pages/home.tsx:199:          eyebrow="Reference architecture (mini)"
+/home/z/my-project/src/app/_pages/home.tsx:200:          title="How the layers fit together"
+/home/z/my-project/src/app/_pages/home.tsx:201:          description="Click any box to dive into the relevant technology page. Full reference diagram lives on the Architecture page."
+/home/z/my-project/src/app/_pages/home.tsx:205:            <ArchLayer label="Sources (14 systems)">
+/home/z/my-project/src/app/_pages/home.tsx:206:              <ArchBox title="Shopify Plus" subtitle="E-commerce orders" tech="REST" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:207:              <ArchBox title="Salesforce CRM" subtitle="Accounts, cases" tech="REST" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:208:              <ArchBox title="Stripe / NetSuite" subtitle="Payments · ERP" tech="API" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:209:              <ArchBox title="Adobe + Snowplow" subtitle="Behavioural events" tech="Kafka" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:212:            <ArchArrow label="Fivetran ELT · schema-on-read" />
+/home/z/my-project/src/app/_pages/home.tsx:214:            <ArchLayer label="Bronze — raw ingest (Databricks + S3)" colour="var(--chart-2)">
+/home/z/my-project/src/app/_pages/home.tsx:216:                title="Bronze · Delta"
+/home/z/my-project/src/app/_pages/home.tsx:217:                subtitle="Append-only raw tables, schema registry, 142 tables, 8.4 TB / mo"
+/home/z/my-project/src/app/_pages/home.tsx:218:                tech="Delta Lake"
+/home/z/my-project/src/app/_pages/home.tsx:223:              <ArchBox title="DQ & lineage" subtitle="Great Expectations + dbt tests" tech="dq" tone="muted" href={hrefFor("governance")} />
+/home/z/my-project/src/app/_pages/home.tsx:224:              <ArchBox title="Unity Catalogue" subtitle="PII tags · column-level access" tech="gov" tone="muted" href={hrefFor("governance")} />
+/home/z/my-project/src/app/_pages/home.tsx:225:              <ArchBox title="Airflow / Dagster" subtitle="Idempotent DAGs, retries" tech="orch" tone="muted" href={hrefFor("orchestration")} />
+/home/z/my-project/src/app/_pages/home.tsx:228:            <ArchArrow label="PySpark · Delta MERGE · conformance" />
+/home/z/my-project/src/app/_pages/home.tsx:230:            <ArchLayer label="Silver — conformed & validated" colour="var(--chart-3)">
+/home/z/my-project/src/app/_pages/home.tsx:232:                title="Silver · Delta"
+/home/z/my-project/src/app/_pages/home.tsx:233:                subtitle="Deduplicated, validated, 86 tables, 3.1 TB / mo"
+/home/z/my-project/src/app/_pages/home.tsx:234:                tech="Delta MERGE"
+/home/z/my-project/src/app/_pages/home.tsx:243:            <ArchLayer label="Gold — business marts + Snowflake serving" colour="var(--chart-1)">
+/home/z/my-project/src/app/_pages/home.tsx:245:                title="Gold · dbt marts"
+/home/z/my-project/src/app/_pages/home.tsx:246:                subtitle="Dimensional star schemas, 54 tables, SCD2"
+/home/z/my-project/src/app/_pages/home.tsx:253:                title="Snowflake SERVING"
+/home/z/my-project/src/app/_pages/home.tsx:254:                subtitle="Multi-cluster, RLS, secure sharing"
+/home/z/my-project/src/app/_pages/home.tsx:255:                tech="Snowflake"
+/home/z/my-project/src/app/_pages/home.tsx:260:              <ArchBox title="Semantic layer" subtitle="dbt MetricFlow + Tableau" tech="metrics" tone="primary" />
+/home/z/my-project/src/app/_pages/home.tsx:261:              <ArchBox title="ML feature store" subtitle="Databricks Feature Store" tech="ML" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:264:            <ArchArrow label="Activation · BI + reverse-ETL" />
+/home/z/my-project/src/app/_pages/home.tsx:266:            <ArchLayer label="Consumption & activation" colour="var(--chart-4)">
+/home/z/my-project/src/app/_pages/home.tsx:268:                title="Tableau dashboards"
+/home/z/my-project/src/app/_pages/home.tsx:270:                tech="Tableau"
+/home/z/my-project/src/app/_pages/home.tsx:276:                title="Hightouch reverse-ETL"
+/home/z/my-project/src/app/_pages/home.tsx:283:              <ArchBox title="Embedded analytics" subtitle="Customer portal data API" tech="API" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:284:              <ArchBox title="Notebooks & ML" subtitle="Databricks Notebooks" tech="ML" tone="muted" />
+/home/z/my-project/src/app/_pages/home.tsx:293:          eyebrow="Synthetic data showcase"
+/home/z/my-project/src/app/_pages/home.tsx:294:          title="Realistic business telemetry, hypothetical numbers"
+/home/z/my-project/src/app/_pages/home.tsx:295:          description="All numbers below are synthetic. They illustrate how the platform surfaces revenue, channel mix and ingestion throughput to the business."
+/home/z/my-project/src/app/_pages/home.tsx:299:            title="Monthly revenue (£M) — FY25"
+/home/z/my-project/src/app/_pages/home.tsx:301:            badge="Synthetic"
+/home/z/my-project/src/app/_pages/home.tsx:329:                    name="Revenue (£M)"
+/home/z/my-project/src/app/_pages/home.tsx:337:            title="Revenue by channel — £612M FY25"
+/home/z/my-project/src/app/_pages/home.tsx:339:            badge="Synthetic"
+/home/z/my-project/src/app/_pages/home.tsx:380:            title="Daily Bronze ingest (TB) — last 30d"
+/home/z/my-project/src/app/_pages/home.tsx:382:            badge="Synthetic"
+/home/z/my-project/src/app/_pages/home.tsx:410:          eyebrow="Design principles"
+/home/z/my-project/src/app/_pages/home.tsx:411:          title="How the platform stays governed, scalable and trusted"
+/home/z/my-project/src/app/_pages/home.tsx:412:          description="Every architectural decision is anchored to a small set of repeatable principles. They make the platform defensible to auditors, reproducible for engineers and explainable to stakeholders."
+/home/z/my-project/src/app/_pages/home.tsx:416:            title="Single source of truth"
+/home/z/my-project/src/app/_pages/home.tsx:417:            description="Every metric has exactly one canonical definition owned by dbt + the semantic layer — dashboards cannot drift because the SQL cannot drift."
+/home/z/my-project/src/app/_pages/home.tsx:428:            title="Layered, idempotent, observable"
+/home/z/my-project/src/app/_pages/home.tsx:429:            description="Bronze→Silver→Gold plus staging→intermediate→marts→serving. Every layer is rerun-safe, lineage-tracked, and SLA-monitored."
+/home/z/my-project/src/app/_pages/home.tsx:440:            title="Cost-aware & FinOps-driven"
+/home/z/my-project/src/app/_pages/home.tsx:441:            description="Cluster parks autoscale, warehouses suspend in seconds, tables are CLUSTERED and OPTIMIZED on schedule — driving 19% cost / TB reduction YoY."
+/home/z/my-project/src/app/_pages/home.tsx:452:            title="Cloud-first, vendor-agnostic"
+/home/z/my-project/src/app/_pages/home.tsx:453:            description="Azure is primary, AWS as DR — every component is deployable to either cloud using Terraform, so the business avoids lock-in."
+/home/z/my-project/src/app/_pages/architecture.tsx:89:        eyebrow="Reference architecture"
+/home/z/my-project/src/app/_pages/architecture.tsx:90:        title="End-to-end modern data platform"
+/home/z/my-project/src/app/_pages/architecture.tsx:101:        title="Architecture diagram — top to bottom"
+/home/z/my-project/src/app/_pages/architecture.tsx:102:        description="Every box links to a dedicated page with code, metrics and integration details."
+/home/z/my-project/src/app/_pages/architecture.tsx:107:            <ArchBox title="Shopify Plus" subtitle="E-commerce orders + checkouts" tech="REST · CDC" tone="muted" />
+/home/z/my-project/src/app/_pages/architecture.tsx:108:            <ArchBox title="Salesforce CRM" subtitle="Accounts, opportunities, cases" tech="REST · CDC" tone="muted" />
+/home/z/my-project/src/app/_pages/architecture.tsx:109:            <ArchBox title="Stripe + NetSuite" subtitle="Payments + ERP GL" tech="API + JDBC" tone="muted" />
+/home/z/my-project/src/app/_pages/architecture.tsx:110:            <ArchBox title="Snowplow + Adobe" subtitle="Behavioural web events" tech="Kafka · stream" tone="muted" />
+/home/z/my-project/src/app/_pages/architecture.tsx:112:          <ArchArrow label="Fivetran ELT · log-based CDC · schema-on-read" />
+/home/z/my-project/src/app/_pages/architecture.tsx:114:            <ArchBox title="Bronze Delta tables" subtitle="142 tables · 8.4 TB / mo · append-only" tech="Delta Lake" tone="accent" href={hrefFor("databricks")} icon={<Boxes className="h-4 w-4" />} />
+/home/z/my-project/src/app/_pages/architecture.tsx:115:            <ArchBox title="Schema registry" subtitle="Drift PR auto-created" tech="schema" tone="muted" />
+
+[Showing results with pagination = limit: 250]
