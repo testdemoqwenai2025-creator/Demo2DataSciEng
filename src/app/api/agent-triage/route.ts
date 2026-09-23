@@ -12,8 +12,14 @@ import ZAI from "z-ai-web-dev-sdk";
  * Per AGENTIC_WORKFLOW.md design — but collapsed into a single LLM call
  * for the synthetic reference. In production this would be a multi-node
  * LangGraph with read_lineage / sample_rows / classify / auto_fix steps.
+ *
+ * Static-build note: Next.js `output: 'export'` does NOT support API
+ * routes. The deploy workflow (.github/workflows/deploy-pages.yml)
+ * temporarily moves this folder out of `src/app/api/` before the
+ * static build, then restores it. On the static GitHub Pages preview,
+ * fetch("/api/agent-triage") 404s and the dashboard falls back to the
+ * deterministic stub gracefully. On the dev preview the route works.
  */
-
 interface TriageRequest {
   signal: string;
   layer: string;

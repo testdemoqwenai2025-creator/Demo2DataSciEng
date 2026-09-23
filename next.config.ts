@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   trailingSlash: isGitHubPages ? true : false,
   // Don't error on eslint/typescript at build time (we lint separately)
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  // (eslint config option removed — Next.js 16 doesn't support it here;
+  //  eslint runs as its own script via `bun run lint`)
   reactStrictMode: false,
 };
 

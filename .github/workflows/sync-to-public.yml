@@ -19,6 +19,9 @@ permissions:
 jobs:
   mirror:
     runs-on: ubuntu-latest
+    # Only run on the private source-of-truth repo — the synced public copy has
+    # the workflow file too, but SYNC_TO_PUBLIC_PAT secret only exists on private
+    if: ${{ github.repository == 'testdemoqwenai2025-creator/AppDataSci-Advanced' }}
     steps:
       - name: Checkout private source
         uses: actions/checkout@v4

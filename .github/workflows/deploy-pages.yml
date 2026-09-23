@@ -40,10 +40,34 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile || bun install
 
+      - name: Exclude API routes from static build
+        # Next.js `output: export` does NOT support API routes.
+        # Move src/app/api/ out of the build path so the static export succeeds.
+        # The dashboard's fetch to /api/agent-triage will 404 on the static site
+        # — its error handling falls back to a deterministic stub gracefully.
+        # In dev mode (where GITHUB_PAGES is not set), the route is restored
+        # by the developer's local checkout.
+        run: |
+          mkdir -p .api-routes-backup
+          if [ -d src/app/api ]; then
+            mv src/app/api .api-routes-backup/api
+            echo "Moved src/app/api out of build path"
+          fi
+
       - name: Build static export
         env:
           GITHUB_PAGES: "true"
         run: bun run build:static
+
+      - name: Restore API routes (so they remain in the repo)
+        if: always()
+        run: |
+          if [ -d .api-routes-backup/api ] && [ ! -d src/app/api ]; then
+            mkdir -p src/app
+            mv .api-routes-backup/api src/app/api
+            echo "Restored src/app/api"
+          fi
+          rm -rf .api-routes-backup
 
       - name: Add .nojekyll (bypass Jekyll for _next folder)
         run: touch out/.nojekyll
