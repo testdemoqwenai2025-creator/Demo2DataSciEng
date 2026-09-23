@@ -774,3 +774,26 @@ Stage Summary:
 - /mlops-tracing → HTTP 200 (352KB), OpenTelemetry: True, Trace: True, Span: True, Critical: True, SLO: True, Pyodide: True, 3D: True, ADR-029: True
 - Production build succeeded (42 routes total, 1 new)
 - ALL THREE STAGES COMPLETE: diffusion-models (#36) + distributed-training (#37) + mlops-tracing (#38)
+
+---
+Task ID: adr030-quantization-inference-q1
+Agent: Super Z (main)
+Task: Stage 1/4 of "quantization + serving + RAG + multimodal" — ADR-030 (AWQ+GGUF) + Quantization & Inference page (#39). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-030: AWQ 4-bit (GPU default, fits 70B on 1× A100 80GB) + llama.cpp GGUF Q4_K_M (CPU/edge default)
+- Quantization & Inference page (#39):
+  * 3D quantisation grid animation (5 phases: emit FP32 → identify salient channels → snap to INT4 codes → dequantise → show error per cell)
+  * Quantisation math: e(x) = x - dequant(quant(x)), MSE = σ²/12 (uniform), per-group Δ → lower error, NF4 = 16 quantiles of N(0,1) = Lloyd-Max optimal
+  * 5-method comparison table: NF4 (QLoRA, info-optimal for N(0,1)), GPTQ (Hessian layer-wise, 10h for 70B), AWQ (channel scaling, 5min for 70B, default), Q4_K_M (super-blocks, CPU/edge), FP8 (H100 native)
+  * Pyodide NF4 demo: builds 16-level NF4 grid via Φ^(-1) (bisection on normal CDF), quantises 256 weights with group_size=64, compares MSE vs uniform INT4 — NF4 wins ~1.5x
+  * Pyodide AWQ demo: 8×32 Linear + 3 salient channels (50x typical magnitude), grid-search s ∈ [0, 0.5], identifies salient channels, INT4 group quant, shows error analysis on salient vs non-salient
+  * Memory savings ASCII table: 70B Llama across 7 precision levels (FP32 280GB → Q2_K 18GB), with KV cache math (524KB/token × 32k context × 8 users = 128GB → motivates ADR-031 PagedAttention)
+  * Low-level PyTorch: build_nf4_grid() (16 quantiles via torch.erfinv — Φ^(-1)(p) = sqrt(2)·erfinv(2p-1)), quantize_nf4/dequantize_nf4 (group quant with NF4 codebook), AWQLinear nn.Module (quantize() calibrates with activation stats + grid-search s over 20 values, forward() applies channel scaling + dequant + matmul + inverse scaling), Q4_K_M static class (BLOCK_SIZE=256, 4-bit codes + block scales + sub-block mins), benchmark_quantization() comparing all three
+  * 'Quantisation IS lossy compression of a manifold' deeper-thought insight (JPEG DCT 8x8 patches = AWQ channel scaling = VQ-VAE tokeniser = all rate-distortion theory; NF4 = Lloyd-Max optimal scalar quantiser for N(0,1) source; ADR-022 pgvector RaBitQ + ADR-023 QLoRA NF4 + ADR-030 AWQ + DuckDB Parquet Snappy + Arrow columnar = same math at different scales; Medallion architecture IS a multi-stage quantisation pipeline with each layer's codebook tuned to its consumer's perceptual metric)
+
+Stage Summary:
+- HEAD = 00e4b5c on both repos (private + public)
+- 39 pages, 30 ADRs, 36 pages with Pyodide, 3 with WasmRunner
+- /quantization-inference → HTTP 200 (331KB), NF4: True, AWQ: True, GPTQ: True, GGUF: True, Pyodide: True, 3D: True, ADR-030: True
+- Production build succeeded (43 routes total, 1 new)
