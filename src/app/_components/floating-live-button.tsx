@@ -57,6 +57,8 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "model-registry":      { topic: "MLflow model registry versioning staging production archived",      label: "Model Registry", codeRepo: "mlflow/mlflow/main/README.md" },
   "model-monitoring":    { topic: "model monitoring drift detection Evidently NannyML retraining",     label: "Monitoring",     codeRepo: "evidentlyai/evidently/main/README.md" },
   "rag-llms":            { topic: "RAG retrieval augmented generation vector database embeddings LLM", label: "RAG & LLMs",     codeRepo: "langchain-ai/langchain/main/README.md" },
+  "vector-db":           { topic: "pgvector Pinecone Weaviate Qdrant vector database HNSW cosine similarity",  label: "Vector DBs",    codeRepo: "pgvector/pgvector/main/README.md" },
+  "rl-agentic":          { topic: "reinforcement learning Q-learning PPO policy gradient agentic AI agents",  label: "RL & Agents",   codeRepo: "openai/spinningup/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

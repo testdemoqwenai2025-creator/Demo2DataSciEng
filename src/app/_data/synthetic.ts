@@ -592,6 +592,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["onnx", "inference", "model-format", "cross-language", "patterns", "mlops"],
   },
+  {
+    id: "ADR-022",
+    title: "Adopt pgvector as the platform's default vector database for RAG + semantic search",
+    status: "accepted",
+    date: "FY27-Q2",
+    deciders: "Data Platform, ML Engineering, GenAI",
+    context:
+      "ADR-021 adopted ONNX for model serving. The RAG page (#28) showed that Gold tables become vector embeddings for LLM retrieval. But where do the vectors live? Standalone vector DBs (Pinecone, Weaviate, Qdrant) add operational complexity — a new service, new backups, new monitoring. pgvector is a Postgres extension — vectors live inside the existing Postgres instance that already powers the platform. No new infrastructure, no new ops burden, SQL-native querying.",
+    decision:
+      "Adopt pgvector as the platform's default vector database. All RAG embeddings (from Gold table rows) are stored as pgvector columns in Postgres. Cosine similarity search via SQL (ORDER BY embedding <=> query_vector LIMIT k). Pinecone/Weaviate reserved for >100M vector workloads where Postgres isn't enough. Chroma (embedded) for local dev + CI tests.",
+    consequences:
+      "+ Zero new infrastructure — vectors in existing Postgres. + SQL-native — vector search is just a SELECT. + Transactional — vectors + metadata in same table (ACID). + pgvector is OSS (PostgreSQL License). + HNSW index for sub-10ms search. − Postgres isn't optimised for >100M vectors (use Pinecone/Weaviate). − No built-in sharding (partition manually). − HNSW index build time can be slow for large datasets.",
+    alternatives: [
+      "Pinecone (managed SaaS — adds cost + external dependency)",
+      "Weaviate (OSS but separate service — new ops burden)",
+      "Qdrant (OSS Rust-native — fast but separate service)",
+    ],
+    tags: ["pgvector", "vector-db", "rag", "postgres", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

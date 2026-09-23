@@ -34,13 +34,15 @@ export type PageId =
   | "feature-store"
   | "model-registry"
   | "model-monitoring"
-  | "rag-llms";
+  | "rag-llms"
+  | "vector-db"
+  | "rl-agentic";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning";
   icon: string;
   description: string;
 }
@@ -269,6 +271,22 @@ export const PAGES: PageMeta[] = [
     group: "GenAI",
     icon: "Sparkles",
     description: "Vector databases, embeddings, semantic search, how the platform's Gold tables become an LLM knowledge base via RAG.",
+  },
+  {
+    id: "vector-db",
+    label: "Vector Databases — pgvector vs Pinecone vs Weaviate",
+    shortLabel: "Vector DBs",
+    group: "GenAI",
+    icon: "Database",
+    description: "pgvector (ADR-022), Pinecone, Weaviate, Qdrant, Chroma — compared with Pyodide vector operations demo.",
+  },
+  {
+    id: "rl-agentic",
+    label: "Reinforcement Learning & Agentic AI — ISR + 3D Animations",
+    shortLabel: "RL & Agents",
+    group: "Reinforcement Learning",
+    icon: "Brain",
+    description: "Animated RL diagrams, agent-environment loop, Q-learning, policy gradients, ISR (self-refinement), the next stage of agentic workflows.",
   },
 ];
 
