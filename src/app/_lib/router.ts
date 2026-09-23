@@ -47,13 +47,14 @@ export type PageId =
   | "mlops-tracing"
   | "quantization-inference"
   | "inference-serving"
-  | "rag-deep-dive";
+  | "rag-deep-dive"
+  | "multimodal-rag";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG";
   icon: string;
   description: string;
 }
@@ -386,6 +387,14 @@ export const PAGES: PageMeta[] = [
     group: "RAG Deep Dive",
     icon: "Search",
     description: "3D hybrid retrieval pipeline animation, chunking math, BM25 + RRF fusion, cross-encoder re-rank, low-level PyTorch TextSplitter+BM25+RRF+CrossEncoder+HybridRAGRetriever.",
+  },
+  {
+    id: "multimodal-rag",
+    label: "Multi-modal RAG — CLIP, SigLIP, Cross-modal pgvector",
+    shortLabel: "Multi-modal RAG",
+    group: "Multi-modal RAG",
+    icon: "Sparkles",
+    description: "3D shared embedding space animation, CLIP/SigLIP contrastive loss, cross-modal retrieval, low-level PyTorch SigLIPModel+MultiModalRAGRetriever+MultiModalLLM.",
   },
 ];
 
