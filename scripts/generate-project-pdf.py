@@ -185,7 +185,7 @@ story.append(Paragraph("Platform", styles["cover_title"]))
 story.append(Spacer(1, 8 * mm))
 story.append(Paragraph("A scalable, governed data platform — trusted, single-source-of-truth datasets across the business", styles["cover_sub"]))
 story.append(Spacer(1, 6 * mm))
-story.append(Paragraph("Reference architecture · 14 pages · Knowledge Loop", styles["cover_sub"]))
+story.append(Paragraph("Reference architecture · 15 pages · Knowledge Loop", styles["cover_sub"]))
 story.append(Spacer(1, 60 * mm))
 # Cover meta block
 cover_meta_data = [
@@ -308,7 +308,7 @@ layer_table.setStyle(TableStyle([
 story.append(layer_table)
 
 # ---------- 3. THE 14 PAGES ----------
-story.append(Paragraph("3. The Fourteen Pages of the Application", styles["h1"]))
+story.append(Paragraph("3. The Fifteen Pages of the Application", styles["h1"]))
 story.append(Paragraph(
     "The application is a multi-page application (MPA). Every page is dedicated to a specific technology or scope, "
     "addressable by URL hash (#/snowflake, #/databricks, etc.). The first ten pages are the architecture pages — "
