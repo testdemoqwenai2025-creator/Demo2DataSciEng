@@ -303,3 +303,33 @@ Stage Summary:
 - DOM nodes reduced: only 5-6 items render initially instead of 12-13
 - 0 Thompson sampling computation on page mount (only when drawer opens)
 - ARCHITECTURE.md pushed to repo root for future retention
+
+---
+Task ID: adr014-pyodide-3-more-pages
+Agent: Super Z (main)
+Task: ADR-014 (DuckDB as CI engine) + Pyodide "Run in browser" on Snowflake (RBAC validator), Knowledge Hub (ADR validator), Modern Big Data (streaming simulation).
+
+Work Log:
+- ADR-014 added to synthetic.ts ADRS array (now 14 ADRs total):
+  * Title: 'Adopt DuckDB as the platform's CI + local analytical engine'
+  * Status: accepted (FY26-Q4), follow-on to ADR-013
+  * Decision: DuckDB for all dbt CI tests (fast, free, local). Promote to
+    Snowflake/Databricks staging only after DuckDB CI passes.
+  * Consequences: CI costs drop ~90%, instant local dev, reads Iceberg natively
+  * Auto-appears on Knowledge Hub page
+- Pyodide 'Run in browser' added to 3 more pages (was 1 on DuckDB → now 4 total):
+  1. Snowflake page — RBAC grant validator: validates roles have expected
+     privileges, flags unexpected grants. Pure Python stdlib.
+  2. Knowledge Hub — ADR structure validator: validates 3 ADRs (001, 013, 014)
+     have all required fields, valid status enum, list-type alternatives/tags.
+  3. Modern Big Data — Kafka streaming simulation: simulates producer (100 msgs)
+     + consumer group (3 consumers, round-robin) + lag calculation + throughput.
+- All use PyodideRunner (lazy-loaded Wasm from CDN, singleton promise cached)
+
+Stage Summary:
+- HEAD = a4e7732 on both repos
+- Deploy #22 succeeded — all build + deploy steps green
+- Live: Pyodide present on /snowflake, /knowledge, /modern-big-data, /duckdb
+- 14 ADRs total (was 13)
+- 17 pages total
+- 4 pages now have executable code (Pyodide)
