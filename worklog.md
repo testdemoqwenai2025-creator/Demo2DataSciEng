@@ -249,3 +249,57 @@ Stage Summary:
 - Browser test confirms Pyodide executed + produced output (Silver.customer, cust_1 visible in DOM)
 - 17 pages total now (was 16)
 - ADR-013 visible on Knowledge Hub page
+
+---
+Task ID: lazy-evaluation-everywhere
+Agent: Super Z (main)
+Task: Make ContextualBandit lazy (drawer mode), build LazyList component, apply "Show more" pattern to all heavy lists, document ARCHITECTURE.md for retention.
+
+Work Log:
+- LazyList component (src/app/_components/lazy-list.tsx):
+  * Generic reusable: renders first N items + "Show more" button
+  * Lazy evaluation: unrendered items contribute 0 DOM nodes
+  * Props: initialCount (default 5), increment (default 5), autoLoadOnScroll
+    (IntersectionObserver), collapsible, disableWrapper (for tbody rows)
+  * Framer Motion AnimatePresence for smooth expand/collapse
+  * "Showing X of Y" count indicator
+  * Custom showMoreLabel / showLessLabel callbacks
+  * Fixed setState-in-effect via ref + setTimeout deferral
+- ContextualBandit refactored from inline → LAZY DRAWER:
+  * Was: 3 recommendation cards rendered inline at bottom of every page
+    + Thompson sampling ran on every page mount
+  * Now: button at bottom of page → Sheet drawer with 5 recommendations
+    + Thompson sampling only runs when drawer opens
+  * 0 Beta computation on page mount → 0 memory until asked
+  * "Re-sample" button for fresh posterior draws
+  * "Not interested (β+1)" per card
+  * Iteration counter
+  * Lazy bandit state load deferred 500ms after mount (non-blocking)
+- LazyList applied to heavy lists:
+  * Knowledge Hub ADR list: show 5 of 13 + "Show 5 more ADRs" + "Collapse to top 5"
+  * Modern Big Data stack inventory: 6 of 12 + "Show 6 more engines"
+  * Modern Big Data file format cheat sheet: 5 of 9 + "Show 4 more formats"
+  * Modern Big Data free tier matrix: 6 of 12 + "Show 6 more services"
+  * All use disableWrapper (table rows can't have motion.div parent)
+- ARCHITECTURE.md (new file in repo root):
+  * Documents "thin index, lazy depth" core principle
+  * Lazy evaluation hierarchy (7 levels: always render → lazy-load Wasm)
+  * Drawer architecture diagram
+  * Bandit architecture (2 Thompson sampling bandits)
+  * Sync + deploy pipeline diagram
+  * Free-tier + OSS stack list
+  * Future architecture moves
+  * Canonical reference for "should this be inline or in a drawer?" decisions
+- All code + worklog pushed to private repo (sync workflow mirrors to public)
+
+Stage Summary:
+- HEAD = 84ddc6b on both repos
+- Deploy #20 succeeded — all build + deploy steps green
+- Live URLs verified:
+  * /knowledge → 208KB (down from 222KB, ~6% reduction), lazy-list: True, bandit-drawer: True
+  * /modern-big-data → 185KB (down from 191KB, ~3% reduction), lazy-list: True
+  * /duckdb → 164KB, bandit-drawer: True
+  * / → 207KB, bandit-drawer: True (button visible on home)
+- DOM nodes reduced: only 5-6 items render initially instead of 12-13
+- 0 Thompson sampling computation on page mount (only when drawer opens)
+- ARCHITECTURE.md pushed to repo root for future retention
