@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
+import { LiveResearchDrawer } from "../_components/live-research-drawer";
 import { PAPERS, type Paper } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import {
   Quote,
   ArrowRight,
   Filter,
+  Sparkles,
 } from "lucide-react";
 
 const TOPIC_LABELS: Record<Paper["topic"], string> = {
@@ -222,11 +224,21 @@ export function ResearchPage() {
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Implemented in</p>
                 <p className="text-xs text-foreground/80">{selectedPaper.implemented_in}</p>
               </div>
-              <Button asChild size="sm" variant="outline" className="gap-1.5">
-                <a href={selectedPaper.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-3.5 w-3.5" /> Read the paper
-                </a>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline" className="gap-1.5">
+                  <a href={selectedPaper.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-3.5 w-3.5" /> Read the paper
+                  </a>
+                </Button>
+                <LiveResearchDrawer
+                  topic={`${selectedPaper.title.split(":")[0]} ${TOPIC_LABELS[selectedPaper.topic].toLowerCase()}`}
+                  trigger={
+                    <Button size="sm" variant="default" className="gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" /> View live research
+                    </Button>
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>

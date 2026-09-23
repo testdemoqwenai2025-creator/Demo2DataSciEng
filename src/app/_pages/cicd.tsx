@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
+import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { PIPELINES, FINOPS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import {
   Server,
   CheckCircle,
   Workflow,
+  Languages,
 } from "lucide-react";
 import {
   BarChart,
@@ -353,6 +355,141 @@ export function CicdPage() {
           </ul>
         </SectionCard>
       </div>
+
+      {/* Multi-language: Bash + Go + Python CI runners */}
+      <SectionCard
+        title="Multi-language: CI runner in Bash, Go & Python"
+        description="Same audit step in three languages — Bash for ops, Go for performance + single binary, Python for ecosystem access."
+        icon={<Languages className="h-5 w-5" />}
+        badge="3 languages"
+      >
+        <MultiLangSamples
+          title="Snowflake grant audit — Bash, Go, Python"
+          samples={[
+            {
+              language: "bash",
+              filename: "audit_grants.sh",
+              note: "Bash + jq — the ops-friendly default. Runs everywhere, easy to read, but no type safety.",
+              code: `#!/usr/bin/env bash
+# Audit all Snowflake grants — flag any new grants since last run
+set -euo pipefail
+
+LAST_HASH=\${1:-$(cat .last_audit_hash 2>/dev/null || echo "")}
+NEW_HASH=$(snowsql -q "SHOW GRANTS" -o csv | sort | sha256sum | cut -d' ' -f1)
+echo "Current grant hash: $NEW_HASH"
+
+if [[ "$LAST_HASH" != "$NEW_HASH" && -n "$LAST_HASH" ]]; then
+  echo "⚠ Grant drift detected — diffing"
+  diff <(echo "$LAST_HASH") <(echo "$NEW_HASH") || true
+  # Page on-call
+  curl -X POST "$PAGERDUTY_URL" -d "{\\"alert\\": \\"snowflake grant drift\\"}"
+fi
+echo "$NEW_HASH" > .last_audit_hash`,
+              highlight: [4, 5, 6, 8, 9, 10, 11, 12, 13],
+            },
+            {
+              language: "go",
+              filename: "audit_grants.go",
+              note: "Go — single binary, type-safe, fast. Compiled and shipped to CI as a static binary. ~30× faster than the bash version on large accounts.",
+              code: `package main
+
+import (
+        "context"
+        "crypto/sha256"
+        "encoding/hex"
+        "fmt"
+        "os"
+        "sort"
+        "strings"
+
+        "github.com/snowflakedb/gosnowflake"
+)
+
+type Grant struct {
+        Role      string
+        Privilege string
+        Object    string
+        Grantee   string
+}
+
+func auditGrants(ctx context.Context, dsn string) (string, error) {
+        db, err := sql.Open("snowflake", dsn)
+        if err != nil { return "", err }
+        defer db.Close()
+
+        rows, err := db.QueryContext(ctx, "SHOW GRANTS")
+        if err != nil { return "", err }
+        defer rows.Close()
+
+        var grants []Grant
+        for rows.Next() {
+                var g Grant
+                if err := rows.Scan(&g.Role, &g.Privilege, &g.Object, &g.Grantee); err != nil {
+                        return "", err
+                }
+                grants = append(grants, g)
+        }
+        // Sort for deterministic hash
+        sort.Slice(grants, func(i, j int) bool {
+                return grants[i].Role < grants[j].Role
+        })
+        h := sha256.New()
+        for _, g := range grants {
+                h.Write([]byte(fmt.Sprintf("%s|%s|%s|%s", g.Role, g.Privilege, g.Object, g.Grantee)))
+        }
+        return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+func main() {
+        hash, err := auditGrants(context.Background(), os.Getenv("SNOWFLAKE_DSN"))
+        if err != nil { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+        fmt.Println(hash)
+}`,
+              highlight: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 37],
+            },
+            {
+              language: "python",
+              filename: "audit_grants.py",
+              note: "Python — when you need snowflake-connector + pandas + great_expectations in one script. The team's default for ad-hoc audits.",
+              code: `#!/usr/bin/env python3
+"""Audit Snowflake grants; flag drift since last run."""
+import hashlib, json, sys
+from snowflake.connector import connect
+from datetime import datetime, timezone
+
+def audit_grants() -> str:
+    with connect(
+        user=os.environ["SNOWFLAKE_USER"],
+        account=os.environ["SNOWFLAKE_ACCOUNT"],
+        private_key_file=os.environ["SNOWFLAKE_KEY_PATH"],
+    ) as conn:
+        cur = conn.cursor()
+        cur.execute("SHOW GRANTS")
+        rows = sorted([tuple(r) for r in cur.fetchall()])
+        h = hashlib.sha256()
+        for r in rows:
+            h.update("|".join(str(x) for x in r).encode())
+        return h.hexdigest()
+
+if __name__ == "__main__":
+    current = audit_grants()
+    last_path = ".last_audit_hash"
+    try:
+        last = open(last_path).read().strip()
+    except FileNotFoundError:
+        last = ""
+    if last and last != current:
+        print(f"⚠ Drift detected at {datetime.now(timezone.utc).isoformat()}", file=sys.stderr)
+        # Page on-call via PagerDuty
+        # requests.post(...)
+    with open(last_path, "w") as f:
+        f.write(current)
+    print(f"Hash: {current}")`,
+              highlight: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+            },
+          ]}
+        />
+      </SectionCard>
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("home")} className="text-sm text-primary hover:underline">

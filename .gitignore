@@ -74,8 +74,5 @@ tool-results/
 # sandbox dev orchestration scripts (internal)
 .zscripts/
 
-# local helper scripts that contain git PATs at runtime
-scripts/setup-github.sh
-scripts/set-sync-secret.py
-scripts/verify-sync.py
-scripts/create-repos.sh
+# Note: scripts/ is now fully tracked — these are project deliverables,
+# safe to commit (PATs are passed as CLI args at runtime, not hardcoded)

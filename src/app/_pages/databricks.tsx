@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
+import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { MEDALLION_LAYERS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { Boxes, Cpu, Layers, Workflow, Database, Sparkles, GitBranch, ShieldCheck, Activity } from "lucide-react";
+import { Boxes, Cpu, Layers, Workflow, Database, Sparkles, GitBranch, ShieldCheck, Activity, Languages } from "lucide-react";
 
 const PYSPARK_BRONZE = `# ============================================================
 # bronze/silver/customer_conform.py
@@ -330,6 +331,100 @@ export function DatabricksPage() {
           </ul>
         </SectionCard>
       </div>
+
+      {/* Multi-language samples: PySpark vs Scala Spark vs Rust UDF */}
+      <SectionCard
+        title="Multi-language: same Silver conformance in PySpark, Scala & Rust"
+        description="PySpark is the default for analytics engineers. Scala is used for performance-critical jobs. Rust is emerging for vectorised UDFs."
+        icon={<Languages className="h-5 w-5" />}
+        badge="3 languages"
+      >
+        <MultiLangSamples
+          title="Silver customer conformance — three idiomatic implementations"
+          description="The same MERGE logic implemented in PySpark (default), Scala (performant), and Rust (vectorised UDF for hot paths)."
+          samples={[
+            {
+              language: "python",
+              filename: "silver_customer.py",
+              note: "PySpark DLT — the default for analytics engineers. Reads from streams, MERGEs on customer_sk.",
+              code: `import dlt
+from pyspark.sql.functions import col, md5, concat_ws, when, lit, current_timestamp
+
+@dlt.table(name="silver.customer", partition_cols=["region_code"])
+@dlt.expect_or_drop("email_not_null", "customer_email IS NOT NULL")
+def silver_customer():
+    return (
+        spark.readStream.format("delta")
+        .load("/mnt/bronze/salesforce/account")
+        .withColumn("customer_email_hash", md5(col("customer_email")))
+        .withColumn("customer_sk", md5(concat_ws("||", col("customer_email_hash"), col("loaded_at"))))
+        .withColumn("is_active", when(col("status") == "ACTIVE", lit(True)).otherwise(lit(False)))
+    )`,
+              highlight: [4, 5, 6, 7, 8, 9, 10, 11],
+            },
+            {
+              language: "scala",
+              filename: "SilverCustomerConformance.scala",
+              note: "Scala Spark — used for performance-critical batch jobs. Same logic, type-safe, ~15% faster than PySpark on the same cluster.",
+              code: `package com.moderndatascieng.silver
+
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+
+object SilverCustomerConformance {
+  def transform(src: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    src
+      .withColumn("customer_email_hash", md5(lower($"customer_email")))
+      .withColumn("customer_sk", md5(concat_ws("||", $"customer_email_hash", $"loaded_at")))
+      .withColumn("is_active", when($"status" === "ACTIVE", lit(true)).otherwise(lit(false)))
+      .withColumn("loaded_at", current_timestamp())
+      .dropDuplicates("customer_email_hash", "loaded_at")
+  }
+
+  def merge(target: String, src: DataFrame)(implicit spark: SparkSession): Unit = {
+    spark.sql(s"""
+      MERGE INTO $target AS t
+      USING src AS s
+        ON t.customer_sk = s.customer_sk
+      WHEN MATCHED AND s.loaded_at > t.loaded_at THEN UPDATE SET *
+      WHEN NOT MATCHED THEN INSERT *
+    """)
+  }
+}`,
+              highlight: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            },
+            {
+              language: "rust",
+              filename: "pii_redact_udf.rs",
+              note: "Rust UDF — for vectorised regex PII redaction. ~10× faster than SQL UDFs, ~3× faster than Python UDFs. Compiles to Wasm for portability.",
+              code: `// Snowflake external function — Rust implementation
+// Reads a column of strings, redacts PII patterns (SSN, card, email)
+
+use regex::Regex;
+
+#[no_mangle]
+pub extern "C" fn redact_pii(input: &str) -> String {
+    let ssn = Regex::new(r"\b\d{3}-\d{2}-\d{4}\b").unwrap();
+    let card = Regex::new(r"\b\d{16,19}\b").unwrap();
+    let email = Regex::new(r"\b[A-Z][a-z]+@[a-z]+\.(com|org|net)\b").unwrap();
+
+    let mut out = input.to_string();
+    out = ssn.replace_all(&out, "[REDACTED-SSN]").to_string();
+    out = card.replace_all(&out, "[REDACTED-CARD]").to_string();
+    out = email.replace_all(&out, "[REDACTED-EMAIL]").to_string();
+    out
+}
+
+// Compile: \`cargo build --release --target wasm32-wasi\`
+// Deploy: Snowflake External Function via API Gateway + Lambda
+`,
+              highlight: [7, 8, 9, 12, 13, 14, 15, 16, 17],
+            },
+          ]}
+        />
+      </SectionCard>
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("snowflake")} className="text-sm text-primary hover:underline">
