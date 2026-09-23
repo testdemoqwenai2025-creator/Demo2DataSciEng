@@ -630,6 +630,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["lora", "qlora", "fine-tuning", "rlhf", "dpo", "llm", "patterns", "genai"],
   },
+  {
+    id: "ADR-024",
+    title: "Adopt the semantic layer (MetricFlow + RAG + LoRA) as the platform's unified NL-to-SQL interface",
+    status: "accepted",
+    date: "FY27-Q2",
+    deciders: "Data Platform, GenAI, Analytics Engineering",
+    context:
+      "ADR-023 adopted LoRA for domain-specific LLM fine-tuning. ADR-022 adopted pgvector for RAG. ADR-009 adopted MetricFlow as the semantic layer. But these three systems are currently separate: MetricFlow defines metrics, RAG retrieves context, LoRA adapts the model. The next convergence is to unify them: the LLM generates SQL grounded in MetricFlow's semantic entities, with RAG providing the schema context, and LoRA providing the domain-specific phrasing. This is the NL-to-SQL interface — ask 'what was UK revenue last quarter?' and the platform generates, validates, and executes the correct SQL.",
+    decision:
+      "Adopt the unified semantic layer: MetricFlow (metric definitions) + RAG (pgvector schema context) + LoRA (domain-specific SQL generation) as the platform's NL-to-SQL interface. Users ask natural-language questions; the LLM generates SQL grounded in MetricFlow entities, validated against the semantic schema, and executed on Snowflake/DuckDB. The semantic layer prevents hallucinated SQL — the LLM can only reference entities MetricFlow knows about.",
+    consequences:
+      "+ Natural-language query interface for non-technical users. + Grounded SQL — LLM can only reference MetricFlow entities (no hallucinated table/column names). + Validated execution — generated SQL is parsed + tested before running. + Self-correcting — if SQL fails, the error is fed back to the LLM. − Complex pipeline (NL → embed → retrieve → prompt → LoRA → generate SQL → validate → execute). − Latency (3-10s per query vs 0.1s for hand-written SQL). − Requires MetricFlow entities to be comprehensive. − LLM can still produce subtly wrong SQL (e.g. wrong join condition).",
+    alternatives: [
+      "Hand-written SQL only (no NL interface — fails non-technical users)",
+      "Text-to-SQL without semantic grounding (hallucinated table names)",
+      "Pre-canned dashboards only (inflexible — can't ask ad-hoc questions)",
+    ],
+    tags: ["semantic-layer", "metricflow", "rag", "lora", "nl-to-sql", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

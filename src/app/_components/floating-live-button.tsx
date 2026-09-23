@@ -60,6 +60,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "vector-db":           { topic: "pgvector Pinecone Weaviate Qdrant vector database HNSW cosine similarity",  label: "Vector DBs",    codeRepo: "pgvector/pgvector/main/README.md" },
   "rl-agentic":          { topic: "reinforcement learning Q-learning PPO policy gradient agentic AI agents",  label: "RL & Agents",   codeRepo: "openai/spinningup/main/README.md" },
   "fine-tuning":         { topic: "LoRA QLoRA fine-tuning RLHF DPO LLM adaptation low-rank",                label: "Fine-Tuning",   codeRepo: "microsoft/LoRA/main/README.md" },
+  "transformer":         { topic: "transformer self-attention multi-head positional encoding BERT GPT", label: "Transformer",  codeRepo: "pytorch/pytorch/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

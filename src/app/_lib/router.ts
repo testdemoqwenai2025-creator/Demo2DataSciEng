@@ -37,13 +37,14 @@ export type PageId =
   | "rag-llms"
   | "vector-db"
   | "rl-agentic"
-  | "fine-tuning";
+  | "fine-tuning"
+  | "transformer";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer";
   icon: string;
   description: string;
 }
@@ -296,6 +297,14 @@ export const PAGES: PageMeta[] = [
     group: "LLM Training",
     icon: "Cpu",
     description: "Low-rank adaptation math, QLoRA 4-bit quantisation, RLHF vs DPO alignment, Pyodide demo, low-level PyTorch code, Gold tables as training data.",
+  },
+  {
+    id: "transformer",
+    label: "Transformer Architecture Deep Dive",
+    shortLabel: "Transformer",
+    group: "Transformer",
+    icon: "Network",
+    description: "Animated self-attention mechanism, positional encoding visualisation, multi-head attention diagram, Pyodide attention demo, low-level PyTorch code.",
   },
 ];
 
