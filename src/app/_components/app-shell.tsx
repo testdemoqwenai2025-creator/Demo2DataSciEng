@@ -36,6 +36,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Data Mesh", ids: ["data-mesh"] },
   { title: "DataFrames", ids: ["polars"] },
   { title: "Machine Learning", ids: ["ml-platform"] },
+  { title: "Deep Learning", ids: ["neural-networks"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

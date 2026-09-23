@@ -573,6 +573,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["mlflow", "ml", "experiment-tracking", "model-registry", "patterns", "mlops"],
   },
+  {
+    id: "ADR-021",
+    title: "Adopt ONNX as the platform's universal model format for cross-language inference",
+    status: "accepted",
+    date: "FY27-Q1",
+    deciders: "ML Engineering, Data Platform, DevOps",
+    context:
+      "ADR-020 adopted MLflow for experiment tracking + model registry. But models trained in Python (scikit-learn, PyTorch) need to be served in production via Go/Rust/C++ microservices for performance. Python inference is 10-100× slower than native code. ONNX (Open Neural Network Exchange) is a universal model format — train in any framework (PyTorch, TensorFlow, scikit-learn), export to .onnx, serve in any runtime (Python, Go, Rust, Java, C++).",
+    decision:
+      "Adopt ONNX as the platform's universal model format for cross-language inference. All production models are exported from MLflow to ONNX via skl2onnx (scikit-learn) or torch.onnx.export (PyTorch). The same .onnx file runs in Python (onnxruntime), Go (onnxruntime-go), Rust (tract), Java (ONNX Runtime Java), and C++ (ONNX Runtime C++). One model, many serving runtimes.",
+    consequences:
+      "+ Train in Python, serve in Go/Rust/C++ — 10-100× faster inference. + Universal format — no framework lock-in. + MLflow → ONNX export is automated in CI/CD. + Same .onnx file runs in browser via ONNX Runtime Web (Wasm). − ONNX doesn't support every operator (some custom ops need manual implementation). − Conversion step adds CI complexity. − ONNX graph optimisation differs across runtimes (perf varies).",
+    alternatives: [
+      "Python-only inference (slow, GIL-bound, needs Python runtime in prod)",
+      "TorchScript (PyTorch-only — no cross-framework support)",
+      "TensorFlow SavedModel (TF-only — vendor lock-in)",
+    ],
+    tags: ["onnx", "inference", "model-format", "cross-language", "patterns", "mlops"],
+  },
 ];
 
 // ============================================================

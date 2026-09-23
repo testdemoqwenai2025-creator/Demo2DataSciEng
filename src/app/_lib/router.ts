@@ -29,13 +29,14 @@ export type PageId =
   | "patterns"
   | "data-mesh"
   | "polars"
-  | "ml-platform";
+  | "ml-platform"
+  | "neural-networks";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning";
   icon: string;
   description: string;
 }
@@ -224,6 +225,14 @@ export const PAGES: PageMeta[] = [
     group: "Machine Learning",
     icon: "Cpu",
     description: "MLflow tracking + model registry + feature stores + inference patterns. Multi-language training code + Pyodide in-browser model training demo.",
+  },
+  {
+    id: "neural-networks",
+    label: "Neural Networks — From Big Data to LLMs",
+    shortLabel: "Neural Nets",
+    group: "Deep Learning",
+    icon: "Brain",
+    description: "Animated neural network diagrams, activation function equations, backpropagation math, Pyodide forward-pass demo, and the evolution from Hadoop to today's LLMs.",
   },
 ];
 
