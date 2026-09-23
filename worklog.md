@@ -529,3 +529,30 @@ Stage Summary:
 - Deploy #34 succeeded
 - 23 pages, 20 ADRs, 16 pages with Pyodide, 3 with WasmRunner
 - /ml-platform → HTTP 200 (142KB), ML: True, Pyodide: True
+
+---
+Task ID: adr021-neural-networks-page
+Agent: Super Z (main)
+Task: ADR-021 (ONNX) + Neural Networks page (#24) with animated SVG, activation equations, backprop math, Pyodide demo, evolution timeline, Transformer architecture.
+
+Work Log:
+- ADR-021 added (now 21 ADRs): ONNX as universal model format
+- Neural Networks page (#24) — src/app/_pages/neural-networks.tsx:
+  * Animated SVG neural network: 4-layer MLP, Framer Motion signal pulses
+  * 5 activation functions with equations + mini-charts (ReLU/Sigmoid/Tanh/GELU/Softmax)
+  * Backpropagation math: 4 equations (loss, gradient, weight update, error signal)
+  * Pyodide demo: 2-layer MLP forward pass in pure Python (Input(3)→Hidden(4)→Output(2))
+  * Evolution timeline: Hadoop(2006)→Spark(2010)→TF(2014)→Transformer(2017)→Lakehouse(2020)→ChatGPT(2022)→Arrow+Wasm(2024)
+  * Transformer architecture: self-attention equation + multi-head + positional encoding
+  * 'The data pipeline IS the AI pipeline' deeper-thought insight
+  * Multi-language code (4 langs, drawer): Python(numpy), Rust(candle), Scala(Spark MLlib), Go(ONNX)
+  * FloatingLiveButton topic configured
+- Fixed: \${model} in Scala code was being interpolated as JS template literal
+  (ReferenceError during static export) — escaped to \\\${model}
+- Verified: local static build succeeds, all 26 routes generate as static pages
+
+Stage Summary:
+- HEAD = 9b4913d on both repos
+- Deploy #37 succeeded
+- 24 pages, 21 ADRs, 17 pages with Pyodide, 3 with WasmRunner
+- /neural-networks → HTTP 200 (188KB), NN: True, Pyodide: True, Transformer: True
