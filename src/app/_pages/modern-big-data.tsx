@@ -5,6 +5,7 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
+import { LazyList } from "../_components/lazy-list";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -708,26 +709,36 @@ export function ModernBigDataPage() {
               </tr>
             </thead>
             <tbody>
-              {STACK.map((s) => (
-                <tr key={s.name} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
-                  <td className="px-3 py-2">
-                    <p className="font-semibold text-xs">{s.name}</p>
-                    <a
-                      href={`https://github.com/${s.repo}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] text-primary hover:underline font-mono"
-                    >
-                      {s.repo}
-                    </a>
-                  </td>
-                  <td className="px-3 py-2 text-[11px] text-muted-foreground">{s.category}</td>
-                  <td className="px-3 py-2 text-[11px] text-muted-foreground">{s.role}</td>
-                  <td className="px-3 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">{s.free_tier}</td>
-                  <td className="px-3 py-2 text-[11px] text-foreground/80">{s.when}</td>
-                  <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{s.file_types}</td>
-                </tr>
-              ))}
+              <LazyList
+                items={STACK}
+                initialCount={6}
+                increment={6}
+                getKey={(s) => s.name}
+                disableWrapper
+                showMoreLabel={(c) => `Show ${c} more engines`}
+                showLessLabel="Collapse to top 6"
+              >
+                {(s) => (
+                  <tr key={s.name} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
+                    <td className="px-3 py-2">
+                      <p className="font-semibold text-xs">{s.name}</p>
+                      <a
+                        href={`https://github.com/${s.repo}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-primary hover:underline font-mono"
+                      >
+                        {s.repo}
+                      </a>
+                    </td>
+                    <td className="px-3 py-2 text-[11px] text-muted-foreground">{s.category}</td>
+                    <td className="px-3 py-2 text-[11px] text-muted-foreground">{s.role}</td>
+                    <td className="px-3 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">{s.free_tier}</td>
+                    <td className="px-3 py-2 text-[11px] text-foreground/80">{s.when}</td>
+                    <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{s.file_types}</td>
+                  </tr>
+                )}
+              </LazyList>
             </tbody>
           </table>
         </div>
@@ -834,16 +845,26 @@ export function ModernBigDataPage() {
               </tr>
             </thead>
             <tbody>
-              {FILE_FORMATS.map((f) => (
-                <tr key={f.name} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
-                  <td className="px-3 py-2 font-mono text-xs font-semibold">{f.name}</td>
-                  <td className="px-3 py-2 text-[11px] text-muted-foreground">{f.type}</td>
-                  <td className="px-3 py-2 text-[11px] text-muted-foreground">{f.role}</td>
-                  <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{f.used_by}</td>
-                  <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{f.compression}</td>
-                  <td className="px-3 py-2 text-[11px] text-foreground/80">{f.when}</td>
-                </tr>
-              ))}
+              <LazyList
+                items={FILE_FORMATS}
+                initialCount={5}
+                increment={4}
+                getKey={(f) => f.name}
+                disableWrapper
+                showMoreLabel={(c) => `Show ${c} more formats`}
+                showLessLabel="Collapse to top 5"
+              >
+                {(f) => (
+                  <tr key={f.name} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
+                    <td className="px-3 py-2 font-mono text-xs font-semibold">{f.name}</td>
+                    <td className="px-3 py-2 text-[11px] text-muted-foreground">{f.type}</td>
+                    <td className="px-3 py-2 text-[11px] text-muted-foreground">{f.role}</td>
+                    <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{f.used_by}</td>
+                    <td className="px-3 py-2 text-[10px] font-mono text-muted-foreground">{f.compression}</td>
+                    <td className="px-3 py-2 text-[11px] text-foreground/80">{f.when}</td>
+                  </tr>
+                )}
+              </LazyList>
             </tbody>
           </table>
         </div>
@@ -866,13 +887,23 @@ export function ModernBigDataPage() {
               </tr>
             </thead>
             <tbody>
-              {FREE_TIERS.map((t) => (
-                <tr key={t.service} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
-                  <td className="px-3 py-2 text-xs font-semibold">{t.service}</td>
-                  <td className="px-3 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">{t.free}</td>
-                  <td className="px-3 py-2 text-[11px] font-mono text-muted-foreground">{t.link}</td>
-                </tr>
-              ))}
+              <LazyList
+                items={FREE_TIERS}
+                initialCount={6}
+                increment={6}
+                getKey={(t) => t.service}
+                disableWrapper
+                showMoreLabel={(c) => `Show ${c} more services`}
+                showLessLabel="Collapse to top 6"
+              >
+                {(t) => (
+                  <tr key={t.service} className="border-b border-border/40 last:border-0 hover:bg-muted/20">
+                    <td className="px-3 py-2 text-xs font-semibold">{t.service}</td>
+                    <td className="px-3 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">{t.free}</td>
+                    <td className="px-3 py-2 text-[11px] font-mono text-muted-foreground">{t.link}</td>
+                  </tr>
+                )}
+              </LazyList>
             </tbody>
           </table>
         </div>

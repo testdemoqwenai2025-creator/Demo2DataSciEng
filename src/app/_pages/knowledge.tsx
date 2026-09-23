@@ -8,6 +8,7 @@ import { ADRS, PATTERNS, TRADEOFFS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LazyList } from "../_components/lazy-list";
 import { KnowledgeShorts } from "../_components/knowledge-shorts";
 import {
   BookOpen,
@@ -99,12 +100,20 @@ export function KnowledgePage() {
                 </button>
               ))}
             </div>
-            <ul className="space-y-1">
-              {filteredAdrs.map((a) => {
+            {/* LazyList — only renders first 5 ADRs + Show more button */}
+            <LazyList
+              items={filteredAdrs}
+              initialCount={5}
+              increment={5}
+              getKey={(a) => a.id}
+              showMoreLabel={(count) => `Show ${count} more ADRs`}
+              showLessLabel="Collapse to top 5"
+            >
+              {(a) => {
                 const S = STATUS_STYLE[a.status] ?? STATUS_STYLE.accepted;
                 const isActive = a.id === selectedAdr;
                 return (
-                  <li key={a.id}>
+                  <li key={a.id} className="mb-1">
                     <button
                       onClick={() => setSelectedAdr(a.id)}
                       className={`w-full text-left rounded-md p-2.5 transition-colors ${isActive ? "bg-primary/10 border border-primary/40" : "border border-transparent hover:bg-accent"}`}
@@ -124,8 +133,8 @@ export function KnowledgePage() {
                     </button>
                   </li>
                 );
-              })}
-            </ul>
+              }}
+            </LazyList>
           </div>
 
           {/* Right: ADR detail */}
