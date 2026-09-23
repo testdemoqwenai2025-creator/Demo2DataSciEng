@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
 import { PAGES, hrefFor, type PageId } from "../_lib/router";
 import { Sparkles, ArrowRight, X, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -118,41 +117,41 @@ function pickRecommendations(
 export function ContextualBandit({ currentPage }: { currentPage: PageId }) {
   const [recommendations, setRecommendations] = useState<ReturnType<typeof pickRecommendations>>([]);
   const [dismissed, setDismissed] = useState(false);
-  const pathname = usePathname();
 
-  // Initial bandit state — loaded lazily from localStorage on mount (client-side only)
-  // Use useSyncExternalStore to avoid setState-in-effect lint violation
-  const noopSubscribe = () => () => {};
-  const getInitialBandit = () => {
-    if (typeof window === "undefined") return {} as BanditState;
+  // Lazy initializer — runs once on mount (client-side). typeof window guard
+  // ensures SSR returns empty object → no hydration mismatch.
+  const [bandit, setBandit] = useState<BanditState>(() => {
+    if (typeof window === "undefined") return {};
     return loadBandit();
-  };
-  const getServerBandit = () => ({}) as BanditState;
-  const initialBandit = useSyncExternalStore(noopSubscribe, getInitialBandit, getServerBandit);
-  const [bandit, setBandit] = useState<BanditState>(initialBandit);
+  });
+  const [mounted, setMounted] = useState(false);
 
-  // Re-sample recommendations when currentPage or bandit changes
-  // (using a derived state pattern — compute from bandit + currentPage)
+  // Set mounted flag after first render — bandit loads via the lazy initializer above
   useEffect(() => {
-    if (!Object.keys(bandit).length) return;
-    // Schedule re-sample in a microtask to avoid setState-in-effect
-    const timer = setTimeout(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Re-sample recommendations when currentPage or bandit changes (only after mounted)
+  useEffect(() => {
+    if (!mounted || !Object.keys(bandit).length) return;
+    const t = setTimeout(() => {
       setRecommendations(pickRecommendations(currentPage, bandit, 3));
       setDismissed(false);
     }, 0);
-    return () => clearTimeout(timer);
-  }, [currentPage, bandit]);
+    return () => clearTimeout(t);
+  }, [currentPage, bandit, mounted]);
 
   // Mark a page as visited (alpha +1) when the user lands on it
   useEffect(() => {
-    if (!Object.keys(bandit).length || !currentPage) return;
-    const timer = setTimeout(() => {
+    if (!mounted || !Object.keys(bandit).length || !currentPage) return;
+    const t = setTimeout(() => {
       setBandit((prev) => {
         const current = prev[currentPage] ?? { alpha: 1, beta: 1, last_visited: "" };
         const next = {
           ...prev,
           [currentPage]: {
-            alpha: current.alpha + 1, // visiting = "win"
+            alpha: current.alpha + 1,
             beta: current.beta,
             last_visited: new Date().toISOString(),
           },
@@ -161,8 +160,8 @@ export function ContextualBandit({ currentPage }: { currentPage: PageId }) {
         return next;
       });
     }, 0);
-    return () => clearTimeout(timer);
-  }, [currentPage, bandit]);
+    return () => clearTimeout(t);
+  }, [currentPage, bandit, mounted]);
 
   const handleSkip = useCallback((pageId: PageId) => {
     setBandit((prev) => {
