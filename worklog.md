@@ -700,3 +700,29 @@ Stage Summary:
 - 35 pages, 26 ADRs, 31 pages with Pyodide, 3 with WasmRunner
 - /computer-vision → HTTP 200 (305KB), Convolution: True, ViT: True, Pyodide: True, 3D: True, ADR-026: True
 - Production build succeeded (39 routes total, 1 new)
+
+---
+Task ID: adr027-diffusion-models-stage1
+Agent: Super Z (main)
+Task: Stage 1/3 of "diffusion + distributed + MLOps" — ADR-027 (DDPM) + Diffusion Models page (#36). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-027: DDPM (Denoising Diffusion Probabilistic Models) for synthetic image generation
+- Diffusion Models page (#36):
+  * 3D-perspective U-Net + diffusion animation (forward noise injection → reverse denoising, with skip connections + time-embedding injection)
+  * Forward kernel math: q(x_t|x_0) = N(√ᾱ_t·x_0, (1-ᾱ_t)I) — closed-form, no Markov chain needed
+  * Simplified DDPM training loss: ‖ε - ε_θ(√ᾱ_t·x_0 + √(1-ᾱ_t)·ε, t)‖²
+  * Score-matching connection: s_θ = -ε_θ/√(1-ᾱ_t) (noise-prediction ⇔ score function)
+  * Continuous-time SDE: dx = -½β_t·x·dt + √β_t·dw (forward) + reverse-time SDE for sampling
+  * Pyodide forward demo: 3 noise schedules (linear/cosine/quadratic) + SNR computation
+  * Pyodide reverse demo: Langevin dynamics sampling on 2-mode GMM (5 chains converge to ±3 modes)
+  * Classifier-free guidance math: ε̃ = ε_θ(x,t,∅) + w·(ε_θ(x,t,c) - ε_θ(x,t,∅)), w=7.5 typical
+  * Low-level PyTorch: SinusoidalTimeEmbedding, ConvBlock with time-MLP injection, DownBlock/UpBlock with skip connections, full UNet (35M params), DDPM class (q_sample + train_step + sample), DDIM class (10-50x faster sampling), classifier_free_guidance function
+  * 'Diffusion IS thermodynamic reverse' deeper-thought insight (Langevin equation 1908, Boltzmann, second law of thermodynamics — diffusion models run the arrow of time backward)
+- Bug fix: unescaped {t-1} in JSX text caused build failure → wrapped in {"{t-1}"}
+
+Stage Summary:
+- HEAD = cad1e8d on both repos (private + public)
+- 36 pages, 27 ADRs, 33 pages with Pyodide, 3 with WasmRunner
+- /diffusion-models → HTTP 200 (352KB), DDPM: True, DDIM: True, U-Net: True, Pyodide: True, 3D: True, ADR-027: True
+- Production build succeeded (40 routes total, 1 new)
