@@ -92,3 +92,42 @@ Stage Summary:
 - HEAD = 655b838 on both private + public repos (sync workflow #11 skipped correctly on public)
 - Deploy workflow #8 succeeded on public — all build + deploy steps green
 - 24/7/365 public preview now uses clean URLs with the new agentic + adaptive features
+
+---
+Task ID: modern-big-data-page
+Agent: Super Z (main)
+Task: New Modern Big Data page covering BigQuery, DuckDB, Spark Streaming, Flink, Kafka, Pulsar, Iceberg with multi-language code, free tiers, file format cheat sheet, trade-offs, live dataset drawer, and deeper architectural insights.
+
+Work Log:
+- Added 'modern-big-data' PageId to router.ts (new group: "Modern Big Data")
+- Added to AppShell sidebar groups
+- Created src/app/_pages/modern-big-data.tsx (~1070 lines)
+- Created route file src/app/modern-big-data/page.tsx
+- Stack inventory: 12 engines/formats with name, category, role, free tier, when-to-use, file types, GitHub repo
+- Multi-language code samples (7 code blocks across 2 MultiLangSamples):
+  * BigQuery SQL (partition + cluster + BI Engine reservation)
+  * DuckDB SQL (httpfs S3 query, 10× faster than Postgres)
+  * Apache Iceberg SQL (open table format, MERGE, time travel, Nessie branches)
+  * Spark Structured Streaming PySpark (Kafka source → Delta MERGE with watermark)
+  * Flink SQL (event-time + watermark + exactly-once, Avro + Schema Registry)
+  * Kafka Python producer (idempotent, Avro, Schema Registry)
+  * Pulsar Python consumer (geo-replication, Avro schema, Functions)
+- File format cheat sheet: 9 formats (Parquet, ORC, Arrow/Feather, Avro, Protobuf, JSON, Delta, Iceberg, Hudi) with type, role, used-by engines, compression, when-to-use
+- Free tier matrix: 12 services with free tier details + links
+- Trade-off matrices: 4 architectural decisions (Kafka vs Pulsar vs Kinesis; Spark Streaming vs Flink; Delta vs Iceberg vs Hudi; BigQuery vs Snowflake vs ClickHouse)
+- LiveResourcesDrawer wired in — fetches arXiv + GitHub + HF + PwC for 'Apache Kafka Flink Spark streaming big data lakehouse'
+- Two deeper-thought sections:
+  1. The convergence pattern — batch + streaming + warehouse + lakehouse converging. File format > engine.
+  2. Lambda→Kappa evolution is finally winning — single pipeline via Delta CDF + Iceberg snapshots
+- Open standards section — always-open (storage formats) vs acceptable-lock-in (consumption layer)
+- File-format decision tree — Q1-Q4 to pick format in under a minute
+- Deployed to GitHub Pages: deploy #12 succeeded, /modern-big-data returns HTTP 200, all 6 stacks visible
+- Verified via browser: page loads without error, H1 correct, all stacks visible, LiveResourcesDrawer button present
+- ESLint clean
+
+Stage Summary:
+- Live URL: https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/modern-big-data
+- HEAD = ee9297a on both private + public repos
+- 16 pages total now (was 15)
+- New sidebar group "Modern Big Data" with single entry
+- The page is now the most code-heavy page in the platform (~1100 lines of code blocks)
