@@ -16,7 +16,7 @@ import requests, os
 
 FIVETRAN_API = "https://api.fivetran.com/v1"
 HEADERS = {"Authorization": f"Bearer {os.environ['FIVETRAN_API_KEY']}"}
-GROUP_ID   = "northwind_bronze"
+GROUP_ID   = "moderndatascieng_bronze"
 
 def create_connector(system: str, service: str, config: dict) -> str:
     """Create a Fivetran connector inside the Bronze group."""
@@ -41,7 +41,7 @@ def create_connector(system: str, service: str, config: dict) -> str:
 
 # Example: new Shopify Plus store onboarded in minutes
 shopify_cfg = {
-    "domain": "northwind-eu.myshopify.com",
+    "domain": "moderndatascieng-eu.myshopify.com",
     "api_key": "{REDACTED}",
     "sync_mode": "Incremental via Shopify webhook",
 }
@@ -100,7 +100,7 @@ sync:
   source:
     model: vip_loyalty_top_5_percent
     warehouse: WH_GOLD_SERVING
-    database: NORTHWIND_PROD
+    database: MODERNDATASCIENG_PROD
     schema: GOLD
   destination:
     type: salesforce

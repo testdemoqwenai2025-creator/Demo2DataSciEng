@@ -35,7 +35,7 @@ const TERRAFORM = `# ===========================================================
 terraform {
   required_version = ">= 1.6"
   backend "s3" {
-    bucket = "northwind-tfstate"
+    bucket = "moderndatascieng-tfstate"
     key    = "snowflake/prod/terraform.tfstate"
     region = "eu-west-1"
   }
@@ -51,7 +51,7 @@ provider "snowflake" {
 
 # Databases
 resource "snowflake_database" "prod" {
-  name = "NORTHWIND_PROD"
+  name = "MODERNDATASCIENG_PROD"
   comment = "Production analytics database"
 }
 
@@ -92,7 +92,7 @@ resource "snowflake_resource_monitor" "platform" {
   credit_quota  = 12000
   frequency     = "MONTHLY"
   start_timestamp = "IMMEDIATELY"
-  notify_users   = ["DATA_PLATFORM@NORTHWIND.COM"]
+  notify_users   = ["DATA_PLATFORM@MODERNDATASCIENG.COM"]
   triggers {
     on_80_percent  = "NOTIFY"
     on_90_percent  = "SUSPEND"
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production          # gated, manual approval
-      url: https://github.com/northwind/data-platform
+      url: https://github.com/moderndatascieng/data-platform
     env:
       DBT_PROFILES_DIR: transform/dbt
     steps:
@@ -150,7 +150,7 @@ jobs:
         run: cd transform/dbt && dbt docs generate
 
       - name: Publish docs to internal site
-        run: aws s3 sync target/ s3://docs.northwind.data/dbt/ --delete
+        run: aws s3 sync target/ s3://docs.moderndatascieng.data/dbt/ --delete
 
       - name: Notify Slack
         run: |

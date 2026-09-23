@@ -44,7 +44,7 @@
 }
 
 :root {
-  /* Northwind Data Platform palette — sophisticated enterprise data theme */
+  /* ModernDataSciEng Platform palette — sophisticated enterprise data theme */
   --radius: 0.5rem;
   --background: oklch(0.99 0.002 95);
   --foreground: oklch(0.18 0.01 240);

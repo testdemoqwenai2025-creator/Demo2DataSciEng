@@ -15,7 +15,7 @@ import { CicdPage } from "./_pages/cicd";
 import { AboutPage } from "./_pages/about";
 
 /**
- * Northwind Data Platform — MPA entry point.
+ * ModernDataSciEng Platform — MPA entry point.
  *
  * Pages are routed via URL hash (#/snowflake, #/databricks, ...) so that the
  * sandbox single-route constraint is respected while delivering a true

@@ -95,7 +95,7 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
             N
           </div>
           <div className="hidden md:flex flex-col leading-tight min-w-0">
-            <p className="text-xs text-muted-foreground truncate">Northwind Data Platform</p>
+            <p className="text-xs text-muted-foreground truncate">ModernDataSciEng Platform</p>
             <p className="text-sm font-semibold truncate">Trusted, governed analytics at scale</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ function FooterContent({ compact = false }: { compact?: boolean }) {
     <div className={compact ? "space-y-2" : "max-w-[1400px] mx-auto w-full space-y-3"}>
       <div className={compact ? "" : "flex flex-col md:flex-row items-start md:items-center justify-between gap-3"}>
         <div className="space-y-1">
-          <p className="font-medium text-foreground">© Northwind Retail Ltd · Synthetic data platform reference architecture</p>
+          <p className="font-medium text-foreground">© ModernDataSciEng Ltd · Synthetic data platform reference architecture</p>
           <p className="text-[11px]">Built with Snowflake · Databricks · dbt · Tableau · Airflow · Fivetran · Hightouch</p>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
@@ -182,7 +182,7 @@ export function AppShell({ active, children }: AppShellProps) {
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-mono text-sm font-bold">
                   N
                 </div>
-                <p className="text-sm font-semibold">Northwind Data Platform</p>
+                <p className="text-sm font-semibold">ModernDataSciEng Platform</p>
               </div>
               <div className="ml-auto flex items-center gap-2">
                 <Button asChild variant="outline" size="sm" className="gap-1.5">
@@ -211,7 +211,7 @@ export function AppShell({ active, children }: AppShellProps) {
                 N
               </div>
               <div className="flex flex-col leading-tight">
-                <p className="text-xs text-muted-foreground">Northwind</p>
+                <p className="text-xs text-muted-foreground">ModernDataSciEng</p>
                 <p className="text-sm font-semibold">Data Platform</p>
               </div>
             </Link>

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Northwind Data Platform · Trusted, governed analytics at scale",
+  title: "ModernDataSciEng Platform · Trusted, governed analytics at scale",
   description:
     "A synthetic reference implementation of a scalable, governed data platform spanning Snowflake, Databricks, dbt, Tableau, Fivetran, Hightouch, Airflow and Unity Catalogue — built around single-source-of-truth datasets.",
   keywords: [
@@ -35,16 +35,16 @@ export const metadata: Metadata = {
     "Lakehouse",
     "PySpark",
   ],
-  authors: [{ name: "Northwind Data Platform" }],
+  authors: [{ name: "ModernDataSciEng Platform" }],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
-    title: "Northwind Data Platform",
+    title: "ModernDataSciEng Platform",
     description:
       "Synthetic reference architecture for a scalable, governed, single-source-of-truth data platform.",
     url: "https://chat.z.ai",
-    siteName: "Northwind",
+    siteName: "ModernDataSciEng",
     type: "website",
   },
 };

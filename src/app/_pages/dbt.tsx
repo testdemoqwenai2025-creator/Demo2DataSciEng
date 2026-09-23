@@ -212,7 +212,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DBT_PROFILES_DIR: transform/dbt
-      DBT_STATE_BUCKET: s3://northwind-dbt-state
+      DBT_STATE_BUCKET: s3://moderndatascieng-dbt-state
     steps:
       - uses: actions/checkout@v4
         with:
@@ -440,7 +440,7 @@ export function DbtPage() {
       <div className="grid md:grid-cols-3 gap-4">
         <SectionCard title="dbt docs" icon={<FileText className="h-5 w-5" />}>
           <ul className="text-sm space-y-1.5 text-muted-foreground">
-            <li>• Auto-generated site: docs.northwind.data</li>
+            <li>• Auto-generated site: docs.moderndatascieng.data</li>
             <li>• 94% model description coverage</li>
             <li>• Search by column, metric, source</li>
             <li>• Stakeholder-facing pages per exposure</li>

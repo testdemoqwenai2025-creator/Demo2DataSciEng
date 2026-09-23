@@ -1,6 +1,6 @@
-# Northwind Data Platform
+# ModernDataSciEng Platform
 
-A scalable, governed data platform reference architecture — built as a multi-page application (MPA) showcasing a complete, single-source-of-truth analytics stack for a hypothetical omnichannel retailer (Northwind Retail Ltd).
+A scalable, governed data platform reference architecture — built as a multi-page application (MPA) showcasing a complete, single-source-of-truth analytics stack for a hypothetical omnichannel retailer (ModernDataSciEng Ltd).
 
 > **Synthetic data disclaimer:** every number, schema, pipeline, dashboard and business name in this reference is **synthetic and hypothetical**. No real personal data is processed, stored or transmitted. See the in-app **About & Compliance** page for full GDPR details.
 
@@ -55,4 +55,4 @@ bun run lint
 
 ## Licence
 
-Reference / educational use. Synthetic data only. © Northwind Retail Ltd (fictional).
+Reference / educational use. Synthetic data only. © ModernDataSciEng Ltd (fictional).

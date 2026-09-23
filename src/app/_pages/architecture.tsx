@@ -88,7 +88,7 @@ export function ArchitecturePage() {
       <PageHeader
         eyebrow="Reference architecture"
         title="End-to-end modern data platform"
-        description={`The Northwind platform is built as four logical planes — sources, lakehouse, serving warehouse and consumption — wired together with orchestration, governance and CI/CD. The diagram below is the canonical reference used by every engineering and analyst team at ${COMPANY.name}.`}
+        description={`The ModernDataSciEng platform is built as four logical planes — sources, lakehouse, serving warehouse and consumption — wired together with orchestration, governance and CI/CD. The diagram below is the canonical reference used by every engineering and analyst team at ${COMPANY.name}.`}
         right={
           <Badge variant="outline" className="gap-1.5">
             <Cloud className="h-3 w-3" /> Azure primary · AWS DR
@@ -245,7 +245,7 @@ export function ArchitecturePage() {
             <li>• Monte Carlo freshness + volume anomaly detection</li>
             <li>• Datadog dashboards for SLA & cost</li>
             <li>• PagerDuty on-call for P0/P1 incidents</li>
-            <li>• Status page (internal): data.northwind.health</li>
+            <li>• Status page (internal): data.moderndatascieng.health</li>
           </ul>
         </SectionCard>
         <SectionCard

@@ -1,9 +1,9 @@
 /**
- * Synthetic reference data for the Northwind Retail Data Platform.
+ * Synthetic reference data for the ModernDataSciEng Retail Data Platform.
  *
  * All numbers, schemas, pipelines and dashboards below are HYPOTHETICAL and
  * synthetic — designed to illustrate the architecture, not to reflect any
- * real company. Northwind Retail Ltd. is a fictional omnichannel retailer.
+ * real company. ModernDataSciEng Ltd. is a fictional omnichannel retailer.
  *
  * Headline business (synthetic):
  *   - 4.2M customers across 9 markets
@@ -13,7 +13,7 @@
  */
 
 export const COMPANY = {
-  name: "Northwind Retail Ltd",
+  name: "ModernDataSciEng Ltd",
   tagline: "Omnichannel retail · 9 markets · 218 stores",
   fiscalYear: "FY25",
   started: "FY19",
@@ -77,7 +77,7 @@ export const MEDALLION_LAYERS = [
   {
     layer: "Bronze",
     purpose: "Raw ingest, append-only, schema-on-read",
-    location: "s3://northwind-bronze/",
+    location: "s3://moderndatascieng-bronze/",
     format: "Delta (raw)",
     tables: 142,
     volume: "8.4 TB / mo",
@@ -86,7 +86,7 @@ export const MEDALLION_LAYERS = [
   {
     layer: "Silver",
     purpose: "Conformed, deduplicated, validated, joined to dims",
-    location: "s3://northwind-silver/",
+    location: "s3://moderndatascieng-silver/",
     format: "Delta (managed, OPTIMISE every 2h)",
     tables: 86,
     volume: "3.1 TB / mo",
@@ -95,7 +95,7 @@ export const MEDALLION_LAYERS = [
   {
     layer: "Gold",
     purpose: "Business-level aggregates, dimensional marts, ML features",
-    location: "s3://northwind-gold/ + Snowflake SERVING",
+    location: "s3://moderndatascieng-gold/ + Snowflake SERVING",
     format: "Delta + Snowflake tables",
     tables: 54,
     volume: "0.6 TB / mo",
@@ -157,11 +157,11 @@ export const OBSERVABILITY = [
 
 /** Unity Catalogue grants */
 export const UNITY_GRANTS = [
-  { principal: "data_engineers", object: "catalog.northwind_bronze", grants: "READ, WRITE", type: "Group" },
-  { principal: "analysts_uk", object: "catalog.northwind_gold.sales", grants: "SELECT", type: "Group" },
-  { principal: "dbt_service", object: "catalog.northwind_silver", grants: "USE, READ, WRITE", type: "Service Principal" },
-  { principal: "compliance", object: "catalog.northwind_gold.sales.pii", grants: "SELECT (with tag PII=true)", type: "Group" },
-  { principal: "ml_platform", object: "catalog.northwind_ml.features", grants: "READ, WRITE, CREATE MODEL", type: "Group" },
+  { principal: "data_engineers", object: "catalog.moderndatascieng_bronze", grants: "READ, WRITE", type: "Group" },
+  { principal: "analysts_uk", object: "catalog.moderndatascieng_gold.sales", grants: "SELECT", type: "Group" },
+  { principal: "dbt_service", object: "catalog.moderndatascieng_silver", grants: "USE, READ, WRITE", type: "Service Principal" },
+  { principal: "compliance", object: "catalog.moderndatascieng_gold.sales.pii", grants: "SELECT (with tag PII=true)", type: "Group" },
+  { principal: "ml_platform", object: "catalog.moderndatascieng_ml.features", grants: "READ, WRITE, CREATE MODEL", type: "Group" },
 ];
 
 /** CI/CD pipelines */

@@ -23,7 +23,7 @@ const UNITY_TAGS = `-- =========================================================
 -- Unity Catalogue — apply PII tags + RBAC
 -- Managed via Terraform / schemachange
 -- ============================================================
-CREATE CATALOG IF NOT EXISTS northwind_govern;
+CREATE CATALOG IF NOT EXISTS moderndatascieng_govern;
 
 -- Tag-based PII classification (consumed by BI + Hightouch + ML)
 CREATE TAG IF NOT EXISTS pii;
@@ -32,14 +32,14 @@ CREATE TAG IF NOT EXISTS pii.phone;
 CREATE TAG IF NOT EXISTS pii.finance;
 
 -- Apply tags to columns
-ALTER TABLE catalog.northwind_gold.sales.dim_customer
+ALTER TABLE catalog.moderndatascieng_gold.sales.dim_customer
   ALTER COLUMN customer_email_hash SET TAG ('pii' = 'true', 'pii.email' = 'true');
 
-ALTER TABLE catalog.northwind_gold.sales.fct_orders
+ALTER TABLE catalog.moderndatascieng_gold.sales.fct_orders
   ALTER COLUMN order_net_amount_gbp SET TAG ('pii.finance' = 'true');
 
 -- Dynamic view redaction for sensitive columns
-CREATE OR REPLACE VIEW catalog.northwind_gold.sales.dim_customer_masked AS
+CREATE OR REPLACE VIEW catalog.moderndatascieng_gold.sales.dim_customer_masked AS
 SELECT
   customer_sk,
   customer_id,
@@ -52,16 +52,16 @@ SELECT
   region_code,
   loyalty_tier,
   is_active
-FROM catalog.northwind_gold.sales.dim_customer;
+FROM catalog.moderndatascieng_gold.sales.dim_customer;
 
 -- Grant access — group-scoped, role-inherited
-GRANT USE CATALOG  ON CATALOG northwind_gold              TO GROUP analysts_uk;
-GRANT USE SCHEMA   ON SCHEMA northwind_gold.sales          TO GROUP analysts_uk;
+GRANT USE CATALOG  ON CATALOG moderndatascieng_gold              TO GROUP analysts_uk;
+GRANT USE SCHEMA   ON SCHEMA moderndatascieng_gold.sales          TO GROUP analysts_uk;
 GRANT SELECT       ON VIEW  dim_customer_masked           TO GROUP analysts_uk;
 
 -- Audit log to Datadog via S3 event log
 CREATE EXTERNAL LOCATION IF NOT EXISTS bronze_raw
-  URL 's3://northwind-bronze/'
+  URL 's3://moderndatascieng-bronze/'
   WITH (CREDENTIAL \`azure_service_principal\`);
 `;
 
@@ -72,23 +72,23 @@ event:
   eventType: COMPLETE
   runId: "run-7c2f1a9c-..."
   job:
-    namespace: northwind
+    namespace: moderndatascieng
     name: dbt.fct_orders
     facets:
       sql:
         query: "SELECT * FROM silver_orders JOIN dim_customer ..."
       dataSource:
         name: snowflake
-        uri: northwind_prod
+        uri: moderndatascieng_prod
   inputs:
-    - namespace: northwind
-      name: catalog.northwind_silver.sales.silver_orders
+    - namespace: moderndatascieng
+      name: catalog.moderndatascieng_silver.sales.silver_orders
       facets:
         schema:
           fields: [{name: order_id, type: varchar}, {name: customer_sk, type: varchar}]
   outputs:
-    - namespace: northwind
-      name: catalog.northwind_gold.sales.fct_orders
+    - namespace: moderndatascieng
+      name: catalog.moderndatascieng_gold.sales.fct_orders
       facets:
         schema:
           fields: [{name: order_id, type: varchar}, {name: order_total, type: number}]
@@ -105,7 +105,7 @@ const OBSERVABILITY_DQ = `# Monte Carlo monitor — freshness + volume + schema 
 monitors:
   - name: fct_orders_freshness
     type: freshness
-    table: catalog.northwind_gold.sales.fct_orders
+    table: catalog.moderndatascieng_gold.sales.fct_orders
     rule: less_than
     threshold_minutes: 30
     severity: critical
@@ -113,7 +113,7 @@ monitors:
 
   - name: silver_customer_volume_anomaly
     type: volume
-    table: catalog.northwind_silver.sales.silver_customer
+    table: catalog.moderndatascieng_silver.sales.silver_customer
     rule: relative_change
     baseline: 7day_rolling_avg
     threshold_pct: -25          # > 25% drop → alert
@@ -122,7 +122,7 @@ monitors:
 
   - name: dim_product_schema_drift
     type: schema
-    table: catalog.northwind_gold.sales.dim_product
+    table: catalog.moderndatascieng_gold.sales.dim_product
     rule: any_change
     severity: info
     notification: github:schema-registry-pr

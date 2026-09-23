@@ -82,7 +82,7 @@ const DELTA_SQL = `-- ==========================================================
 -- Optimise for predicate pushdown on hot columns
 CREATE TABLE IF NOT EXISTS silver.order_line
 USING DELTA
-LOCATION 's3://northwind-silver/sales/order_line'
+LOCATION 's3://moderndatascieng-silver/sales/order_line'
 PARTITIONED BY (order_date_sk)
 CLUSTERED BY (customer_sk, product_sk)
 TBLPROPERTIES (

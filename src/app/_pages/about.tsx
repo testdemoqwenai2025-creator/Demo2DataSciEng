@@ -285,7 +285,7 @@ export function AboutPage() {
           <div className="rounded-md border border-border/60 p-4">
             <Users className="h-4 w-4 text-primary mb-2" />
             <p className="text-xs text-muted-foreground mb-1">Team</p>
-            <p className="text-sm">Northwind Data Platform Engineering</p>
+            <p className="text-sm">ModernDataSciEng Platform Engineering</p>
             <p className="text-[11px] text-muted-foreground">Synthetic reference team · {COMPANY.fiscalYear}</p>
           </div>
         </div>

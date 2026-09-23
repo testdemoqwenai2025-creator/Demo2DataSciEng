@@ -1,5 +1,5 @@
 /**
- * Hash-based router for the Northwind Data Platform MPA.
+ * Hash-based router for the ModernDataSciEng Platform MPA.
  * Simulates a true multi-page application within the sandbox single-route constraint.
  * Each "page" is addressed by its hash: e.g. #/snowflake, #/databricks.
  */
@@ -33,7 +33,7 @@ export const PAGES: PageMeta[] = [
     shortLabel: "Overview",
     group: "Overview",
     icon: "LayoutDashboard",
-    description: "Single source of truth across the Northwind business — value, KPIs and end-to-end picture.",
+    description: "Single source of truth across the ModernDataSciEng business — value, KPIs and end-to-end picture.",
   },
   {
     id: "architecture",
