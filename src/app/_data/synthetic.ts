@@ -968,6 +968,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["cryo-em", "relion", "cryosparc", "cryodrgn", "fourier", "ctf", "radon-transform", "projection-slice", "vae", "patterns", "genai"],
   },
+  {
+    id: "ADR-041",
+    title: "Adopt Visium + MERFISH + STAGATE for spatial transcriptomics — gene expression with spatial context",
+    status: "accepted",
+    date: "FY31-Q2",
+    deciders: "Data Platform, Genomics, Bioinformatics, Architecture",
+    context:
+      "ADR-037 covered genetics (DNA/RNA/CRISPR/GWAS). ADR-039 covered systems biology (multi-omics integration). Spatial transcriptomics is the missing modality — measuring RNA in tissue with sub-cellular spatial coordinates, revealing tissue organisation at single-cell resolution. Three commercial platforms compete: (1) 10x Visium (Ståhl 2016) — 5000 spots/array, 55μm diameter, ~10-50 cells per spot, full transcriptome (20K genes). (2) MERFISH (Chen 2015) — combinatorial barcoding, 4 base × 16 rounds = 4^16 = 4 billion barcodes, ~1000 genes, 10K-100K cells per slide at sub-cellular (200nm) resolution. (3) Stereo-seq (Chen 2022, BGI) — DNA nanoball on chip, 500nm resolution, full transcriptome, 1cm × 1cm area, ~10⁷ cells per slide. Three core algorithms are needed: (1) Cell segmentation via U-Net (Ronneberger 2015) on DAPI-stained nuclei images — instance segmentation with morphology constraints. (2) Spatial domain detection via graph attention autoencoders (STAGATE, Dong 2022) — k-nearest spatial neighbours + GAT layers for embedding. (3) Cell-cell communication via NicheNet (Browaeys 2019) — ligand-receptor inference with prior knowledge network. The math: combinatorial barcodes have 4^N possible codes for N rounds × 4 fluorophores; gene expression at position (x, y) is a vector in R^20K; spatial neighbour graph is a sparse matrix; U-Net = encoder-decoder with skip connections (same architecture as in ADR-034 cryo-EM but for 2D segmentation).",
+    decision:
+      "Adopt a three-layer spatial transcriptomics stack: (1) Wet-lab: 10x Visium for full-transcriptome discovery (5000 spots/array, ~10 cells/spot), MERFISH for targeted high-resolution (1000 genes, 10K cells/slide at sub-cellular), Stereo-seq for highest resolution (500nm, 10⁷ cells). (2) Image analysis: cell segmentation via StarDist (Schmidt 2018, U-Net + star-convex polygons) on DAPI + mRNA puncta. (3) Downstream: STAGATE for spatial domain detection, NicheNet for ligand-receptor cell-cell communication, spatial domain visualisation on tissue cross-section. Storage: cell × gene matrix + cell metadata (x, y, morphological features) → Parquet via Spark (same pattern as ADR-037 gVCF). Connects to ADR-039 multi-omics: spatial transcriptomics adds the spatial modality to MOFA+ integration. Connects to ADR-034 bioinformatics: cell type annotation via scVI / ESM-2-like protein expression embedding → pgvector. Connects to ADR-022 pgvector: 20K-dim gene expression vectors per cell, HNSW for cell similarity search by transcriptional profile.",
+    consequences:
+      "+ Captures spatial context lost in dissociated scRNA-seq — tissue architecture preserved. + MERFISH sub-cellular resolution reveals RNA localisation (nucleus vs cytoplasm vs membrane). + STAGATE identifies spatially coherent domains (cortex layers, tumour regions). + NicheNet identifies ligand-receptor pairs driving cell-cell communication. + Connects to ADR-039 systems biology — spatial multi-omics integration. − 10x Visium spot resolution (~10 cells) is coarse — single-cell methods (MERFISH, Stereo-seq) preferred. − Cell segmentation on noisy tissue images is hard (F1 score ~0.85 best). − Combinatorial barcode errors (1-2% per round) limit MERFISH gene count (~1000). − Stereo-seq data volume is huge (10⁷ cells × 20K genes = 2 × 10¹¹ entries) — needs Spark.",
+    alternatives: [
+      "Slide-seq (Rodriques 2019) — 10μm beads, lower throughput than Visium",
+      "DBiT-seq (Liu 2020) — microfluidic barcoding, less mature",
+      ".seqFISH+ (Eng 2019) — similar to MERFISH, less commercial support",
+      "Standard scRNA-seq + computational deconvolution — loses spatial info entirely",
+    ],
+    tags: ["spatial-transcriptomics", "visium", "merfish", "stereo-seq", "stagate", "nichenet", "u-net", "combinatorial-barcoding", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

@@ -78,6 +78,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "macro-structures":          { topic: "protein structure Ramachandran Michaelis-Menten enzyme kinetics glycan WURCS lipid LIPID MAPS AlphaFold DB",      label: "Macro Structures", codeRepo: "dptech-corp/Uni-Mol/main/README.md" },
   "systems-biology":           { topic: "systems biology FBA flux balance analysis metabolic network PPI STRING multi-omics MOFA whole-cell COBRApy",      label: "Systems Biology", codeRepo: "opencobra/cobrapy/main/README.md" },
   "cryo-em":                    { topic: "cryo-EM RELION CryoSPARC cryoDRGN Fourier projection-slice CTF Radon transform single particle analysis",      label: "Cryo-EM",        codeRepo: "structuremlucsb/cryodrgn/main/README.md" },
+  "spatial-transcriptomics":    { topic: "spatial transcriptomics Visium MERFISH Stereo-seq STAGATE NicheNet combinatorial barcoding U-Net cell segmentation",      label: "Spatial Tx",    codeRepo: "theislab/stlearn/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

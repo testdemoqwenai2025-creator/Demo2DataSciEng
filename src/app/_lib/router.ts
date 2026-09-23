@@ -55,13 +55,14 @@ export type PageId =
   | "genetic-materials"
   | "macro-structures"
   | "systems-biology"
-  | "cryo-em";
+  | "cryo-em"
+  | "spatial-transcriptomics";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics";
   icon: string;
   description: string;
 }
@@ -458,6 +459,14 @@ export const PAGES: PageMeta[] = [
     group: "Cryo-EM",
     icon: "Atom",
     description: "AI-generated illustrations + projection-slice short, 2D FFT + CTF correction + Radon transform + FSC resolution, RELION/CryoSPARC/cryoDRGN papers, 24h HPC pipeline, low-level PyTorch fft2+CTFCorrection+CryoEM2DClassifier+CryoDRGN VAE.",
+  },
+  {
+    id: "spatial-transcriptomics",
+    label: "Spatial Transcriptomics — Visium, MERFISH, STAGATE, NicheNet",
+    shortLabel: "Spatial Transcriptomics",
+    group: "Spatial Transcriptomics",
+    icon: "Grid",
+    description: "AI-generated illustrations + combinatorial barcode short, MERFISH 4¹⁶ codebook + Hamming error correction, U-Net cell segmentation, STAGATE graph attention autoencoder, NicheNet ligand-receptor, low-level PyTorch MERFISHDecoder+UNet+STAGATE+NicheNet.",
   },
 ];
 
