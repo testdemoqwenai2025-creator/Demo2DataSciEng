@@ -205,3 +205,47 @@ Stage Summary:
   clicking opens drawer with correct topic ('Apache Spark Delta Lake Lakehouse Databricks')
 - Live on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/databricks
 - Now every page (except home) has a persistent floating button → universal access to live research data
+
+---
+Task ID: adr013-duckdb-page-pyodide
+Agent: Super Z (main)
+Task: ADR-013 (Iceberg commitment) + DuckDB page (#17) + PyodideRunner (executable code in browser).
+
+Work Log:
+- ADR-013 added to synthetic.ts ADRS array:
+  * Title: 'Commit to Apache Iceberg as the platform's primary open table format'
+  * Status: accepted (FY26-Q3)
+  * Decision: Iceberg primary for new Bronze/Silver; Delta stays default on Databricks-only workloads (with UniForm to expose as Iceberg); Hudi held for CDC-heavy upserts only
+  * Auto-appears on Knowledge Hub page (12 → 13 ADRs)
+- New 'duckdb' PageId in router.ts; new 'Databases' sidebar group in AppShell
+- DuckDB page created (src/app/_pages/duckdb.tsx + src/app/duckdb/page.tsx):
+  * 4 KPIs: 10× Postgres perf, ~30MB binary, file formats read, MIT OSS license
+  * 4 multi-language code samples in drawer mode (Python/SQL/Rust/Go) — all embedding DuckDB as a library
+  * 4 primary use cases: notebook analytics, CI tests for dbt, edge processing, MotherDuck
+  * DuckDB vs Postgres vs Spark comparison table (7 aspects)
+  * File formats read natively (Parquet/Arrow/ORC, CSV/JSON/Excel, Iceberg/Delta/SQLite)
+  * Two deeper-thought sections (laptop-scale big data; Arrow as lingua franca)
+  * 'Try DuckDB in 30 seconds' code block + executable Pyodide demo
+  * FloatingLiveButton topic configured: 'DuckDB in-process OLAP analytical SQL Parquet Arrow'
+- PyodideRunner component (src/app/_components/pyodide-runner.tsx):
+  * Lazy-loads Pyodide (Python in WebAssembly) from jsdelivr CDN on first click
+  * ~10MB initial download; cached in module-level variable (singleton promise shared across instances)
+  * Captures stdout/stderr, renders in dark terminal-style output panel
+  * States: idle → loading → running → done/error
+  * Shows runtime load time (e.g. 'Runtime: 3400ms load + execution')
+  * Works on static GitHub Pages (pure client-side Wasm, no backend)
+- Wired PyodideRunner into DuckDB page — 'Try it in your browser — no install' section:
+  * Pure Python stdlib (hashlib, datetime) — demonstrates the same Silver conformance logic as the PySpark sample
+  * First click loads Pyodide; prints the conformed Silver table to the output panel
+  * Output shows: customer_sk, customer_id, email_hash, is_active, region_code for 4 synthetic customers
+
+Stage Summary:
+- HEAD = de7a84b on both repos
+- Deploy #18 succeeded — all build + deploy steps green
+- Live URL: https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/duckdb → HTTP 200, 159KB
+- Page loads without error
+- H1: 'DuckDB — Laptop-scale Big Data'
+- Pyodide 'Run in browser (Pyodide)' button present
+- Browser test confirms Pyodide executed + produced output (Silver.customer, cust_1 visible in DOM)
+- 17 pages total now (was 16)
+- ADR-013 visible on Knowledge Hub page
