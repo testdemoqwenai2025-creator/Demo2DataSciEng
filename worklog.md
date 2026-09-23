@@ -365,3 +365,41 @@ Stage Summary:
 - Deploy #24 succeeded — all build + deploy steps green
 - All 18 routes return HTTP 200
 - 7 pages with Pyodide: /duckdb, /snowflake, /knowledge, /modern-big-data, /databricks, /governance, /evolution, /streaming (8 actually — streaming has its own Pyodide too!)
+
+---
+Task ID: adr016-arrow-page-wasmrunner
+Agent: Super Z (main)
+Task: ADR-016 (Wasm universal runtime) + Apache Arrow page (#19) + WasmRunner component (executable Rust/C via WebAssembly).
+
+Work Log:
+- ADR-016 added to synthetic.ts (now 16 ADRs):
+  * Title: 'Adopt WebAssembly as the platform's universal in-browser execution runtime'
+  * Status: accepted (FY26-Q4), follow-on to ADR-015 (Pyodide)
+  * Decision: Wasm is universal runtime for all 7 languages. Pyodide for Python
+    (done). Wasmtime for Rust/C (wasm32-wasi). Go compiles natively. WebContainer
+    for Node/TS (future). WasmRunner loads any .wasm binary.
+- Apache Arrow page (#19) — src/app/_pages/arrow.tsx:
+  * New 'Columnar' sidebar group
+  * 4 KPIs, 'Arrow is the HTTP of data' insight
+  * 4-language code samples (Python/Rust/Go/C) in drawer mode
+  * WasmRunner integration (41-byte hand-assembled Wasm binary)
+  * Arrow vs Parquet comparison table
+  * Arrow Flight code sample (10× faster gRPC columnar)
+  * FloatingLiveButton topic configured
+- WasmRunner component — src/app/_components/wasm-runner.tsx:
+  * Hand-assembled 41-byte WebAssembly binary (exports add(i32, i32) -> i32)
+  * Instantiates via WebAssembly.instantiate()
+  * Runs 5 test cases, shows output in terminal panel
+  * Shows instantiation time (typically < 1ms)
+  * Same output-panel pattern as PyodideRunner
+- Wired WasmRunner into Databricks + CI/CD pages:
+  * Databricks: after the 5-language MultiLangSamples drawer
+  * CI/CD: after the 5-language MultiLangSamples drawer
+
+Stage Summary:
+- HEAD = 823555d on both repos
+- Deploy #26 succeeded — all build + deploy steps green
+- Live: /arrow (122KB), /databricks (209KB), /cicd (196KB) all return HTTP 200
+- WasmRunner markers present on /arrow, /databricks, /cicd
+- 19 pages total, 16 ADRs, 8 pages with Pyodide, 3 pages with WasmRunner
+- 7 languages in multi-lang samples (Py/Scala/Rust/Go/Bash/Elixir/C)
