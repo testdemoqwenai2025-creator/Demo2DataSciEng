@@ -726,3 +726,27 @@ Stage Summary:
 - 36 pages, 27 ADRs, 33 pages with Pyodide, 3 with WasmRunner
 - /diffusion-models → HTTP 200 (352KB), DDPM: True, DDIM: True, U-Net: True, Pyodide: True, 3D: True, ADR-027: True
 - Production build succeeded (40 routes total, 1 new)
+
+---
+Task ID: adr028-distributed-training-stage2
+Agent: Super Z (main)
+Task: Stage 2/3 of "diffusion + distributed + MLOps" — ADR-028 (FSDP) + Distributed Training page (#37). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-028: FSDP (Fully Sharded Data Parallel = ZeRO-3) for models > 1B params
+- Distributed Training page (#37):
+  * 3D Ring AllReduce animation (8 GPUs in a ring, 2 phases × 4 steps each — reduce-scatter then all-gather)
+  * AllReduce math: Bytes_per_GPU = 2·N·(P-1)/P → 2N asymptotically (bandwidth-optimal, beats naive All2All by factor of P)
+  * Memory breakdown chart: DDP (65GB) → ZeRO-2 (23GB) → FSDP (9GB) for 1B model — stacked bars with 4 colors (params/grads/optim/activations)
+  * ZeRO sharding progression: ZeRO-1 (shard optim) → ZeRO-2 (+shard grads) → ZeRO-3=FSDP (shard all three)
+  * Pyodide AllReduce simulation: full Ring algorithm step-by-step + memory math at 1B/7B/70B model scales (answers 'can I train 70B Llama on 8× A100?' → No, needs 64)
+  * Two memory tricks: BF16 mixed precision (2x save on params+grads) + activation checkpointing (4x save on activations, +30% compute)
+  * Low-level PyTorch: setup_distributed (NCCL backend), train_ddp (DistributedSampler + set_epoch critical for shuffle), train_fsdp (FULL_SHARD + MixedPrecision BF16 + size_based_auto_wrap + activation_checkpoint), gradient_accumulation (fake bigger batches), save_fsdp_checkpoint/load_fsdp_checkpoint (per-rank shards), CheckpointedTransformerBlock wrapper
+  * Hardware roofline: NVLink 900GB/s vs InfiniBand HDR 25GB/s = 36× ratio, explains why 8× A100 in one DGX node trains 36× faster than 8× across 8 nodes
+  * 'Distributed training IS a MapReduce' deeper-thought insight (DDP = MapReduce with AllReduce as shuffle, FSDP = column-partitioned broadcast join + aggregateByKey, ZeRO-3 paper explicitly cites Spark-style implementation as inspiration, unifies ADR-002 Medallion + ADR-028 FSDP as dual architectures)
+
+Stage Summary:
+- HEAD = 0b35610 on both repos (private + public)
+- 37 pages, 28 ADRs, 34 pages with Pyodide, 3 with WasmRunner
+- /distributed-training → HTTP 200 (327KB), DDP: True, FSDP: True, ZeRO: True, AllReduce: True, Pyodide: True, 3D: True, ADR-028: True
+- Production build succeeded (41 routes total, 1 new)
