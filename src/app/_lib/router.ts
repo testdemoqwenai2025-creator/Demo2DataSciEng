@@ -1,7 +1,9 @@
 /**
- * Hash-based router for the ModernDataSciEng Platform MPA.
- * Simulates a true multi-page application within the sandbox single-route constraint.
- * Each "page" is addressed by its hash: e.g. #/snowflake, #/databricks.
+ * Real-route router for the ModernDataSciEng Platform.
+ *
+ * Each page is a real Next.js route: /snowflake, /databricks, etc.
+ * Hash anchors (e.g. /#knowledge-loop) are reserved for in-page
+ * section scrolling on the home page only.
  */
 
 export type PageId =
@@ -26,7 +28,7 @@ export interface PageMeta {
   label: string;
   shortLabel: string;
   group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop";
-  icon: string; // lucide icon name
+  icon: string;
   description: string;
 }
 
@@ -157,15 +159,16 @@ export function pageById(id: string): PageMeta {
   return PAGES.find((p) => p.id === id) ?? PAGES[0];
 }
 
-/** Parse `#/snowflake` → `snowflake`. Default = `home`. */
-export function parseHash(): PageId {
-  if (typeof window === "undefined") return "home";
-  const raw = window.location.hash.replace(/^#\/?/, "").trim();
-  if (!raw) return "home";
-  const match = PAGES.find((p) => p.id === raw);
-  return match ? (match.id as PageId) : "home";
+/** Real path for a page: home -> "/", others -> "/<id>" */
+export function hrefFor(id: PageId): string {
+  return id === "home" ? "/" : `/${id}`;
 }
 
-export function hrefFor(id: PageId): string {
-  return `#/${id}`;
+/** Map a pathname (from usePathname()) back to a PageId */
+export function pathnameToPageId(pathname: string | null | undefined): PageId {
+  if (!pathname || pathname === "/") return "home";
+  // Strip leading slash + trailing slash
+  const cleaned = pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+  const match = PAGES.find((p) => p.id === cleaned);
+  return match ? (match.id as PageId) : "home";
 }

@@ -1,18 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { PAGES, hrefFor, type PageId } from "../_lib/router";
+import { usePathname } from "next/navigation";
+import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, Home, Github, Mail, ShieldCheck } from "lucide-react";
 
 interface AppShellProps {
-  active: PageId;
   children: React.ReactNode;
 }
 
@@ -169,8 +169,34 @@ function FooterContent({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function AppShell({ active, children }: AppShellProps) {
+export function AppShell({ children }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const active = pathnameToPageId(pathname);
+
+  // Backward-compat: redirect old hash URLs (e.g. /#/databricks → /databricks)
+  // Runs once on mount, client-side only.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (hash.startsWith("#/")) {
+      const targetId = hash.slice(2).trim();
+      const target = PAGES.find((p) => p.id === targetId);
+      if (target && target.id !== "home") {
+        // Replace history so the back button doesn't bounce to the hash
+        window.history.replaceState(null, "", hrefFor(target.id));
+        // Force a navigation via hash change to trigger router update
+        window.location.hash = "";
+        // Navigate using assign to the real route
+        window.location.assign(hrefFor(target.id));
+      } else if (hash === "#/" || hash === "#") {
+        // Home — just clear the hash
+        window.history.replaceState(null, "", "/");
+        window.location.hash = "";
+      }
+    }
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Mobile sidebar (sheet) */}
