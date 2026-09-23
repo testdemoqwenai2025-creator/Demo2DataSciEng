@@ -625,3 +625,28 @@ Stage Summary:
 - Deploy #43 succeeded
 - 31 pages, 23 ADRs, 25 pages with Pyodide, 3 with WasmRunner
 - /fine-tuning → HTTP 200 (185KB), LoRA: True, Pyodide: True, 3D: True
+
+---
+Task ID: adr024-transformer-deep-dive
+Agent: Super Z (main)
+Task: ADR-024 (semantic layer) + Transformer Architecture Deep Dive page (#32) with animated self-attention, PE heatmap, multi-head diagram, Pyodide demos, low-level PyTorch.
+
+Work Log:
+- ADR-024: unified semantic layer (MetricFlow + RAG + LoRA as NL-to-SQL interface)
+- Transformer page (#32):
+  * 5th 3D animation: self-attention mechanism (4-step cycle: Q → Q·K → softmax → weight V)
+  * The attention equation: softmax(Q·K^T/√d_k)·V
+  * Pyodide self-attention: real Q·K^T/√d_k on 3 tokens + softmax + weighted V sum
+  * Positional encoding heatmap: sinusoidal PE, 6×8, dimension highlight cycles
+  * Pyodide PE: full matrix + dot product encodes relative position
+  * Multi-head attention SVG diagram: h heads → concat → W_O → output
+  * Low-level PyTorch MultiHeadAttention class (full implementation)
+  * Transformer block ASCII diagram (attention + add&norm + FFN + add&norm)
+  * 'Attention IS content-addressable memory' deeper-thought insight:
+    Q=query, K=index, V=content; RAG IS attention over external KB
+
+Stage Summary:
+- HEAD = b69540f on both repos
+- Deploy #45 succeeded
+- 32 pages, 24 ADRs, 27 pages with Pyodide, 3 with WasmRunner
+- /transformer → HTTP 200 (207KB), Attention: True, Pyodide: True, 3D: True
