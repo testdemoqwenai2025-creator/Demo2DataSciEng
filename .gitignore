@@ -70,3 +70,12 @@ tool-results/
 
 # z.ai SDK internal cache
 .zai/
+
+# sandbox dev orchestration scripts (internal)
+.zscripts/
+
+# local helper scripts that contain git PATs at runtime
+scripts/setup-github.sh
+scripts/set-sync-secret.py
+scripts/verify-sync.py
+scripts/create-repos.sh
