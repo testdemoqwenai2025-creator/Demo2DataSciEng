@@ -14,13 +14,14 @@ export type PageId =
   | "fivetran-hightouch"
   | "orchestration"
   | "governance"
-  | "cicd";
+  | "cicd"
+  | "about";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About";
   icon: string; // lucide icon name
   description: string;
 }
@@ -105,6 +106,14 @@ export const PAGES: PageMeta[] = [
     group: "Delivery",
     icon: "GitMerge",
     description: "Trunk-based Git flow, GitHub Actions pipelines, environment promotion and infrastructure as code.",
+  },
+  {
+    id: "about",
+    label: "About & Compliance",
+    shortLabel: "About",
+    group: "About",
+    icon: "Info",
+    description: "Mission, synthetic-data disclaimer, GDPR compliance, contact and repository links.",
   },
 ];
 

@@ -12,6 +12,7 @@ import { FivetranHightouchPage } from "./_pages/fivetran-hightouch";
 import { OrchestrationPage } from "./_pages/orchestration";
 import { GovernancePage } from "./_pages/governance";
 import { CicdPage } from "./_pages/cicd";
+import { AboutPage } from "./_pages/about";
 
 /**
  * Northwind Data Platform — MPA entry point.
@@ -36,6 +37,7 @@ export default function Home() {
       case "orchestration": return <OrchestrationPage />;
       case "governance": return <GovernancePage />;
       case "cicd": return <CicdPage />;
+      case "about": return <AboutPage />;
       default: return <HomePage />;
     }
   })();

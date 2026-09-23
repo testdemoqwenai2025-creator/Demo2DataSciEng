@@ -1,0 +1,47 @@
+# ============================================================
+# Sync workflow: AppDataSci-Advanced (private) → DemoAppDataSci (public)
+# On every push to main, mirror the commit to the public preview repo.
+# ============================================================
+name: Mirror to public preview repo
+
+on:
+  push:
+    branches:
+      - main
+    # ignore workflow-only commits to avoid loops
+    paths-ignore:
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure Git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Push mirror to public repo
+        env:
+          GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
+        run: |
+          # Use a PAT-scoped remote (the secret must grant repo:public_repo on DemoAppDataSci)
+          git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/DemoAppDataSci.git"
+          # Push all branches + tags; --force-with-lease keeps history safe
+          git push --force-with-lease public refs/heads/main:refs/heads/main
+          git push --tags public || true
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::warning::Mirror sync failed — review the workflow run and re-trigger manually."

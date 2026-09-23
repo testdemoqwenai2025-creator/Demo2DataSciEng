@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Boxes, Database, ShieldCheck, Workflow, GitBranch, BarChart3, ArrowLeftRight, GitMerge, Network, LayoutDashboard } from "lucide-react";
 import { PAGES, hrefFor, type PageId } from "../_lib/router";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
@@ -10,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Home, Github, Mail, ShieldCheck } from "lucide-react";
 
 interface AppShellProps {
   active: PageId;
@@ -25,7 +23,12 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Orchestration & Delivery", ids: ["orchestration", "cicd"] },
   { title: "Analytics", ids: ["tableau"] },
   { title: "Governance", ids: ["governance"] },
+  { title: "About", ids: ["about"] },
 ];
+
+const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
+const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/DemoAppDataSci";
+const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSci-Advanced";
 
 function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () => void }) {
   return (
@@ -72,6 +75,7 @@ function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () =>
 
 function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () => void }) {
   const page = PAGES.find((p) => p.id === active) ?? PAGES[0];
+  const isHome = active === "home";
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="flex h-14 items-center gap-3 px-4 md:px-6">
@@ -96,6 +100,15 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2">
+          {/* Return to Home button — visible on every page except home */}
+          {!isHome && (
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link href={hrefFor("home")} aria-label="Return to home">
+                <Home className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Home</span>
+              </Link>
+            </Button>
+          )}
           <Badge variant="outline" className="hidden sm:inline-flex gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Prod · v2.4.0
           </Badge>
@@ -109,6 +122,47 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
         <span className="text-xs text-muted-foreground hidden md:inline">— {page.description}</span>
       </div>
     </header>
+  );
+}
+
+/** Footer — GDPR notice + GitHub contact + repo links, used on every page */
+function FooterContent({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={compact ? "space-y-2" : "max-w-[1400px] mx-auto w-full space-y-3"}>
+      <div className={compact ? "" : "flex flex-col md:flex-row items-start md:items-center justify-between gap-3"}>
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">© Northwind Retail Ltd · Synthetic data platform reference architecture</p>
+          <p className="text-[11px]">Built with Snowflake · Databricks · dbt · Tableau · Airflow · Fivetran · Hightouch</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
+          <a
+            href={PUBLIC_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+          >
+            <Github className="h-3.5 w-3.5" /> Public preview repo
+          </a>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+          >
+            <Mail className="h-3.5 w-3.5" /> {CONTACT_EMAIL}
+          </a>
+        </div>
+      </div>
+      <div className="border-t border-border/40 pt-2">
+        <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary/70" />
+          <span>
+            <strong className="text-foreground/80">GDPR:</strong> This platform processes personal data in accordance
+            with EU Regulation 2016/679 (GDPR). All PII is tagged, masked and access-controlled via Unity Catalogue;
+            data subject requests (access, rectification, erasure, portability) can be raised via the contact above.
+            Synthetic reference data is used throughout — no real personal data is processed, stored or transmitted.
+          </span>
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -130,7 +184,12 @@ export function AppShell({ active, children }: AppShellProps) {
                 </div>
                 <p className="text-sm font-semibold">Northwind Data Platform</p>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-2">
+                <Button asChild variant="outline" size="sm" className="gap-1.5">
+                  <Link href={hrefFor("home")} aria-label="Return to home">
+                    <Home className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
                 <ThemeToggle />
               </div>
             </div>
@@ -172,11 +231,8 @@ export function AppShell({ active, children }: AppShellProps) {
           <main className="flex-1 px-4 md:px-8 py-6 max-w-[1400px] mx-auto w-full">
             <div key={active} className="page-enter">{children}</div>
           </main>
-          <footer className="mt-auto border-t border-border/60 bg-muted/30 py-4 px-4 md:px-8">
-            <div className="max-w-[1400px] mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-              <p>© Northwind Retail Ltd · Synthetic data platform reference architecture</p>
-              <p>Built with Snowflake · Databricks · dbt · Tableau · Airflow · Fivetran · Hightouch</p>
-            </div>
+          <footer className="mt-auto border-t border-border/60 bg-muted/30 py-5 px-4 md:px-8">
+            <FooterContent />
           </footer>
         </div>
       </div>
@@ -185,8 +241,8 @@ export function AppShell({ active, children }: AppShellProps) {
       <div className="lg:hidden flex-1 pt-14">
         <TopBar active={active} />
         <main className="px-4 py-5">{children}</main>
-        <footer className="border-t border-border/60 bg-muted/30 py-4 px-4 text-xs text-muted-foreground">
-          © Northwind Retail Ltd · Synthetic data platform reference architecture
+        <footer className="border-t border-border/60 bg-muted/30 py-5 px-4 text-xs text-muted-foreground">
+          <FooterContent compact />
         </footer>
       </div>
     </div>
