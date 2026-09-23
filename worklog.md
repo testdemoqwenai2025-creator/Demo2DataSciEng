@@ -403,3 +403,36 @@ Stage Summary:
 - WasmRunner markers present on /arrow, /databricks, /cicd
 - 19 pages total, 16 ADRs, 8 pages with Pyodide, 3 pages with WasmRunner
 - 7 languages in multi-lang samples (Py/Scala/Rust/Go/Bash/Elixir/C)
+
+---
+Task ID: adr017-patterns-page-elixir-arrow
+Agent: Super Z (main)
+Task: ADR-017 (Arrow Flight) + Data Engineering Patterns page (#20) + Elixir on Arrow page.
+
+Work Log:
+- ADR-017 added to synthetic.ts (now 17 ADRs):
+  * Title: 'Adopt Arrow Flight as the platform's cross-engine data transfer protocol'
+  * Status: accepted (FY27-Q1)
+  * Decision: Arrow Flight (gRPC + columnar binary) for all cross-engine queries
+  * 10× faster than REST/JSON, zero-copy RecordBatch transfer
+- Data Engineering Patterns page (#20) — src/app/_pages/patterns.tsx:
+  * New 'Patterns' sidebar group
+  * 5 interactive Pyodide demos:
+    1. Medallion (Bronze→Silver→Gold flow)
+    2. SCD2 (row lifecycle, point-in-time queries)
+    3. dbt Slim CI (state-aware model selection, time saved)
+    4. Session-Context RLS (108 views → 1 view, region filtering)
+    5. Reverse-ETL (one SQL model → Salesforce + Klaviyo + Meta)
+  * 'Patterns are the platform's API' deeper-thought insight
+  * FloatingLiveButton topic configured
+- Elixir added to Arrow page (5th language, was 4):
+  * beam-arrow bindings, same Arrow columnar format, same zero-copy
+  * References BeamWasm as future Wasm compilation path
+  * Arrow page badge updated to '5 languages'
+
+Stage Summary:
+- HEAD = d7b7415 on both repos
+- Deploy #28 succeeded
+- 20 pages, 17 ADRs, 13 pages with Pyodide (8 existing + 5 new on patterns),
+  3 pages with WasmRunner
+- 7+1=8 languages in multi-lang samples (Elixir now on 3 pages: Databricks, CI/CD, Arrow)
