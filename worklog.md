@@ -900,3 +900,26 @@ Stage Summary:
 - 43 pages, 34 ADRs, 40 pages with Pyodide, 3 with WasmRunner
 - /bioinformatics → HTTP 200 (343KB), ESM-2: True, AlphaFold2: True, Needleman: True, Smith-Waterman: True, BLAST: True, BWT: True, Pyodide: True, 3D: True, ADR-034: True
 - Production build succeeded (47 routes total, 1 new)
+
+---
+Task ID: adr035-cheminformatics-b2
+Agent: Super Z (main)
+Task: Stage 2/3 of "bioinformatics + cheminformatics + molecular modelling" — ADR-035 (ECFP+ChemBERTa) + Cheminformatics page (#44). User requested modern scientific papers + HPC/Big Data applications.
+
+Work Log:
+- ADR-035: ECFP4 (sparse, 1024-bit) + ChemBERTa-77M (dense, 768-dim) for cheminformatics — molecules as embeddable documents in pgvector
+- Cheminformatics page (#44):
+  * 3D molecule + ECFP fingerprint animation (6 phases: render aspirin CC(=O)Oc1ccccc1C(=O)O as molecular graph → highlight radius=1 atom environment (direct neighbours, ~3-4 atoms) → radius=2 ECFP4 (full substructure within 2 bonds) → hash each environment to bit position → 1024-bit fingerprint shown → ChemBERTa embeds SMILES → pgvector)
+  * ECFP4 math: per-atom BFS to radius R=2 (ECFP4 diameter 4), collect (element, bond_order, depth), hash to 32-bit identifier, fold into n_bits vector (default 1024, 2048 for >50 heavy atoms); 3 sub-algorithms — Daylight initial invariants (atomic_num+degree+H_count+charge+aromatic+ring), iterative refinement inv[i]^(r+1) = hash(inv[i]^r, sorted neighbours), 32-bit hash + fold
+  * Tanimoto similarity math: |A∩B|/|A∪B| Jaccard on bit vectors, range [0,1], thresholds T>0.85 active analogs (same pharmacophore), 0.5-0.85 same scaffold (scaffold hopping), <0.3 dissimilar (diversity check)
+  * Pyodide demo: full ECFP4 from scratch (BFS + hash + fold) + Tanimoto on 3 molecules (aspirin, paracetamol, ibuprofen — aspirin+paracetamol share aryl-ester/amide scaffold, higher T than aspirin+ibuprofen which has propionic acid not ester) + simulated ChemBERTa embeddings showing cosine sim hierarchy
+  * Modern papers: ChemBERTa (Chithrananda et al. 2020, 'ChemBERTa: Large-Scale Self-Supervised Pretraining for Molecular Property Prediction' — BERT-base 12 layers/768-dim/12 heads, MLM on 77M SMILES from PubChem, masking recovers functional group patterns, SMILES IS a language), Uni-Mol (Zhou et al. 2023, 'Uni-Mol: A 3D-aware molecular pretraining framework' — SE(3)-equivariant transformer on 209M 3D conformers from QM9+GEOM, captures 3D pharmacophore similarity better than ECFP4 for DTI)
+  * Drug discovery pipeline ASCII: 100M ZINC20/ChEMBL library → Spark indexing (1000 workers, per-SMILES: RDKit canonicalise + ECFP4 1024-bit + ChemBERTa 512-dim + Lipinski Rule of 5 filter) → pgvector HNSW on embedding column + bit(1024) on ecfp column → query with known inhibitor SMILES → hybrid retrieval (ECFP4 Tanimoto top-5000 ‖ ChemBERTa cosine top-5000 → RRF fusion → 5000 → Lipinski pass filter → 3000) → ADMET prediction (ChemBERTa regression head: logP/logS/hERG/CYP450/hepatotox) → AutoDock Vina 3D docking (ΔG < -7 kcal/mol binding threshold → 100 candidates) → vLLM LLM summarisation (cross-modal RAG: target protein ESM-2 from ADR-034 + drug ChemBERTa + docking scores → top-10 lead compounds) → wet-lab synthesis
+  * Low-level PyTorch: ECFPFingerprinter (compute_initial_invariants Daylight, update_invariant with iterative refinement inv[i]^(r+1)=hash(inv[i]^r, sorted nbrs with bond_order), fingerprint() returns n_bits vector), tanimoto() Jaccard scorer, SmilesTokenizer (regex 2-char tokens Cl/Br/%10+, ring closure %10+, mask() for MLM training), ChemBERTa nn.Module (BERT-base 12 layers/768-dim/12 heads, weight-tied LM head = input embedding like GPT, embed_molecule returns L2-normalised for pgvector), MolecularRAGRetriever (extends ADR-032 hybrid to molecules — ECFP4 Tanimoto + ChemBERTa cosine + RRF k=60 fusion, _parse_smiles via RDKit in production), lipinski_rule_of_5 (MW<500, LogP<5, HBD<5, HBA<10, passes if ≤1 violation)
+  * 'Molecular fingerprints ARE learned hash functions' deeper-thought insight (ECFP4 = atom environment → 32-bit hash → bit position in 1024-bit vector, ChemBERTa = SMILES → 12-layer transformer → 768-dim vector — both are 'learned hash functions over molecular graphs' reducing variable-size structure to fixed-dim similarity-preserving vector, difference is what similarity means — ECFP4 preserves exact substructure overlap (Tanimoto on bits), ChemBERTa preserves pharmacophore similarity (cosine on dense); unifies ADR-024 NL-SQL + ADR-032 RAG + ADR-033 SigLIP + ADR-034 ESM-2 + ADR-035 ChemBERTa as 5 instances of SAME algorithm — transformer encoder + masked objective + pgvector + HNSW + RAG, modality changes but algorithm doesn't; drug-target interaction completes the loop — DTI(drug_emb ⊕ target_emb) → interaction_score = 2-input cross-encoder on mixed-modality embeddings trained on (drug, target, Kd) triples from BindingDB, drug discovery IS multi-modal RAG — drug+target+interaction record = image+caption+matching label for the medical domain)
+
+Stage Summary:
+- HEAD = ebc00a1 on both repos (private + public)
+- 44 pages, 35 ADRs, 41 pages with Pyodide, 3 with WasmRunner
+- /cheminformatics → HTTP 200 (362KB), ECFP: True, Tanimoto: True, ChemBERTa: True, SMILES: True, Pyodide: True, 3D: True, ADR-035: True
+- Production build succeeded (48 routes total, 1 new)
