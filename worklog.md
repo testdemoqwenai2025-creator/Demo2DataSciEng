@@ -333,3 +333,35 @@ Stage Summary:
 - 14 ADRs total (was 13)
 - 17 pages total
 - 4 pages now have executable code (Pyodide)
+
+---
+Task ID: adr015-pyodide-streaming-page
+Agent: Super Z (main)
+Task: ADR-015 (Pyodide/Wasm runtime) + Pyodide on 3 more pages (Databricks MERGE validator, Governance DQ validator, Evolution version-diff) + Real-Time Streaming page (#18).
+
+Work Log:
+- ADR-015 added to synthetic.ts (now 15 ADRs total):
+  * Title: 'Adopt Pyodide + WebAssembly as the platform's in-browser execution runtime'
+  * Status: accepted (FY26-Q4), follow-on to ADR-014
+  * Decision: Pyodide for Python samples, lazy-loaded from CDN, singleton cache.
+    Future: wasmtime for Rust/C, WebContainer for Node.
+- Pyodide added to 3 more pages (now 7 pages total with executable code):
+  1. Databricks — Delta MERGE syntax validator (regex-based, checks 5 required clauses)
+  2. Governance — DQ rules validator (6 rules, severity/coverage/pattern checks)
+  3. Evolution — Version-diff simulator (compares v1.0→v2.0→v2.4, shows added/removed)
+- Real-Time Streaming page (#18) — src/app/_pages/streaming.tsx:
+  * New 'Streaming' sidebar group
+  * Lambda → Kappa ASCII diagram (both architectures)
+  * Change-data-feed breakthrough insight (table IS the stream)
+  * 6-engine stack inventory (LazyList: 4 initial + Show more)
+  * 4-stack multi-language code samples (Kafka/Flink/Spark/Pulsar in drawer)
+  * Pyodide Kafka streaming simulation (100 msgs, 3 consumers, lag/throughput)
+  * 'When to pick which' decision matrix (4 cards)
+  * FloatingLiveButton topic configured
+- 18 pages total, 15 ADRs, 7 pages with Pyodide, 7 languages in multi-lang samples
+
+Stage Summary:
+- HEAD = b189f0e on both repos
+- Deploy #24 succeeded — all build + deploy steps green
+- All 18 routes return HTTP 200
+- 7 pages with Pyodide: /duckdb, /snowflake, /knowledge, /modern-big-data, /databricks, /governance, /evolution, /streaming (8 actually — streaming has its own Pyodide too!)
