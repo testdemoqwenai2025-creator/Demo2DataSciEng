@@ -359,20 +359,23 @@ export function CicdPage() {
         </SectionCard>
       </div>
 
-      {/* Multi-language: Bash + Go + Python CI runners */}
+      {/* Multi-language: 5 idioms for the same grant audit */}
       <SectionCard
-        title="Multi-language: CI runner in Bash, Go & Python"
-        description="Same audit step in three languages — Bash for ops, Go for performance + single binary, Python for ecosystem access."
+        title="Multi-language: 5 idioms for Snowflake grant audit"
+        description="Bash (ops) · Go (single binary, ~30× faster) · Python (ecosystem) · Elixir (BEAM supervision tree, self-healing) · C (librdkafka, max perf). Click to open the drawer — keeps the page lightweight."
         icon={<Languages className="h-5 w-5" />}
-        badge="3 languages"
+        badge="5 languages · drawer"
       >
         <MultiLangSamples
-          title="Snowflake grant audit — Bash, Go, Python"
+          drawerMode
+          drawerButtonLabel="View 5-language grant audit implementations"
+          title="Snowflake grant audit — 5 idiomatic implementations"
+          description="Same audit step in 5 languages. Bash = ops default. Go = single binary, type-safe. Python = ecosystem access. Elixir = BEAM-supervised, self-healing. C = librdkafka-backed, max perf."
           samples={[
             {
               language: "bash",
               filename: "audit_grants.sh",
-              note: "Bash + jq — the ops-friendly default. Runs everywhere, easy to read, but no type safety.",
+              note: "Bash + jq — the ops-friendly default. Runs everywhere, easy to read, but no type safety. File types: .sh (source), no compilation.",
               code: `#!/usr/bin/env bash
 # Audit all Snowflake grants — flag any new grants since last run
 set -euo pipefail
@@ -393,7 +396,7 @@ echo "$NEW_HASH" > .last_audit_hash`,
             {
               language: "go",
               filename: "audit_grants.go",
-              note: "Go — single binary, type-safe, fast. Compiled and shipped to CI as a static binary. ~30× faster than the bash version on large accounts.",
+              note: "Go — single binary, type-safe, fast. Compiled and shipped to CI as a static binary. ~30× faster than the bash version on large accounts. File types: .go (source), single static binary output.",
               code: `package main
 
 import (
@@ -453,7 +456,7 @@ func main() {
             {
               language: "python",
               filename: "audit_grants.py",
-              note: "Python — when you need snowflake-connector + pandas + great_expectations in one script. The team's default for ad-hoc audits.",
+              note: "Python — when you need snowflake-connector + pandas + great_expectations in one script. The team's default for ad-hoc audits. File types: .py (source), interpreted.",
               code: `#!/usr/bin/env python3
 """Audit Snowflake grants; flag drift since last run."""
 import hashlib, json, sys
@@ -489,6 +492,145 @@ if __name__ == "__main__":
         f.write(current)
     print(f"Hash: {current}")`,
               highlight: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+            },
+            {
+              language: "elixir",
+              filename: "audit_grants.ex",
+              note: "Elixir + GenServer — self-healing via BEAM supervision tree. If the audit process crashes, the supervisor restarts it. ~1M concurrent lightweight processes per node. File types: .ex (source), .beam (compiled bytecode), .ez (release).",
+              code: `defmodule ModernDataSciEng.Audit.Grants do
+  @moduledoc """
+  Audits Snowflake grants by querying via Postgres-wire-compatible endpoint.
+  Idempotent — produces a stable SHA256 hash for drift detection.
+  Self-healing: supervised by BEAM, auto-restarts on crash.
+  """
+  use GenServer
+
+  require Logger
+
+  @table :grant_audit_state
+
+  def start_link(_opts), do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
+
+  @impl true
+  def init(_) do
+    :ets.new(@table, [:named_table, :public, :set])
+    schedule_tick()
+    {:ok, %{last_hash: load_last_hash()}}
+  end
+
+  @impl true
+  def handle_info(:tick, state) do
+    {:noreply, run_audit(state), 10_000}
+  end
+
+  @impl true
+  def handle_call(:current_hash, _from, state) do
+    {:reply, state.last_hash, state}
+  end
+
+  defp run_audit(state) do
+    # Query via Postgres-wire protocol (Snowflake supports this)
+    {:ok, rows} = Postgrex.query!(conn(), "SHOW GRANTS", [])
+
+    hash =
+      rows.rows
+      |> Enum.map(&Tuple.to_list/1)
+      |> Enum.sort()
+      |> :erlang.term_to_binary()
+      |> then(&:crypto.hash(:sha256, &1))
+      |> Base.encode16(case: :lower)
+
+    if state.last_hash && state.last_hash != hash do
+      Logger.warn("Snowflake grant drift detected at \#{DateTime.utc_now()}")
+      # Page on-call via HTTP — async, doesn't block the audit loop
+      Task.start(fn ->
+        Finch.build(:post, System.get_env("PAGERDUTY_URL"),
+          [{"content-type", "application/json"}],
+          ~s({"alert": "snowflake grant drift"})
+        ) |> Finch.request()
+      end)
+    end
+
+    :ets.insert(@table, {:last_hash, hash})
+    %{state | last_hash: hash}
+  end
+
+  defp load_last_hash, do: :ets.lookup(@table, :last_hash)[:last_hash] || ""
+  defp conn, do: System.get_env("SNOWFLAKE_PG_CONN")
+  defp schedule_tick, do: Process.send_after(self(), :tick, 10_000)
+end
+
+# File types: .ex (source), .beam (compiled bytecode), .ez (release archive)
+# Run as a release: MIX_ENV=prod mix release; _build/prod/rel/audit/bin/audit start`,
+              highlight: [11, 12, 13, 14, 15, 16, 24, 25, 26, 27, 32, 33, 34, 35, 36, 37, 38, 49, 50, 51, 52],
+            },
+            {
+              language: "c",
+              filename: "lag_audit.c",
+              note: "C + librdkafka — high-perf Kafka topic-lag monitor. Compiles to single static binary; ~30× faster than Python equivalent. The lingua-franca of native systems programming. File types: .c/.h (source), .so (shared lib), single static binary output.",
+              code: `// ============================================================
+// librdkafka audit — high-perf Kafka topic-lag monitor
+// Compiles to single binary; ~30x faster than Python equivalent
+// Foundation for many high-level Kafka clients (confluent-kafka-python
+// wraps librdkafka)
+// ============================================================
+#include <librdkafka/rdkafka.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+int audit_lag(const char* brokers, const char* group_id) {
+    rd_kafka_conf_t* conf = rd_kafka_conf_new();
+    rd_kafka_conf_set(conf, "bootstrap.servers", brokers);
+    rd_kafka_conf_set(conf, "group.id", group_id);
+    rd_kafka_conf_set(conf, "enable.auto.commit", "false");
+
+    rd_kafka_t* rk = rd_kafka_new(RD_KAFKA_CONSUMER, conf, NULL, 0);
+    if (!rk) {
+        fprintf(stderr, "Failed to create consumer: %s\\n",
+                rd_kafka_err2str(rd_kafka_last_error()));
+        return 1;
+    }
+
+    rd_kafka_topic_partition_list_t* topics = rd_kafka_topic_partition_list_new(1);
+    rd_kafka_topic_partition_list_add(topics, "moderndatascieng.orders", -1);
+    rd_kafka_assign(rk, topics);
+
+    // Sample 1000 messages; measure latency
+    int n = 0;
+    int64_t total_lag = 0;
+    time_t start = time(NULL);
+
+    while (n < 1000 && difftime(time(NULL), start) < 60.0) {
+        rd_kafka_message_t* msg = rd_kafka_consumer_poll(rk, 1000);
+        if (msg) {
+            int64_t ts = rd_kafka_message_timestamp(msg, NULL, NULL);
+            int64_t lag = (int64_t)time(NULL) * 1000 - ts;
+            total_lag += lag;
+            n++;
+            rd_kafka_message_destroy(msg);
+        }
+    }
+
+    int64_t avg_lag = n > 0 ? total_lag / n : 0;
+    printf("{\\"samples\\": %d, \\"avg_lag_ms\\": %lld}\\n", n, avg_lag);
+
+    rd_kafka_destroy(rk);
+    return avg_lag > 60000 ? 2 : 0;  // exit 2 = lag > 60s
+}
+
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s <brokers> <group_id>\\n", argv[0]);
+        return 1;
+    }
+    return audit_lag(argv[1], argv[2]);
+}
+
+// Compile: gcc -O2 -o lag_audit lag_audit.c -lrdkafka
+// Run:     ./lag_audit broker-1:9092 moderndatascieng-silver-service`,
+              highlight: [13, 14, 15, 16, 18, 19, 20, 21, 22, 24, 25, 26, 32, 33, 34, 35, 36, 37, 45, 47, 48, 49],
             },
           ]}
         />

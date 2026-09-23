@@ -745,12 +745,14 @@ export function ModernBigDataPage() {
 
       {/* Multi-language code samples: BigQuery + DuckDB + Iceberg SQL */}
       <SectionCard
-        title="Multi-language: serverless SQL across BigQuery, DuckDB & Iceberg"
+        title="Multi-language: serverless SQL across BigQuery, DuckDB & Iceberg (drawer)"
         description="The same analytical query written for three different engines. Note how the SQL is nearly identical — the file format (Parquet) is the constant, the engine is the variable."
         icon={<Languages className="h-5 w-5" />}
         badge="3 engines"
       >
         <MultiLangSamples
+            drawerMode
+            drawerButtonLabel="View code samples"
           title="Aggregation across three serverless engines"
           samples={[
             {
@@ -780,12 +782,14 @@ export function ModernBigDataPage() {
 
       {/* Multi-language code samples: streaming */}
       <SectionCard
-        title="Multi-language: streaming producers/consumers across Spark, Flink, Kafka, Pulsar"
+        title="Multi-language: streaming across Spark, Flink, Kafka, Pulsar (drawer)"
         description="The same order-event pipeline implemented in four different streaming stacks. Notice the convergence: Flink SQL and Spark Structured Streaming look almost identical."
         icon={<Languages className="h-5 w-5" />}
         badge="4 stacks"
       >
         <MultiLangSamples
+            drawerMode
+            drawerButtonLabel="View code samples"
           title="Order event processing — 4 streaming implementations"
           samples={[
             {

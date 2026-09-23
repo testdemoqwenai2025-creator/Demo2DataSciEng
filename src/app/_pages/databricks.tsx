@@ -345,21 +345,23 @@ export function DatabricksPage() {
         }
       />
 
-      {/* Multi-language samples: PySpark vs Scala Spark vs Rust UDF */}
+      {/* Multi-language samples: 5 idioms for the same Silver conformance */}
       <SectionCard
-        title="Multi-language: same Silver conformance in PySpark, Scala & Rust"
-        description="PySpark is the default for analytics engineers. Scala is used for performance-critical jobs. Rust is emerging for vectorised UDFs."
+        title="Multi-language: 5 idioms for Silver customer conformance"
+        description="PySpark (default) · Scala (type-safe performant) · Rust (vectorised UDF) · Elixir (real-time streaming) · C (Arrow native). Click to open the drawer — keeps the page lightweight."
         icon={<Languages className="h-5 w-5" />}
-        badge="3 languages"
+        badge="5 languages · drawer"
       >
         <MultiLangSamples
-          title="Silver customer conformance — three idiomatic implementations"
-          description="The same MERGE logic implemented in PySpark (default), Scala (performant), and Rust (vectorised UDF for hot paths)."
+          drawerMode
+          drawerButtonLabel="View 5-language Silver conformance implementations"
+          title="Silver customer conformance — 5 idiomatic implementations"
+          description="The same MERGE logic in 5 languages. PySpark = analytics default. Scala = type-safe performant. Rust = vectorised UDF. Elixir = real-time streaming via Broadway + BEAM. C = Arrow native UDF."
           samples={[
             {
               language: "python",
               filename: "silver_customer.py",
-              note: "PySpark DLT — the default for analytics engineers. Reads from streams, MERGEs on customer_sk.",
+              note: "PySpark DLT — the default for analytics engineers. Reads from streams, MERGEs on customer_sk. Compiles to JVM bytecode via Py4J bridge.",
               code: `import dlt
 from pyspark.sql.functions import col, md5, concat_ws, when, lit, current_timestamp
 
@@ -378,7 +380,7 @@ def silver_customer():
             {
               language: "scala",
               filename: "SilverCustomerConformance.scala",
-              note: "Scala Spark — used for performance-critical batch jobs. Same logic, type-safe, ~15% faster than PySpark on the same cluster.",
+              note: "Scala Spark — type-safe, ~15% faster than PySpark on the same cluster. JVM-native; compiles to bytecode. Used for performance-critical batch jobs.",
               code: `package com.moderndatascieng.silver
 
 import org.apache.spark.sql.functions._
@@ -393,7 +395,7 @@ object SilverCustomerConformance {
       .withColumn("customer_sk", md5(concat_ws("||", $"customer_email_hash", $"loaded_at")))
       .withColumn("is_active", when($"status" === "ACTIVE", lit(true)).otherwise(lit(false)))
       .withColumn("loaded_at", current_timestamp())
-      .dropDuplicates("customer_email_hash", "loaded_at")
+      .dropDuplicates("customer_email_hash", $"loaded_at")
   }
 
   def merge(target: String, src: DataFrame)(implicit spark: SparkSession): Unit = {
@@ -411,7 +413,7 @@ object SilverCustomerConformance {
             {
               language: "rust",
               filename: "pii_redact_udf.rs",
-              note: "Rust UDF — for vectorised regex PII redaction. ~10× faster than SQL UDFs, ~3× faster than Python UDFs. Compiles to Wasm for portability.",
+              note: "Rust UDF — vectorised regex PII redaction. ~10× faster than SQL UDFs, ~3× faster than Python UDFs. Compiles to Wasm for portability + native for max perf.",
               code: `// Snowflake external function — Rust implementation
 // Reads a column of strings, redacts PII patterns (SSN, card, email)
 
@@ -430,10 +432,136 @@ pub extern "C" fn redact_pii(input: &str) -> String {
     out
 }
 
-// Compile: \`cargo build --release --target wasm32-wasi\`
+// Compile: cargo build --release --target wasm32-wasi
 // Deploy: Snowflake External Function via API Gateway + Lambda
 `,
               highlight: [7, 8, 9, 12, 13, 14, 15, 16, 17],
+            },
+            {
+              language: "elixir",
+              filename: "silver_customer_conform.ex",
+              note: "Elixir + BroadwayKafka — real-time streaming with back-pressure via the BEAM VM. Discord + WhatsApp use this for high-concurrency pipelines. Compiles to .beam bytecode.",
+              code: `defmodule ModernDataSciEng.SilverCustomerConform do
+  @moduledoc """
+  Broadway pipeline: Kafka Bronze events -> Silver conformed table.
+  Uses BroadwayKafka for back-pressure + concurrent processing.
+  The BEAM VM gives us ~1M concurrent lightweight processes per node.
+  """
+  use Broadway
+
+  alias BroadwayKafka.Producer
+  alias ModernDataSciEng.{Customer, Repo}
+
+  @impl true
+  def start_link(opts \\\\ []) do
+    Broadway.start_link(__MODULE__,
+      name: __MODULE__,
+      producer: [
+        module: {Producer, [
+          hosts: [{"broker-1", 9092}],
+          group_id: "silver-conform-service",
+          topics: ["bronze.customer"],
+        ]},
+        concurrency: 4,
+      ],
+      processors: [
+        default: [concurrency: 100, max_demand: 50],
+      ],
+      batchers: [
+        default: [concurrency: 10, batch_size: 1000, batch_timeout: 5000],
+      ],
+    )
+  end
+
+  @impl true
+  def handle_message(_, message, _) do
+    # Decode Avro payload
+    {:ok, customer_event} = :avro.decode(message.data, schema_name: "Customer")
+
+    # Conform: generate surrogate key, normalise, dedupe
+    customer_sk =
+      :crypto.hash(:md5, "\#{customer_event.email_hash}|\#{customer_event.loaded_at}")
+      |> Base.encode16(case: :lower)
+
+    conformed = %{
+      customer_sk: customer_sk,
+      customer_id: customer_event.customer_id,
+      email_hash: customer_event.email_hash,
+      is_active: customer_event.status == "ACTIVE",
+      region_code: customer_event.region || "UNKNOWN",
+      loaded_at: DateTime.utc_now(),
+    }
+
+    # Idempotent upsert via Ecto (Postgres wire)
+    Repo.insert_all(Customer, [conformed],
+      on_conflict: {:replace, [:is_active, :region_code, :loaded_at]},
+      conflict_target: :customer_sk,
+    )
+
+    message
+  end
+
+  @impl true
+  def handle_batch(_, messages, _, _) do
+    # Batch write to Delta via JDBC
+    rows = Enum.map(messages, & &1.data)
+    :delta_writer.write("s3://silver/customer", rows)
+    :ok
+  end
+end
+
+# File types: .ex (source), .beam (compiled bytecode), .ez (release archive)
+# Run: mix run -e ModernDataSciEng.SilverCustomerConform.start_link()`,
+              highlight: [11, 12, 13, 14, 15, 16, 17, 18, 19, 28, 29, 30, 31, 32, 33, 47, 48, 49, 50, 51],
+            },
+            {
+              language: "c",
+              filename: "vectorised_email_hash.c",
+              note: "C + Apache Arrow C++ — vectorised column processing at the native layer. Most high-level APIs (DuckDB, Polars, Pandas) eventually call into C/C++ here. Compiles to .so shared library.",
+              code: `// ============================================================
+// Apache Arrow C UDF — vectorised email hashing for PII redaction
+// Process a whole column at once (vectorised) — 10x faster than row-by-row
+// Compiles to a shared lib loadable by DuckDB / Postgres / Polars
+// ============================================================
+#include <arrow/c/abi.h>
+#include <openssl/md5.h>
+#include <string.h>
+#include <stdint.h>
+
+// Arrow C Data Interface (ABI-stable across languages)
+// The same function is callable from Python, Rust, Go, Java via Arrow C-ABI
+int vectorised_email_hash(
+    struct ArrowArray* input_column,   // input: strings
+    struct ArrowArray* output_column,  // output: fixed-size binary (16 bytes MD5)
+    int64_t length
+) {
+    if (input_column->n_buffers < 3) return -1;
+
+    const int32_t* offsets = (const int32_t*) input_column->buffers[1];
+    const char* data = (const char*) input_column->buffers[2];
+
+    // Allocate output buffer (16 bytes per row for MD5)
+    uint8_t* out = (uint8_t*) output_column->buffers[1];
+
+    for (int64_t i = 0; i < length; i++) {
+        int32_t start = offsets[i];
+        int32_t end = offsets[i + 1];
+        size_t len = (size_t)(end - start);
+
+        // Compute MD5 of the email string (OpenSSL)
+        MD5((const unsigned char*)(data + start), len, out + (i * 16));
+    }
+
+    return 0;  // success
+}
+
+// Compile: gcc -O3 -shared -fPIC -o email_hash_udf.so email_hash_udf.c \\
+//          -I/usr/include/arrow -lcrypto
+// Load in DuckDB:  INSTALL 'email_hash_udf.so';
+//                  CREATE MACRO email_hash(col) AS udf_vectorised_email_hash(col);
+// Load in Postgres: CREATE FUNCTION email_hash(text) RETURNS bytea \\
+//                   AS 'email_hash_udf.so', 'vectorised_email_hash' LANGUAGE C;`,
+              highlight: [9, 10, 11, 12, 13, 15, 16, 17, 20, 21, 22, 23, 28, 29, 30, 31, 32],
             },
           ]}
         />
