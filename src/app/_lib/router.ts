@@ -52,13 +52,14 @@ export type PageId =
   | "bioinformatics"
   | "cheminformatics"
   | "molecular-modelling"
-  | "genetic-materials";
+  | "genetic-materials"
+  | "macro-structures";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures";
   icon: string;
   description: string;
 }
@@ -431,6 +432,14 @@ export const PAGES: PageMeta[] = [
     group: "Genetic Materials",
     icon: "Dna",
     description: "AI-generated scientific illustrations + CRISPR editing short, HMM Viterbi gene finding, BLOSUM log-odds, GWAS logistic regression, ENCODE/GTEx/UK Biobank papers, 100K-genome Spark pipeline, low-level PyTorch HMM+CRISPRGuideDesigner+GWAS.",
+  },
+  {
+    id: "macro-structures",
+    label: "Macro Structures — Protein, Enzyme, Glycan, Lipid Hierarchy",
+    shortLabel: "Macro Structures",
+    group: "Macro Structures",
+    icon: "Boxes",
+    description: "AI-generated illustrations + Ramachandran short, 4-level protein hierarchy, Michaelis-Menten/Hill enzyme kinetics, glycomics WURCS, lipidomics LIPID MAPS, AlphaFold DB 200M, low-level PyTorch SecondaryStructurePredictor+RamachandranValidator+EnzymeKinetics+GlycanGraph+LipidFingerprinter.",
   },
 ];
 

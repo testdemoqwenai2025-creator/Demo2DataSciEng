@@ -908,6 +908,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["genetics", "dna", "rna", "crispr", "gwas", "hmm", "viterbi", "blosum", "encode", "uk-biobank", "patterns", "genai"],
   },
+  {
+    id: "ADR-038",
+    title: "Adopt AlphaFold DB (200M structures) + Michaelis-Menten parameterisation for macro-structure analysis",
+    status: "accepted",
+    date: "FY30-Q3",
+    deciders: "Data Platform, Structural Biology, ML Engineering, Architecture",
+    context:
+      "ADR-034 documented protein structure prediction (AlphaFold2). ADR-035 covered small molecules. ADR-036 covered molecular dynamics. The macro-structure domain needs deeper treatment: (1) Protein structure hierarchy (primary sequence → secondary α/β → tertiary fold → quaternary complex) — the Ramachandran plot (Ramachandran 1963) maps φ/ψ backbone dihedral angles to allowed/disallowed regions, validating structure predictions. (2) Enzyme kinetics — Michaelis-Menten V = Vmax·[S]/(Km+[S]) describes saturation kinetics; the Hill equation V = Vmax·[S]^n/(Kd^n+[S]^n) models allosteric cooperativity (n>1 positive, n<1 negative). (3) Carbohydrate structure — glycosidic bonds (α1-4, β1-4, α1-6) define N-linked and O-linked glycans; the GlyTouCan database has 100K+ structures. (4) Lipid structure — phospholipids (PC, PE, PS, PI), sphingolipids, sterols; the LIPID MAPS consortium has 40K+ lipid structures. The AlphaFold Protein Structure Database (Varadi 2022, DeepMind + EBI) has 200M+ predicted structures covering nearly every UniProt protein — the largest biological structure dataset ever created.",
+    decision:
+      "Adopt AlphaFold DB as the default protein structure reference (replaces PDB-only for uncharacterised proteins). Three macro-structure stacks: (1) Protein structure analysis via DSSP (secondary structure assignment from 3D coords) + Ramachandran validation + ESM-2 functional embedding (ADR-034) → pgvector. (2) Enzyme kinetics via SciPy curve_fit on Michaelis-Menten + Hill equations; BRENDA database for Km/Vmax lookup by EC number. (3) Glycomics via glypy + GlyTouCan WURCS canonical strings → graph fingerprints (similar to ECFP from ADR-035). (4) Lipidomics via LIPID MAPS LMSD (Lipid Maps Structure Database) + lipid class fingerprints. Modern: AlphaFold3 (ADR-036) handles protein-ligand, protein-protein, protein-DNA/RNA, protein-glycan complexes — extending the structure database to biomolecular interactions.",
+    consequences:
+      "+ AlphaFold DB gives 3D structure for ~99% of UniProt proteins — vs PDB's 170K (mostly human + model organisms). + Ramachandran plot validates structure in milliseconds (no MD needed). + Michaelis-Menten is a 2-parameter model — fast to fit, interpretable. + GlyTouCan canonical WURCS = unique string per glycan (like SMILES for molecules). + LIPID MAPS LMSD has 40K lipids with class hierarchy. − AlphaFold confidence (pLDDT) varies — low for disordered regions. − Michaelis-Menten assumes steady-state, no substrate inhibition — limited to simple enzymes. − Glycan branching is hard to embed (tree → vector lossy). − Lipid class is more important than exact structure for biology — fingerprints need class-aware design.",
+    alternatives: [
+      "PDB-only (170K structures, no predictions) — limits to experimentally-solved structures",
+      "ESMFold (LinearFold + ESM-2, 100x faster than AlphaFold2) — for low-latency structure prediction",
+      "RoseTTAFold (Baek 2021) — alternative to AlphaFold2, similar accuracy",
+      "OMEGA (Lees 2006) for glycan 3D — older, less accurate than modern ML",
+    ],
+    tags: ["macro-structures", "protein-structure", "ramachandran", "enzyme-kinetics", "michaelis-menten", "hill-equation", "glycomics", "lipidomics", "alphafold-db", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
