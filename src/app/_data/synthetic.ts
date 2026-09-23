@@ -988,6 +988,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["spatial-transcriptomics", "visium", "merfish", "stereo-seq", "stagate", "nichenet", "u-net", "combinatorial-barcoding", "patterns", "genai"],
   },
+  {
+    id: "ADR-042",
+    title: "Adopt scVI + WNN + RNA velocity for single-cell multi-omics at million-cell scale",
+    status: "accepted",
+    date: "FY31-Q3",
+    deciders: "Data Platform, Genomics, Bioinformatics, Architecture",
+    context:
+      "ADR-041 covered spatial transcriptomics (with spatial coordinates). Single-cell multi-omics is the dissociated counterpart — measure RNA + chromatin accessibility + protein per cell without spatial context, but at massive scale (1M+ cells per experiment). Three core problems: (1) 10x Genomics droplet barcoding — GEM (Gel bead-in-EMulsion) encapsulates one cell + one barcoded bead per droplet, ~1% doublet rate, UMI (Unique Molecular Identifier) collapses PCR duplicates. (2) scRNA + scATAC integration via WNN (Weighted Nearest Neighbours, Hao 2021 Seurat v4) — both modalities have cell-specific weights, KNN graph built on weighted combination. (3) RNA velocity (La Manno 2018, Bergen 2020) — kinetic modelling: unspliced (intronic) vs spliced (exonic) mRNA counts. d[u]/dt = α - β·u (transcription - degradation), d[s]/dt = β·u - γ·s. Ratio u/s indicates direction of cell-state transition. Production: scVI (Lopez 2018) — VAE for scRNA-seq with zero-inflated negative binomial likelihood, batch correction via encoder-conditioned latent. Harmony (Korsunsky 2019) — fast iterative batch correction via PCA + soft k-means. Modern: 10x Genomics Multiome (RNA + ATAC on same cell), Total-seq (protein + RNA). The math: 10x GEMs have Poisson(λ=0.1) cells per droplet (most are empty, ~1% doublets), UMI collision is binomial, WNN uses CCA (Canonical Correlation Analysis) on paired modalities, scVI's likelihood = ZINB(θ, π) where θ = negative binomial mean and π = zero-inflation probability.",
+    decision:
+      "Adopt a three-layer single-cell multi-omics stack: (1) scRNA: scVI VAE (latent 30-dim, zero-inflated negative binomial likelihood, batch correction via conditional encoder). (2) scATAC: LSI (Latent Semantic Indexing = TF-IDF + SVD, 30 components) + Harmony for batch correction. (3) Integration: WNN (Seurat v4) for paired multi-modal data (RNA+ATAC on same cell), or scVI-cross-modal for unpaired. Trajectory: RNA velocity via scVelo (Bergen 2020) — solves ODE d[u]/dt = α - β·u, d[s]/dt = β·u - γ·s. Production: 10x Genomics Chromium Next GEM (10K-100K cells per run, $1500 per run), 10x Multiome (RNA + ATAC paired, $3000 per run). Storage: cell × gene matrix in Parquet (1M cells × 20K genes = 2×10¹⁰ entries, sparse), cell metadata (cell type, sample, batch) → Parquet. Connects to ADR-037 genetic materials: variant calling on the same donor's bulk WGS. Connects to ADR-034 bioinformatics: cell type annotation via scVI → pgvector (cell similarity search by transcriptional profile). Connects to ADR-041 spatial transcriptomics: single-cell methods validate spatial findings (same cell types, same markers).",
+    consequences:
+      "+ Handles 1M+ cells at $1500 per 10x run — cheapest single-cell method. + WNN integrates RNA + ATAC + protein on same cell. + RNA velocity adds direction to embeddings (transition, not just position). + scVI's VAE handles zero-inflation + batch effects. + Cell × gene matrix in Parquet = SQL-queryable via Spark. − 10x GEM doublet rate ~1% (need DoubletFinder/Scrublet). − scATAC is sparse (10K peaks × 50K cells, only ~5% non-zero). − RNA velocity's kinetic parameters (α, β, γ) are hard to estimate — assumes constant rates. − Batch effects across 10x runs are large (need Harmony + scVI). − Cell type annotation is manual — no consistent ontology (Cell Ontology ongoing).",
+    alternatives: [
+      "Smart-seq2 (full-length RNA, plate-based) — better coverage, but 100× fewer cells (1000s not millions)",
+      "Parse Bioscience (combinatorial barcoding) — 1M cells per run, no microfluidics",
+      "10x Multiome alternative: SHARE-seq (Ma 2020) — RNA + ATAC + histone modification",
+      "BASIC (Bayesian Inference for Single-cell Analysis) — alternative to scVI, smaller community",
+    ],
+    tags: ["single-cell", "multi-omics", "10x-genomics", "scvi", "wnn", "rna-velocity", "harmony", "scvelo", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

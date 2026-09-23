@@ -60,6 +60,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Systems Biology", ids: ["systems-biology"] },
   { title: "Cryo-EM", ids: ["cryo-em"] },
   { title: "Spatial Transcriptomics", ids: ["spatial-transcriptomics"] },
+  { title: "Single-cell Multi-omics", ids: ["singlecell-multiomics"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

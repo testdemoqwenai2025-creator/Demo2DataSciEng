@@ -56,13 +56,14 @@ export type PageId =
   | "macro-structures"
   | "systems-biology"
   | "cryo-em"
-  | "spatial-transcriptomics";
+  | "spatial-transcriptomics"
+  | "singlecell-multiomics";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics";
   icon: string;
   description: string;
 }
@@ -467,6 +468,14 @@ export const PAGES: PageMeta[] = [
     group: "Spatial Transcriptomics",
     icon: "Grid",
     description: "AI-generated illustrations + combinatorial barcode short, MERFISH 4¹⁶ codebook + Hamming error correction, U-Net cell segmentation, STAGATE graph attention autoencoder, NicheNet ligand-receptor, low-level PyTorch MERFISHDecoder+UNet+STAGATE+NicheNet.",
+  },
+  {
+    id: "singlecell-multiomics",
+    label: "Single-cell Multi-omics — scVI, WNN, RNA velocity, Harmony",
+    shortLabel: "Single-cell",
+    group: "Single-cell Multi-omics",
+    icon: "Atom",
+    description: "AI-generated illustrations + RNA velocity short, 10x GEM Poisson + UMI, scVI ZINB VAE, WNN multi-modal integration, RNA velocity kinetic ODE, Harmony batch correction, low-level PyTorch scVI+WNN+RNAVelocitySolver+Harmony.",
   },
 ];
 
