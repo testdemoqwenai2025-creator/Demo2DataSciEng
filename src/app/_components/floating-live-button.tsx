@@ -76,6 +76,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "molecular-modelling":      { topic: "molecular dynamics force field AMBER CHARMM Verlet integration E(n)-equivariant neural network AlphaFold3 SchNet Equiformer",      label: "Molecular Mod.",  codeRepo: "openmm/openmm/main/README.md" },
   "genetic-materials":         { topic: "genetics DNA RNA CRISPR Cas9 GWAS HMM Viterbi BLOSUM ENCODE GTEx UK Biobank BWA GATK genomics",      label: "Genetics",       codeRepo: "samtools/bcftools/main/README.md" },
   "macro-structures":          { topic: "protein structure Ramachandran Michaelis-Menten enzyme kinetics glycan WURCS lipid LIPID MAPS AlphaFold DB",      label: "Macro Structures", codeRepo: "dptech-corp/Uni-Mol/main/README.md" },
+  "systems-biology":           { topic: "systems biology FBA flux balance analysis metabolic network PPI STRING multi-omics MOFA whole-cell COBRApy",      label: "Systems Biology", codeRepo: "opencobra/cobrapy/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

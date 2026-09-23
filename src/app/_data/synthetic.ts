@@ -928,6 +928,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["macro-structures", "protein-structure", "ramachandran", "enzyme-kinetics", "michaelis-menten", "hill-equation", "glycomics", "lipidomics", "alphafold-db", "patterns", "genai"],
   },
+  {
+    id: "ADR-039",
+    title: "Adopt Flux Balance Analysis + GNN for systems biology — metabolic networks at whole-cell scale",
+    status: "accepted",
+    date: "FY30-Q4",
+    deciders: "Data Platform, Systems Biology, ML Engineering, Architecture",
+    context:
+      "ADR-037 covered genetics (DNA/RNA/CRISPR/GWAS). ADR-038 covered macro-structures (proteins/enzymes/glycans/lipids). The remaining frontier is systems biology — integrating ALL of these into a coherent cellular model. Three core problems: (1) Metabolic network analysis via Flux Balance Analysis (FBA) — linear programming on a stoichiometric matrix S (m metabolites × n reactions) where S·v = 0 enforces mass balance, maximise biomass = c·v. Recon 3D (Brunk 2018) has 13,500 reactions and 8,400 metabolites — the human metabolic network. (2) Protein-protein interaction (PPI) networks — STRING database (Szklarczyk 2023) has 19.5M PPIs across 19,000 organisms, scored by confidence. PageRank / NetworkX centrality identifies hub proteins (essential genes). (3) Multi-omics integration — combine transcriptomics (RNA-seq, 20K genes × N samples), proteomics (mass spec, 10K proteins), metabolomics (LC-MS, 1K metabolites), and epigenomics (ATAC-seq, 500K peaks) into a single model. Modern: Karr 2012 simulated a whole cell (Mycoplasma genitalium, 525 genes) — every gene + metabolite + reaction in a single simulation. Takes 10 hours on 1 CPU for one cell cycle (9 hours real). BioModels Database (Li 2010) has 1,500+ curated ODE models. The math: FBA is LP, PPI analysis is graph algorithms, multi-omics is matrix factorisation (PCA/ICA/NMF).",
+    decision:
+      "Adopt a three-layer systems biology stack: (1) Metabolic modelling via COBRApy (Python, LP solver — GLPK for free, Gurobi for production 1000x faster) on Recon 3D. Compute growth rate, gene essentiality, minimal medium, knockout phenotypes. (2) PPI analysis via NetworkX + Graph Neural Networks (PyTorch Geometric) on STRING database — PageRank for essentiality prediction, GNN for function prediction from network topology. (3) Multi-omics integration via MOFA+ (Argelaguet 2020) — Bayesian factor analysis that decomposes the multi-omics matrix into shared + modality-specific factors. Connects to ADR-037-038: variant → protein → pathway (Recon 3D) → phenotype (FBA); variant → PPI partner → complex function. Connects to ADR-022 pgvector: pathway embeddings + protein complex embeddings store for RAG. Whole-cell simulation (Karr 2012 pattern) is the aspirational end-goal — every gene product + metabolite + reaction in one model, simulated cell cycle by cell cycle.",
+    consequences:
+      "+ FBA is fast (seconds for Recon 3D on laptop) and predictive — knockout phenotype accuracy 90%+. + STRING PPI has 19.5M interactions, scored by confidence (high 0.9, medium 0.4). + MOFA+ integrates any number of omics without manual alignment. + Whole-cell models are the north star — Karr 2012 showed feasibility for a 525-gene organism. + All integrate with pgvector — pathway / complex embeddings storable. − FBA assumes steady state — misses dynamics (need FBA + ODE for time-series). − STRING has many false positives — high-confidence filter (0.7+) cuts to 4M. − MOFA+ requires samples with matched omics — expensive. − Whole-cell simulation is still infeasible for human (20K genes) — even for M. genitalium it took 10h.",
+    alternatives: [
+      "Pure ODE modelling (BioModels 1,500 models) — accurate but requires per-pathway hand-built, doesn't scale to genome",
+      "Boolean networks (Kauffman 1969) — qualitative but loses quantitative predictions",
+      "Constraint-based modelling without LP (genetic algorithms) — slower, less accurate",
+      "Pure deep learning (Geneformer, Theodoris 2023) — captures gene-gene interactions but lacks mechanistic interpretability",
+    ],
+    tags: ["systems-biology", "fba", "metabolic-network", "ppi", "string", "multi-omics", "mofa", "whole-cell", "cobra", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

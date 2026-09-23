@@ -53,13 +53,14 @@ export type PageId =
   | "cheminformatics"
   | "molecular-modelling"
   | "genetic-materials"
-  | "macro-structures";
+  | "macro-structures"
+  | "systems-biology";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology";
   icon: string;
   description: string;
 }
@@ -440,6 +441,14 @@ export const PAGES: PageMeta[] = [
     group: "Macro Structures",
     icon: "Boxes",
     description: "AI-generated illustrations + Ramachandran short, 4-level protein hierarchy, Michaelis-Menten/Hill enzyme kinetics, glycomics WURCS, lipidomics LIPID MAPS, AlphaFold DB 200M, low-level PyTorch SecondaryStructurePredictor+RamachandranValidator+EnzymeKinetics+GlycanGraph+LipidFingerprinter.",
+  },
+  {
+    id: "systems-biology",
+    label: "Systems Biology — FBA, PPI, Multi-omics, Whole-cell",
+    shortLabel: "Systems Biology",
+    group: "Systems Biology",
+    icon: "Network",
+    description: "AI-generated illustrations + metabolic flux short, FBA LP on stoichiometric matrix, PPI networks PageRank + GNN, MOFA+ multi-omics factor analysis, Karr 2012 whole-cell, low-level PyTorch FBASolver+PPINetwork+MultiOmicsFactorAnalysis+WholeCellModel.",
   },
 ];
 

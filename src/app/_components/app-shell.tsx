@@ -57,6 +57,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Molecular Modelling", ids: ["molecular-modelling"] },
   { title: "Genetic Materials", ids: ["genetic-materials"] },
   { title: "Macro Structures", ids: ["macro-structures"] },
+  { title: "Systems Biology", ids: ["systems-biology"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
