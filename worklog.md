@@ -677,3 +677,26 @@ Stage Summary:
 - HEAD = 688cdcd on both repos
 - Deploy #47 succeeded
 - 34 pages, 25 ADRs, 29 pages with Pyodide, 3 with WasmRunner
+
+---
+Task ID: adr026-computer-vision
+Agent: Super Z (main)
+Task: ADR-026 (ViT+CNN hybrid) + Computer Vision page (#35) with 3D convolution animation, conv2d+backprop Pyodide demos, low-level PyTorch Conv2d/LeNet/VisionTransformer/HybridViT, hardware implications.
+
+Work Log:
+- ADR-026: hybrid ViT+CNN architecture (CNN stem + ViT body, LoRA adaptation, pgvector embeddings)
+- Computer Vision page (#35):
+  * 3D-perspective convolution animation (kernel sliding over 6×6 input, 9 positions, output fills progressively)
+  * Convolution math (cross-correlation, padding, stride, receptive field growth)
+  * Pyodide conv2d: 3 kernels (Sobel-X, Sobel-Y, blur) on 6×6 image + maxpool
+  * Pyodide convolutional backprop: train 3×3 kernel via SGD (forward + dK + update, 30 epochs)
+  * Architecture timeline: LeNet (1998, 60K) → AlexNet (2012, 60M) → VGG-16 (2014, 138M) → ResNet-50 (2015, 25.6M) → EfficientNet (2019, 66M) → ConvNeXt (2022, 89M) → ViT-22B (2023, 22B) → CLIP/SigLIP (2024+)
+  * Low-level PyTorch: Conv2d class with Kaiming init, LeNet-5, full VisionTransformer with patch embed + CLS token + positional encoding + 12 transformer blocks, HybridViT (ADR-026 arch)
+  * Hardware implications ASCII: conv im2col → matmul, ViT attention → matmul, same A100 tensor cores
+  * 'Convolutions ARE learnable DSP filters' deeper-thought insight (Sobel 1968, Canny 1986, Gabor 1946 — all hand-engineered convs, CNNs just make them learnable; ViT generalises further with content-addressable filters)
+
+Stage Summary:
+- HEAD = efabe57 on both repos (private + public)
+- 35 pages, 26 ADRs, 31 pages with Pyodide, 3 with WasmRunner
+- /computer-vision → HTTP 200 (305KB), Convolution: True, ViT: True, Pyodide: True, 3D: True, ADR-026: True
+- Production build succeeded (39 routes total, 1 new)
