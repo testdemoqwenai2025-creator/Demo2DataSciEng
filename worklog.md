@@ -601,3 +601,27 @@ Stage Summary:
 - HEAD = faf8211 on both repos
 - Deploy #41 succeeded
 - 30 pages, 22 ADRs, 23 pages with Pyodide, 3 with WasmRunner
+
+---
+Task ID: adr023-fine-tuning-page
+Agent: Super Z (main)
+Task: ADR-023 (LoRA+QLoRA) + LLM Fine-Tuning page (#31) with 3D LoRA animation, Pyodide LoRA math + DPO demos, low-level PyTorch code.
+
+Work Log:
+- ADR-023: LoRA + QLoRA as default fine-tuning method
+- Fine-Tuning page (#31):
+  * 3D LoRA architecture animation (W frozen + A×B trainable → h')
+  * 4 math sections (forward pass, backward pass, init, QLoRA NF4)
+  * Pyodide LoRA math: gradient descent on matrix factorisation (100× param reduction)
+  * Low-level PyTorch LoRALinear class (full implementation with injection)
+  * RLHF vs DPO comparison (3-stage vs 1-stage)
+  * Pyodide DPO loss simulation (sigmoid + log-likelihood on preference pairs)
+  * Gold tables → training data (DuckDB generates instruction-response pairs)
+  * 'The low-rank hypothesis' deeper-thought insight
+- Fixed: `<<` in JSX text caused parsing error (replaced with &lt;&lt;)
+
+Stage Summary:
+- HEAD = 821778c on both repos
+- Deploy #43 succeeded
+- 31 pages, 23 ADRs, 25 pages with Pyodide, 3 with WasmRunner
+- /fine-tuning → HTTP 200 (185KB), LoRA: True, Pyodide: True, 3D: True
