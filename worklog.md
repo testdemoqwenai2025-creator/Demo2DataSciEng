@@ -499,3 +499,33 @@ Stage Summary:
 - 22 pages, 19 ADRs, 15 pages with Pyodide, 3 with WasmRunner
 - /polars → HTTP 200 (110KB), Polars: True, Pyodide: True
 - /evolution → Carbon-Aware section live (Carbon: True)
+
+---
+Task ID: adr020-ml-platform-page
+Agent: Super Z (main)
+Task: ADR-020 (MLflow) + ML Platform page (#23) with Pyodide model training demo.
+
+Work Log:
+- ADR-020 added to synthetic.ts (now 20 ADRs):
+  * Title: 'Adopt MLflow as experiment tracking + model registry standard'
+  * Status: accepted (FY27-Q1)
+  * Decision: MLflow for tracking + registry; Databricks Feature Store / Feast for features
+- ML Platform page (#23) — src/app/_pages/ml-platform.tsx:
+  * New 'Machine Learning' sidebar group
+  * 4 KPIs: 7 lifecycle stages, 4+ languages, MLflow, Pyodide in-browser
+  * ML lifecycle: 7 stages with tools per stage
+  * Pyodide ML demo: trains LINEAR REGRESSION via gradient descent in browser
+    (200 epochs, 100 samples, converges to w≈2.0, b≈1.0, shows MSE/RMSE)
+  * Multi-language code (4 langs, drawer): Python (sklearn+MLflow), Rust (candle),
+    Scala (Spark MLlib), Go (ONNX runtime)
+  * MLflow lifecycle code: TRACK → REGISTER → PROMOTE → SERVE
+  * 'The lakehouse IS the ML platform' deeper-thought insight
+  * Free tier matrix (7 services)
+  * FloatingLiveButton topic configured
+- Fixed: missing '}' after closing backtick in MLflow code template literal
+
+Stage Summary:
+- HEAD = 68aae6c on both repos
+- Deploy #34 succeeded
+- 23 pages, 20 ADRs, 16 pages with Pyodide, 3 with WasmRunner
+- /ml-platform → HTTP 200 (142KB), ML: True, Pyodide: True
