@@ -333,18 +333,6 @@ export function DatabricksPage() {
           </ul>
         </SectionCard>
       </div>
-
-      {/* Live resources drawer button — fetches real-time arXiv + GitHub + HF + PwC */}
-      <LiveResourcesDrawer
-        topic="Apache Spark Delta Lake Lakehouse"
-        codeRepo="delta-io/delta/master/README.md"
-        trigger={
-          <Button variant="outline" className="gap-1.5">
-            <Sparkles className="h-3.5 w-3.5" /> View live resources for Spark + Delta Lake
-          </Button>
-        }
-      />
-
       {/* Multi-language samples: 5 idioms for the same Silver conformance */}
       <SectionCard
         title="Multi-language: 5 idioms for Silver customer conformance"

@@ -7,6 +7,7 @@ import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
 import { ContextualBandit } from "./contextual-bandit";
+import { FloatingLiveButton } from "./floating-live-button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -282,6 +283,10 @@ export function AppShell({ children }: AppShellProps) {
           <FooterContent compact />
         </footer>
       </div>
+
+      {/* Floating live-data button — appears on every non-home page,
+          opens the LiveResourcesDrawer with topic pre-set per page */}
+      <FloatingLiveButton />
     </div>
   );
 }

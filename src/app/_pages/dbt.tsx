@@ -465,17 +465,6 @@ export function DbtPage() {
           </ul>
         </SectionCard>
       </div>
-
-      <LiveResourcesDrawer
-        topic="dbt data build tool analytics engineering"
-        codeRepo="dbt-labs/dbt-core/main/README.md"
-        trigger={
-          <Button variant="outline" className="gap-1.5">
-            <Sparkles className="h-3.5 w-3.5" /> View live resources for dbt
-          </Button>
-        }
-      />
-
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("tableau")} className="text-sm text-primary hover:underline">
           → Continue to Tableau &amp; analytics
