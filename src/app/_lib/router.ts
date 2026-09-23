@@ -44,13 +44,14 @@ export type PageId =
   | "computer-vision"
   | "diffusion-models"
   | "distributed-training"
-  | "mlops-tracing";
+  | "mlops-tracing"
+  | "quantization-inference";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference";
   icon: string;
   description: string;
 }
@@ -359,6 +360,14 @@ export const PAGES: PageMeta[] = [
     group: "MLOps & Tracing",
     icon: "Activity",
     description: "Trace DAG animation, OTLP wire format, Kahn topo sort + DP critical path, SLO math (p99, burn rate, error budget), low-level PyTorch+OpenTelemetry code.",
+  },
+  {
+    id: "quantization-inference",
+    label: "Quantization & Inference — NF4, GPTQ, AWQ, llama.cpp GGUF",
+    shortLabel: "Quantization",
+    group: "Quantization & Inference",
+    icon: "Gauge",
+    description: "3D quantisation grid animation, NF4/GPTQ/AWQ math, group quantisation, AWQ channel scaling, low-level PyTorch NF4+AWQLinear+Q4_K_M, llama.cpp GGUF.",
   },
 ];
 

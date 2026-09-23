@@ -48,6 +48,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Diffusion Models", ids: ["diffusion-models"] },
   { title: "Distributed Training", ids: ["distributed-training"] },
   { title: "MLOps & Tracing", ids: ["mlops-tracing"] },
+  { title: "Quantization & Inference", ids: ["quantization-inference"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

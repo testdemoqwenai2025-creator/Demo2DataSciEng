@@ -748,6 +748,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["observability", "opentelemetry", "tracing", "spans", "critical-path", "slo", "sli", "patterns", "genai"],
   },
+  {
+    id: "ADR-030",
+    title: "Adopt AWQ 4-bit quantisation + llama.cpp GGUF for cost-effective LLM inference",
+    status: "accepted",
+    date: "FY28-Q3",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-023 adopted QLoRA 4-bit NF4 for fine-tuning. ADR-028 adopted FSDP for training. The remaining gap is inference: a 70B model in BF16 needs 140GB just for weights — 2× A100 80GB per replica, very expensive for serving. Three production-grade quantisation schemes compete: (1) NF4 (NormalFloat 4-bit, used in QLoRA — information-theoretically optimal for normally-distributed weights, but designed for adapters not deployment); (2) GPTQ (Generalised Post-Training Quantisation, layer-by-layer Hessian-based weight update — accurate but slow to quantise, ~hours per 70B); (3) AWQ (Activation-aware Weight Quantisation, scales salient weight channels by ~1% to preserve activations — fast to quantise, ~minutes per 70B, marginal accuracy loss); (4) llama.cpp GGUF k-quants (Q4_K_M, Q5_K_M, Q6_K — super-blocks with mixed precision, runs on CPU/Mac). The math: quantisation error e = x - dequant(quant(x)); group quantisation minimises MSE per group; AWQ's insight is that not all weight channels are equal — those with larger activation magnitudes are more important to preserve.",
+    decision:
+      "Adopt AWQ 4-bit as the default inference quantisation for GPU-served LLMs (7B-70B), with llama.cpp GGUF Q4_K_M as the default for CPU/edge deployment. Production stack: AWQ-quantised Llama-3-70B (40GB VRAM, fits 1× A100 80GB with 40GB headroom for KV cache) served via vLLM (ADR-031 will cover serving); llama.cpp with GGUF Q4_K_M for edge / Mac / CPU-only deployments (4-bit with mixed-precision super-blocks, ~3.5 bits/weight effective). For fine-tuning, keep ADR-023's QLoRA NF4 (designed for backward pass, not inference). The AWQ math: identify the top 1% of weight channels by activation magnitude (per-layer calibration on 128 samples), scale them by s > 1 before quantisation (so the post-quantisation rounding error is smaller relative to the magnitude), then apply standard 4-bit group quantisation. Quantisation error: e = ||x - dequant(quant(s·x))/s||₂. Group size 128, MSE minimised per group.",
+    consequences:
+      "+ 4× memory reduction vs BF16 (140GB → 35GB for 70B). + Same accuracy as BF16 within 1% perplexity (AWQ paper). + Fits 70B on 1× A100 80GB (vs 2× without quantisation) — 50% cost saving. + llama.cpp enables edge deployment (Mac, Raspberry Pi for 7B). + Connects to ADR-031 serving stack (vLLM supports AWQ kernels). − Calibration set matters — must be representative of production traffic. − GPTQ slightly more accurate but 100× slower to quantise. − NF4 designed for backward pass (LoRA), not optimal for pure inference. − Quantisation-aware training (QAT) is more accurate but requires retraining — we don't have compute budget for that.",
+    alternatives: [
+      "GPTQ 4-bit (more accurate, but ~10h quantisation time per 70B model — impractical for iteration)",
+      "NF4 (designed for fine-tuning adapters via QLoRA, not for pure inference)",
+      "FP8 (NVIDIA H100 native, but only on H100 hardware — our cluster is A100)",
+      "Full BF16 inference (highest accuracy but 4× cost — used only for golden-path benchmark)",
+    ],
+    tags: ["quantization", "awq", "nf4", "gptq", "llama-cpp", "gguf", "4-bit", "inference", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
