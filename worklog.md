@@ -844,3 +844,36 @@ Stage Summary:
 - 41 pages, 32 ADRs, 38 pages with Pyodide, 3 with WasmRunner
 - /rag-deep-dive → HTTP 200 (326KB), BM25: True, RRF: True, Cross-encoder: True, Hybrid: True, Pyodide: True, 3D: True, ADR-032: True, chunking: True
 - Production build succeeded (45 routes total, 1 new)
+
+---
+Task ID: adr033-multimodal-rag-q4-FINAL
+Agent: Super Z (main)
+Task: Stage 4/4 (FINAL) of "quantization + serving + RAG + multimodal" — ADR-033 (SigLIP) + Multi-modal RAG page (#42). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-033: SigLIP (sigmoid loss variant of CLIP) for multi-modal embeddings — text + image in one shared ℝ^768 pgvector space
+- Multi-modal RAG page (#42) — FINAL page in the 4-stage series:
+  * 3D shared embedding space animation (5 phases: pre-training random scatter → contrastive pull matched pairs → aligned semantic clusters (revenue, customer growth, churn, supply chain) → query "revenue chart" retrieves BOTH T1 (text) and I1 (image) → cross-modal RAG result)
+  * Contrastive loss math: CLIP L = -log(exp(sim(I_i,T_i)/τ) / Σ_j exp(sim(I_i,T_j)/τ)) — NxN softmax, O(N²) coupling, caps at batch 32k vs SigLIP L = -log σ(z·(s·sim-b)) — per-pair sigmoid, independent, scales to batch 1M+ on TPU
+  * Pyodide demo: implements both CLIP + SigLIP loss from scratch with cosine_sim, clip_loss (softmax with temperature), siglip_loss (per-pair sigmoid with learnable s/b), simulates pre-training random embeddings → post-training aligned embeddings, shows similarity matrix change (was unaligned → aligned on diagonal), then runs cross-modal retrieval — text query "show me the revenue chart" retrieves BOTH revenue text chunk (id=1, text) AND revenue chart image (id=2, image) from same pgvector index
+  * Cross-modal RAG pipeline ASCII: query (text OR image) → SigLIP encode (text or image branch, SAME ℝ^768 space) → pgvector HNSW search (modality-agnostic, returns top-50 mixed) → multi-modal LLM (LLaVA) cross-encoder re-rank → top-5 mixed → vLLM; with pgvector schema (CREATE TABLE chunks with modality column)
+  * Low-level PyTorch: SigLIPModel (encode_image, encode_text, siglip_loss with learnable logit_scale + logit_bias = -log σ(z·(s·sim-b))), VisionEncoder (ViT from ADR-026 — patch_embed + CLS token + pos_embed + transformer encoder blocks), TextEncoder (transformer from /transformer — token_embed + pos_embed + transformer encoder), MultiModalRAGRetriever (extends ADR-032 hybrid to mixed modalities — index_documents handles both text and image batches, retrieve encodes query with appropriate branch and searches modality-agnostic pgvector), MultiModalLLM (LLaVA-style — projects image embeddings to LLM space via linear projection, concatenates as "image tokens" before text, full LLM forward for cross-attention scoring)
+  * 'Contrastive learning IS metric learning IS the embedding IS the index' deeper-thought insight (any two co-occurring modalities can be aligned via contrastive learning — CodeBERT for code+docstring, Whisper for audio+transcript, ADR-024 NL-to-SQL semantic layer for SQL+description, VideoCLIP for video+caption; SigLIP's architecture is modality-invariant; the shared embedding space IS the unified query language; ADR-022 pgvector stores ANY embedding — text/image/synthetic/multi-modal; ADR-024 semantic layer IS contrastive learning on NL+SQL pairs; ADR-032 RAG IS contrastive learning on query+doc pairs; ADR-033 SigLIP IS contrastive learning on image+caption pairs; ALL three are the same algorithm on different modality pairs; the platform from data ingestion to LLM response is ONE big contrastive-learning pipeline — pgvector IS the shared embedding space, the user's NL question IS the query embedding, the platform's response IS the retrieved nearest neighbour, every user interaction IS a contrastive-learning step — the platform IS the model)
+
+Stage Summary — ALL 4 STAGES COMPLETE (q1+q2+q3+q4):
+- HEAD = 64b9d3b on both repos (private + public)
+- 42 pages, 33 ADRs, 39 pages with Pyodide, 3 with WasmRunner
+- /multimodal-rag → HTTP 200 (331KB), CLIP: True, SigLIP: True, Contrastive: True, cross-modal: True, Pyodide: True, 3D: True, ADR-033: True
+- Production build succeeded (46 routes total, 1 new)
+
+FINAL TOTALS — full platform state after 4 stages:
+- 42 pages (started this conversation at 35)
+- 33 ADRs (started at 26)
+- 39 pages with Pyodide demos (started at 32)
+- 3 pages with WasmRunner (unchanged)
+- 46 routes (started at 39)
+- 7 new pages in this 4-stage series:
+  #39 /quantization-inference (NF4, GPTQ, AWQ, llama.cpp GGUF)
+  #40 /inference-serving (vLLM, PagedAttention, continuous batching)
+  #41 /rag-deep-dive (hybrid BM25+vector, RRF, cross-encoder)
+  #42 /multimodal-rag (CLIP, SigLIP, cross-modal pgvector) — FINAL
