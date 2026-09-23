@@ -48,13 +48,14 @@ export type PageId =
   | "quantization-inference"
   | "inference-serving"
   | "rag-deep-dive"
-  | "multimodal-rag";
+  | "multimodal-rag"
+  | "bioinformatics";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics";
   icon: string;
   description: string;
 }
@@ -395,6 +396,14 @@ export const PAGES: PageMeta[] = [
     group: "Multi-modal RAG",
     icon: "Sparkles",
     description: "3D shared embedding space animation, CLIP/SigLIP contrastive loss, cross-modal retrieval, low-level PyTorch SigLIPModel+MultiModalRAGRetriever+MultiModalLLM.",
+  },
+  {
+    id: "bioinformatics",
+    label: "Bioinformatics — Sequence Alignment, ESM-2, AlphaFold2",
+    shortLabel: "Bioinformatics",
+    group: "Bioinformatics",
+    icon: "Dna",
+    description: "3D DNA helix + alignment animation, Needleman-Wunsch/Smith-Waterman DP, BWA-MEM/BLAST, ESM-2 + AlphaFold2 papers, low-level PyTorch ESM2Tokenizer+ESM2Model+RoPE+StructureModule+IPA.",
   },
 ];
 

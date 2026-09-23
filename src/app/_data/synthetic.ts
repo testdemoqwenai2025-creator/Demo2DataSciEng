@@ -828,6 +828,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["multimodal", "clip", "siglip", "contrastive-learning", "cross-modal", "rag", "embeddings", "pgvector", "patterns", "genai"],
   },
+  {
+    id: "ADR-034",
+    title: "Adopt ESM-2 + pgvector for bioinformatics — protein sequences as embeddable documents",
+    status: "accepted",
+    date: "FY29-Q3",
+    deciders: "Data Platform, Bioinformatics, ML Engineering, Architecture",
+    context:
+      "ADR-033 unified text + image in one embedding space. The platform now needs to ingest genomics and proteomics data alongside the existing tabular + image content. Three core bioinformatics problems need infrastructure: (1) Sequence alignment (Smith-Waterman local, Needleman-Wunsch global — both O(n·m) DP); (2) Read mapping against a reference genome (BWA/BLAST use k-mer indexing + Burrows-Wheeler Transform for O(n) search); (3) Functional prediction from sequence (ESM-2 (Lin 2023) — a 650M-param protein language model trained on 250M sequences via masked language modelling; AlphaFold2 (Jumper 2021) — adds a geometric structure head to predict 3D coordinates). The key insight from ADR-033: a protein sequence IS a 'document' — embeddable with a transformer, storable in pgvector, queryable via RAG. The 20-letter amino acid alphabet becomes a 20-token vocabulary; the 3-letter codon → amino acid translation is a learned mapping. ESM-2's representations cluster proteins by function — a 'contrastive learning on evolution' result: 250M sequences aligned by descent → functional similarity in embedding space.",
+    decision:
+      "Adopt ESM-2 (650M params) as the default protein sequence encoder, with pgvector storing protein embeddings alongside text and image. Three-layer bioinformatics stack: (1) Sequence alignment via Biopython (Needleman-Wunsch global, Smith-Waterman local — both O(n·m) DP); (2) Reference genome mapping via BWA-MEM (BWT-based, O(n) per read, parallelised across chromosomes on Spark); (3) Functional prediction via ESM-2 (encoder transformer, 33 layers, 1280-dim embeddings) → pgvector HNSW index → RAG retrieval of similar proteins. Connects to ADR-027 diffusion: AlphaFold2's structure head IS a conditional diffusion model — predicts 3D coordinates from sequence embeddings, same DDPM math. Connects to ADR-022 pgvector: protein function search is RAG on the universe of UniProt. Application: when a novel protein is sequenced (e.g. new SARS-CoV-2 variant), embed with ESM-2 → ANN search in pgvector → retrieve functionally similar known proteins → RAG-prompt an LLM to summarise likely function + drug targets.",
+    consequences:
+      "+ Protein sequences become first-class platform data — same RAG infrastructure as text/image. + ESM-2 captures evolutionary information (trained on UniProt's 250M sequences with masked LM). + AlphaFold2 + ESM-2 + pgvector = function-from-sequence pipeline. + Connects to ADR-027 diffusion (AlphaFold2 structure head IS diffusion). + Genomics data via Spark (BWA-MEM distributed, GATK for variants) — same infrastructure as data pipelines. − ESM-2 (650M params) needs AWQ (ADR-030) + vLLM (ADR-031) to serve on 1× A100. − Protein sequences are not natural language — tokeniser must use 20-letter amino acid alphabet, not BPE. − AlphaFold2's structure head is GPU-heavy (relaxed + iterative SE(3)-equivariant attention) — separate inference path from ESM-2 embeddings. − Biological safety: functional prediction of novel pathogens needs governance (don't auto-publish predictions of dangerous functions).",
+    alternatives: [
+      "BLAST-only (no ML) — exact-match alignment, misses functional similarity for divergent sequences",
+      "Profile HMMs (HMMER) — family-specific, but each family needs separate training",
+      "Train a bespoke protein encoder — full control but 1000s of GPU-hours for a 650M model",
+      "Use AlphaFold2's MSA track directly — most accurate but requires multiple sequence alignment (slow)",
+    ],
+    tags: ["bioinformatics", "esm-2", "alphafold2", "sequence-alignment", "needleman-wunsch", "smith-waterman", "blast", "bwt", "rag", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

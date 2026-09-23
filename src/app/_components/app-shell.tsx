@@ -52,6 +52,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Inference Serving", ids: ["inference-serving"] },
   { title: "RAG Deep Dive", ids: ["rag-deep-dive"] },
   { title: "Multi-modal RAG", ids: ["multimodal-rag"] },
+  { title: "Bioinformatics", ids: ["bioinformatics"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
