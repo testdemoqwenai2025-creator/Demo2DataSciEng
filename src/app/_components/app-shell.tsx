@@ -34,6 +34,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Columnar", ids: ["arrow"] },
   { title: "Patterns", ids: ["patterns"] },
   { title: "Data Mesh", ids: ["data-mesh"] },
+  { title: "DataFrames", ids: ["polars"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

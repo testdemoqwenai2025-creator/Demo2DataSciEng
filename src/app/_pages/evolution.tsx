@@ -18,6 +18,7 @@ import {
   XCircle,
   ArrowRight,
   Sparkles,
+  Activity,
 } from "lucide-react";
 
 const RING_STYLE: Record<string, { color: string; label: string; icon: typeof CheckCircle2 }> = {
@@ -165,6 +166,44 @@ export function EvolutionPage() {
               </div>
             </div>
           ))}
+        </div>
+      </SectionCard>
+
+      {/* Carbon-Aware Computing */}
+      <SectionCard
+        title="Carbon-Aware Computing — the FY27+ aspiration"
+        description="Shift non-urgent workloads to hours when grid carbon intensity is low. Projected: −30% scope-2 emissions."
+        icon={<Activity className="h-5 w-5" />}
+        badge="FY27+"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            Data platforms consume significant electricity — Snowflake warehouses, Databricks clusters, S3 storage all draw power from the grid. The grid&apos;s carbon intensity varies by hour: solar peaks midday, wind is unpredictable, coal/gas baseload is constant. A carbon-aware scheduler defers non-urgent jobs ( Bronze→Silver batch, nightly Gold refresh, dbt docs generation) to hours when grid CO₂ is low.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Projected impact:</strong> −30% scope-2 emissions for the platform&apos;s compute, with zero impact on SLAs (urgent workloads run immediately; only deferred jobs shift). The pattern: each job gets a carbon budget; if the grid is dirty now, wait up to N hours for a cleaner window. The Electricity Maps API provides real-time carbon intensity forecasts.
+          </p>
+          <p>
+            This is a <strong className="text-foreground/80">research aspiration</strong> — the platform doesn&apos;t implement it yet. But the architecture is ready: Airflow supports deferrable sensors; the carbon-aware SDK exists; the job priority matrix (urgent vs deferrable) is a classification problem the agentic DQ triage agent (ADR-019&apos;s bandit) could learn. The intersection of RL + sustainability is the FY28 frontier.
+          </p>
+        </div>
+        <div className="mt-4 grid md:grid-cols-4 gap-2 text-xs">
+          <div className="rounded-md border border-border/60 p-2.5 bg-muted/20">
+            <p className="font-semibold text-emerald-600 dark:text-emerald-400">Urgent (immediate)</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Bronze ingestion, anomaly alerts, agent triage</p>
+          </div>
+          <div className="rounded-md border border-border/60 p-2.5 bg-muted/20">
+            <p className="font-semibold text-amber-600 dark:text-amber-400">Deferrable (≤ 4h)</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Silver conformance, Gold marts, dbt build</p>
+          </div>
+          <div className="rounded-md border border-border/60 p-2.5 bg-muted/20">
+            <p className="font-semibold text-violet-600 dark:text-violet-400">Deferrable (≤ 24h)</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Z-ORDER optimisation, VACUUM, docs gen</p>
+          </div>
+          <div className="rounded-md border border-border/60 p-2.5 bg-muted/20">
+            <p className="font-semibold text-cyan-600 dark:text-cyan-400">Projected savings</p>
+            <p className="text-[10px] text-muted-foreground mt-1">−30% scope-2 CO₂ for compute</p>
+          </div>
         </div>
       </SectionCard>
 

@@ -535,6 +535,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["polars", "dataframe", "arrow", "rust", "patterns", "single-node"],
   },
+  {
+    id: "ADR-019",
+    title: "Adopt the contextual bandit as the platform's official recommendation engine",
+    status: "accepted",
+    date: "FY27-Q1",
+    deciders: "Data Platform, Frontend, Developer Experience",
+    context:
+      "The platform has 2 Thompson sampling bandits in production: Knowledge Shorts (per-short Beta posterior) and page recommendations (per-page Beta posterior with contextual features). Both persist to localStorage, learn across sessions, and use Marsaglia-Tsang Gamma sampling for Beta distribution draws. The pattern works — the bandit surfaces relevant content based on user interactions (clicks = α+1 wins, skips = β+1 losses). But it's undocumented as a formal platform component.",
+    decision:
+      "Formalise the contextual bandit as the platform's official recommendation engine. The Thompson sampling pattern (Beta posterior + Marsaglia-Tsang Gamma + contextual multipliers) is the standard for all adaptive content. Future recommendation surfaces (drawer tab defaults, search result ranking, Knowledge Short ordering) use the same bandit pattern. The bandit is a first-class platform component, not a prototype.",
+    consequences:
+      "+ Personalised recommendations that learn across sessions. + Simple to implement (Beta posterior, no neural network). + Contextual features (same-group boost, time-of-day boost). + Lazy evaluation (0 computation until drawer opens). + Persists in localStorage (no backend needed). − Cold-start problem (uniform Beta(1,1) until interactions accumulate). − No feature vectors (simplified — real contextual bandits use logistic regression). − No cross-user learning (localStorage is per-browser). − No server-side state (can't share bandit across devices).",
+    alternatives: [
+      "No recommendations (static ordering — no personalisation)",
+      "Collaborative filtering (needs server + user database — breaks static model)",
+      "Neural recommender (overkill for 21 pages × 10 shorts)",
+    ],
+    tags: ["bandit", "thompson-sampling", "recommendation", "rl", "patterns", "frontend"],
+  },
 ];
 
 // ============================================================

@@ -27,13 +27,14 @@ export type PageId =
   | "streaming"
   | "arrow"
   | "patterns"
-  | "data-mesh";
+  | "data-mesh"
+  | "polars";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames";
   icon: string;
   description: string;
 }
@@ -206,6 +207,14 @@ export const PAGES: PageMeta[] = [
     group: "Data Mesh",
     icon: "Network",
     description: "Domain-oriented data ownership, data as a product, federated governance, self-serve platform infrastructure.",
+  },
+  {
+    id: "polars",
+    label: "Polars vs DuckDB vs Pandas — The Great DataFrame Shootout",
+    shortLabel: "Polars vs DuckDB",
+    group: "DataFrames",
+    icon: "Boxes",
+    description: "Three DataFrame libraries benchmarked in your browser. Arrow-native, lazy evaluation, 10-30× speed differences — with Pyodide timing demos.",
   },
 ];
 

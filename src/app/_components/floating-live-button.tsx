@@ -50,6 +50,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "arrow":               { topic: "Apache Arrow columnar in-memory format Flight zero-copy IPC",     label: "Arrow",          codeRepo: "apache/arrow/main/README.md" },
   "patterns":            { topic: "data engineering patterns Medallion SCD2 slim CI reverse-ETL",     label: "Patterns",       codeRepo: "dbt-labs/dbt-core/main/README.md" },
   "data-mesh":            { topic: "data mesh domain-oriented data products federated governance",      label: "Data Mesh",      codeRepo: "DataEngineeringZine/data-mesh/main/README.md" },
+  "polars":              { topic: "Polars DuckDB Pandas DataFrame Arrow columnar benchmark",       label: "DataFrames",     codeRepo: "pola-rs/polars/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
