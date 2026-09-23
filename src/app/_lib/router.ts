@@ -26,13 +26,14 @@ export type PageId =
   | "duckdb"
   | "streaming"
   | "arrow"
-  | "patterns";
+  | "patterns"
+  | "data-mesh";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh";
   icon: string;
   description: string;
 }
@@ -197,6 +198,14 @@ export const PAGES: PageMeta[] = [
     group: "Patterns",
     icon: "Boxes",
     description: "Medallion, SCD2, slim CI, session RLS, reverse-ETL — 5 core patterns with Pyodide executable demos.",
+  },
+  {
+    id: "data-mesh",
+    label: "Data Mesh — Domain-Oriented Data Products",
+    shortLabel: "Data Mesh",
+    group: "Data Mesh",
+    icon: "Network",
+    description: "Domain-oriented data ownership, data as a product, federated governance, self-serve platform infrastructure.",
   },
 ];
 

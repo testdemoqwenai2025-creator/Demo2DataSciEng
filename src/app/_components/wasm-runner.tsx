@@ -16,10 +16,14 @@ import { Play, Loader2, AlertCircle, CheckCircle2, Cpu } from "lucide-react";
  *
  * The demo below uses a hand-assembled Wasm binary (41 bytes) that
  * exports an `add(i32, i32) -> i32` function. In production, you'd
- * compile the Rust/C code using:
- *   - Rust:  cargo build --target wasm32-wasi
- *   - C/C++: emcc -o module.wasm module.c
- *   - Go:    GOOS=js GOARCH=wasm go build
+ * compile from any of the 7 supported languages:
+ *   - Rust:     cargo build --target wasm32-wasi
+ *   - C/C++:    emcc -o module.wasm module.c
+ *   - Go:       GOOS=js GOARCH=wasm go build -o main.wasm
+ *   - Python:   (Pyodide — already in production per ADR-015)
+ *   - Elixir:   (BeamWasm — experimental, per ADR-016 future)
+ *   - Scala:    (Scala.js — compiles to JS, then to Wasm via wasm-tools)
+ *   - Bash:     (not compilable to Wasm — use Pyodide for equivalent logic)
  *
  * The pattern is the same regardless of source language: compile to
  * .wasm, host the binary, load via WebAssembly.instantiate(), call

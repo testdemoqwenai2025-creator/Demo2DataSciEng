@@ -516,6 +516,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["arrow", "flight", "grpc", "transfer", "patterns", "cross-engine"],
   },
+  {
+    id: "ADR-018",
+    title: "Adopt Polars as the platform's default single-node DataFrame library",
+    status: "accepted",
+    date: "FY27-Q1",
+    deciders: "Data Platform, Analytics Engineering, Data Science",
+    context:
+      "ADR-014 adopted DuckDB as the CI + local analytical engine (SQL-first). But many data scientists and analytics engineers prefer a DataFrame API (code-first) over SQL. Pandas is the incumbent but is single-threaded, row-based internally, and 10-30× slower than Polars on the same data. Polars is Rust-native, Arrow-columnar, multi-threaded, and has lazy evaluation (query optimisation before execution). Both DuckDB and Polars speak Arrow natively — they're interchangeable for the same data.",
+    decision:
+      "Adopt Polars as the platform's default single-node DataFrame library for Python + Rust code that prefers a DataFrame API over SQL. DuckDB remains the default for SQL-first workflows (ADR-014). Both are Arrow-native — a Polars DataFrame converts to a DuckDB table and back with zero-copy. Pandas is held for ecosystem compatibility (libraries that require pandas objects) but new code should use Polars.",
+    consequences:
+      "+ 10-30× faster than Pandas on single-node. + Arrow-native (zero-copy with DuckDB). + Lazy evaluation (query optimiser before execution). + Multi-threaded (uses all cores). + Rust core (memory-safe, no GIL). + Smaller memory footprint. − Smaller ecosystem than Pandas (some libraries don't support Polars objects). − API differs from Pandas (migration cost for existing code). − No Pandas-style in-place mutation (Polars is immutable).",
+    alternatives: [
+      "Stay on Pandas (slow, single-threaded, row-based internally)",
+      "Use DuckDB for everything (SQL-only, no DataFrame API)",
+      "Modin (Pandas on Ray/Dask — distributed but still Pandas API)",
+    ],
+    tags: ["polars", "dataframe", "arrow", "rust", "patterns", "single-node"],
+  },
 ];
 
 // ============================================================
