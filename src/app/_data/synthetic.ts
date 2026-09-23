@@ -708,6 +708,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["diffusion", "ddpm", "ddim", "score-matching", "unet", "sde", "lora", "synthetic-data", "patterns", "genai"],
   },
+  {
+    id: "ADR-028",
+    title: "Adopt FSDP (Fully Sharded Data Parallel) for distributed LLM training beyond single-GPU memory",
+    status: "accepted",
+    date: "FY28-Q1",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-027 adopted DDPM for image generation — training a 1B-parameter U-Net needs ~16GB just for parameters (FP32) + ~32GB for Adam optimiser states + ~16GB for gradients = 64GB. A single A100 (80GB) is at the limit. ADR-023 adopted LoRA to keep adaptation cheap, but pretraining the U-Net from scratch (and the platform's 70B-parameter LLM eventually) needs full-parameter training across multiple GPUs. Three approaches compete: DataParallel (DP, replicate model on every GPU, split batch), DistributedDataParallel (DDP, optimised DP with ring AllReduce), and Fully Sharded Data Parallel (FSDP / ZeRO-3 — shard parameters, gradients, AND optimiser states across GPUs). The math: for an N-layer model with B billion params and P GPUs, DP needs 16·B GB per GPU (full replica). DDP needs the same. FSDP needs 16·B/P GB per GPU (sharded). The communication cost: DDP allreduces gradients every step (2·B·P·log P bytes via ring AllReduce). FSDP allgathers parameters before each layer's forward (B/P bytes per layer) and reduces-scatters gradients after backward (B·(P-1)/P bytes per layer). The roofline: FSDP trades 2× more communication for P× less memory.",
+    decision:
+      "Adopt FSDP (PyTorch FSDP, equivalent to DeepSpeed ZeRO-3) as the default distributed training strategy for models > 1B parameters. For models ≤ 1B, use DDP (simpler, no sharding overhead). FSDP configuration: (1) shard_strategy = FULL_SHARD (parameters + gradients + optimiser states all sharded); (2) mixed_precision = BF16 (compute in BF16, master weights in FP32 — same as ADR-023's QLoRA but for full training); (3) activation_checkpointing = True (recompute forward activations in backward — trades 30% compute for 4× memory); (4) cpu_offload = False (keep shards on GPU — CPU offload is too slow for production). The training step: (a) FSDP.all_gather(params) before forward — each GPU has the full layer briefly; (b) compute forward in BF16; (c) FSDP.reduce_scatter(grads) after backward — each GPU owns its gradient shard; (d) Adam updates the local optimiser shard in FP32; (e) repeat. Per-step comm: 2·B bytes allgather + 2·B bytes reduce-scatter (per layer, but pipelined). Cluster: 8× A100 80GB via NVLink (900GB/s) for FY28 training runs.",
+    consequences:
+      "+ Scales to 200B+ models on 8× A100 80GB (would need 3.2TB single-GPU otherwise). + Same hardware as ADR-026/027 (no new GPUs needed). + Mixed precision (BF16) gives 2× throughput. + Activation checkpointing gives 4× effective memory at 30% compute cost. − Communication-bound: large models spend 30-50% of time on allgather/reduce-scatter. − Debugging is harder (sharded state is hard to inspect). − FSDP is newer than DDP — fewer battle-tested patterns. − CPU offload is too slow (we explicitly disabled it).",
+    alternatives: [
+      "DDP (DistributedDataParallel) — simpler, but limited to ~1B params on 80GB A100",
+      "DeepSpeed ZeRO-2 (shard gradients + optimiser, NOT parameters) — middle ground, but still limited to ~2B params on 80GB",
+      "Pipeline Parallelism (GPipe, Megatron-LM) — splits model across GPUs by layer, but introduces pipeline bubbles",
+      "Tensor Parallelism (Megatron-LM) — splits individual matmuls across GPUs, but needs custom kernels per layer type",
+    ],
+    tags: ["distributed", "fsdp", "ddp", "zero", "allreduce", "ring-allgather", "mixed-precision", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

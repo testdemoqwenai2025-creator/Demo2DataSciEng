@@ -65,6 +65,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "gen-ai-patterns":      { topic: "generative AI autoregressive decoding BPE tokeniser temperature sampling",      label: "Gen AI",         codeRepo: "openai/tiktoken/main/README.md" },
   "computer-vision":      { topic: "computer vision convolutional neural network Vision Transformer ViT CNN ResNet attention",      label: "Comp Vision",    codeRepo: "pytorch/vision/main/README.md" },
   "diffusion-models":     { topic: "diffusion models DDPM DDIM score matching U-Net noise schedule Langevin dynamics SDE",      label: "Diffusion",      codeRepo: "openai/improved-diffusion/main/README.md" },
+  "distributed-training": { topic: "distributed training DDP FSDP ZeRO AllReduce Ring AllReduce PyTorch multi-GPU",      label: "Distributed",   codeRepo: "pytorch/pytorch/main/torch/distributed/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

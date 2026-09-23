@@ -42,13 +42,14 @@ export type PageId =
   | "comp-sci-materials"
   | "gen-ai-patterns"
   | "computer-vision"
-  | "diffusion-models";
+  | "diffusion-models"
+  | "distributed-training";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training";
   icon: string;
   description: string;
 }
@@ -341,6 +342,14 @@ export const PAGES: PageMeta[] = [
     group: "Diffusion Models",
     icon: "Waves",
     description: "Forward/reverse diffusion math, U-Net with time embedding, DDPM trainer, DDIM sampler, classifier-free guidance, Langevin dynamics, low-level PyTorch. From thermodynamics to image generation.",
+  },
+  {
+    id: "distributed-training",
+    label: "Distributed Training — DDP, FSDP, ZeRO, Ring AllReduce",
+    shortLabel: "Distributed Training",
+    group: "Distributed Training",
+    icon: "Network",
+    description: "Ring AllReduce animation, ZeRO sharding progression, memory breakdown (params+grads+optim+activations), BF16 mixed precision, activation checkpointing, low-level PyTorch FSDP.",
   },
 ];
 
