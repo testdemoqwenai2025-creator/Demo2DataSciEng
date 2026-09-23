@@ -77,6 +77,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "genetic-materials":         { topic: "genetics DNA RNA CRISPR Cas9 GWAS HMM Viterbi BLOSUM ENCODE GTEx UK Biobank BWA GATK genomics",      label: "Genetics",       codeRepo: "samtools/bcftools/main/README.md" },
   "macro-structures":          { topic: "protein structure Ramachandran Michaelis-Menten enzyme kinetics glycan WURCS lipid LIPID MAPS AlphaFold DB",      label: "Macro Structures", codeRepo: "dptech-corp/Uni-Mol/main/README.md" },
   "systems-biology":           { topic: "systems biology FBA flux balance analysis metabolic network PPI STRING multi-omics MOFA whole-cell COBRApy",      label: "Systems Biology", codeRepo: "opencobra/cobrapy/main/README.md" },
+  "cryo-em":                    { topic: "cryo-EM RELION CryoSPARC cryoDRGN Fourier projection-slice CTF Radon transform single particle analysis",      label: "Cryo-EM",        codeRepo: "structuremlucsb/cryodrgn/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

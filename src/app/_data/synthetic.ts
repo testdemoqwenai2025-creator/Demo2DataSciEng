@@ -948,6 +948,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["systems-biology", "fba", "metabolic-network", "ppi", "string", "multi-omics", "mofa", "whole-cell", "cobra", "patterns", "genai"],
   },
+  {
+    id: "ADR-040",
+    title: "Adopt RELION 4 + cryoDRGN for cryo-EM reconstruction — Fourier-space processing at petabyte scale",
+    status: "accepted",
+    date: "FY31-Q1",
+    deciders: "Data Platform, Structural Biology, ML Engineering, Architecture",
+    context:
+      "ADR-038 covered macro structures (proteins via AlphaFold DB). ADR-036 covered molecular modelling (force fields). Cryo-Electron Microscopy (Cryo-EM) is the experimental complement — image frozen-hydrated proteins in their native state at near-atomic resolution. The Nobel-winning technique (Dubochet, Frank, Henderson 2017) produces ~10^5 particle images per microscope session, each at signal-to-noise ratio (SNR) ~0.01 (raw image mostly noise). Three core algorithms are needed: (1) 2D classification via maximum-likelihood (Scheres 2012 RELION) — Bayesian classification of particles into orientation classes; (2) 3D reconstruction via Fourier-space projection-slice theorem (Crowther 1971) — each 2D image is a slice of the 3D Fourier transform, recover 3D by averaging; (3) Heterogeneous reconstruction via variational autoencoders (cryoDRGN, Zhong 2020) — model continuous conformational states with a VAE rather than discrete classes. The math: Contrast Transfer Function CTF(k) = -sin(χ(k)) where χ(k) = πλdefocus·k² - πC_sλ³·k⁴/2 + φ_0; B-factor sharpening signal *= exp(B/k_res²); Fourier Shell Correlation FSC(k) = Σ(F_1·F_2*) / (|F_1|·|F_2|) measures 3D resolution. CryoSPARC (Punjani 2017) uses stochastic gradient descent on GPU for ~10× faster orientation search than RELION's branch-and-bound.",
+    decision:
+      "Adopt a three-stage cryo-EM stack: (1) Motion correction + CTF estimation via MotionCor2 + CTFFIND4 (preprocessing, CPU + GPU); (2) 2D classification + 3D reconstruction via RELION 4.0 (Bayesian, MPI-parallel) for high-resolution homogeneous samples, CryoSPARC (GPU SGD) for fast iteration; (3) Heterogeneous + continuous reconstruction via cryoDRGN (VAE on particle images) for samples with conformational variability. Connects to ADR-038 AlphaFold DB: cryo-EM is the experimental ground truth that validates predictions; for low-resolution cryo-EM, AlphaFold structures provide initial models for refinement (model-building via Buccaneer/phenix.auto_build). Connects to ADR-036 molecular modelling: cryo-EM density maps are restraints in MD simulations (MDFF — Molecular Dynamics Flexible Fitting). Production: ~1 TB raw movies per session, processed on Slurm cluster with 100+ GPUs, 1-3 days to high-resolution map. The Fourier-space math is the same as signal processing (2D FFT, projection-slice theorem) — cryo-EM IS 3D signal reconstruction from 2D noisy projections.",
+    consequences:
+      "+ RELION + CryoSPARC + cryoDRGN cover the full pipeline (homogeneous + heterogeneous). + Fourier-space processing exploits FFT O(N log N) — 100× faster than real-space. + VAE captures continuous conformational states that discrete classification misses. + Validates AlphaFold predictions (some AlphaFold models disagree with high-res cryo-EM, flagging low-confidence regions). + Connects to ADR-036 via MDFF (density-restrained MD). − CTF correction requires accurate defocus estimation per micrograph — sensitive to specimen ice thickness. − RELION's branch-and-bound orientation search is slow at high resolution (~weeks for 1.5Å refinement). − cryoDRGN's VAE needs ~10⁵ particles minimum for stable training. − Specimen bias (preferred orientation) causes anisotropic resolution — needs tilted collection.",
+    alternatives: [
+      "IMOD + Relion-classic (1990s stack) — still used for tomography but superseded for SPA",
+      "EMAN2 (Baxter 2015) — open-source RELION alternative, smaller community",
+      "DeepEM (Bepler 2022) — end-to-end ML reconstruction, faster but less mature",
+      "CisTEM (Grigorieff 2018) — focused on high-resolution refinement, less heterogeneous support",
+    ],
+    tags: ["cryo-em", "relion", "cryosparc", "cryodrgn", "fourier", "ctf", "radon-transform", "projection-slice", "vae", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

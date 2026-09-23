@@ -54,13 +54,14 @@ export type PageId =
   | "molecular-modelling"
   | "genetic-materials"
   | "macro-structures"
-  | "systems-biology";
+  | "systems-biology"
+  | "cryo-em";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM";
   icon: string;
   description: string;
 }
@@ -449,6 +450,14 @@ export const PAGES: PageMeta[] = [
     group: "Systems Biology",
     icon: "Network",
     description: "AI-generated illustrations + metabolic flux short, FBA LP on stoichiometric matrix, PPI networks PageRank + GNN, MOFA+ multi-omics factor analysis, Karr 2012 whole-cell, low-level PyTorch FBASolver+PPINetwork+MultiOmicsFactorAnalysis+WholeCellModel.",
+  },
+  {
+    id: "cryo-em",
+    label: "Cryo-EM Image Processing — RELION, CryoSPARC, cryoDRGN",
+    shortLabel: "Cryo-EM",
+    group: "Cryo-EM",
+    icon: "Atom",
+    description: "AI-generated illustrations + projection-slice short, 2D FFT + CTF correction + Radon transform + FSC resolution, RELION/CryoSPARC/cryoDRGN papers, 24h HPC pipeline, low-level PyTorch fft2+CTFCorrection+CryoEM2DClassifier+CryoDRGN VAE.",
   },
 ];
 
