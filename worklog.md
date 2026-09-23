@@ -436,3 +436,33 @@ Stage Summary:
 - 20 pages, 17 ADRs, 13 pages with Pyodide (8 existing + 5 new on patterns),
   3 pages with WasmRunner
 - 7+1=8 languages in multi-lang samples (Elixir now on 3 pages: Databricks, CI/CD, Arrow)
+
+---
+Task ID: adr018-data-mesh-page-go-wasm
+Agent: Super Z (main)
+Task: ADR-018 (Polars) + Data Mesh page (#21) + Go→Wasm documentation in WasmRunner.
+
+Work Log:
+- ADR-018 added to synthetic.ts (now 18 ADRs):
+  * Title: 'Adopt Polars as the platform's default single-node DataFrame library'
+  * Status: accepted (FY27-Q1), follow-on to ADR-014 (DuckDB for SQL)
+  * Decision: Polars for DataFrame API (code-first), DuckDB for SQL, both Arrow-native
+  * 10-30× faster than Pandas, lazy evaluation, multi-threaded, Rust core
+- Data Mesh page (#21) — src/app/_pages/data-mesh.tsx:
+  * New 'Data Mesh' sidebar group
+  * 4 principles of Data Mesh (Dehghani): domain ownership, data as product,
+    federated governance, self-serve platform infrastructure
+  * 'The platform IS principle #4' deeper-thought insight
+  * Pyodide data product catalogue simulation (3 products, 3 domains, SLAs)
+  * 'When to adopt Data Mesh' decision matrix
+  * Data product definition YAML
+  * FloatingLiveButton topic configured
+- WasmRunner updated with Go compilation documentation:
+  * Now documents ALL 7 language compilation paths to Wasm:
+    Rust (wasm32-wasi), C/C++ (emcc), Go (GOOS=js GOARCH=wasm),
+    Python (Pyodide), Elixir (BeamWasm), Scala (Scala.js), Bash (N/A)
+
+Stage Summary:
+- HEAD = c3a9c7c on both repos
+- Deploy #30 succeeded
+- 21 pages, 18 ADRs, 14 pages with Pyodide, 3 with WasmRunner
