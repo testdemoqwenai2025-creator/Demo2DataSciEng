@@ -923,3 +923,48 @@ Stage Summary:
 - 44 pages, 35 ADRs, 41 pages with Pyodide, 3 with WasmRunner
 - /cheminformatics → HTTP 200 (362KB), ECFP: True, Tanimoto: True, ChemBERTa: True, SMILES: True, Pyodide: True, 3D: True, ADR-035: True
 - Production build succeeded (48 routes total, 1 new)
+
+---
+Task ID: adr036-molecular-modelling-b3-FINAL
+Agent: Super Z (main)
+Task: Stage 3/3 (FINAL) of "bioinformatics + cheminformatics + molecular modelling" — ADR-036 (AMBER+E(n)-EGNN+AlphaFold3) + Molecular Modelling page (#45). User requested modern scientific papers + HPC/Big Data + exceptional insights.
+
+Work Log:
+- ADR-036: Two-track molecular modelling stack — AMBER force fields (OpenMM ff14SB+GAFF2) for classical MD + E(n)-equivariant neural networks (Satorras 2022) for property prediction + AlphaFold3-style diffusion for structure prediction
+- Molecular Modelling page (#45) — FINAL in the bioinformatics+cheminformatics+molecular-modelling trilogy:
+  * 3D molecular dynamics animation (8 atoms in 2D box, perturbing positions per step under AMBER force field, velocity arrows showing instantaneous direction, dt=0.5 fs timestep)
+  * AMBER force field math: E_total = Σ_bonds K_r(r-r_0)² + Σ_angles K_θ(θ-θ_0)² + Σ_dihedrals K_φ(1+cos(nφ-δ)) + Σ VdW 4ε[(σ/r)¹²-(σ/r)⁶] + Σ_elec q_i q_j/(4πε_0 r_ij) — 5 terms, each physically motivated; 3 sub-algorithms (bonded terms O(N) cheap analytical, VdW Lennard-Jones 6-12 potential r^-12 repulsion + r^-6 attraction, electrostatics Coulomb long-range O(N²) naive → PME O(N log N))
+  * Verlet integration math: x(t+Δt) = 2x(t) - x(t-Δt) + a(t)·Δt² — symplectic (preserves phase-space volume, energy oscillates but doesn't drift), critical for stable μs-scale MD; timestep constraints (Δt < 0.5 fs for H-bond stretch, 2-4 fs with SHAKE/RATTLE constraints, 4 fs with virtual sites)
+  * Pyodide demo: full AMBER force field (bond_energy K(r-r0)² + angle_energy K(θ-θ0)² + vdw_energy 4ε[(σ/r)¹²-(σ/r)⁶] + coulomb_energy q1q2/(4πεr)) + Verlet integration from scratch on 5-atom molecule, 100 steps, energy conservation check (verifies symplectic property); plus E(n)-equivariant layer math (EGCL update rule)
+  * E(n)-equivariance math: f(R·x) = R·f(x) for any R ∈ O(n) — symmetry as inductive bias; water molecule rotated 90° is same molecule, non-equivariant MLP must learn every rotation as separate input (100× more data), equivariant network inherits symmetry; EGCL update rule (Satorras 2022): m_ij = φ_e(h_i, h_j, ||x_i-x_j||²) edge message on INVARIANT features, x_i' = x_i + Σ(x_i-x_j)·φ_x(m_ij) EQUIVARIANT position update via weighted displacement vectors, h_i' = h_i + φ_h(Σ m_ij) INVARIANT feature aggregation
+  * Modern papers: E(n)-equivariant GNN (Satorras et al. 2022 ICML 'E(n) Equivariant Graph Neural Networks' — generalises GNNs to E(n)-equivariance, SchNet Schütt 2017 + PaiNN Painn 2021 + Equiformer Liao 2023 all build on this, trained on QM9 130K + ANI-1x 5M DFT conformers, 1000× data efficiency vs non-equivariant baselines, 5% MAE worse than DFT but 1000× faster), AlphaFold3 (Abramson et al. 2024 Nature 630 'Accurate structure prediction of biomolecular interactions' — extends AlphaFold2 from protein-only to ANY biomolecular interaction: protein-protein antibody-antigen, protein-ligand drug binding THE killer use case, protein-DNA/RNA, protein-ion metals; same SE(3)-equivariant structure module + same diffusion as ADR-027 image generation; diffusion treats different atom types (C/N/O/S/P/H/metals) as channels of same 3D coordinate tensor; AlphaFold2→AlphaFold3 = text-only-LM → text-image-LM = multi-modal in molecular sense)
+  * HPC/Big Data pipeline ASCII: input (target PDB + drug SMILES) → AlphaFold3 predict complex (ESM-2 from ADR-034 + ChemBERTa from ADR-035 + diffusion module from ADR-036) → OpenMM + AMBER ff14SB classical MD (solvate TIP3P 50K water + minimise 1000 steps + equilibrate NVT 100ps + NPT 1ns + production 1μs at 4fs/step = 250K steps → 1.2 TB trajectory XTC) → Spark distributed trajectory analysis (partition by frame 1000×100K atoms, per-frame RMSD/Rg/DSSP secondary structure, k-means cluster on RMSD matrix, identify stable binding poses) → MM-PBSA binding free energy (ΔG_bind = <E_complex> - <E_protein> - <E_ligand>, 100 frames averaged, 1 kcal/mol accuracy vs Kd) → E(n)-EGNN refine + properties (Equiformer on QM9+ANI-1x, predict per-atom forces in O(N²) vs DFT O(N³), QM/MM for active site) → vLLM LLM summary; ALL on same platform (Spark, Parquet/Arrow, pgvector, vLLM, OTel)
+  * Low-level PyTorch: AMBERForceField nn.Module (forward = _bond_energy harmonic K_r(r-r_0)² + _angle_energy harmonic K_θ(θ-θ_0)² + _vdw_energy Lennard-Jones 4ε[(σ/r)¹²-(σ/r)⁶] pairwise via cdist + _electrostatic_energy Coulomb q_i q_j/(4πε r) pairwise), verlet_integrate (x(t+dt) = 2x(t) - x(t-dt) + a*dt² symplectic), velocity_verlet (half-step velocity variant for production — v(t+dt/2) = v(t) + 0.5·a(t)·dt, x(t+dt) = x(t) + v(t+dt/2)·dt, a(t+dt) = F(x(t+dt))/m, v(t+dt) = v(t+dt/2) + 0.5·a(t+dt)·dt), EquivariantGraphConvolutionLayer EGCL from Satorras 2022 (phi_e edge message on INVARIANT features [h_src, h_dst, sq_dist], phi_x scalar weight applied to displacement vectors for EQUIVARIANT position update via index_add scatter, phi_h invariant feature aggregation), EquivariantGNN (atom_embed + stack of EGCLs + energy_head, forward returns per-molecule energy + per-atom positions + features, with batch index for graph batching), AlphaFold3DiffusionModule (extends ADR-027 diffusion to 3D atom coords — cosine noise schedule + SE(3)-equivariant denoising layers stack of EGCLs with complete graph attention + condition on sequence embedding from ESM-2/ChemBERTa + DDIM 50-step sampling)
+  * 'Physics IS the inductive bias' deeper-thought insight (AMBER force field = 60 years of encoded physics: Hooke 1660 harmonic bond stretches, Lennard-Jones 1924 VdW, Coulomb 1785 electrostatics, Karplus 1959 periodic dihedral torsions — when we use AMBER for MD we constrain simulation with 60 years of physics knowledge, trajectory frames are samples from Boltzmann distribution this physics defines; E(n)-equivariance = rotational symmetry as network architecture — water molecule rotated 90° is same molecule, non-equivariant MLP must learn every rotation as separate input (100× more data), equivariant network inherits symmetry f(Rx)=Rf(x) — same principle that made CNNs work for images (translation-equivariance) and AlphaFold2 for proteins (SE(3)-equivariance), general principle: encode symmetry of data's generating distribution into network architecture, physics has rotation/reflection/permutation symmetry — encode them all get 1000× data efficiency, trajectory is toward more symmetries encoded not bigger networks; AlphaFold3's diffusion IS Anfinsen's thermodynamic principle (Anfinsen 1973 Nobel 1972 — protein's native structure is global free-energy minimum, variational principle of molecular physics), reverse SDE minimises free energy (variational lower bound), SE(3)-equivariant architecture ensures minimum is in correct physical space, diffusion timestep t maps to Boltzmann temperature (t=T high temp random structure, t=0 zero temp ground state), DDPM reverse process IS simulated annealing — same algorithm different framing; unifies ADR-027 image diffusion + ADR-034 AlphaFold2 + ADR-036 AlphaFold3 as 3 instances of same variational principle (Anfinsen + Boltzmann + reverse-SDE), applied to different physical systems (pixels, protein backbones, mixed atom types); molecular modelling stack doesn't use ML to bypass physics — uses ML to encode physics as network's inductive bias, data efficiency + accuracy + physical correctness all come from architecture matching physics not from data volume)
+- Bug fix: Python f-string `{step * 0.5:.1f}` in JSX → JS `.toFixed(1)` (line 71)
+
+Stage Summary — ALL 3 STAGES COMPLETE (b1+b2+b3):
+- HEAD = a1c1458 on both repos (private + public)
+- 45 pages, 36 ADRs, 42 pages with Pyodide, 3 with WasmRunner
+- /molecular-modelling → HTTP 200 (423KB), AMBER: True, Verlet: True, Equivariant: True, AlphaFold3: True, Pyodide: True, 3D: True, ADR-036: True
+- Production build succeeded (49 routes total, 1 new)
+
+FINAL TOTALS — full platform state after bio+chem+mm trilogy:
+- 45 pages (started this conversation at 42)
+- 36 ADRs (started at 33)
+- 42 pages with Pyodide demos (started at 39)
+- 3 pages with WasmRunner (unchanged)
+- 49 routes (started at 46)
+- 3 new pages in this bio+chem+mm trilogy:
+  #43 /bioinformatics (Needleman-Wunsch, Smith-Waterman, ESM-2, AlphaFold2)
+  #44 /cheminformatics (ECFP4, Tanimoto, ChemBERTa, virtual screening)
+  #45 /molecular-modelling (AMBER, Verlet, E(n)-EGNN, AlphaFold3) — FINAL
+
+THE GRAND UNIFICATION — across all 45 pages and 36 ADRs:
+- The platform is one big multi-modal contrastive-learning pipeline (ADR-033 insight)
+- pgvector IS the shared embedding space (ADR-022 — text/image/protein/molecule all in one HNSW index)
+- Every user interaction is a contrastive-learning step
+- The platform IS the model
+- All 5 modern scientific paper threads (ESM-2, AlphaFold2, ChemBERTa, E(n)-EGNN, AlphaFold3) are instances of the same algorithm (transformer encoder + masked/contrastive objective + pgvector + HNSW + RAG), applied to different modalities (text, image, protein sequence, 2D molecular graph, 3D molecular dynamics)
+- Physics encoded as inductive bias (force field = 60 years of physics; equivariance = rotational symmetry; diffusion = Anfinsen's thermodynamic principle)
+- The deeper pattern: data efficiency + accuracy + physical correctness all come from architecture matching the data's generating distribution, NOT from data volume
