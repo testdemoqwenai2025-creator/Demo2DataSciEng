@@ -22,13 +22,14 @@ export type PageId =
   | "dashboard"
   | "evolution"
   | "research"
-  | "modern-big-data";
+  | "modern-big-data"
+  | "duckdb";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases";
   icon: string;
   description: string;
 }
@@ -161,6 +162,14 @@ export const PAGES: PageMeta[] = [
     group: "Modern Big Data",
     icon: "Database",
     description: "BigQuery, DuckDB, Spark Streaming, Flink, Kafka, Pulsar, Iceberg — the modern open + serverless stack with code + free tiers.",
+  },
+  {
+    id: "duckdb",
+    label: "DuckDB — Laptop-scale Big Data",
+    shortLabel: "DuckDB",
+    group: "Databases",
+    icon: "Database",
+    description: "In-process OLAP that runs anywhere — just open a Parquet file. Arrow-native, OSS, 10× faster than Postgres on a single node.",
   },
 ];
 

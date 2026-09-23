@@ -45,6 +45,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "evolution":           { topic: "technology radar Thoughtworks data engineering roadmap",          label: "Evolution",     codeRepo: "thoughtworks/radar/main/README.md" },
   "research":            { topic: "MapReduce Delta Lake Kimball dimensional modelling Lakehouse",    label: "Research",      codeRepo: "apache/spark/main/README.md" },
   "modern-big-data":     { topic: "Apache Kafka Flink Spark streaming big data lakehouse",           label: "Big Data",      codeRepo: "apache/kafka/trunk/README.md" },
+  "duckdb":              { topic: "DuckDB in-process OLAP analytical SQL Parquet Arrow",                label: "DuckDB",        codeRepo: "duckdb/duckdb/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

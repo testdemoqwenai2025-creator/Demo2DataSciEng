@@ -421,6 +421,25 @@ export const ADRS: ADR[] = [
     alternatives: ["Each vendor's API separately", "Atlan", "Monte Carlo lineage only"],
     tags: ["governance", "lineage", "openlineage", "patterns"],
   },
+  {
+    id: "ADR-013",
+    title: "Commit to Apache Iceberg as the platform's primary open table format",
+    status: "accepted",
+    date: "FY26-Q3",
+    deciders: "Data Platform, Architecture, Storage",
+    context:
+      "ADR-001 (FY23-Q1) implicitly chose Delta by adopting Databricks + Delta Lake. Three years on, the open table format landscape has consolidated: Delta, Iceberg, Hudi all serve similar needs but differ in vendor-neutrality. With the platform now serving Snowflake, BigQuery, Databricks, DuckDB and Trino as compute engines, the cost of Delta-lock-in (less mature off-Databricks) is growing. The Unity Catalogue spec, OneTable (Hudi/Iceberg/Delta interop), and Snowflake's Polaris Catalog have made Iceberg the de facto vendor-neutral choice.",
+    decision:
+      "Adopt Apache Iceberg as the platform's primary open table format for all new tables in Bronze + Silver. Delta remains the default on Databricks-only workloads (where it's more native), with UniForm enabled to expose Delta tables as Iceberg for cross-engine reads. Hudi is held — only consider for CDC-heavy upsert pipelines that can't be served by Iceberg merge-on-read.",
+    consequences:
+      "+ Vendor-neutral; same table readable by Spark, Trino, Flink, Athena, BigQuery, Snowflake, DuckDB. + Mature spec (v2 with row-level deletes). + Avoids Databricks lock-in. + Future-proof — Snowflake Polaris + Glue + Nessie catalogs all support it. − Delta is more native on Databricks (Photon optimisations). − Migration cost from existing Delta tables (use UniForm to expose as Iceberg without rewriting). − Iceberg merge-on-read deletes are less mature than Delta's. − Catalog choice (Nessie vs REST vs Glue) is a follow-on decision.",
+    alternatives: [
+      "Stay on Delta (Databricks-lock-in risk grows)",
+      "Migrate to Hudi (CDC-first, smaller ecosystem)",
+      "Polyglot — keep all three (operational complexity too high)",
+    ],
+    tags: ["storage", "table-format", "iceberg", "delta", "patterns"],
+  },
 ];
 
 // ============================================================
