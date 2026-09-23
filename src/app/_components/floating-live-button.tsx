@@ -68,6 +68,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "distributed-training": { topic: "distributed training DDP FSDP ZeRO AllReduce Ring AllReduce PyTorch multi-GPU",      label: "Distributed",   codeRepo: "pytorch/pytorch/main/torch/distributed/README.md" },
   "mlops-tracing":        { topic: "OpenTelemetry distributed tracing spans critical path SLO observability MLflow",      label: "MLOps",          codeRepo: "open-telemetry/opentelemetry-python/main/README.md" },
   "quantization-inference": { topic: "LLM quantization NF4 AWQ GPTQ llama.cpp GGUF 4-bit inference QLoRA",      label: "Quantization",  codeRepo: "IST-DASLab/gptq/main/README.md" },
+  "inference-serving":     { topic: "vLLM PagedAttention continuous batching KV cache LLM inference serving Triton OpenAI API",      label: "Inference",     codeRepo: "vllm-project/vllm/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

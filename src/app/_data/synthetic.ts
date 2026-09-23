@@ -768,6 +768,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["quantization", "awq", "nf4", "gptq", "llama-cpp", "gguf", "4-bit", "inference", "patterns", "genai"],
   },
+  {
+    id: "ADR-031",
+    title: "Adopt vLLM with PagedAttention + continuous batching as the default LLM serving stack",
+    status: "accepted",
+    date: "FY28-Q4",
+    deciders: "Data Platform, ML Engineering, SRE, Architecture",
+    context:
+      "ADR-030 quantised 70B Llama-3 to 35GB (fits 1× A100 80GB with 45GB headroom for KV cache). The question is now serving: how to maximise throughput (tokens/sec) and minimise tail latency (p99) on this hardware. Three serving stacks compete: (1) Hugging Face Transformers + Accelerate — sequential, no batching, OOM-prone (KV cache contiguous VRAM); (2) NVIDIA Triton + FasterTransformer — fast kernels but no continuous batching, static batch sizes; (3) vLLM (PagedAttention, Kwon 2023) — KV cache in non-contiguous pages (like OS virtual memory), continuous batching (join/leave mid-step), 8-23× higher throughput than HF. The math: KV cache per token = 2·L·d_model·bytes (K+V, all layers). For 70B Llama (80 layers, 8192 d_model, BF16): 2·80·8192·2 = 2.6MB/token. For 32k context × 8 users = 670GB contiguous KV — OOMs even on 80GB A100. PagedAttention: KV in 16MB pages, OS-style page table, free pages reclaimed when a sequence finishes. Continuous batching: each step, the scheduler picks the next token for every active sequence — no waiting for batch to fill or empty. The throughput improvement: HF ~50 tok/s/GPU; vLLM ~3000 tok/s/GPU at high concurrency.",
+    decision:
+      "Adopt vLLM with PagedAttention + continuous batching as the default LLM serving stack for the platform. Three architectural choices: (1) PagedAttention for KV cache management — paged KV layout (block_size=16 tokens, page_size=16MB), per-sequence page table, copy-on-write for beam search; (2) Continuous batching — iteration-level scheduler, sequences join/leave mid-step, no static batch size; (3) AWQ kernels (from ADR-030) — vLLM's Marlin kernel for INT4 matmul, 2× faster than dequantise-then-matmul. Deployment: vLLM server behind an OpenAI-compatible REST API (/v1/completions, /v1/chat/completions), autoscaled by GPU utilisation (target 80%). For batch offline (e.g. evaluation harness), use vLLM's offline batch mode. For real-time chat (e.g. agent-triage), use streaming completions (SSE). Connects to ADR-029 OpenTelemetry: every request creates a trace_id, every token generated is a span with span_id (one per decode step). The throughput SLI: tokens/sec; the latency SLO: p99(first_token) < 500ms, p99(per_token) < 50ms.",
+    consequences:
+      "+ 8-23× higher throughput than HF Transformers (PagedAttention paper). + Handles variable-length sequences without padding waste. + KV cache fragmented, no OOM crashes. + Same OpenAI API as GPT-4 — drop-in for client code. + Connects to ADR-029 telemetry — per-token spans flow into Tempo. − vLLM is newer than HF — occasional kernel bugs, less mature for non-Llama models. − PagedAttention requires custom CUDA kernels — won't work on AMD GPUs well. − Continuous batching adds scheduler complexity — at low QPS, no benefit. − Streaming SSE adds complexity for client code (compared to single response).",
+    alternatives: [
+      "Hugging Face Transformers + Accelerate — simple, but 10× slower and OOM-prone",
+      "NVIDIA Triton + FasterTransformer — fast kernels, but no continuous batching",
+      "TGI (Text Generation Inference, HuggingFace) — comparable to vLLM but smaller community",
+      "Custom serving stack — full control but reinvents PagedAttention",
+    ],
+    tags: ["inference", "vllm", "pagedattention", "continuous-batching", "kv-cache", "serving", "openai-api", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

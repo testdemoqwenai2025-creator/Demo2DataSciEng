@@ -45,13 +45,14 @@ export type PageId =
   | "diffusion-models"
   | "distributed-training"
   | "mlops-tracing"
-  | "quantization-inference";
+  | "quantization-inference"
+  | "inference-serving";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving";
   icon: string;
   description: string;
 }
@@ -368,6 +369,14 @@ export const PAGES: PageMeta[] = [
     group: "Quantization & Inference",
     icon: "Gauge",
     description: "3D quantisation grid animation, NF4/GPTQ/AWQ math, group quantisation, AWQ channel scaling, low-level PyTorch NF4+AWQLinear+Q4_K_M, llama.cpp GGUF.",
+  },
+  {
+    id: "inference-serving",
+    label: "Inference Serving — vLLM, PagedAttention, Continuous Batching",
+    shortLabel: "Inference Serving",
+    group: "Inference Serving",
+    icon: "Server",
+    description: "3D PagedAttention animation, KV cache math, continuous batching, AWQ Marlin kernel, low-level PyTorch KVCache+PagedKVCache+ContinuousBatchingScheduler+vLLM server.",
   },
 ];
 
