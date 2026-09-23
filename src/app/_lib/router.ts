@@ -49,13 +49,14 @@ export type PageId =
   | "inference-serving"
   | "rag-deep-dive"
   | "multimodal-rag"
-  | "bioinformatics";
+  | "bioinformatics"
+  | "cheminformatics";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics";
   icon: string;
   description: string;
 }
@@ -404,6 +405,14 @@ export const PAGES: PageMeta[] = [
     group: "Bioinformatics",
     icon: "Dna",
     description: "3D DNA helix + alignment animation, Needleman-Wunsch/Smith-Waterman DP, BWA-MEM/BLAST, ESM-2 + AlphaFold2 papers, low-level PyTorch ESM2Tokenizer+ESM2Model+RoPE+StructureModule+IPA.",
+  },
+  {
+    id: "cheminformatics",
+    label: "Cheminformatics — ECFP, Tanimoto, ChemBERTa, Molecular RAG",
+    shortLabel: "Cheminformatics",
+    group: "Cheminformatics",
+    icon: "Atom",
+    description: "3D molecule + ECFP fingerprint animation, ECFP4/Tanimoto math, ChemBERTa/Uni-Mol papers, virtual screening pipeline, low-level PyTorch ECFPFingerprinter+SmilesTokenizer+ChemBERTa+MolecularRAGRetriever.",
   },
 ];
 

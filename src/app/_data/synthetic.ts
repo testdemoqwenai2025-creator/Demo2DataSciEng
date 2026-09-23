@@ -848,6 +848,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["bioinformatics", "esm-2", "alphafold2", "sequence-alignment", "needleman-wunsch", "smith-waterman", "blast", "bwt", "rag", "patterns", "genai"],
   },
+  {
+    id: "ADR-035",
+    title: "Adopt ECFP4 fingerprints + ChemBERTa embeddings for cheminformatics — molecular RAG",
+    status: "accepted",
+    date: "FY29-Q4",
+    deciders: "Data Platform, Cheminformatics, ML Engineering, Architecture",
+    context:
+      "ADR-034 adopted ESM-2 for protein sequences. The platform now ingests chemical structures alongside proteins — drug discovery needs to query 'find compounds similar to known inhibitor X' and 'predict properties of compound Y'. Three cheminformatics primitives are required: (1) Molecular fingerprints — ECFP4 (Rogers 2010, 'Extended-Connectivity Fingerprints') is the industry standard; circular substructure enumeration hashed to a 1024-2048 bit vector. (2) Tanimoto similarity (Jaccard on bit vectors) — T(a,b) = |a∩b| / |a∪b|. (3) Modern learned embeddings — ChemBERTa (Chithrananda 2020, SMILES as text, BERT MLM), Uni-Mol (Zhou 2023, 3D-aware), Mol-BERT. The key insight from ADR-034: a molecule IS a 'document' — SMILES strings (Simplified Molecular-Input Line-Entry System, e.g. 'CC(=O)Oc1ccccc1C(=O)O' for aspirin) are tokenisable, ChemBERTa embeds them, embeddings store in pgvector. ECFP4 fingerprints coexist as sparse retrieval (BM25 analog) — Tanimoto is the sparse scorer, ChemBERTa cosine sim is the dense scorer. Hybrid = same pattern as ADR-032.",
+    decision:
+      "Adopt two-track cheminformatics: ECFP4 (sparse, exact substructure match) for traditional cheminformatics + ChemBERTa-77M (dense, semantic) for ML-based similarity. Storage: pgvector stores both fingerprints (tsvector on SMILES, BERT vector on ChemBERTa) — same hybrid pattern as ADR-032 RAG. Pipeline: SMILES → RDKit canonicalise → ECFP4 (1024-bit) + ChemBERTa (512-dim) → pgvector. Retrieval: Tanimoto (ECFP4) + cosine (ChemBERTa) in parallel → RRF fusion → top-k. Applications: virtual screening (search 100M ZINC library for top-1000 candidates), drug repurposing (find existing drugs similar to a target), toxicity prediction (regression on 90K Tox21 compounds). Connects to ADR-034 ESM-2: drug discovery = protein target (ESM-2) + drug candidate (ChemBERTa) + interaction prediction — same shared embedding space vision. Connects to ADR-022 pgvector: 100M compounds, 1024-dim ChemBERTa vectors, HNSW index.",
+    consequences:
+      "+ 100M+ compound libraries (ZINC, ChEMBL) searchable in seconds via HNSW. + SMILES is text — ChemBERTa can be served with vLLM (ADR-031) like any LLM. + ECFP4 + ChemBERTa hybrid = same RAG pattern as ADR-032 — proven, no new infrastructure. + Connects to ADR-034 protein embeddings: drug-target interaction via shared embedding (drug ChemBERTa + target ESM-2). + Lipinski's Rule of 5 + ADMET predictions = drug-likeness scoring at indexing time. − ECFP4 is collision-prone for large molecules (use 2048-bit for >50 heavy atoms). − ChemBERTa trained on small molecules only (~77M from PubChem) — protein-bound ligands need fine-tuning. − Stereochemistry lost in ECFP4 — use stereo-specific variants (ECFP4-s) when needed. − SMILES has multiple valid encodings per molecule — must canonicalise before indexing.",
+    alternatives: [
+      "MACCS keys (166-bit, hand-curated substructures) — older, less expressive, but battle-tested",
+      "Topological torsion fingerprints — captures chiral info, but smaller community",
+      "Graph neural networks (D-MPNN, Gilmer 2017) — most accurate, but expensive to embed 100M molecules",
+      "3D pharmacophore fingerprints — needs 3D coordinates, expensive to compute",
+    ],
+    tags: ["cheminformatics", "ecfp", "tanimoto", "chemberta", "uni-mol", "smiles", "rdkit", "virtual-screening", "rag", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
