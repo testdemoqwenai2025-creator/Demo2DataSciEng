@@ -63,6 +63,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "transformer":         { topic: "transformer self-attention multi-head positional encoding BERT GPT", label: "Transformer",  codeRepo: "pytorch/pytorch/main/README.md" },
   "comp-sci-materials":  { topic: "computational science materials chemistry silicon GPU semiconductor LLM hardware", label: "Comp Sci",     codeRepo: "cmu-db/oltp-bench/main/README.md" },
   "gen-ai-patterns":      { topic: "generative AI autoregressive decoding BPE tokeniser temperature sampling",      label: "Gen AI",         codeRepo: "openai/tiktoken/main/README.md" },
+  "computer-vision":      { topic: "computer vision convolutional neural network Vision Transformer ViT CNN ResNet attention",      label: "Comp Vision",    codeRepo: "pytorch/vision/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

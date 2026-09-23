@@ -668,6 +668,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["agentic", "isr", "rl", "self-refinement", "roadmap", "patterns", "genai"],
   },
+  {
+    id: "ADR-026",
+    title: "Adopt Vision Transformer (ViT) + CNN hybrid architecture for image understanding tasks",
+    status: "accepted",
+    date: "FY27-Q3",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-024 unified the semantic layer for NL-to-SQL. ADR-023 adopted LoRA for LLM adaptation. The platform now needs to ingest unstructured image content (invoice scans, dashboard screenshots, document PDFs, satellite imagery for supply-chain) alongside the existing structured Gold tables. The Comp Sci & Materials page (#33) documented that convolutions and attention are both matmul — the same hardware accelerates both. The Transformer page (#32) showed self-attention is content-addressable memory. The question is: do we use a pure CNN (ResNet), a pure ViT (Vision Transformer), or a hybrid? Recent research (ConvNeXt, Swin, ViT-22B) shows the choice depends on data scale, latency budget, and transfer-learning requirements. The platform's data is mid-scale (~10M images), latency budget is 100ms p99, and we need transfer learning from open-world pretraining.",
+    decision:
+      "Adopt a hybrid architecture: ViT for the body (patches → transformer encoder → pooled embedding), with a CNN stem (first 2-3 conv layers) for the input tokeniser. Use LoRA (ADR-023) for domain adaptation on the ViT body. Use the same pgvector store (ADR-022) for image embeddings — the same ANN index that serves RAG text retrieval will serve image retrieval. The convolution kernel K ∈ ℝ^(k×k×C_in×C_out) operates as: Y[i,j] = Σ_{u,v,c} X[i+u, j+v, c] · K[u,v,c] + b. The attention head operates as: A = softmax(QKᵀ/√d_k)V. Both are matmul + reduction — the GPU runs them on the same tensor cores. The decision: ViT for new vision tasks (image classification, OCR, document understanding), ResNet/EfficientNet for cases where inductive bias matters (small datasets, edge deployment), hybrid (CNN stem + ViT body) for production.",
+    consequences:
+      "+ ViT scales better with data — already proven on the platform's 10M image corpus. + Same hardware (A100 GPUs) accelerates both conv and attention via tensor cores. + LoRA adapters (ADR-023) work for vision models — same fine-tuning pipeline. + pgvector (ADR-022) indexes image embeddings — same RAG retrieval infrastructure for text and images. + Connects to ADR-024 semantic layer: image embeddings become queryable via NL-to-SQL. − ViT needs more data than CNN to overcome lack of inductive bias. − Convolutions are easier to deploy on edge (mobile, IoT) — keep CNN fallback. − Multi-modal embeddings need careful normalisation before sharing the pgvector index.",
+    alternatives: [
+      "Pure CNN (ResNet-50 / EfficientNet-B7) — strong inductive bias, less data-hungry, but plateaus on large datasets",
+      "Pure ViT (no CNN stem) — simpler code, but loses the cheap inductive bias of early convolution",
+      "Swin Transformer (hierarchical) — efficient for dense prediction, but more complex",
+      "Multi-modal foundation model (CLIP / SigLIP) — uses text-image pairs, but pretraining cost is high",
+    ],
+    tags: ["vision", "vit", "cnn", "convolution", "attention", "lora", "pgvector", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

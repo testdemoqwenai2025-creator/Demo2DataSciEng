@@ -40,13 +40,14 @@ export type PageId =
   | "fine-tuning"
   | "transformer"
   | "comp-sci-materials"
-  | "gen-ai-patterns";
+  | "gen-ai-patterns"
+  | "computer-vision";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision";
   icon: string;
   description: string;
 }
@@ -323,6 +324,14 @@ export const PAGES: PageMeta[] = [
     group: "Generative AI",
     icon: "Sparkles",
     description: "BPE tokeniser math, temperature/top-k/top-p sampling, entropy & perplexity, autoregressive decoding, Pyodide text generation demo. Code-oriented, mathematical.",
+  },
+  {
+    id: "computer-vision",
+    label: "Computer Vision — Convolutional Networks to Vision Transformers",
+    shortLabel: "Computer Vision",
+    group: "Computer Vision",
+    icon: "Image",
+    description: "Animated convolution kernel, 2D convolution math, max pooling, convolutional backpropagation, ViT patch embedding, low-level PyTorch Conv2d/LeNet/VisionTransformer/HybridViT. From LeNet to ViT-22B.",
   },
 ];
 
