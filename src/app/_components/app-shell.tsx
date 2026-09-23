@@ -42,6 +42,8 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Reinforcement Learning", ids: ["rl-agentic"] },
   { title: "LLM Training", ids: ["fine-tuning"] },
   { title: "Transformer", ids: ["transformer"] },
+  { title: "Comp. Science", ids: ["comp-sci-materials"] },
+  { title: "Generative AI", ids: ["gen-ai-patterns"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

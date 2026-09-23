@@ -38,13 +38,15 @@ export type PageId =
   | "vector-db"
   | "rl-agentic"
   | "fine-tuning"
-  | "transformer";
+  | "transformer"
+  | "comp-sci-materials"
+  | "gen-ai-patterns";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI";
   icon: string;
   description: string;
 }
@@ -305,6 +307,22 @@ export const PAGES: PageMeta[] = [
     group: "Transformer",
     icon: "Network",
     description: "Animated self-attention mechanism, positional encoding visualisation, multi-head attention diagram, Pyodide attention demo, low-level PyTorch code.",
+  },
+  {
+    id: "comp-sci-materials",
+    label: "Computational Science & Materials for AI",
+    shortLabel: "Comp Sci & Materials",
+    group: "Computational Science",
+    icon: "Cpu",
+    description: "Silicon chemistry to GPU architecture to LLM training. Matrix multiply math, DFT analogy, roofline model, Pyodide matmul benchmark. The physical foundations of AI.",
+  },
+  {
+    id: "gen-ai-patterns",
+    label: "Generative AI Patterns — Autoregressive Decoding & Sampling",
+    shortLabel: "Gen AI Patterns",
+    group: "Generative AI",
+    icon: "Sparkles",
+    description: "BPE tokeniser math, temperature/top-k/top-p sampling, entropy & perplexity, autoregressive decoding, Pyodide text generation demo. Code-oriented, mathematical.",
   },
 ];
 

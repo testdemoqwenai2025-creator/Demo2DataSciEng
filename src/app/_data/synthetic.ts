@@ -649,6 +649,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["semantic-layer", "metricflow", "rag", "lora", "nl-to-sql", "patterns", "genai"],
   },
+  {
+    id: "ADR-025",
+    title: "Adopt the agentic platform architecture — formalising the ISR evolution as the platform's agentic roadmap",
+    status: "accepted",
+    date: "FY27-Q2",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-019 formalised the contextual bandit as the recommendation engine. The RL & Agentic AI page (#30) documented the 4-stage evolution: single-shot → ReAct → ISR (Iterative Self-Refinement) → self-improving. The platform's /api/agent-triage endpoint is at Stage 2 (ReAct). The next evolution — ISR (Stage 3) and self-improving (Stage 4) — needs to be formalised as the platform's agentic roadmap, not just documentation. The agentic architecture connects: the bandit (ADR-019, Stage 1 RL) → the DQ triage agent (Stage 2 ReAct) → ISR self-evaluation (Stage 3) → RL fine-tuning on agent trajectories (Stage 4).",
+    decision:
+      "Formalise the 4-stage agentic evolution as the platform's official agentic architecture. Stage 1 (bandit) is in production. Stage 2 (ReAct agent) is in production via /api/agent-triage. Stage 3 (ISR) is the FY27 Q3 milestone — add a self-evaluation step before the agent posts. Stage 4 (self-improving) is the FY28 bet — RL fine-tune the agent's policy on which triage paths led to human-approved fixes. The Q-learning equation (Q(s,a) ← Q(s,a) + α[r + γ·max Q(s',a') − Q(s,a)]) from the RL page IS the Stage 4 update rule.",
+    consequences:
+      "+ Clear roadmap from today's bandit to self-improving agents. + Each stage has a concrete milestone + success metric. + The RL math is already documented (Q-learning page). + The bandit infrastructure (ADR-019) is the foundation. − Stage 3 (ISR) adds latency (self-evaluation before posting). − Stage 4 (RL fine-tuning) needs trajectory logging infrastructure. − Self-improving agents raise safety questions (what if the policy optimises for the wrong thing?).",
+    alternatives: [
+      "Stay at Stage 2 (ReAct) — no self-evaluation, no self-improvement",
+      "Jump to Stage 4 (skip ISR) — risky without self-evaluation guardrails",
+      "External agentic framework (LangGraph/LangChain) — vendor dependency",
+    ],
+    tags: ["agentic", "isr", "rl", "self-refinement", "roadmap", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

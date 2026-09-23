@@ -61,6 +61,8 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "rl-agentic":          { topic: "reinforcement learning Q-learning PPO policy gradient agentic AI agents",  label: "RL & Agents",   codeRepo: "openai/spinningup/main/README.md" },
   "fine-tuning":         { topic: "LoRA QLoRA fine-tuning RLHF DPO LLM adaptation low-rank",                label: "Fine-Tuning",   codeRepo: "microsoft/LoRA/main/README.md" },
   "transformer":         { topic: "transformer self-attention multi-head positional encoding BERT GPT", label: "Transformer",  codeRepo: "pytorch/pytorch/main/README.md" },
+  "comp-sci-materials":  { topic: "computational science materials chemistry silicon GPU semiconductor LLM hardware", label: "Comp Sci",     codeRepo: "cmu-db/oltp-bench/main/README.md" },
+  "gen-ai-patterns":      { topic: "generative AI autoregressive decoding BPE tokeniser temperature sampling",      label: "Gen AI",         codeRepo: "openai/tiktoken/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
