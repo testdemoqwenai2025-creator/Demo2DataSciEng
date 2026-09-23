@@ -1,4 +1,4 @@
-import { FivetranHightouchPage } from "../../_pages/fivetran-hightouch";
+import { FivetranHightouchPage } from "../_pages/fivetran-hightouch";
 
 /**
  * /fivetran-hightouch — ModernDataSciEng Platform route.

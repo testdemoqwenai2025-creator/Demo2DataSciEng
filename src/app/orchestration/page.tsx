@@ -1,4 +1,4 @@
-import { OrchestrationPage } from "../../_pages/orchestration";
+import { OrchestrationPage } from "../_pages/orchestration";
 
 /**
  * /orchestration — ModernDataSciEng Platform route.

@@ -1,4 +1,4 @@
-import { ResearchPage } from "../../_pages/research";
+import { ResearchPage } from "../_pages/research";
 
 /**
  * /research — ModernDataSciEng Platform route.

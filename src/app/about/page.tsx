@@ -1,4 +1,4 @@
-import { AboutPage } from "../../_pages/about";
+import { AboutPage } from "../_pages/about";
 
 /**
  * /about — ModernDataSciEng Platform route.

@@ -1,4 +1,4 @@
-import { EvolutionPage } from "../../_pages/evolution";
+import { EvolutionPage } from "../_pages/evolution";
 
 /**
  * /evolution — ModernDataSciEng Platform route.

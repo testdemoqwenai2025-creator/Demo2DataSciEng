@@ -1,4 +1,4 @@
-import { DatabricksPage } from "../../_pages/databricks";
+import { DatabricksPage } from "../_pages/databricks";
 
 /**
  * /databricks — ModernDataSciEng Platform route.

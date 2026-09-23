@@ -1,4 +1,4 @@
-import { KnowledgePage } from "../../_pages/knowledge";
+import { KnowledgePage } from "../_pages/knowledge";
 
 /**
  * /knowledge — ModernDataSciEng Platform route.

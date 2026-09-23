@@ -1,4 +1,4 @@
-import { SnowflakePage } from "../../_pages/snowflake";
+import { SnowflakePage } from "../_pages/snowflake";
 
 /**
  * /snowflake — ModernDataSciEng Platform route.

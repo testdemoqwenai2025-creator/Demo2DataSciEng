@@ -1,4 +1,4 @@
-import { TableauPage } from "../../_pages/tableau";
+import { TableauPage } from "../_pages/tableau";
 
 /**
  * /tableau — ModernDataSciEng Platform route.

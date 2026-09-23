@@ -1,4 +1,4 @@
-import { ArchitecturePage } from "../../_pages/architecture";
+import { ArchitecturePage } from "../_pages/architecture";
 
 /**
  * /architecture — ModernDataSciEng Platform route.

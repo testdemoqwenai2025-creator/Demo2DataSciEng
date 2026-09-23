@@ -1,4 +1,4 @@
-import { CicdPage } from "../../_pages/cicd";
+import { CicdPage } from "../_pages/cicd";
 
 /**
  * /cicd — ModernDataSciEng Platform route.

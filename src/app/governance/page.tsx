@@ -1,4 +1,4 @@
-import { GovernancePage } from "../../_pages/governance";
+import { GovernancePage } from "../_pages/governance";
 
 /**
  * /governance — ModernDataSciEng Platform route.

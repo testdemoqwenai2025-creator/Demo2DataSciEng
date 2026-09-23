@@ -1,4 +1,4 @@
-import { DbtPage } from "../../_pages/dbt";
+import { DbtPage } from "../_pages/dbt";
 
 /**
  * /dbt — ModernDataSciEng Platform route.

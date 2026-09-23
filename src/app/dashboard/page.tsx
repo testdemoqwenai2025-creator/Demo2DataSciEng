@@ -1,4 +1,4 @@
-import { DashboardPage } from "../../_pages/dashboard";
+import { DashboardPage } from "../_pages/dashboard";
 
 /**
  * /dashboard — ModernDataSciEng Platform route.
