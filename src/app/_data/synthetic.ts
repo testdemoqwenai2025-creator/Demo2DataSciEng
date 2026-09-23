@@ -788,6 +788,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["inference", "vllm", "pagedattention", "continuous-batching", "kv-cache", "serving", "openai-api", "patterns", "genai"],
   },
+  {
+    id: "ADR-032",
+    title: "Adopt hybrid retrieval (BM25 + vector + cross-encoder re-rank) as the default RAG retrieval pipeline",
+    status: "accepted",
+    date: "FY29-Q1",
+    deciders: "Data Platform, ML Engineering, GenAI, Architecture",
+    context:
+      "ADR-022 adopted pgvector for vector embeddings. The RAG & LLMs page (#28) introduced naive RAG (embed → ANN search → top-k → stuff into prompt). For production NL-to-SQL grounding (ADR-024 semantic layer), naive RAG underperforms: (1) embedding similarity misses exact-match SQL identifiers (e.g. user asks for 'dim_customer' table by name — vector ANN may return semantically-related but wrong tables); (2) chunking strategy matters more than the embedding model — too-small chunks lose context, too-large chunks dilute signal; (3) single-stage retrieval is recall-bound — top-10 from vector ANN often misses the right chunk that re-ranking would surface. The state-of-the-art RAG pipeline (Cohere, Anthropic, OpenAI) uses THREE stages: (1) chunk documents with semantic boundaries (LangChain RecursiveCharacterTextSplitter, chunk_size=512, overlap=64); (2) PARALLEL hybrid retrieval: BM25 (sparse, exact-match) + pgvector ANN (dense, semantic) — each returns top-50, then RRF (Reciprocal Rank Fusion) merges; (3) cross-encoder re-ranking: bi-encoder embedding is query/doc independent (cheap, approximate), cross-encoder co-encodes query+doc (expensive, accurate) on top-50, returns final top-5. The math: BM25 score = IDF(q) · (f(q,D) · (k1+1)) / (f(q,D) + k1·(1 − b + b·|D|/avgdl)); RRF score = Σ 1/(60 + rank_i); cross-encoder = softmax(W · [query; doc; query*doc] + b).",
+    decision:
+      "Adopt three-stage hybrid retrieval as the default RAG pipeline. Stage 1 — Chunking: RecursiveCharacterTextSplitter with chunk_size=512 tokens (not characters — tiktoken-aware), overlap=64 tokens (sliding window preserves context across boundaries). For SQL DDL/schema, use statement-aware chunking (one CREATE TABLE per chunk). Stage 2 — Hybrid retrieval (parallel): BM25 via pgvector's ts_vector + GIN index (sparse, exact SQL identifier match) + pgvector HNSW ANN (dense, semantic). Both return top-50, fused via Reciprocal Rank Fusion (k=60). Stage 3 — Cross-encoder re-rank: ms-marco-MiniLM-L-12-v2 (cross-encoder, fine-tuned on MS MARCO) on top-50 → final top-5 to stuff into prompt. Cross-encoder cost: ~5ms per (query, doc) pair × 50 = 250ms per query — acceptable for production. Connects to ADR-031 vLLM: the re-ranked top-5 → augmented prompt → vLLM streaming completion. Connects to ADR-029 OTel: each retrieval stage emits a span (BM25_search, vector_search, RRF_fusion, cross_encoder_rerank) — full RAG trace visible in Grafana.",
+    consequences:
+      "+ Hybrid BM25+vector eliminates both failure modes (exact-match + semantic) — lifts RAG accuracy by 15-25% vs vector-only. + Cross-encoder re-rank adds another 5-10% (paper: https://arxiv.org/abs/2010.11324). + Chunking with overlap prevents context loss at boundaries. + pgvector stores both sparse (tsvector) and dense (vector) — single DB, single query. + Connects to ADR-029 trace store — every retrieval stage visible. − Cross-encoder adds ~250ms latency (acceptable for chat, marginal for sub-100ms). − Chunking is hard — needs per-document-type strategy (SQL DDL ≠ prose). − RRF k=60 is a magic number from the original paper — needs per-corpus tuning. − Re-rank model adds another model to deploy (cross-encoder on GPU or CPU).",
+    alternatives: [
+      "Pure vector RAG (semantic only — current naive approach, 15-25% accuracy loss on SQL identifier matches)",
+      "Pure BM25 (sparse only — misses semantic matches, no NL-to-SQL grounding)",
+      "Multi-vector retrieval (ColBERT-style late interaction — most accurate, but 100× storage cost)",
+      "Generative retrieval (T5-style encoder-decoder generating doc IDs — bleeding edge, not production-ready)",
+    ],
+    tags: ["rag", "hybrid-retrieval", "bm25", "vector", "cross-encoder", "rerank", "rrf", "chunking", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

@@ -69,6 +69,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "mlops-tracing":        { topic: "OpenTelemetry distributed tracing spans critical path SLO observability MLflow",      label: "MLOps",          codeRepo: "open-telemetry/opentelemetry-python/main/README.md" },
   "quantization-inference": { topic: "LLM quantization NF4 AWQ GPTQ llama.cpp GGUF 4-bit inference QLoRA",      label: "Quantization",  codeRepo: "IST-DASLab/gptq/main/README.md" },
   "inference-serving":     { topic: "vLLM PagedAttention continuous batching KV cache LLM inference serving Triton OpenAI API",      label: "Inference",     codeRepo: "vllm-project/vllm/main/README.md" },
+  "rag-deep-dive":         { topic: "RAG retrieval augmented generation hybrid BM25 vector cross-encoder re-rank chunking RRF",      label: "RAG",           codeRepo: "langchain-ai/langchain/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

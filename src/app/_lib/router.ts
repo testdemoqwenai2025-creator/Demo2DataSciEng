@@ -46,13 +46,14 @@ export type PageId =
   | "distributed-training"
   | "mlops-tracing"
   | "quantization-inference"
-  | "inference-serving";
+  | "inference-serving"
+  | "rag-deep-dive";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive";
   icon: string;
   description: string;
 }
@@ -377,6 +378,14 @@ export const PAGES: PageMeta[] = [
     group: "Inference Serving",
     icon: "Server",
     description: "3D PagedAttention animation, KV cache math, continuous batching, AWQ Marlin kernel, low-level PyTorch KVCache+PagedKVCache+ContinuousBatchingScheduler+vLLM server.",
+  },
+  {
+    id: "rag-deep-dive",
+    label: "RAG Deep Dive — Hybrid Retrieval, BM25, Cross-encoder Re-rank",
+    shortLabel: "RAG Deep Dive",
+    group: "RAG Deep Dive",
+    icon: "Search",
+    description: "3D hybrid retrieval pipeline animation, chunking math, BM25 + RRF fusion, cross-encoder re-rank, low-level PyTorch TextSplitter+BM25+RRF+CrossEncoder+HybridRAGRetriever.",
   },
 ];
 
