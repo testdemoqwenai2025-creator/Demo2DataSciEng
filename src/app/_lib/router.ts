@@ -28,13 +28,14 @@ export type PageId =
   | "arrow"
   | "patterns"
   | "data-mesh"
-  | "polars";
+  | "polars"
+  | "ml-platform";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning";
   icon: string;
   description: string;
 }
@@ -215,6 +216,14 @@ export const PAGES: PageMeta[] = [
     group: "DataFrames",
     icon: "Boxes",
     description: "Three DataFrame libraries benchmarked in your browser. Arrow-native, lazy evaluation, 10-30× speed differences — with Pyodide timing demos.",
+  },
+  {
+    id: "ml-platform",
+    label: "Machine Learning Platform — MLOps Lifecycle",
+    shortLabel: "ML Platform",
+    group: "Machine Learning",
+    icon: "Cpu",
+    description: "MLflow tracking + model registry + feature stores + inference patterns. Multi-language training code + Pyodide in-browser model training demo.",
   },
 ];
 

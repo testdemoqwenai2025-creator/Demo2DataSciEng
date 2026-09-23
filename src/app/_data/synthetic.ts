@@ -554,6 +554,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["bandit", "thompson-sampling", "recommendation", "rl", "patterns", "frontend"],
   },
+  {
+    id: "ADR-020",
+    title: "Adopt MLflow as the platform's experiment tracking + model registry standard",
+    status: "accepted",
+    date: "FY27-Q1",
+    deciders: "Data Platform, ML Engineering, Data Science",
+    context:
+      "The platform now has 22 pages covering data engineering end-to-end. But ML pipelines are missing — no experiment tracking, no model registry, no feature store governance. Data scientists train models ad-hoc, losing track of which hyperparameters produced which results. Models are deployed without versioning or rollback. The ML lifecycle (train → track → register → serve → monitor) needs infrastructure. MLflow is OSS (Apache 2.0), language-agnostic (Python/R/Java), and integrates with Databricks + Spark natively.",
+    decision:
+      "Adopt MLflow as the platform's standard for experiment tracking (MLflow Tracking) and model registry (MLflow Model Registry). All training runs log parameters, metrics, and artifacts to MLflow. All production models are registered with version + stage (None/Staging/Production/Archived). Databricks Feature Store (or Feast as OSS alternative) for feature serving. Model serving via MLflow Models (batch) + real-time via containerised endpoints.",
+    consequences:
+      "+ Reproducible experiments — every run tracked with params + metrics + artifacts. + Model versioning — rollback to any previous version. + Language-agnostic — Python, R, Java, Scala all log to MLflow. + OSS (Apache 2.0) — no vendor lock-in. + Databricks-native integration. + Model registry UI for promotion (Staging → Production). − Needs a tracking server (MLflow Tracking Server) or file-based local mode. − Feature store is separate (Databricks Feature Store or Feast). − Model monitoring (drift detection) needs additional tooling (Evidently, NannyML). − No built-in hyperparameter tuning (use Optuna/Ray Tune alongside).",
+    alternatives: [
+      "Weights & Biases (commercial — excellent UI but per-seat pricing)",
+      "Comet ML (commercial — similar to W&B)",
+      "Custom tracking (SQLite + custom UI — reinventing the wheel)",
+    ],
+    tags: ["mlflow", "ml", "experiment-tracking", "model-registry", "patterns", "mlops"],
+  },
 ];
 
 // ============================================================
