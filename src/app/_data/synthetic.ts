@@ -868,6 +868,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["cheminformatics", "ecfp", "tanimoto", "chemberta", "uni-mol", "smiles", "rdkit", "virtual-screening", "rag", "patterns", "genai"],
   },
+  {
+    id: "ADR-036",
+    title: "Adopt AMBER force fields + E(n)-equivariant neural networks for molecular dynamics and structure prediction",
+    status: "accepted",
+    date: "FY30-Q1",
+    deciders: "Data Platform, Molecular Modelling, ML Engineering, Architecture",
+    context:
+      "ADR-035 handles small molecules (1D SMILES → 2D graph). ADR-034 handles protein sequences (1D → 3D via AlphaFold2). The remaining frontier is full molecular dynamics (MD) — simulating 3D atom trajectories over time. Two approaches: (1) Classical MD with force fields (AMBER, CHARMM) — Verlet integration of Newton's equations on a parameterised potential energy function E = Σ bonds + Σ angles + Σ dihedrals + Σ van der Waals + Σ electrostatics. GROMACS, OpenMM, NAMD. ~10⁶ atoms for ~10⁻⁶ seconds (1μs) on 1 GPU-day. (2) Modern: E(n)-equivariant neural networks (Satorras 2022, 'E(n) Equivariant Graph Neural Networks') and AlphaFold3 (Abramson 2024, 'Accurate structure prediction of biomolecular interactions') — learn the potential energy surface from quantum chemistry data (QM9, ANI-1). The math: E(n)-equivariance means f(R·x) = R·f(x) for any rotation R — the network output rotates the same way as the input, so it doesn't waste capacity learning rotation symmetry. The SchNet (Schütt 2017), Equiformer (Liao 2023), and PaiNN (Painn 2021) architectures all build on this. AlphaFold3 extended AlphaFold2 to predict not just protein structure but ANY biomolecular interaction (protein-protein, protein-ligand, protein-nucleic-acid) — the diffusion-based structure module from ADR-027 handles all these as different atom types.",
+    decision:
+      "Adopt a two-track molecular modelling stack: (1) Classical MD via OpenMM with AMBER ff14SB force field for proteins + GAFF2 for small molecules — for equilibrium simulations, binding free energy (MM-PBSA), and conformational sampling. (2) Modern ML via E(n)-equivariant networks for property prediction (energy, forces, dipole moments) and AlphaFold3-style diffusion for interaction structure prediction. Production: train an Equiformer (Liao 2023) on QM9 (130K small molecules with DFT-computed properties) + ANI-1x (5M DFT conformers) → predict per-atom forces and total energy in O(N²) instead of O(N³) DFT. For large protein-ligand complexes: use classical MD (force field) for >10⁵ atoms, neural network for <10³ atoms. The connection to ADR-027 (diffusion): AlphaFold3's structure module IS the same DDPM, applied to mixed atom types (C, N, O, S, P, H, metals) instead of just protein residues. Connection to ADR-034: AlphaFold2 → AlphaFold3 is the same upgrade path as text-to-text-image (multi-modal).",
+    consequences:
+      "+ E(n)-equivariant NN is 1000× faster than DFT for energy prediction (ms vs hours). + AlphaFold3 handles protein-ligand complexes — the killer drug discovery use case. + Classical MD on OpenMM integrates with Spark (partition by trajectory frame). + Same diffusion math as ADR-027 (image generation) — pattern reuse. + Connects to ADR-035 ChemBERTa: small-molecule 3D structure feeds Uni-Mol. − E(n)-equivariant kernels are custom (PyG, e3nn libraries) — not as mature as standard PyTorch. − Force field accuracy depends on parameterisation — AMBER is good for proteins but GAFF2 has known issues with drug-like molecules. − AlphaFold3 weights not publicly released (only server access via AlphaFold Server) — use Boltz-1 or open-source equivalents. − Long MD trajectories (μs scale) still need HPC clusters — not yet feasible on commodity GPUs.",
+    alternatives: [
+      "Pure classical MD (GROMACS only) — accurate but 1000× slower than ML",
+      "DFT only (ORCA, Gaussian) — most accurate but O(N³), limited to <1000 atoms",
+      "Graph neural networks without equivariance (D-MPNN) — works but loses 3D inductive bias",
+      "Tensor Field Networks (Thomas 2018) — older equivariant formulation, less efficient than E(n)",
+    ],
+    tags: ["molecular-modelling", "amber", "force-field", "verlet", "equivariant", "e3nn", "equiformer", "alphafold3", "diffusion", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

@@ -50,13 +50,14 @@ export type PageId =
   | "rag-deep-dive"
   | "multimodal-rag"
   | "bioinformatics"
-  | "cheminformatics";
+  | "cheminformatics"
+  | "molecular-modelling";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling";
   icon: string;
   description: string;
 }
@@ -413,6 +414,14 @@ export const PAGES: PageMeta[] = [
     group: "Cheminformatics",
     icon: "Atom",
     description: "3D molecule + ECFP fingerprint animation, ECFP4/Tanimoto math, ChemBERTa/Uni-Mol papers, virtual screening pipeline, low-level PyTorch ECFPFingerprinter+SmilesTokenizer+ChemBERTa+MolecularRAGRetriever.",
+  },
+  {
+    id: "molecular-modelling",
+    label: "Molecular Modelling — Force Fields, Verlet, E(n)-Equivariant NN, AlphaFold3",
+    shortLabel: "Molecular Modelling",
+    group: "Molecular Modelling",
+    icon: "Atom",
+    description: "3D molecular dynamics animation, AMBER force field math, Verlet integration, E(n)-equivariant GNN, AlphaFold3 diffusion, low-level PyTorch AMBERForceField+verlet_integrate+EquivariantGraphConvolutionLayer+AlphaFold3DiffusionModule.",
   },
 ];
 

@@ -73,6 +73,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "multimodal-rag":         { topic: "CLIP SigLIP contrastive learning multi-modal RAG cross-modal embeddings shared embedding space",      label: "Multi-modal",   codeRepo: "google-research/big_vision/main/README.md" },
   "bioinformatics":         { topic: "bioinformatics sequence alignment Needleman-Wunsch Smith-Waterman BLAST BWA ESM-2 AlphaFold2 protein",      label: "Bioinformatics", codeRepo: "facebookresearch/esm/main/README.md" },
   "cheminformatics":         { topic: "cheminformatics ECFP fingerprint Tanimoto similarity ChemBERTa RDKit SMILES molecular virtual screening drug discovery",      label: "Cheminformatics", codeRepo: "rdkit/rdkit/main/README.md" },
+  "molecular-modelling":      { topic: "molecular dynamics force field AMBER CHARMM Verlet integration E(n)-equivariant neural network AlphaFold3 SchNet Equiformer",      label: "Molecular Mod.",  codeRepo: "openmm/openmm/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
