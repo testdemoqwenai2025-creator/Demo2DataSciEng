@@ -6,6 +6,7 @@ import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
+import { ContextualBandit } from "./contextual-bandit";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -260,6 +261,8 @@ export function AppShell({ children }: AppShellProps) {
           <TopBar active={active} />
           <main className="flex-1 px-4 md:px-8 py-6 max-w-[1400px] mx-auto w-full">
             <div key={active} className="page-enter">{children}</div>
+            {/* Contextual bandit — recommended next pages */}
+            <ContextualBandit currentPage={active} />
           </main>
           <footer className="mt-auto border-t border-border/60 bg-muted/30 py-5 px-4 md:px-8">
             <FooterContent />
@@ -270,7 +273,10 @@ export function AppShell({ children }: AppShellProps) {
       {/* Mobile content (no sidebar visible) */}
       <div className="lg:hidden flex-1 pt-14">
         <TopBar active={active} />
-        <main className="px-4 py-5">{children}</main>
+        <main className="px-4 py-5">
+          {children}
+          <ContextualBandit currentPage={active} />
+        </main>
         <footer className="border-t border-border/60 bg-muted/30 py-5 px-4 text-xs text-muted-foreground">
           <FooterContent compact />
         </footer>

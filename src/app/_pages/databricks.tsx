@@ -4,9 +4,11 @@ import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
+import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
 import { MEDALLION_LAYERS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Boxes, Cpu, Layers, Workflow, Database, Sparkles, GitBranch, ShieldCheck, Activity, Languages } from "lucide-react";
 
 const PYSPARK_BRONZE = `# ============================================================
@@ -331,6 +333,17 @@ export function DatabricksPage() {
           </ul>
         </SectionCard>
       </div>
+
+      {/* Live resources drawer button — fetches real-time arXiv + GitHub + HF + PwC */}
+      <LiveResourcesDrawer
+        topic="Apache Spark Delta Lake Lakehouse"
+        codeRepo="delta-io/delta/master/README.md"
+        trigger={
+          <Button variant="outline" className="gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" /> View live resources for Spark + Delta Lake
+          </Button>
+        }
+      />
 
       {/* Multi-language samples: PySpark vs Scala Spark vs Rust UDF */}
       <SectionCard

@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { PIPELINES, FINOPS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   GitMerge,
   GitBranch,
@@ -18,6 +20,7 @@ import {
   CheckCircle,
   Workflow,
   Languages,
+  Sparkles,
 } from "lucide-react";
 import {
   BarChart,
@@ -490,6 +493,16 @@ if __name__ == "__main__":
           ]}
         />
       </SectionCard>
+
+      <LiveResourcesDrawer
+        topic="GitHub Actions Terraform CI/CD data engineering"
+        codeRepo="hashicorp/terraform/main/README.md"
+        trigger={
+          <Button variant="outline" className="gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" /> View live resources for CI/CD + Terraform
+          </Button>
+        }
+      />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("home")} className="text-sm text-primary hover:underline">

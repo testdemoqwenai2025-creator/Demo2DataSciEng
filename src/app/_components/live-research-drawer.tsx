@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Loader2, Search, FileText, GitBranch, Database, Quote, Sparkles, AlertCircle } from "lucide-react";
+import { ExternalLink, Loader2, Search, FileText, GitBranch, Database, Quote, Sparkles, AlertCircle, Send } from "lucide-react";
 
 /**
  * LiveResearchDrawer — opens as a right-side drawer.
@@ -275,6 +275,27 @@ export function LiveResearchDrawer({ topic, trigger }: { topic: string; trigger:
             <code className="font-mono text-foreground/80">{topic}</code>. Cached 24h in localStorage.
           </SheetDescription>
         </SheetHeader>
+
+        {/* Bidirectional submit — link to prefilled GitHub issue */}
+        <div className="border-b border-border/60 px-4 py-2.5 bg-primary/5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] text-muted-foreground">
+              <strong className="text-foreground/80">Bidirectional:</strong> found a paper we should add?
+            </p>
+            <a
+              href={`https://github.com/testdemoqwenai2025-creator/DemoAppDataSci/issues/new?${new URLSearchParams({
+                title: `Suggest paper for topic: ${topic}`,
+                body: `## Suggested paper for topic: \`${topic}\`\n\n**URL**: \n\n**Why should this be in the platform?**\n\n_(replace this with your rationale — which platform page should it appear on?)_\n\n---\n_Submitted via the LiveResearchDrawer bidirectional submit form._`,
+                labels: "suggested-paper,research",
+              }).toString()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] text-primary hover:underline flex items-center gap-1"
+            >
+              <Send className="h-3 w-3" /> Suggest
+            </a>
+          </div>
+        </div>
 
         <div className="p-4 space-y-5">
           {loading && (

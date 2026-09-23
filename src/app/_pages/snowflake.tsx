@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { SNOWFLAKE_WAREHOUSES, SNOWFLAKE_RBAC } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { Database, Cpu, ShieldCheck, Server, Layers, Zap, Key } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Database, Cpu, ShieldCheck, Server, Layers, Zap, Key, Sparkles } from "lucide-react";
 
 const WAREHOUSE_DDL = `-- ============================================================
 -- Snowflake warehouse sizing matrix (managed by Terraform)
@@ -323,6 +325,16 @@ export function SnowflakePage() {
           </ul>
         </SectionCard>
       </div>
+
+      <LiveResourcesDrawer
+        topic="Snowflake cloud data warehouse"
+        codeRepo="snowflakedb/snowflake-connector-python/main/README.md"
+        trigger={
+          <Button variant="outline" className="gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" /> View live resources for Snowflake
+          </Button>
+        }
+      />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("dbt")} className="text-sm text-primary hover:underline">
