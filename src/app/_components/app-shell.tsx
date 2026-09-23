@@ -32,6 +32,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Databases", ids: ["duckdb"] },
   { title: "Streaming", ids: ["streaming"] },
   { title: "Columnar", ids: ["arrow"] },
+  { title: "Patterns", ids: ["patterns"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

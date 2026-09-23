@@ -48,6 +48,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "duckdb":              { topic: "DuckDB in-process OLAP analytical SQL Parquet Arrow",                label: "DuckDB",        codeRepo: "duckdb/duckdb/main/README.md" },
   "streaming":           { topic: "Apache Kafka Flink Pulsar streaming Lambda Kappa architecture",     label: "Streaming",     codeRepo: "apache/flink/main/README.md" },
   "arrow":               { topic: "Apache Arrow columnar in-memory format Flight zero-copy IPC",     label: "Arrow",          codeRepo: "apache/arrow/main/README.md" },
+  "patterns":            { topic: "data engineering patterns Medallion SCD2 slim CI reverse-ETL",     label: "Patterns",       codeRepo: "dbt-labs/dbt-core/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

@@ -497,6 +497,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["wasm", "wasmtime", "execution", "runtime", "patterns", "multi-language"],
   },
+  {
+    id: "ADR-017",
+    title: "Adopt Arrow Flight as the platform's cross-engine data transfer protocol",
+    status: "accepted",
+    date: "FY27-Q1",
+    deciders: "Data Platform, Architecture, Integration",
+    context:
+      "ADR-013 committed to Iceberg as the primary table format (vendor-neutral, multi-engine). ADR-016 adopted WebAssembly for in-browser execution. But cross-engine queries (DuckDB → Snowflake → BigQuery → Trino) still transfer data via JDBC/ODBC (row-based, slow) or REST/JSON (10× overhead vs binary). Arrow Flight is a gRPC-based columnar transfer protocol that ships RecordBatches directly — 10× faster than REST/JSON, zero deserialisation overhead, and natively supported by DuckDB, Dremio, InfluxDB 3.0, and Voltron Data.",
+    decision:
+      "Adopt Apache Arrow Flight as the platform's cross-engine data transfer protocol. All inter-engine queries (DuckDB ↔ Snowflake ↔ BigQuery ↔ Trino) use Flight for columnar binary transfer. The pattern: source engine exposes a Flight endpoint, consumer engine connects via Flight client, receives Arrow RecordBatch stream — zero-copy into the consumer's memory. Falls back to JDBC/ODBC only for engines without Flight support (legacy Postgres, MySQL).",
+    consequences:
+      "+ 10× throughput vs REST/JSON for bulk transfer. + Zero-copy — Arrow RecordBatch arrives ready for compute, no deserialisation. + gRPC-based — streaming, bidirectional, multiplexed. + Columnar binary — no JSON parsing, no row-to-column conversion. + DuckDB + Trino + Dremio + InfluxDB support natively. − Needs Flight server on each engine (Snowflake/BigQuery don't have native Flight yet — use Arrow Flight SQL bridge). − gRPC adds operational complexity vs simple REST. − TLS cert management for secure Flight endpoints.",
+    alternatives: [
+      "JDBC/ODBC for all cross-engine queries (row-based, 10× slower)",
+      "REST/JSON APIs (universally compatible but 10× overhead)",
+      "Kafka for all transfers (streaming-first but overkill for point queries)",
+    ],
+    tags: ["arrow", "flight", "grpc", "transfer", "patterns", "cross-engine"],
+  },
 ];
 
 // ============================================================

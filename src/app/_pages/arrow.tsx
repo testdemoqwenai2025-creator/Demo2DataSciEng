@@ -277,11 +277,11 @@ export function ArrowPage() {
         title="Multi-language: Arrow in Python, Rust, Go, C"
         description="Same columnar data, 4 languages, zero-copy between them. The C Data Interface makes them all interoperable. Click to open the drawer."
         icon={<Languages className="h-5 w-5" />}
-        badge="4 languages · drawer"
+        badge="5 languages · drawer"
       >
         <MultiLangSamples
           drawerMode
-          drawerButtonLabel="View 4-language Arrow implementations"
+          drawerButtonLabel="View 5-language Arrow implementations"
           title="Apache Arrow — 4 idiomatic implementations"
           description="Python (pyarrow) · Rust (arrow-rs) · Go (arrow-go) · C (Arrow C Data Interface). The same RecordBatch is readable by all 4 without copying."
           samples={[

@@ -25,13 +25,14 @@ export type PageId =
   | "modern-big-data"
   | "duckdb"
   | "streaming"
-  | "arrow";
+  | "arrow"
+  | "patterns";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns";
   icon: string;
   description: string;
 }
@@ -188,6 +189,14 @@ export const PAGES: PageMeta[] = [
     group: "Columnar",
     icon: "Boxes",
     description: "The zero-copy columnar format that makes DuckDB, Polars, Pandas, Spark, Flink interchangeable. Arrow Flight for transfer, C Data Interface for UDFs.",
+  },
+  {
+    id: "patterns",
+    label: "Data Engineering Patterns — Interactive Guides",
+    shortLabel: "Patterns",
+    group: "Patterns",
+    icon: "Boxes",
+    description: "Medallion, SCD2, slim CI, session RLS, reverse-ETL — 5 core patterns with Pyodide executable demos.",
   },
 ];
 
