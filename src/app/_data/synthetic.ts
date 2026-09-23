@@ -611,6 +611,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["pgvector", "vector-db", "rag", "postgres", "patterns", "genai"],
   },
+  {
+    id: "ADR-023",
+    title: "Adopt LoRA + QLoRA as the platform's default fine-tuning method for domain-specific LLMs",
+    status: "accepted",
+    date: "FY27-Q2",
+    deciders: "ML Engineering, Data Platform, GenAI",
+    context:
+      "ADR-022 adopted pgvector for RAG retrieval. But RAG has limits — the LLM's base knowledge can't be updated via retrieval alone. Domain-specific tasks (e.g. SQL generation for the platform's schema, anomaly interpretation using the platform's taxonomy, natural-language-to-dbt-model) require the LLM's weights to be adapted. Full fine-tuning of a 7B model costs ~$500+ in GPU time and requires 8× A100 GPUs. LoRA (Low-Rank Adaptation) freezes the base weights and trains only small low-rank matrices (A·B where A is d×r, B is r×d, r << d). QLoRA further quantises the base model to 4-bit, enabling fine-tuning on a single consumer GPU (RTX 3090).",
+    decision:
+      "Adopt LoRA (Low-Rank Adaptation) + QLoRA (Quantised LoRA) as the platform's default fine-tuning method. All domain-specific LLM adaptation uses LoRA adapters (rank r=8-64) on top of frozen base models. QLoRA for resource-constrained environments (single GPU, 4-bit base). RLHF (Reinforcement Learning from Human Feedback) for alignment; DPO (Direct Preference Optimisation) as the simpler alternative to RLHF. Gold table rows (ADR-013) + ADR-022 embeddings become the training data for domain-specific fine-tuning.",
+    consequences:
+      "+ 99% fewer trainable parameters (LoRA: 0.1-1% of base model). + Train on single GPU (QLoRA: 1× RTX 3090 for 7B model). + Adapters are composable — stack multiple LoRA adapters. + Adapters are small (10-100MB vs 14GB base). + No catastrophic forgetting of base knowledge. − Slightly lower quality than full fine-tuning (1-3% gap). − LoRA rank selection is empirical (r=8 for style, r=64 for domain knowledge). − RLHF is complex (reward model + PPO + KL divergence); DPO is simpler but newer.",
+    alternatives: [
+      "Full fine-tuning (expensive, catastrophic forgetting, not composable)",
+      "Prompt engineering only (limited — can't teach new domain knowledge)",
+      "Prefix tuning (similar to LoRA but less flexible)",
+    ],
+    tags: ["lora", "qlora", "fine-tuning", "rlhf", "dpo", "llm", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

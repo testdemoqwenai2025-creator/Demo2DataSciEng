@@ -36,13 +36,14 @@ export type PageId =
   | "model-monitoring"
   | "rag-llms"
   | "vector-db"
-  | "rl-agentic";
+  | "rl-agentic"
+  | "fine-tuning";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training";
   icon: string;
   description: string;
 }
@@ -287,6 +288,14 @@ export const PAGES: PageMeta[] = [
     group: "Reinforcement Learning",
     icon: "Brain",
     description: "Animated RL diagrams, agent-environment loop, Q-learning, policy gradients, ISR (self-refinement), the next stage of agentic workflows.",
+  },
+  {
+    id: "fine-tuning",
+    label: "LLM Fine-Tuning — LoRA, QLoRA, RLHF, DPO",
+    shortLabel: "Fine-Tuning",
+    group: "LLM Training",
+    icon: "Cpu",
+    description: "Low-rank adaptation math, QLoRA 4-bit quantisation, RLHF vs DPO alignment, Pyodide demo, low-level PyTorch code, Gold tables as training data.",
   },
 ];
 

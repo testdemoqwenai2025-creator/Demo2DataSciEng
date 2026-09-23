@@ -40,6 +40,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "MLOps", ids: ["feature-store", "model-registry", "model-monitoring"] },
   { title: "GenAI", ids: ["rag-llms", "vector-db"] },
   { title: "Reinforcement Learning", ids: ["rl-agentic"] },
+  { title: "LLM Training", ids: ["fine-tuning"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
