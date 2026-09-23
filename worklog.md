@@ -797,3 +797,26 @@ Stage Summary:
 - 39 pages, 30 ADRs, 36 pages with Pyodide, 3 with WasmRunner
 - /quantization-inference → HTTP 200 (331KB), NF4: True, AWQ: True, GPTQ: True, GGUF: True, Pyodide: True, 3D: True, ADR-030: True
 - Production build succeeded (43 routes total, 1 new)
+
+---
+Task ID: adr031-inference-serving-q2
+Agent: Super Z (main)
+Task: Stage 2/4 of "quantization + serving + RAG + multimodal" — ADR-031 (vLLM) + Inference Serving page (#40). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-031: vLLM with PagedAttention + continuous batching as default LLM serving stack (8-23x throughput vs HF)
+- Inference Serving page (#40):
+  * 3D PagedAttention animation (6 phases showing how 4 sequences A/B/C/D share 32 VRAM pages, with seqD reusing freed pages from seqA — no defrag, no OOM)
+  * KV cache math: per-token = 2·L·H_kv·D_head·bytes (70B Llama-3 BF16: 2.6MB/token, 32k×8 users = 670GB → OOMs without paging)
+  * Continuous batching ASCII comparison (static: batch barrier + padding waste vs continuous: iteration-level scheduler, slot freed immediately)
+  * Pyodide KV cache math: per-token for Llama-3 8B/70B/GPT-4, contiguous vs paged allocation analysis, throughput math (HF 50 tok/s/GPU vs vLLM 3000 tok/s/GPU = 60x)
+  * AWQ Marlin kernel ASCII: naive dequant-then-matmul (1500 tok/s) vs fused Marlin kernel (3000 tok/s) — kernel fusion makes AWQ actually faster than BF16
+  * Low-level PyTorch: KVCache dataclass (per-seq tensor with append), PagedKVCache dataclass (flat tensor [num_blocks, num_kv_heads, block_size, head_dim, 2] + per-seq block_tables + free_blocks list, allocate_sequence/free_sequence/write_kv/read_kv with page table indirection), ContinuousBatchingScheduler (iteration-level: drop finished → promote waiting → run batch → step), VLLMServer (OpenAI-compatible API + SSE streaming for /v1/completions)
+  * 'LLM serving IS the OS process scheduler' deeper-thought insight (PagedAttention = IBM System/370 paged virtual memory 1972 — KV cache is process address space, free list = buddy allocator, 16-token block = 4KB page; continuous batching = round-robin CPU scheduler with preemption, max_batch_size = runqueue length; unifies Airflow DAG scheduling + vLLM sequence scheduling + FSDP gradient scheduling as same scheduling problem on same GPU substrate; ADR-029 OpenTelemetry standard makes isomorphism concrete — every Airflow task / vLLM sequence / FSDP step emits spans with same shape)
+- Bug fix: JS template literal `${...}` in Python f-string required escaping `\${...}` (line 310)
+
+Stage Summary:
+- HEAD = 9a77e4f on both repos (private + public)
+- 40 pages, 31 ADRs, 37 pages with Pyodide, 3 with WasmRunner
+- /inference-serving → HTTP 200 (351KB), vLLM: True, PagedAttention: True, KV cache: True, Continuous: True, Pyodide: True, 3D: True, ADR-031: True
+- Production build succeeded (44 routes total, 1 new)
