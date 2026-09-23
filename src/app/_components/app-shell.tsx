@@ -37,6 +37,8 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "DataFrames", ids: ["polars"] },
   { title: "Machine Learning", ids: ["ml-platform"] },
   { title: "Deep Learning", ids: ["neural-networks"] },
+  { title: "MLOps", ids: ["feature-store", "model-registry", "model-monitoring"] },
+  { title: "GenAI", ids: ["rag-llms"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

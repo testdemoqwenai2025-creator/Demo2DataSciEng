@@ -53,6 +53,10 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "polars":              { topic: "Polars DuckDB Pandas DataFrame Arrow columnar benchmark",       label: "DataFrames",     codeRepo: "pola-rs/polars/main/README.md" },
   "ml-platform":         { topic: "MLflow machine learning MLOps model registry feature store inference", label: "ML Platform",   codeRepo: "mlflow/mlflow/main/README.md" },
   "neural-networks":     { topic: "neural networks deep learning transformer attention LLM GPT",     label: "Neural Nets",    codeRepo: "pytorch/pytorch/main/README.md" },
+  "feature-store":       { topic: "feature store online offline train serve consistency Feast",        label: "Feature Store",  codeRepo: "feast-dev/feast/main/README.md" },
+  "model-registry":      { topic: "MLflow model registry versioning staging production archived",      label: "Model Registry", codeRepo: "mlflow/mlflow/main/README.md" },
+  "model-monitoring":    { topic: "model monitoring drift detection Evidently NannyML retraining",     label: "Monitoring",     codeRepo: "evidentlyai/evidently/main/README.md" },
+  "rag-llms":            { topic: "RAG retrieval augmented generation vector database embeddings LLM", label: "RAG & LLMs",     codeRepo: "langchain-ai/langchain/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

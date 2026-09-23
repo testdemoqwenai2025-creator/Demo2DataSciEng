@@ -30,13 +30,17 @@ export type PageId =
   | "data-mesh"
   | "polars"
   | "ml-platform"
-  | "neural-networks";
+  | "neural-networks"
+  | "feature-store"
+  | "model-registry"
+  | "model-monitoring"
+  | "rag-llms";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI";
   icon: string;
   description: string;
 }
@@ -233,6 +237,38 @@ export const PAGES: PageMeta[] = [
     group: "Deep Learning",
     icon: "Brain",
     description: "Animated neural network diagrams, activation function equations, backpropagation math, Pyodide forward-pass demo, and the evolution from Hadoop to today's LLMs.",
+  },
+  {
+    id: "feature-store",
+    label: "Feature Store — Train/Serve Consistency",
+    shortLabel: "Feature Store",
+    group: "MLOps",
+    icon: "Database",
+    description: "Online + offline feature serving, point-in-time correctness, Feast vs Databricks, train/serve skew prevention.",
+  },
+  {
+    id: "model-registry",
+    label: "Model Registry — Versioning + Stages",
+    shortLabel: "Model Registry",
+    group: "MLOps",
+    icon: "GitBranch",
+    description: "MLflow Model Registry: versioning, stages (None→Staging→Production→Archived), A/B testing, rollback patterns.",
+  },
+  {
+    id: "model-monitoring",
+    label: "Model Monitoring — Drift Detection",
+    shortLabel: "Monitoring",
+    group: "MLOps",
+    icon: "Activity",
+    description: "Data drift, concept drift, prediction drift. Evidently, NannyML, retraining triggers, monitoring dashboards.",
+  },
+  {
+    id: "rag-llms",
+    label: "RAG & LLMs — Gold Tables as Knowledge Base",
+    shortLabel: "RAG & LLMs",
+    group: "GenAI",
+    icon: "Sparkles",
+    description: "Vector databases, embeddings, semantic search, how the platform's Gold tables become an LLM knowledge base via RAG.",
   },
 ];
 
