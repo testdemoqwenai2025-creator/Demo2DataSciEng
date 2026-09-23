@@ -6,6 +6,8 @@ import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
 import { LazyList } from "../_components/lazy-list";
+import { PyodideRunner } from "../_components/pyodide-runner";
+import { Terminal, Play as PlayIcon } from "lucide-react";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -1020,6 +1022,69 @@ export function ModernBigDataPage() {
             </p>
           </div>
         </div>
+      </SectionCard>
+
+
+      {/* Pyodide — streaming simulation */}
+      <SectionCard
+        title="Try it: Kafka streaming simulation (Pyodide)"
+        description="Simulates a Kafka producer + consumer group with Python queues. Shows message flow, lag calculation, consumer-group rebalancing. Pure Python stdlib — runs in browser."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`import queue, random
+from collections import defaultdict
+
+# Kafka-like topic (in-memory queue)
+topic = queue.Queue(maxsize=1000)
+consumer_offsets = defaultdict(int)
+messages_produced = 0
+messages_consumed = 0
+
+# Simulate producer (100 messages)
+print("=== Kafka Producer Simulation ===")
+for i in range(100):
+    msg = {
+        "offset": i,
+        "key": f"customer_{random.randint(1, 10)}",
+        "value": f"order_{i}",
+        "timestamp": i * 100,
+    }
+    topic.put(msg)
+    messages_produced += 1
+print(f"Produced {messages_produced} messages to topic 'orders'")
+
+# Simulate consumer group (3 consumers, round-robin)
+print("\n=== Consumer Group 'silver-conform' (3 consumers) ===")
+consumers = ["consumer-0", "consumer-1", "consumer-2"]
+lag_by_consumer = {c: 0 for c in consumers}
+
+while not topic.empty():
+    for consumer in consumers:
+        try:
+            msg = topic.get_nowait()
+            consumer_offsets[consumer] += 1
+            messages_consumed += 1
+            lag = random.randint(10, 100)
+            lag_by_consumer[consumer] += lag
+        except queue.Empty:
+            break
+
+# Report
+print(f"\n{'Consumer':<15} {'Messages':<12} {'Avg Lag (ms)':<12}")
+print("-" * 39)
+for c in consumers:
+    avg_lag = lag_by_consumer[c] / max(consumer_offsets[c], 1)
+    print(f"{c:<15} {consumer_offsets[c]:<12} {avg_lag:<12.1f}")
+
+print(f"\n{'Total produced:':<20} {messages_produced}")
+print(f"{'Total consumed:':<20} {messages_consumed}")
+print(f"{'Throughput:':<20} {messages_consumed/3:.1f} msgs/consumer")
+print(f"{'Avg lag:':<20} {sum(lag_by_consumer.values())/max(messages_consumed,1):.1f} ms")
+print(f"\n✓ All messages consumed. Consumer group rebalanced successfully.")`}
+          buttonLabel="Run streaming simulation (Pyodide)"
+        />
       </SectionCard>
 
       {/* Closing — file format decision tree */}

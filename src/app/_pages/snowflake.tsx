@@ -8,6 +8,8 @@ import { SNOWFLAKE_WAREHOUSES, SNOWFLAKE_RBAC } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PyodideRunner } from "../_components/pyodide-runner";
+import { Terminal, Play } from "lucide-react";
 import { Database, Cpu, ShieldCheck, Server, Layers, Zap, Key, Sparkles } from "lucide-react";
 
 const WAREHOUSE_DDL = `-- ============================================================
@@ -325,6 +327,60 @@ export function SnowflakePage() {
           </ul>
         </SectionCard>
       </div>
+
+      {/* Pyodide — RBAC grant validator (executable in browser) */}
+      <SectionCard
+        title="Try it: RBAC grant validator (Pyodide)"
+        description="Validates that every role has the expected privileges, flags unexpected grants. Pure Python stdlib — runs in your browser via Pyodide. First click loads ~10MB runtime."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`# Snowflake RBAC grant validator
+# Simulates SHOW GRANTS output + validates against expected role/privilege matrix
+
+grants = [
+    {"role": "TRANSFORMER", "privilege": "USAGE",       "object": "WH_DBT_TRANSFORM",        "grantee": "DATA_ENGINEERS"},
+    {"role": "TRANSFORMER", "privilege": "CREATE TABLE","object": "ANALYTICS.GOLD",         "grantee": "DATA_ENGINEERS"},
+    {"role": "REPORTER",    "privilege": "SELECT",       "object": "ANALYTICS.GOLD",         "grantee": "ANALYSTS"},
+    {"role": "PII_READER", "privilege": "SELECT",       "object": "ANALYTICS.GOLD.DIM_CUSTOMER", "grantee": "COMPLIANCE"},
+    {"role": "MARKETING_READER_UK", "privilege": "SELECT", "object": "ANALYTICS.GOLD.FCT_ORDERS", "grantee": "MKT_ANALYSTS_UK"},
+]
+
+expected = {
+    "TRANSFORMER": ["USAGE", "CREATE TABLE"],
+    "REPORTER":    ["SELECT"],
+    "PII_READER":  ["SELECT"],
+}
+
+issues = []
+for role, expected_privs in expected.items():
+    role_grants = [g for g in grants if g["role"] == role]
+    actual_privs = set(g["privilege"] for g in role_grants)
+    missing = set(expected_privs) - actual_privs
+    if missing:
+        issues.append(f"⚠ {role}: missing privileges {missing}")
+    else:
+        print(f"✓ {role}: all expected privileges present ({len(actual_privs)})")
+
+for g in grants:
+    if g["role"] not in expected:
+        issues.append(f"⚠ Unexpected role '{g[\"role\"]}' with {g[\"privilege\"]} on {g[\"object\"]}")
+
+print()
+print("=" * 60)
+if issues:
+    print("AUDIT ISSUES:")
+    for issue in issues:
+        print(f"  {issue}")
+    print(f"\n{len(issues)} issue(s) found.")
+else:
+    print("✓ All grants validated — no issues found.")
+print("=" * 60)`}
+          buttonLabel="Run RBAC validator (Pyodide)"
+        />
+      </SectionCard>
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("dbt")} className="text-sm text-primary hover:underline">
           → Continue to dbt &amp; dimensional modelling

@@ -9,6 +9,7 @@ import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LazyList } from "../_components/lazy-list";
+import { PyodideRunner } from "../_components/pyodide-runner";
 import { KnowledgeShorts } from "../_components/knowledge-shorts";
 import {
   BookOpen,
@@ -22,6 +23,7 @@ import {
   ArrowRight,
   Search,
   Play,
+  Terminal,
 } from "lucide-react";
 
 const STATUS_STYLE: Record<string, { badge: "default" | "outline" | "secondary" | "destructive"; icon: typeof CheckCircle2; tone: string }> = {
@@ -263,6 +265,61 @@ export function KnowledgePage() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+
+      {/* Pyodide — ADR structure validator */}
+      <SectionCard
+        title="Try it: ADR structure validator (Pyodide)"
+        description="Validates that every ADR has the required fields (id, title, status, context, decision, consequences, alternatives, tags). Pure Python — runs in browser."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`# ADR structure validator
+# Checks every ADR has all required fields + valid status
+
+adrs = [
+    {"id": "ADR-001", "title": "Adopt Lakehouse", "status": "accepted", "date": "FY23-Q1",
+     "deciders": "Data Platform", "context": "Needed BI + ML platform...",
+     "decision": "Adopt Databricks Lakehouse", "consequences": "+ Single format",
+     "alternatives": ["Snowflake-only"], "tags": ["storage", "lakehouse"]},
+    {"id": "ADR-013", "title": "Commit to Iceberg", "status": "accepted", "date": "FY26-Q3",
+     "deciders": "Data Platform, Architecture", "context": "Vendor-neutrality...",
+     "decision": "Iceberg primary, Delta on Databricks", "consequences": "+ Vendor-neutral",
+     "alternatives": ["Stay on Delta", "Migrate to Hudi"], "tags": ["iceberg", "delta"]},
+    {"id": "ADR-014", "title": "DuckDB for CI", "status": "accepted", "date": "FY26-Q4",
+     "deciders": "Data Platform, DevOps", "context": "CI needs local engine...",
+     "decision": "DuckDB for CI + local analytics", "consequences": "+ CI costs drop 90%",
+     "alternatives": ["Snowflake CI", "SQLite"], "tags": ["ci", "duckdb"]},
+]
+
+required = ["id", "title", "status", "date", "deciders", "context", "decision", "consequences", "alternatives", "tags"]
+valid_statuses = ["accepted", "proposed", "deprecated", "superseded"]
+
+issues = []
+for adr in adrs:
+    for field in required:
+        if field not in adr or not adr[field]:
+            issues.append(f"⚠ {adr.get('id', '???')}: missing '{field}'")
+    if adr.get("status") and adr["status"] not in valid_statuses:
+        issues.append(f"⚠ {adr['id']}: invalid status '{adr['status']}'")
+    if adr.get("alternatives") and not isinstance(adr["alternatives"], list):
+        issues.append(f"⚠ {adr['id']}: alternatives must be a list")
+    if not any(adr.get('id','') in i for i in issues):
+        print(f"✓ {adr['id']}: valid ({adr['status']}, {len(adr.get('alternatives',[]))} alternatives)")
+
+print()
+print("=" * 60)
+if issues:
+    print("VALIDATION ISSUES:")
+    for i in issues: print(f"  {i}")
+    print(f"\n{len(issues)} issue(s) found.")
+else:
+    print(f"✓ All {len(adrs)} ADRs validated — structure is correct.")
+print("=" * 60)`}
+          buttonLabel="Run ADR validator (Pyodide)"
+        />
       </SectionCard>
 
       {/* Knowledge Shorts — vertical video-style explainers */}

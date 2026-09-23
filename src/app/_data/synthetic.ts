@@ -440,6 +440,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["storage", "table-format", "iceberg", "delta", "patterns"],
   },
+  {
+    id: "ADR-014",
+    title: "Adopt DuckDB as the platform's CI + local analytical engine",
+    status: "accepted",
+    date: "FY26-Q4",
+    deciders: "Data Platform, Analytics Engineering, DevOps",
+    context:
+      "ADR-013 committed to Iceberg as the primary table format. CI tests for dbt models + Iceberg tables need a local execution engine — running every CI test against Snowflake/Databricks burns credits for what should be free. DuckDB reads Iceberg natively (via the iceberg extension), runs on any laptop/CI runner without a server, and is 100% OSS. The 'just open a Parquet/Iceberg file' pattern means CI can test transforms on a sample of real data in seconds, not minutes.",
+    decision:
+      "Adopt DuckDB as the platform's CI + local analytical engine. All dbt model tests in CI run on DuckDB first (fast, free, local). Only promote to Snowflake/Databricks staging after DuckDB CI passes. Local development uses DuckDB for ad-hoc analytics — analysts query Parquet/Iceberg files directly without provisioning a warehouse. MotherDuck is the managed option when shared access is needed.",
+    consequences:
+      "+ CI costs drop ~90% (no warehouse credits for tests). + Local dev is instant (no server to start). + DuckDB reads Iceberg natively — no format conversion. + Analysts prototype before promoting to warehouse. − DuckDB SQL dialect differs slightly from Snowflake (functions, types). − Single-node limits (~1TB per query). − Not all Snowflake features (dynamic RLS via session context, secure views) are testable in DuckDB.",
+    alternatives: [
+      "Keep running CI tests on Snowflake (expensive, slow)",
+      "Use SQLite for CI (no Parquet/Iceberg support, row-based)",
+      "Use Postgres for CI (server overhead, no columnar perf)",
+    ],
+    tags: ["ci", "duckdb", "testing", "patterns", "local-dev"],
+  },
 ];
 
 // ============================================================
