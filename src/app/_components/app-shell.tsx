@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PAGES, hrefFor, type PageId } from "../_lib/router";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
+import { LoginButton } from "./login-button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -113,6 +114,7 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
           <Badge variant="outline" className="hidden sm:inline-flex gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Prod · v2.4.0
           </Badge>
+          <LoginButton />
           <ThemeToggle />
         </div>
       </div>
@@ -191,6 +193,7 @@ export function AppShell({ active, children }: AppShellProps) {
                     <Home className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
+                <LoginButton />
                 <ThemeToggle />
               </div>
             </div>

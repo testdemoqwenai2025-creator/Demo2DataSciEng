@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { MEDALLION_LAYERS } from "../_data/synthetic";
@@ -20,6 +20,7 @@ import {
   Boxes,
   GitBranch,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import {
   AreaChart,
@@ -95,11 +96,29 @@ interface Anomaly {
   layer: string;
   severity: "info" | "warning" | "critical";
   detail: string;
+  id: string; // unique key for agent state tracking
 }
+
+interface AgentHypothesis {
+  root_cause: string;
+  confidence: "low" | "medium" | "high";
+  suggested_action: string;
+  known_pattern: boolean;
+  steps_taken: string[];
+  _meta?: { agent_id: string; tokens: number; timestamp: string; error?: string };
+}
+
+type AgentState =
+  | { status: "idle" }
+  | { status: "investigating" }
+  | { status: "done"; hypothesis: AgentHypothesis }
+  | { status: "error"; message: string };
 
 function genAnomaly(): Anomaly {
   const a = ANOMALY_TEMPLATES[Math.floor(Math.random() * ANOMALY_TEMPLATES.length)];
-  return { ts: fmtTime(new Date()), ...a };
+  // Unique-ish id so we can track per-anomaly agent state
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return { ts: fmtTime(new Date()), id, ...a };
 }
 
 const LAYER_COLORS: Record<string, string> = {
@@ -111,7 +130,11 @@ const LAYER_COLORS: Record<string, string> = {
 export function DashboardPage() {
   const [live, setLive] = useState(true);
   const [runs, setRuns] = useState<PipelineRun[]>(() => Array.from({ length: 8 }, genRun));
-  const [anomalies, setAnomalies] = useState<Anomaly[]>(() => Array.from({ length: 5 }, genAnomaly));
+  const [anomalies, setAnomalies] = useState<Anomaly[]>(() => Array.from({ length: 5 }, () => {
+    // Each initial anomaly needs a unique id for agent state tracking
+    const a = ANOMALY_TEMPLATES[Math.floor(Math.random() * ANOMALY_TEMPLATES.length)];
+    return { ts: fmtTime(new Date(Date.now() - Math.random() * 60000)), id: `init-${Math.random().toString(36).slice(2, 10)}`, ...a };
+  }));
   const [creditsBurned, setCreditsBurned] = useState(2847.32);
   const [p95Latency, setP95Latency] = useState(1.4);
   const [throughput, setThroughput] = useState(8.42);
@@ -123,12 +146,55 @@ export function DashboardPage() {
     }))
   );
 
+  const [agentStates, setAgentStates] = useState<Record<string, AgentState>>({});
+  const [autoTriage, setAutoTriage] = useState(true);
+
+  // Call the agent API for an anomaly
+  const callAgent = useCallback(async (anomaly: Anomaly) => {
+    setAgentStates((prev) => ({ ...prev, [anomaly.id]: { status: "investigating" } }));
+    try {
+      const res = await fetch("/api/agent-triage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          signal: anomaly.signal,
+          layer: anomaly.layer,
+          severity: anomaly.severity,
+          detail: anomaly.detail,
+          ts: anomaly.ts,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        setAgentStates((prev) => ({
+          ...prev,
+          [anomaly.id]: { status: "error", message: `Agent HTTP ${res.status}: ${text.slice(0, 100)}` },
+        }));
+        return;
+      }
+      const data = (await res.json()) as AgentHypothesis;
+      setAgentStates((prev) => ({ ...prev, [anomaly.id]: { status: "done", hypothesis: data } }));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setAgentStates((prev) => ({ ...prev, [anomaly.id]: { status: "error", message: msg } }));
+    }
+  }, []);
+
   // Live ticker — every 3s
   useEffect(() => {
     if (!live) return;
     const interval = setInterval(() => {
       setRuns((prev) => [genRun(), ...prev].slice(0, 12));
-      setAnomalies((prev) => (Math.random() < 0.45 ? [genAnomaly(), ...prev].slice(0, 8) : prev));
+      setAnomalies((prev) => {
+        if (Math.random() >= 0.45) return prev;
+        const newAnomaly = genAnomaly();
+        // Auto-trigger the agent if enabled
+        if (autoTriage) {
+          // Fire and forget — state updates via callback
+          callAgent(newAnomaly);
+        }
+        return [newAnomaly, ...prev].slice(0, 8);
+      });
       setCreditsBurned((c) => Math.round((c + 1.2 + Math.random() * 0.8) * 100) / 100);
       setP95Latency((l) => Math.round((l + (Math.random() - 0.5) * 0.2) * 100) / 100);
       setThroughput((t) => Math.round((t + (Math.random() - 0.5) * 0.3) * 100) / 100);
@@ -142,7 +208,7 @@ export function DashboardPage() {
       ]);
     }, 3000);
     return () => clearInterval(interval);
-  }, [live]);
+  }, [live, autoTriage, callAgent]);
 
   // What-if simulator
   const [loadMultiplier, setLoadMultiplier] = useState(1);
@@ -159,15 +225,27 @@ export function DashboardPage() {
         title="Live Dashboard — synthetic observatory"
         description="A real-time (simulated) view of the platform as it operates. Pipeline runs tick in every few seconds, credits burn on Snowflake + Databricks, anomalies flow in. Everything below is synthetic — but the patterns are what real production telemetry looks like."
         right={
-          <Button
-            variant={live ? "default" : "outline"}
-            size="sm"
-            className="gap-1.5"
-            onClick={() => setLive((v) => !v)}
-          >
-            {live ? <PauseCircle className="h-3.5 w-3.5" /> : <PlayCircle className="h-3.5 w-3.5" />}
-            {live ? "Pause live feed" : "Resume live feed"}
-          </Button>
+          <div className="flex gap-2 items-center">
+            <Button
+              variant={autoTriage ? "default" : "outline"}
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setAutoTriage((v) => !v)}
+              title="When enabled, the dq-triage-v1 agent auto-investigates every new anomaly"
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${autoTriage ? "animate-pulse" : ""}`} />
+              {autoTriage ? "Agent: ON" : "Agent: OFF"}
+            </Button>
+            <Button
+              variant={live ? "default" : "outline"}
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setLive((v) => !v)}
+            >
+              {live ? <PauseCircle className="h-3.5 w-3.5" /> : <PlayCircle className="h-3.5 w-3.5" />}
+              {live ? "Pause live feed" : "Resume live feed"}
+            </Button>
+          </div>
         }
       />
 
@@ -338,8 +416,9 @@ export function DashboardPage() {
                   : a.severity === "warning"
                   ? "bg-amber-500"
                   : "bg-emerald-500";
+              const agentState = agentStates[a.id] ?? { status: "idle" as const };
               return (
-                <div key={`${a.ts}-${i}`} className="px-3 py-2 hover:bg-muted/20">
+                <div key={a.id} className="px-3 py-2 hover:bg-muted/20">
                   <div className="flex items-start gap-2">
                     <span className={`mt-1.5 h-2 w-2 rounded-full shrink-0 ${dot} ${live ? "animate-pulse" : ""}`} />
                     <div className="flex-1 min-w-0">
@@ -350,6 +429,70 @@ export function DashboardPage() {
                         <Badge variant="outline" className="text-[9px]">{a.layer}</Badge>
                         <Badge variant={a.severity === "critical" ? "destructive" : "outline"} className="text-[9px]">{a.severity}</Badge>
                       </div>
+                      {/* Agent hypothesis block — renders inline once agent finishes */}
+                      {agentState.status === "investigating" && (
+                        <div className="mt-2 rounded border border-primary/30 bg-primary/5 px-2 py-1.5">
+                          <p className="text-[10px] flex items-center gap-1.5 text-primary">
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                            <span className="font-mono">dq-triage-v1</span> investigating…
+                          </p>
+                        </div>
+                      )}
+                      {agentState.status === "done" && agentState.hypothesis && (
+                        <div className="mt-2 rounded border border-primary/40 bg-primary/8 px-2 py-1.5">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <p className="text-[10px] font-mono flex items-center gap-1.5 text-primary">
+                              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                              dq-triage-v1 · root cause
+                            </p>
+                            <Badge
+                              variant="outline"
+                              className={
+                                "text-[8px] " + (
+                                  agentState.hypothesis.confidence === "high"
+                                    ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                                    : agentState.hypothesis.confidence === "medium"
+                                    ? "border-amber-500/40 text-amber-600 dark:text-amber-400"
+                                    : "border-muted-foreground/40 text-muted-foreground"
+                                )
+                              }
+                            >
+                              {agentState.hypothesis.confidence} confidence
+                            </Badge>
+                          </div>
+                          <p className="text-[10px] leading-snug text-foreground/90">{agentState.hypothesis.root_cause}</p>
+                          <p className="text-[10px] leading-snug text-muted-foreground mt-1">
+                            <span className="font-semibold text-foreground/80">Action:</span> {agentState.hypothesis.suggested_action}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            {agentState.hypothesis.known_pattern && (
+                              <Badge variant="outline" className="text-[8px] border-emerald-500/40 text-emerald-600 dark:text-emerald-400">
+                                known pattern
+                              </Badge>
+                            )}
+                            {agentState.hypothesis._meta?.tokens && (
+                              <span className="text-[9px] font-mono text-muted-foreground">
+                                {agentState.hypothesis._meta.tokens} tokens
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {agentState.status === "error" && (
+                        <div className="mt-2 rounded border border-rose-500/40 bg-rose-500/8 px-2 py-1.5">
+                          <p className="text-[10px] text-rose-600 dark:text-rose-400">
+                            Agent error: {agentState.message}
+                          </p>
+                        </div>
+                      )}
+                      {agentState.status === "idle" && (
+                        <button
+                          onClick={() => callAgent(a)}
+                          className="mt-1.5 text-[10px] text-primary hover:underline"
+                        >
+                          → Triage with agent
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

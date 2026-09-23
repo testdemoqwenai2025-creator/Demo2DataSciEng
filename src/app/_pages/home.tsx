@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EXEC_KPIS, COMPANY, REVENUE_TREND, CHANNEL_MIX, DAILY_INGEST } from "../_data/synthetic";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { ArchBox, ArchLayer, ArchArrow } from "../_components/arch-diagram";
+import { HomeSearch } from "../_components/home-search";
 import { hrefFor } from "../_lib/router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -164,15 +165,30 @@ export function HomePage() {
             The platform spans Snowflake, Databricks, dbt, Tableau, Fivetran, Hightouch, Airflow and Unity
             Catalogue — every layer is purpose-built, observable and CI/CD-driven.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <Button asChild size="sm">
+          {/* Search box */}
+          <div className="mt-6">
+            <HomeSearch />
+          </div>
+          {/* CTAs */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild size="default" className="gap-1.5">
               <Link href={hrefFor("architecture")}>
-                Explore architecture <ArrowRight className="h-4 w-4 ml-1" />
+                Get Started <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href={hrefFor("governance")}>
-                <ShieldCheck className="h-4 w-4 mr-1" /> Governance & DQ
+            <Button asChild size="default" variant="outline">
+              <Link href={hrefFor("dashboard")}>
+                <Activity className="h-4 w-4 mr-1" /> View live dashboard
+              </Link>
+            </Button>
+            <Button asChild size="default" variant="ghost">
+              <Link href={hrefFor("knowledge")}>
+                Knowledge Hub <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </Button>
+            <Button asChild size="default" variant="ghost">
+              <Link href={hrefFor("about")}>
+                <ShieldCheck className="h-4 w-4 mr-1" /> About & GDPR
               </Link>
             </Button>
           </div>

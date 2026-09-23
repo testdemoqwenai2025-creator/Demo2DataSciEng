@@ -8,6 +8,7 @@ import { ADRS, PATTERNS, TRADEOFFS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { KnowledgeShorts } from "../_components/knowledge-shorts";
 import {
   BookOpen,
   FileText,
@@ -19,6 +20,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Search,
+  Play,
 } from "lucide-react";
 
 const STATUS_STYLE: Record<string, { badge: "default" | "outline" | "secondary" | "destructive"; icon: typeof CheckCircle2; tone: string }> = {
@@ -252,6 +254,16 @@ export function KnowledgePage() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+      {/* Knowledge Shorts — vertical video-style explainers */}
+      <SectionCard
+        title="Knowledge Shorts — 60-second explainers"
+        description="Short-form technical knowledge in the YouTube Shorts style. Swipe horizontally to browse. Click any short to expand the full explanation + jump to the implementing page. Inspired by channels like datamlistic."
+        icon={<Play className="h-5 w-5" />}
+        badge="10 shorts"
+      >
+        <KnowledgeShorts />
       </SectionCard>
 
       {/* Closing thought */}

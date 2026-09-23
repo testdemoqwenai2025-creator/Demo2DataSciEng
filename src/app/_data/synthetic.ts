@@ -924,3 +924,154 @@ export const PAPERS: Paper[] = [
     url: "https://www.cis.upenn.edu/~ktan/pubs/icde01.pdf",
   },
 ];
+
+// ============================================================
+// Knowledge Shorts — short-form technical explainers
+// Styled like YouTube Shorts (vertical, swipeable, 60-sec reads).
+// Inspired by https://www.youtube.com/@datamlistic/short
+// ============================================================
+export interface KnowledgeShort {
+  id: string;
+  title: string;        // ≤ 60 chars, hook-style
+  topic: string;        // category label
+  duration: string;     // e.g. "0:42"
+  views: string;        // e.g. "12.4k"
+  likes: string;
+  body: string;         // the actual short explanation (3-5 sentences)
+  key_takeaway: string; // one-liner the viewer remembers
+  related_page: string; // platform page id where this knowledge is implemented
+  accent: "emerald" | "amber" | "violet" | "cyan" | "yellow";
+}
+
+export const KNOWLEDGE_SHORTS: KnowledgeShort[] = [
+  {
+    id: "ks-1",
+    title: "Why Bronze is append-only (and why you should care)",
+    topic: "Architecture",
+    duration: "0:48",
+    views: "18.2k",
+    likes: "1.4k",
+    body:
+      "Bronze is the raw layer — append-only, schema-on-read, no MERGE. Why? Because the moment you mutate Bronze, you lose the ability to re-run Silver idempotently. Bronze is your evidence locker — every row that ever arrived is still there. If you need to fix something, you don't overwrite — you add a Silver correction row that supersedes the Bronze fact.",
+    key_takeaway: "Bronze = evidence. Silver = truth. Gold = business.",
+    related_page: "databricks",
+    accent: "emerald",
+  },
+  {
+    id: "ks-2",
+    title: "SCD2 in 60 seconds — slowly changing dimensions",
+    topic: "Modelling",
+    duration: "0:58",
+    views: "24.7k",
+    likes: "2.1k",
+    body:
+      "When a customer's segment changes from 'Standard' to 'VIP', you don't overwrite the old row — you close it (set valid_to) and open a new row with the new segment. Why? Because historical reporting needs to know what the segment was at the time of the order, not what it is now. SCD2 = surrogate key per attribute-window, valid_from + valid_to, point-in-time correct.",
+    key_takeaway: "Don't overwrite history. Close it + open a new row.",
+    related_page: "dbt",
+    accent: "amber",
+  },
+  {
+    id: "ks-3",
+    title: "What is Delta Lake's transaction log actually doing?",
+    topic: "Storage",
+    duration: "0:52",
+    views: "31.5k",
+    likes: "3.2k",
+    body:
+      "Delta Lake is just Parquet files + a JSON transaction log. Every write appends a new version to the log; readers pick the latest committed version. ACID comes from optimistic concurrency: writers propose a commit, the log rejects if another writer got there first. Time travel is just 'read the log at version N'. Z-ORDER pre-sorts files so reads can skip 90%+ of files.",
+    key_takeaway: "Delta = Parquet + JSON log. Everything else is optimisation.",
+    related_page: "databricks",
+    accent: "violet",
+  },
+  {
+    id: "ks-4",
+    title: "Snowflake RLS without 100 views — session context",
+    topic: "Security",
+    duration: "0:46",
+    views: "14.8k",
+    likes: "1.8k",
+    body:
+      "The naive approach: one SECURE VIEW per role per region (108 views for 9 markets × 12 roles). The right approach: ONE view + SESSION_CONTEXT('ROW_ACCESS_REGION'). When the user logs in via SSO, their SAML attributes drive SET ROW_ACCESS_REGION — the view filters rows by that session var. One view, infinite regions.",
+    key_takeaway: "One view + session context beats 100 hand-coded views.",
+    related_page: "snowflake",
+    accent: "cyan",
+  },
+  {
+    id: "ks-5",
+    title: "dbt slim CI — run only what changed",
+    topic: "DevOps",
+    duration: "0:54",
+    views: "22.3k",
+    likes: "2.6k",
+    body:
+      "Full dbt build on every PR = 14 minutes. Slim CI = compare the new manifest against the previous one, run only state:modified+ (changed models + downstream). Run drops to ~4 minutes. State is stored as a manifest.json uploaded to S3 on every merge to main. CI pulls it, defers, runs only what's needed.",
+    key_takeaway: "State-aware CI: run only what changed + downstream.",
+    related_page: "cicd",
+    accent: "emerald",
+  },
+  {
+    id: "ks-6",
+    title: "Medallion isn't a religious choice — it's a layering rule",
+    topic: "Architecture",
+    duration: "0:38",
+    views: "9.1k",
+    likes: "870",
+    body:
+      "Bronze (raw), Silver (conformed), Gold (dimensional). The rule: each layer has exactly one job, and you can't skip layers. If Silver starts doing Gold's work (e.g. joining facts to dims), you lose rerun-safety. The rule isn't religious — it's the only way to keep the platform debuggable at scale.",
+    key_takeaway: "Bronze→Silver→Gold isn't optional. Skipping = debugging hell.",
+    related_page: "databricks",
+    accent: "amber",
+  },
+  {
+    id: "ks-7",
+    title: "What is Unity Catalogue actually tagging?",
+    topic: "Governance",
+    duration: "0:50",
+    views: "11.6k",
+    likes: "1.2k",
+    body:
+      "Unity Catalogue tags are labels you apply to columns: 'pii=true', 'pii.email=true', 'criticality=gold'. They're consumed by everything downstream — Hightouch masks tagged columns in reverse-ETL, Tableau enforces RLS via tagged dimensions, Monte Carlo's anomaly detectors skip tagged stable columns. One tag, five consumers.",
+    key_takeaway: "Tag once, enforce everywhere. PII never leaks.",
+    related_page: "governance",
+    accent: "violet",
+  },
+  {
+    id: "ks-8",
+    title: "Reverse-ETL — push governed audiences back to business tools",
+    topic: "Activation",
+    duration: "0:42",
+    views: "16.9k",
+    likes: "1.7k",
+    body:
+      "ETL brings data in. Reverse-ETL pushes governed data out — your CRM, your CDP, your ad platforms. The trick: define the audience as a SQL model in Snowflake (versioned in Git), let Hightouch upsert into Salesforce. The same definition feeds Tableau (BI) and Klaviyo (activation) — no drift.",
+    key_takeaway: "Define once in SQL. Sync to many. No drift.",
+    related_page: "fivetran-hightouch",
+    accent: "cyan",
+  },
+  {
+    id: "ks-9",
+    title: "Why we still use Airflow AND Dagster (hybrid)",
+    topic: "Orchestration",
+    duration: "0:55",
+    views: "8.7k",
+    likes: "940",
+    body:
+      "Airflow has the best operators (FivetranOperator, SnowflakeOperator). Dagster has the best asset graph (native lineage + partitions). Neither alone is perfect. The hybrid: Airflow for batch schedules (time-driven), Dagster for asset-backed workloads (asset-driven). Both emit OpenLineage events. The mental model isn't 'pick one' — it's 'use the right tool per workload'.",
+    key_takeaway: "Airflow for time. Dagster for assets. Both emit lineage.",
+    related_page: "orchestration",
+    accent: "yellow",
+  },
+  {
+    id: "ks-10",
+    title: "The semantic layer — why metrics drift without it",
+    topic: "Analytics",
+    duration: "0:51",
+    views: "19.4k",
+    likes: "2.3k",
+    body:
+      "Without a semantic layer, every BI tool defines revenue slightly differently. Tableau's revenue ≠ Looker's revenue ≠ Hightouch's revenue. The semantic layer (MetricFlow) defines each metric once in YAML — measures, dimensions, derived metrics. All consumers read from it. Metric drift becomes structurally impossible.",
+    key_takeaway: "Define the metric once. Read it everywhere. No drift.",
+    related_page: "dbt",
+    accent: "emerald",
+  },
+];
