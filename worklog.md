@@ -170,3 +170,38 @@ Stage Summary:
 - Live URL verified: /databricks loads without error, drawer opens, 4+ languages visible
 - Page sizes reduced ~20% via progressive disclosure (heavy code now in drawers)
 - File types per language documented in drawer footer (.py, .scala, .rs, .ex, .beam, .c, .so, .sh, .go, etc.)
+
+---
+Task ID: floating-live-button
+Agent: Super Z (main)
+Task: Build persistent floating FAB on every page that opens LiveResourcesDrawer with topic pre-set per page. Replaces scattered inline LiveResourcesDrawer buttons.
+
+Work Log:
+- Built FloatingLiveButton component (src/app/_components/floating-live-button.tsx):
+  * Material FAB pattern, fixed bottom-right, z-40
+  * Pulsing emerald glow animation on first load (subtle, dismissible)
+  * Tooltip card above button on first visit — explains what it does
+  * 'X' dismiss button + localStorage persistence (mdse-floating-live-dismissed-v1)
+  * Once dismissed → quiet chevron-up that still works on click
+  * Live indicator dot (green pulsing) in top-right corner
+  * Hover label 'Live data for {page}' (desktop)
+  * Spring animation via Framer Motion on mount
+  * Fixed lint: setState-in-effect resolved via setTimeout deferral
+- 16-page topic mapping (Record<PageId, PageTopic>):
+  * Each page → topic + label + codeRepo tuned for arXiv + GitHub + HF + PwC search
+  * e.g. /databricks → 'Apache Spark Delta Lake Lakehouse Databricks'
+  * /governance → 'Unity Catalogue data governance lineage OpenLineage'
+  * /modern-big-data → 'Apache Kafka Flink Spark streaming big data lakehouse'
+- Wired FloatingLiveButton into AppShell so it appears on every page
+- Hidden on home page (home has search + CTAs already)
+- Removed inline LiveResourcesDrawer buttons from 6 pages:
+  Databricks, Snowflake, dbt, CI/CD, Governance, Modern Big Data
+  (now redundant — the floating button covers all pages)
+
+Stage Summary:
+- HEAD = e8a66da on both repos
+- Deploy #16 succeeded — all build + deploy steps green
+- Verified via browser on /databricks: page loads, floating button present,
+  clicking opens drawer with correct topic ('Apache Spark Delta Lake Lakehouse Databricks')
+- Live on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/databricks
+- Now every page (except home) has a persistent floating button → universal access to live research data
