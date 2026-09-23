@@ -750,3 +750,27 @@ Stage Summary:
 - 37 pages, 28 ADRs, 34 pages with Pyodide, 3 with WasmRunner
 - /distributed-training → HTTP 200 (327KB), DDP: True, FSDP: True, ZeRO: True, AllReduce: True, Pyodide: True, 3D: True, ADR-028: True
 - Production build succeeded (41 routes total, 1 new)
+
+---
+Task ID: adr029-mlops-tracing-stage3
+Agent: Super Z (main)
+Task: Stage 3/3 of "diffusion + distributed + MLOps" — ADR-029 (OpenTelemetry) + MLOps & Tracing page (#38). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-029: OpenTelemetry unified observability standard (replaces dual OpenLineage + MLflow stacks, correlates model degradation → training run → data pipeline)
+- MLOps & Tracing page (#38):
+  * 3D trace DAG animation (5 phases: emit spans → build DAG via parent_id → Kahn topo sort → DP relaxation dist[v]=max(dist[u]+dur[v]) → reconstruct critical path)
+  * OTLP wire format ASCII: span shape (trace_id 16B W3C, span_id 8B, parent_span_id, start/end ns, status, attributes, events, links), traceparent HTTP header for propagation
+  * Critical path math: O(V+E) via Kahn's algorithm + DP relaxation, with algorithm steps listed
+  * SLO math: P99(trace_duration) < T, burn rate = observed_p99/T, error budget = (1-SLO)×N per quarter, alert threshold 2x burn for 1h
+  * Pyodide trace analysis: builds span DAG for pipeline→train→DDP→AllReduce→eval→deploy, computes critical path, shows per-span % of trace, simulates 1000 traces with 5% slow outliers, computes p50/p95/p99/p999 + SLO burn rate
+  * Low-level PyTorch+OTel: setup_telemetry() with Resource + OTLPSpanExporter + BatchSpanProcessor, train_step() with manual spans for forward/backward/optimizer (ml.framework/ml.world_size/gpus.rank/ml.train.loss attributes), trace_allreduce() contextmanager wrapping NCCL AllReduce with bandwidth computation, call_data_pipeline() showing W3C Trace Context propagation via inject(), compute_critical_path() full Kahn+DP implementation, slo_status() burn rate computation
+  * Unified observability architecture ASCII: 6 producers (Airflow/Spark/PyTorch/agent-triage/Triton/GenAI) → OTel Collector (tail sampling, k8s enrichment) → Tempo/Loki/Mimir → Grafana (TraceQL/LogQL/PromQL + critical path plugin)
+  * 'Traces ARE distributed backpropagation' deeper-thought insight (trace DAG = autograd computational graph; dist[v]=max(dist[u]+dur[v]) is the max-version of grad[v]=Σ(grad[u]·∂v/∂u); both compute duals of DAGs; ADR-029 + ADR-028 + ADR-019 + ADR-027 all describe temporal DAGs in one language; observability is to operations what autograd is to learning)
+
+Stage Summary:
+- HEAD = cc0a140 on both repos (private + public)
+- 38 pages, 29 ADRs, 35 pages with Pyodide, 3 with WasmRunner
+- /mlops-tracing → HTTP 200 (352KB), OpenTelemetry: True, Trace: True, Span: True, Critical: True, SLO: True, Pyodide: True, 3D: True, ADR-029: True
+- Production build succeeded (42 routes total, 1 new)
+- ALL THREE STAGES COMPLETE: diffusion-models (#36) + distributed-training (#37) + mlops-tracing (#38)
