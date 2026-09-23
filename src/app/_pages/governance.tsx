@@ -8,6 +8,8 @@ import { DQ_RULES, OBSERVABILITY, UNITY_GRANTS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PyodideRunner } from "../_components/pyodide-runner";
+import { Terminal } from "lucide-react";
 import {
   ShieldCheck,
   Activity,
@@ -330,6 +332,20 @@ export function GovernancePage() {
           </ul>
         </SectionCard>
       </div>
+
+      {/* Pyodide — DQ rules validator */}
+      <SectionCard
+        title="Try it: DQ rules validator (Pyodide)"
+        description="Validates data quality rules against expected patterns + severity + coverage. Pure Python stdlib — runs in browser."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`dq_rules = [\n    {\"table\": \"fct_orders\", \"rule\": \"not_null(order_id)\", \"severity\": \"error\", \"coverage\": \"100%\"},\n    {\"table\": \"fct_orders\", \"rule\": \"unique(order_id)\", \"severity\": \"error\", \"coverage\": \"100%\"},\n    {\"table\": \"fct_orders\", \"rule\": \"accepted_range(order_total > 0)\", \"severity\": \"warn\", \"coverage\": \"99.98%\"},\n    {\"table\": \"fct_orders\", \"rule\": \"freshness < 30m\", \"severity\": \"error\", \"coverage\": \"100%\"},\n    {\"table\": \"dim_customer\", \"rule\": \"unique(customer_sk)\", \"severity\": \"error\", \"coverage\": \"100%\"},\n    {\"table\": \"dim_customer\", \"rule\": \"not_null(email) where is_active\", \"severity\": \"error\", \"coverage\": \"99.4%\"},\n]\n\nexpected_patterns = {\n    \"fct_orders\": [\"not_null\", \"unique\", \"accepted_range\", \"freshness\"],\n    \"dim_customer\": [\"unique\", \"not_null\"],\n}\n\nvalid_severities = [\"error\", \"warn\", \"info\"]\nknown_patterns = [\"not_null\", \"unique\", \"accepted_range\", \"freshness\", \"relationships\", \"regex\"]\n\nissues = []\nfor rule in dq_rules:\n    if rule[\"severity\"] not in valid_severities:\n        issues.append(f\"\\u26a0 {rule[\u0027table\u0027]}: invalid severity '{rule[\u0027severity\u0027]}'\")\n    if not rule[\"coverage\"].endswith(\"%\"):\n        issues.append(f\"\\u26a0 {rule[\u0027table\u0027]}: coverage must end with %\")\n    pattern_found = any(p in rule[\"rule\"] for p in known_patterns)\n    if not pattern_found:\n        issues.append(f\"\\u26a0 {rule[\u0027table\u0027]}: unknown rule pattern in '{rule[\u0027rule\u0027]}'\")\n\nfor table, patterns in expected_patterns.items():\n    table_rules = [r for r in dq_rules if r[\"table\"] == table]\n    found = []\n    for r in table_rules:\n        for p in patterns:\n            if p in r[\"rule\"]: found.append(p)\n    missing = set(patterns) - set(found)\n    if missing:\n        issues.append(f\"\\u26a0 {table}: missing expected patterns: {missing}\")\n    else:\n        print(f\"\\u2713 {table}: all {len(patterns)} expected patterns present ({len(table_rules)} rules)\")\n\nprint()\nprint(\"=\" * 60)\nif issues:\n    print(\"DQ RULES VALIDATION ISSUES:\")\n    for i in issues: print(f\"  {i}\")\n    print(f\"\\\\n{len(issues)} issue(s) found.\")\nelse:\n    print(f\"\\u2713 All {len(dq_rules)} DQ rules validated.\")\nprint(\"=\" * 60)`}
+          buttonLabel="Run DQ validator (Pyodide)"
+        />
+      </SectionCard>
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("cicd")} className="text-sm text-primary hover:underline">
           → Continue to CI/CD &amp; DevOps

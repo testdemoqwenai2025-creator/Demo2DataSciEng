@@ -459,6 +459,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["ci", "duckdb", "testing", "patterns", "local-dev"],
   },
+  {
+    id: "ADR-015",
+    title: "Adopt Pyodide + WebAssembly as the platform's in-browser execution runtime",
+    status: "accepted",
+    date: "FY26-Q4",
+    deciders: "Data Platform, Frontend, Developer Experience",
+    context:
+      "ADR-014 adopted DuckDB for CI + local analytics. But the public GitHub Pages preview is a static site — no backend, no DuckDB binary, no server-side execution. Users browsing the platform can't run code samples without installing Python + DuckDB locally. The move from 'documentation' to 'platform' requires in-browser execution: code samples that actually run when users click 'Run'.",
+    decision:
+      "Adopt Pyodide (Python compiled to WebAssembly) as the platform's in-browser execution runtime for Python code samples. Lazy-loaded from CDN (~10MB) on first 'Run' click; cached as a singleton promise across all PyodideRunner instances on the page. Future: wasmtime for Rust/C UDFs, WebContainer for Node/TS samples. All execution is pure client-side — no backend, works on static GitHub Pages.",
+    consequences:
+      "+ Code samples are executable — users see real output, not just syntax. + Zero backend cost (pure Wasm in browser). + Works on static GitHub Pages (no server needed). + Lazy-loaded — only downloads when user asks. + Singleton cache — subsequent runs are instant. − ~10MB initial download for first click (~3-5s on broadband). − Only stdlib + packages Pyodide ships — no PySpark, no snowflake-connector. − Browser memory limits (~2GB Wasm heap). − No real cloud services — synthetic data only.",
+    alternatives: [
+      "Backend execution (requires server — breaks static GitHub Pages model)",
+      "WebContainer for Node (covers TS/JS but not Python)",
+      "Compile DuckDB to Wasm (heavy — ~50MB, less mature than Pyodide)",
+    ],
+    tags: ["pyodide", "wasm", "execution", "frontend", "patterns"],
+  },
 ];
 
 // ============================================================

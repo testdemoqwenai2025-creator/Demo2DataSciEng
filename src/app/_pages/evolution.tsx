@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
+import { PyodideRunner } from "../_components/pyodide-runner";
+import { Terminal } from "lucide-react";
 import { InlineCode } from "../_components/code-block";
 import { EVOLUTION_VERSIONS, TECH_RADAR, ROADMAP } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
@@ -175,6 +177,20 @@ export function EvolutionPage() {
           and we'll either fix the approach or kill it. The platform evolves because the team is honest about
           which assumptions held and which didn't.
         </p>
+      </SectionCard>
+
+
+      {/* Pyodide — version-diff simulator */}
+      <SectionCard
+        title="Try it: Platform version-diff simulator (Pyodide)"
+        description="Compares platform versions (v1.0 → v2.0 → v2.4) and shows what decisions + tech were added/removed. Pure Python — runs in browser."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`versions = {\n    \"v1.0\": {\n        \"label\": \"Monolith era\",\n        \"decisions\": [\"Postgres-only\", \"Manual ETL\", \"Tableau on a single VM\"],\n        \"tech\": [\"PostgreSQL\", \"Python ETL\", \"Tableau Server\"],\n    },\n    \"v2.0\": {\n        \"label\": \"Lakehouse era\",\n        \"decisions\": [\"Databricks Lakehouse\", \"Delta Lake\", \"Medallion formal\", \"dbt for Gold\"],\n        \"tech\": [\"Databricks\", \"Delta Lake\", \"dbt\", \"Airflow\", \"Fivetran\"],\n    },\n    \"v2.4\": {\n        \"label\": \"Governed analytics\",\n        \"decisions\": [\"Unity Catalogue\", \"MetricFlow\", \"Hightouch\", \"Slim CI\", \"OpenLineage\"],\n        \"tech\": [\"Unity Catalogue\", \"MetricFlow\", \"Hightouch\", \"GitHub Actions\", \"Terraform\", \"Monte Carlo\"],\n    },\n}\n\ndef diff(v1_name, v2_name):\n    v1 = versions[v1_name]\n    v2 = versions[v2_name]\n    added_d = set(v2[\"decisions\"]) - set(v1[\"decisions\"])\n    removed_d = set(v1[\"decisions\"]) - set(v2[\"decisions\"])\n    added_t = set(v2[\"tech\"]) - set(v1[\"tech\"])\n    removed_t = set(v1[\"tech\"]) - set(v2[\"tech\"])\n    \n    print(f\"=== {v1_name} \\u2192 {v2_name} ===\")\n    print(f\"  {v1[\u0027label\u0027]} \\u2192 {v2[\u0027label\u0027]}\")\n    print()\n    if added_d:\n        print(f\"  Decisions ADDED ({len(added_d)}):\")\n        for d in sorted(added_d): print(f\"    + {d}\")\n    if removed_d:\n        print(f\"  Decisions REMOVED ({len(removed_d)}):\")\n        for d in sorted(removed_d): print(f\"    - {d}\")\n    print()\n    if added_t:\n        print(f\"  Tech ADDED ({len(added_t)}):\")\n        for t in sorted(added_t): print(f\"    + {t}\")\n    if removed_t:\n        print(f\"  Tech REMOVED ({len(removed_t)}):\")\n        for t in sorted(removed_t): print(f\"    - {t}\")\n    print(f\"\\\\n  Summary: +{len(added_d)} decisions, -{len(removed_d)} decisions, +{len(added_t)} tech, -{len(removed_t)} tech\")\n\ndiff(\"v1.0\", \"v2.0\")\nprint()\ndiff(\"v2.0\", \"v2.4\")\nprint()\ndiff(\"v1.0\", \"v2.4\")`}
+          buttonLabel="Run version-diff simulator (Pyodide)"
+        />
       </SectionCard>
 
       <div className="flex flex-wrap gap-2">

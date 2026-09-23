@@ -9,6 +9,8 @@ import { MEDALLION_LAYERS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PyodideRunner } from "../_components/pyodide-runner";
+import { Terminal } from "lucide-react";
 import { Boxes, Cpu, Layers, Workflow, Database, Sparkles, GitBranch, ShieldCheck, Activity, Languages } from "lucide-react";
 
 const PYSPARK_BRONZE = `# ============================================================
@@ -552,6 +554,20 @@ int vectorised_email_hash(
               highlight: [9, 10, 11, 12, 13, 15, 16, 17, 20, 21, 22, 23, 28, 29, 30, 31, 32],
             },
           ]}
+        />
+      </SectionCard>
+
+
+      {/* Pyodide — Delta MERGE syntax validator */}
+      <SectionCard
+        title="Try it: Delta MERGE syntax validator (Pyodide)"
+        description="Validates that a MERGE statement has all required clauses (MERGE INTO, USING, ON, WHEN MATCHED, WHEN NOT MATCHED). Pure Python regex — runs in browser."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="executable"
+      >
+        <PyodideRunner
+          code={`import re\n\nmerge_sql = \"\"\"\nMERGE INTO silver.order_line AS t\nUSING (\n  SELECT order_id, customer_sk, product_sk, order_date_sk, qty, net_amount\n  FROM bronze.shopify.order_line_raw\n  WHERE loaded_at > (SELECT COALESCE(MAX(loaded_at), '1970-01-01') FROM silver.order_line)\n) AS s\nON t.order_line_id = s.order_line_id\nWHEN MATCHED AND s.loaded_at > t.loaded_at THEN UPDATE SET *\nWHEN NOT MATCHED THEN INSERT *\n\"\"\"\n\nrequired_clauses = {\n    \"MERGE INTO\": \"target table\",\n    \"USING\": \"source data\",\n    \"ON\": \"join condition\",\n    \"WHEN MATCHED\": \"update clause\",\n    \"WHEN NOT MATCHED\": \"insert clause\",\n}\n\nissues = []\nfor clause, desc in required_clauses.items():\n    if clause in merge_sql:\n        print(f\"\\u2713 Found '{clause}' \u2014 {desc}\")\n    else:\n        issues.append(f\"\\u26a0 Missing '{clause}' \u2014 {desc}\")\n\nif re.search(r'\\bAS \\w+', merge_sql):\n    print(\"\\u2713 Table aliases found (AS t / AS s)\")\nif \"UPDATE SET\" in merge_sql:\n    print(\"\\u2713 UPDATE SET found\")\nif \"INSERT\" in merge_sql:\n    print(\"\\u2713 INSERT found\")\n\nprint()\nprint(\"=\" * 60)\nif issues:\n    print(\"MERGE SYNTAX ISSUES:\")\n    for i in issues: print(f\"  {i}\")\n    print(f\"\\\\n{len(issues)} issue(s) found.\")\nelse:\n    print(\"\\u2713 MERGE statement is valid \u2014 all required clauses present.\")\n    print(\"  Safe to deploy as idempotent Silver conformance.\")\nprint(\"=\" * 60)`}
+          buttonLabel="Run MERGE validator (Pyodide)"
         />
       </SectionCard>
 

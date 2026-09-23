@@ -46,6 +46,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "research":            { topic: "MapReduce Delta Lake Kimball dimensional modelling Lakehouse",    label: "Research",      codeRepo: "apache/spark/main/README.md" },
   "modern-big-data":     { topic: "Apache Kafka Flink Spark streaming big data lakehouse",           label: "Big Data",      codeRepo: "apache/kafka/trunk/README.md" },
   "duckdb":              { topic: "DuckDB in-process OLAP analytical SQL Parquet Arrow",                label: "DuckDB",        codeRepo: "duckdb/duckdb/main/README.md" },
+  "streaming":           { topic: "Apache Kafka Flink Pulsar streaming Lambda Kappa architecture",     label: "Streaming",     codeRepo: "apache/flink/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

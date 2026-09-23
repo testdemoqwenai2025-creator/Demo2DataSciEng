@@ -23,13 +23,14 @@ export type PageId =
   | "evolution"
   | "research"
   | "modern-big-data"
-  | "duckdb";
+  | "duckdb"
+  | "streaming";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming";
   icon: string;
   description: string;
 }
@@ -170,6 +171,14 @@ export const PAGES: PageMeta[] = [
     group: "Databases",
     icon: "Database",
     description: "In-process OLAP that runs anywhere — just open a Parquet file. Arrow-native, OSS, 10× faster than Postgres on a single node.",
+  },
+  {
+    id: "streaming",
+    label: "Real-Time Streaming",
+    shortLabel: "Streaming",
+    group: "Streaming",
+    icon: "Radio",
+    description: "Kafka, Pulsar, Flink, Spark Streaming — the Lambda→Kappa evolution from dual-pipeline to unified streaming.",
   },
 ];
 
