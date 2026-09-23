@@ -47,6 +47,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Computer Vision", ids: ["computer-vision"] },
   { title: "Diffusion Models", ids: ["diffusion-models"] },
   { title: "Distributed Training", ids: ["distributed-training"] },
+  { title: "MLOps & Tracing", ids: ["mlops-tracing"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

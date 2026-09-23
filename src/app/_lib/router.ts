@@ -43,13 +43,14 @@ export type PageId =
   | "gen-ai-patterns"
   | "computer-vision"
   | "diffusion-models"
-  | "distributed-training";
+  | "distributed-training"
+  | "mlops-tracing";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing";
   icon: string;
   description: string;
 }
@@ -350,6 +351,14 @@ export const PAGES: PageMeta[] = [
     group: "Distributed Training",
     icon: "Network",
     description: "Ring AllReduce animation, ZeRO sharding progression, memory breakdown (params+grads+optim+activations), BF16 mixed precision, activation checkpointing, low-level PyTorch FSDP.",
+  },
+  {
+    id: "mlops-tracing",
+    label: "MLOps & Tracing — OpenTelemetry, Spans, Critical Path, SLOs",
+    shortLabel: "MLOps & Tracing",
+    group: "MLOps & Tracing",
+    icon: "Activity",
+    description: "Trace DAG animation, OTLP wire format, Kahn topo sort + DP critical path, SLO math (p99, burn rate, error budget), low-level PyTorch+OpenTelemetry code.",
   },
 ];
 

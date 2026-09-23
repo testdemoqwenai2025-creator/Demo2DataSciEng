@@ -728,6 +728,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["distributed", "fsdp", "ddp", "zero", "allreduce", "ring-allgather", "mixed-precision", "patterns", "genai"],
   },
+  {
+    id: "ADR-029",
+    title: "Adopt OpenTelemetry with distributed tracing as the unified observability standard across data + ML pipelines",
+    status: "accepted",
+    date: "FY28-Q2",
+    deciders: "Data Platform, ML Engineering, SRE, Architecture",
+    context:
+      "ADR-002 (Medallion) and ADR-028 (FSDP) showed that the data pipeline and the ML training loop are structurally isomorphic — both are distributed DAGs with checkpoint + retry. Currently the platform uses two separate observability stacks: OpenLineage for data lineage (Airflow/Dagster → Marquez), and MLflow tracking for ML training runs (parameters + metrics + artifacts). This dual-stack approach has three failure modes: (1) correlation is impossible — when a model degrades (model-monitoring page), the team cannot trace which pipeline run produced the training data; (2) the ADR-028 distributed training page showed that FSDP generates per-rank telemetry that MLflow cannot capture (NCCL timing, AllReduce bandwidth, GPU memory per rank); (3) the floating LiveResourcesButton fetches arXiv papers per topic, but cannot surface platform events in the same UI. OpenTelemetry (OTel) is the CNCF standard that unifies metrics, logs, and traces under one wire format. The math: a span = (trace_id, span_id, parent_span_id, start_time, duration, attributes). A trace = a DAG of spans sharing a trace_id. The critical path of a distributed DAG is the longest-duration path through the span DAG — computable in O(V+E) via topological sort + dynamic programming. The 95th percentile of span duration is the SLI; the SLO is '99% of traces complete within T seconds'.",
+    decision:
+      "Adopt OpenTelemetry as the unified observability standard for ALL platform components — data pipelines, ML training, model serving, GenAI agents. Three layers: (1) Instrumentation: OTel SDK in every service (Python auto-instrumentation for Airflow/Dagster/MLflow, native OTel exporters for Spark/DuckDB); (2) Collection: OTel Collector as the central ingest point (receives OTLP, exports to Tempo for traces, Loki for logs, Mimir for metrics, Grafana for visualisation); (3) Retention: traces 30 days (sampling 10% in production, 100% in staging), metrics 90 days, logs 14 days. Span attributes follow semantic conventions: data.traces.lineage_dataset, ml.traces.model_id, ml.traces.framework (pytorch/tensorflow), ml.trains.world_size, gpus.rank. The critical-path computation runs as a Grafana plugin — every trace shows the critical path highlighted, with per-span contributions to total latency. Replaces: ADR-007's OpenLineage-only lineage (now OTel + OpenLineage collector bridge), MLflow's bespoke tracking (now MLflow for artifacts + OTel for telemetry).",
+    consequences:
+      "+ One query language (TraceQL/LogQL) for both data and ML. + Correlation: model degradation → trace the training run → find the pipeline that produced the data. + ADR-028 FSDP telemetry (NCCL timing, AllReduce bytes) flows into the same trace store. + Sampling reduces cost — only 10% of production traces stored. + Standard SDK = no vendor lock-in (Tempo/Loki/Mimir are OSS). − Initial instrumentation cost — every service needs the OTel SDK. − Sampling is hard — head sampling loses the long tail; tail sampling needs smarter logic (e.g. sample traces with errors or > p99 latency). − OTel Collector has learning curve (processors, exporters, connectors).",
+    alternatives: [
+      "Stay with dual-stack (OpenLineage + MLflow) — simpler today, but no correlation",
+      "Use a commercial APM (Datadog, New Relic, Honeycomb) — fast time-to-value, but vendor lock-in + $ per GB ingested",
+      "Build a bespoke telemetry layer — full control, but reinvents the wheel and won't keep up with CNCF ecosystem",
+      "Use only Jaeger (traces) without metrics/logs — partial, doesn't solve the unification problem",
+    ],
+    tags: ["observability", "opentelemetry", "tracing", "spans", "critical-path", "slo", "sli", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
