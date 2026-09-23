@@ -968,3 +968,49 @@ THE GRAND UNIFICATION — across all 45 pages and 36 ADRs:
 - All 5 modern scientific paper threads (ESM-2, AlphaFold2, ChemBERTa, E(n)-EGNN, AlphaFold3) are instances of the same algorithm (transformer encoder + masked/contrastive objective + pgvector + HNSW + RAG), applied to different modalities (text, image, protein sequence, 2D molecular graph, 3D molecular dynamics)
 - Physics encoded as inductive bias (force field = 60 years of physics; equivariance = rotational symmetry; diffusion = Anfinsen's thermodynamic principle)
 - The deeper pattern: data efficiency + accuracy + physical correctness all come from architecture matching the data's generating distribution, NOT from data volume
+
+---
+Task ID: adr039-systems-biology-b6-FINAL
+Agent: Super Z (main)
+Task: Stage 3/3 (FINAL) of "deeper iteration: genetic materials + macro structures + systems biology" — ADR-039 (FBA+GNN+MOFA+whole-cell) + Systems Biology page (#48). User requested AI-generated 3D images + click-to-popup + creative shorts + exceptional insights.
+
+Work Log:
+- ADR-039: Three-layer systems biology stack — COBRApy FBA on Recon 3D + GNN on STRING PPI + MOFA+ multi-omics + Karr 2012 whole-cell pattern
+- Systems Biology page (#48) — FINAL in the deeper-iteration trilogy:
+  * 4 AI-generated scientific illustrations via z-ai-web-dev-sdk (metabolic network hairball with colour-coded pathways, PPI network with hub proteins in yellow, multi-omics 4-circle Venn diagram, whole-cell 3D render with organelles + glowing molecular activity) — ImageModal click-to-popup with inline modal + 'Open in new tab' button for high-res PNG
+  * Metabolic flux 'short' — looping 5-phase animation (network topology glucose→G6P→F6P→pyruvate→lactate/ATP/biomass → stoichiometric matrix S with colour-coded +production/-consumption → mass balance S·v=0 → maximise biomass c·v → optimal flux distribution with arrow-width showing flux magnitudes 10/10/10/5/3/2) — inline TikTok-style clip
+  * FBA math: max c·v s.t. S·v=0, v_min ≤ v ≤ v_max — Linear Programming on stoichiometric matrix; S is sparse (<5 non-zeros/column), Recon 3D 8400×13500=113M entries with ~70K non-zeros, solved by Simplex/Interior-Point in seconds
+  * Pyodide: full FBA from scratch on 4-reaction glycolysis (build S matrix, solve LP, verify mass balance S·v=0 should be 0 for all metabolites, gene knockout analysis showing R2/R3/R4 essential) + 6-protein PPI network with PageRank centrality (identifies hub C as essential) + MOFA+ conceptual explanation (decompose X_m = W_m·Z + ε_m into shared latent factors across modalities)
+  * Modern papers: Recon 3D (Brunk 2018 Nature Biotech — 13.5K reactions, 8.4K metabolites, 3.2K genes GPR, 3D spatial compartments, genetic diseases map to Recon 3D genes), STRING (Szklarczyk 2023 NAR — 19.5M PPIs across 19K organisms scored by confidence from 7 evidence channels: genomic context, gene co-expression, high-throughput experiments, text mining, etc.), MOFA+ (Argelaguet 2020 Genome Biology — Bayesian factor analysis decomposing multi-omics matrices into shared + modality-specific latent factors, scales to 10 omics × 10K samples, same math as PCA applied jointly across matrices), Karr 2012 whole-cell (Cell 150 — first complete M. genitalium simulation with 525 genes, 28 sub-models integrated, 10h CPU for 9h cell cycle, north star for systems biology)
+  * Systems biology pipeline ASCII: patient WGS + multi-omics → variant→protein effect (ESM-2 + AlphaFold DB from ADR-034/038) → pathway mapping (Recon 3D GPR + STRING + Reactome) → FBA flux analysis (knockout reaction, predict growth rate, if biomass drops = disease-causing variant) → MOFA+ multi-omics integration (decompose cohort into K latent factors, cluster patients by factor scores for drug response stratification) → vLLM RAG summary
+  * Low-level PyTorch: FBASolver (LP via projected gradient ascent with mass balance + bounds as soft penalties, production uses GLPK/Gurobi Simplex), PPINetwork (message-passing GNN with self+neighbour mean aggregation + multi-label function prediction head, production uses PyTorch Geometric SAGEConv), pagerank() (centrality scorer with d=0.85 damping for hub/essentiality prediction), MultiOmicsFactorAnalysis (MOFA+ — decomposes X_m = W_m·Z + ε_m via alternating optimisation, production uses variational Bayes with sparsity priors), WholeCellModel (Karr 2012 pattern — integrates mRNA decay (5min half-life) + transcription (Poisson) + translation (10/min per mRNA) + protein decay (10h half-life) + DNA replication + cell division in 1s timestep)
+  * 'Systems biology IS distributed systems engineering applied to the cell' deeper-thought insight (FBA IS supply chain optimisation — S = bill of materials, v = production rate, biomass = customer demand, mass balance = inventory conservation, Dantzig Simplex 1947 was originally US Air Force supply chain; PPI networks ARE distributed systems topology — hub proteins = load balancers with many dependents like Netflix microservice critical-path, essentiality prediction via PageRank = same analysis Netflix does for service dependency graphs, knockout screens = chaos engineering, 10% genes essential = 10% microservices critical for any large distributed system; whole-cell simulation IS microservices architecture — Karr's 28 sub-models = 28 microservices with own time scale and solver integrated by message passing, chromosome = configuration file, cell cycle = deployment cycle, integration hard because each service has own contract same as SRE; systems biology IS SRE for the cell — cell is largest distributed system known, evolution load-tested for 4B years, our job to reverse-engineer the playbook; platform's systems biology stack connects to its data engineering stack — FBA is LP same as data pipeline optimisation, PPI is graph analytics same as fraud detection, MOFA+ is matrix factorisation same as recommender systems, whole-cell is microservices same as platform itself; cell IS original distributed system, biology IS original cloud)
+
+Stage Summary — ALL 3 DEEPER-ITERATION STAGES COMPLETE (b4+b5+b6):
+- HEAD = ad12b30 on both repos (private + public)
+- 48 pages, 39 ADRs, 45 pages with Pyodide, 3 with WasmRunner
+- /systems-biology → HTTP 200 (382KB), FBA: True, PPI: True, MOFA: True, Whole-cell: True, Recon: True, Pyodide: True, ADR-039: True, AI images: 4
+- Production build succeeded (50 routes total, 1 new)
+
+FINAL TOTALS — full platform state after deeper-iteration trilogy:
+- 48 pages (started this conversation at 45)
+- 39 ADRs (started at 36)
+- 45 pages with Pyodide demos (started at 42)
+- 3 pages with WasmRunner (unchanged)
+- 50 routes (started at 49)
+- 3 new pages in this deeper-iteration trilogy:
+  #46 /genetic-materials (DNA, RNA, CRISPR, GWAS, HMM Viterbi, BLOSUM) — with 4 AI images + CRISPR editing short
+  #47 /macro-structures (protein 4 levels, Ramachandran, Michaelis-Menten/Hill, WURCS glycans, LIPID MAPS lipids, AlphaFold DB) — with 4 AI images + Ramachandran short
+  #48 /systems-biology (FBA LP, PPI PageRank+GNN, MOFA+ multi-omics, Karr whole-cell) — FINAL — with 4 AI images + metabolic flux short
+
+NEW INFRASTRUCTURE added in this trilogy:
+- ImageModal component (reusable click-to-popup image with inline modal + 'Open in new tab' button for high-res PNG)
+- 12 AI-generated scientific illustrations (4 per page × 3 pages, total ~1.5MB PNGs in /public/images/{genetics,macro,systemsbio}/)
+- 3 looping 'shorts' (CRISPR editing 8-phase, Ramachandran plot 5-phase, metabolic flux 5-phase) — inline TikTok-style animations via Framer Motion 3D-perspective + stage transition
+
+THE SCIENCE TRILOGY ARC:
+- Genetic Materials (#46): the genome is a 3.2Gbp self-indexing file system, GWAS is grep on regulatory elements, CRISPR is sed for biology (programmable read-write head)
+- Macro Structures (#47): protein folding is CSP, Michaelis-Menten is M/M/1 queueing, glycans/lipids use ECFP4 pattern from ADR-035
+- Systems Biology (#48): FBA is supply chain LP (Dantzig 1947 original use case), PPI networks are distributed systems topology (Netflix critical-path), whole-cell simulation is microservices architecture (Karr's 28 sub-models = 28 microservices), cell is largest distributed system known, evolution load-tested for 4B years
+
+The grand pattern across all 48 pages and 39 ADRs: every scientific domain — bioinformatics, cheminformatics, molecular modelling, genetics, macro structures, systems biology — is a different modality of the SAME contrastive-learning + DP + LP + graph-theory algorithmic stack. The platform's pgvector IS the shared embedding space for all of them. The cell IS the original distributed system; biology IS the original cloud.
