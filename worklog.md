@@ -466,3 +466,36 @@ Stage Summary:
 - HEAD = c3a9c7c on both repos
 - Deploy #30 succeeded
 - 21 pages, 18 ADRs, 14 pages with Pyodide, 3 with WasmRunner
+
+---
+Task ID: adr019-polars-page-carbon-section
+Agent: Super Z (main)
+Task: ADR-019 (bandit as recommendation engine) + Polars vs DuckDB vs Pandas page (#22) + Carbon-Aware Computing section on Evolution page.
+
+Work Log:
+- ADR-019 added to synthetic.ts (now 19 ADRs):
+  * Title: 'Adopt the contextual bandit as the platform's official recommendation engine'
+  * Status: accepted (FY27-Q1)
+  * Decision: Thompson sampling bandit is the standard for all adaptive content
+  * Formalises the 2 existing bandits (Knowledge Shorts + page recommendations) as first-class
+- Polars vs DuckDB vs Pandas page (#22) — src/app/_pages/polars.tsx:
+  * New 'DataFrames' sidebar group
+  * Pyodide live benchmark: 3 approaches (Pandas row-by-row, DuckDB dict-agg,
+    Polars vectorised) on 10,000 synthetic orders. Shows real timing + speedup.
+  * 9-aspect comparison table
+  * 'The API determines the team, not the speed' insight
+  * 'When to pick which' decision matrix (3 cards)
+  * FloatingLiveButton topic configured
+- Carbon-Aware Computing section on Evolution page:
+  * Defers non-urgent jobs to low-CO2 grid hours
+  * Projected: -30% scope-2 emissions, zero SLA impact
+  * Job priority matrix: Urgent/Deferrable≤4h/Deferrable≤24h
+  * References Electricity Maps API, carbon-aware SDK, Airflow deferrable sensors
+  * Connects to ADR-019's bandit (could learn urgent/deferrable classification)
+
+Stage Summary:
+- HEAD = 1465523 on both repos
+- Deploy #32 succeeded
+- 22 pages, 19 ADRs, 15 pages with Pyodide, 3 with WasmRunner
+- /polars → HTTP 200 (110KB), Polars: True, Pyodide: True
+- /evolution → Carbon-Aware section live (Carbon: True)
