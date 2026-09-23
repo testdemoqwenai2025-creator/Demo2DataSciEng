@@ -820,3 +820,27 @@ Stage Summary:
 - 40 pages, 31 ADRs, 37 pages with Pyodide, 3 with WasmRunner
 - /inference-serving → HTTP 200 (351KB), vLLM: True, PagedAttention: True, KV cache: True, Continuous: True, Pyodide: True, 3D: True, ADR-031: True
 - Production build succeeded (44 routes total, 1 new)
+
+---
+Task ID: adr032-rag-deep-dive-q3
+Agent: Super Z (main)
+Task: Stage 3/4 of "quantization + serving + RAG + multimodal" — ADR-032 (hybrid retrieval) + RAG Deep Dive page (#41). User requested coding + math as centerpieces.
+
+Work Log:
+- ADR-032: three-stage hybrid retrieval (BM25 + vector + cross-encoder re-rank) as default RAG pipeline
+- RAG Deep Dive page (#41):
+  * 3D hybrid RAG pipeline animation (5 phases: chunking 10 chunks → parallel BM25+vector each top-5 → RRF fusion combining rankings → cross-encoder re-rank top-50→top-5 → final top-5 to vLLM)
+  * Chunking math: 512 tokens + 64 overlap (sweet spot — too small 128 loses context, too large 2048 dilutes signal, statement-aware for SQL DDL = clustered index layout)
+  * BM25 math: IDF × TF saturation (k1=1.5, diminishing returns after 1st occurrence) × length norm (b=0.75, prevents long docs winning by being long), with 3-term breakdown
+  * Pyodide demo: full hybrid pipeline on 5-chunk SQL DDL corpus, 4 test queries (customer revenue, fact_sales amount, region sum, product category price), BM25 scoring with IDF computation, RRF fusion (k=60) of simulated BM25+vector rankings, cross-encoder re-rank with simulated cross-encoder scores
+  * RRF math: Σ 1/(k + rank_i), k=60 from Cormack 2009 paper (sweet spot — distinct top-10 scores, flat beyond rank 50; too small k=10 over-weights top items, too large k=200 flattens everything)
+  * Cross-encoder math: bi-encoder cos(emb(q), emb(d)) = 1 matmul O(N) vs cross-encoder transformer([q;d]) = full attention 100x cost — why we only run on top-50 from RRF, gives another 5-10% accuracy
+  * Low-level PyTorch: TextSplitter (RecursiveCharacterTextSplitter — tries \\n\\n→\\n→.→space→char in order, merges with overlap = sliding window preserves context), BM25 class (fit/index corpus + compute DF + avgdl, idf with smoothing, score with k1/b saturation, search returns top-k), reciprocal_rank_fusion(k=60) — pure Python implementation, CrossEncoder nn.Module (transformer encoder + linear head, full per-pair forward = nested-loop join semantics), HybridRAGRetriever (orchestrates all 3 stages — index chunks+embed+store, retrieve runs BM25+vector parallel → RRF → cross-encoder)
+  * 'RAG IS a database query planner' deeper-thought insight (chunking = physical layout (Postgres 8KB page = 512-token chunk, overlap = page metadata), RecursiveCharacterTextSplitter = B-tree split heuristic, BM25+vector = index selection (B-tree vs HNSW = equality vs semantic), RRF = cost-based plan fusion (Postgres BitmapAnd pattern), cross-encoder = nested-loop join on small input (slow but flexible, only when input cardinality low), LLM at end = projection operator — formats retrieved tuples (chunks) into NL response; ADR-024 semantic layer runs the same planner in reverse: NL→planner(LLM)→physical plan(SQL)→execution, RAG runs forward: NL→retrieval→projection(LLM))
+- Bug fix: 3 Python f-string patterns in JSX text (e.g. `{10-i*1.5:.1f}`) → JS `.toFixed(1)` (line 99, 115, 163)
+
+Stage Summary:
+- HEAD = 9cf084b on both repos (private + public)
+- 41 pages, 32 ADRs, 38 pages with Pyodide, 3 with WasmRunner
+- /rag-deep-dive → HTTP 200 (326KB), BM25: True, RRF: True, Cross-encoder: True, Hybrid: True, Pyodide: True, 3D: True, ADR-032: True, chunking: True
+- Production build succeeded (45 routes total, 1 new)
