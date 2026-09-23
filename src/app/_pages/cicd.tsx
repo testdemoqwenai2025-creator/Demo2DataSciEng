@@ -5,6 +5,8 @@ import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
+import { WasmRunner } from "../_components/wasm-runner";
+import { Terminal } from "lucide-react";
 import { PIPELINES, FINOPS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -635,6 +637,21 @@ int main(int argc, char** argv) {
           ]}
         />
       </SectionCard>
+
+      {/* WasmRunner — C/Rust compiled to Wasm */}
+      <SectionCard
+        title="Try it: C/Rust audit tool compiled to WebAssembly"
+        description="The C (librdkafka lag audit) + Rust samples above, compiled to Wasm, would run in your browser. Demo uses a hand-assembled 41-byte Wasm binary — the pattern is the same for real C code compiled via emcc or Rust via wasm32-wasi."
+        icon={<Terminal className="h-5 w-5" />}
+        badge="Wasm · ADR-016"
+      >
+        <WasmRunner
+          sourceLanguage="C/Rust → wasm32-wasi"
+          buttonLabel="Run Wasm module (41 bytes)"
+          description="In production: compile the C librdkafka audit above with `emcc -o audit.wasm audit.c -lrdkafka` and host the .wasm binary. The WasmRunner loads it, calls the exported function — same pattern as the Rust/C UDFs on the Databricks page."
+        />
+      </SectionCard>
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("home")} className="text-sm text-primary hover:underline">
           → Back to overview

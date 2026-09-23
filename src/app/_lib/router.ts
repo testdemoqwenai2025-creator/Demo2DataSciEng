@@ -24,13 +24,14 @@ export type PageId =
   | "research"
   | "modern-big-data"
   | "duckdb"
-  | "streaming";
+  | "streaming"
+  | "arrow";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar";
   icon: string;
   description: string;
 }
@@ -179,6 +180,14 @@ export const PAGES: PageMeta[] = [
     group: "Streaming",
     icon: "Radio",
     description: "Kafka, Pulsar, Flink, Spark Streaming — the Lambda→Kappa evolution from dual-pipeline to unified streaming.",
+  },
+  {
+    id: "arrow",
+    label: "Apache Arrow — Columnar Lingua Franca",
+    shortLabel: "Arrow",
+    group: "Columnar",
+    icon: "Boxes",
+    description: "The zero-copy columnar format that makes DuckDB, Polars, Pandas, Spark, Flink interchangeable. Arrow Flight for transfer, C Data Interface for UDFs.",
   },
 ];
 

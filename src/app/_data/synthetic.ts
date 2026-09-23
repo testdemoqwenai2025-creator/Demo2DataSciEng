@@ -478,6 +478,25 @@ export const ADRS: ADR[] = [
     ],
     tags: ["pyodide", "wasm", "execution", "frontend", "patterns"],
   },
+  {
+    id: "ADR-016",
+    title: "Adopt WebAssembly as the platform's universal in-browser execution runtime",
+    status: "accepted",
+    date: "FY26-Q4",
+    deciders: "Data Platform, Frontend, Developer Experience, Architecture",
+    context:
+      "ADR-015 adopted Pyodide for Python execution. But the platform has 7 languages in multi-lang samples — Python, Scala, Rust, Go, Bash, Elixir, C. Only Python can run in-browser currently. WebAssembly is the universal runtime: Rust compiles to wasm32-wasi, C/C++ via Emscripten, Go has native wasm support, and experimental Wasm backends exist for BEAM/Erlang. One runtime, many languages, zero backends.",
+    decision:
+      "Formalise WebAssembly as the platform's universal in-browser execution runtime. Pyodide (Python→Wasm) is already in production (ADR-015). Add wasmtime bindings for Rust/C code samples compiled to wasm32-wasi. Go compiles to Wasm natively (GOOS=js GOARCH=wasm). WebContainer for Node/TS is the future path. The WasmRunner component loads any .wasm binary from CDN or inline, calls the exported function, shows the output — same pattern regardless of the source language.",
+    consequences:
+      "+ One runtime, all 7 languages — universal portability. + Zero backend — pure Wasm in browser. + ABI-stable — same .wasm binary runs in any browser, any OS. + Lazy-loaded — only fetches .wasm when user clicks Run. + Composable — WasmRunner + PyodideRunner share the same output panel pattern. − Wasm ecosystem is still maturing for some languages (Elixir/BEAM is experimental). − No system calls in browser Wasm (no file I/O, no network) — sandboxed. − Compilation step needed (cargo build --target wasm32-wasi, emcc, tinygo) — can't compile in-browser (yet). − Browser memory limits (~2GB Wasm heap per tab).",
+    alternatives: [
+      "Stick with Pyodide only (Python only — leaves 6 languages without execution)",
+      "Backend execution per language (breaks the static GitHub Pages model — needs server)",
+      "Wait for WASI to mature further (lose the first-mover advantage on multi-language execution)",
+    ],
+    tags: ["wasm", "wasmtime", "execution", "runtime", "patterns", "multi-language"],
+  },
 ];
 
 // ============================================================
