@@ -58,3 +58,37 @@ Stage Summary:
 - 5 new files added: src/app/api/agent-triage/route.ts, src/app/_components/login-button.tsx, src/app/_components/home-search.tsx, src/app/_components/knowledge-shorts.tsx, .github/workflows/deploy-pages.yml
 - Agent feature works on dev preview; static preview gracefully falls back to "Agent unavailable" stub via dashboard's catch block
 - All 15 pages render correctly on both dev preview and GitHub Pages
+
+---
+Task ID: multi-lang-scripts-live-drawer-animated-shorts
+Agent: Super Z (main)
+Task: Real-route refactor (no hash), multi-language code samples (Scala/Go/Rust/Bash), audit+test scripts, LiveResearchDrawer (live arXiv+GitHub+PwC+S2 client-side fetch), animated Knowledge Shorts with Framer Motion + Thompson sampling bandit.
+
+Work Log:
+- Routing refactor: 14 new route files in src/app/<page-id>/page.tsx, each importing from ../_pages/. router.ts now returns real paths (/databricks instead of #/databricks). AppShell moved to layout.tsx — all routes get shell via usePathname(). Backward-compat redirect for old #/databricks URLs. not-found.tsx for 404s.
+- .gitignore updated: scripts/ folder now fully tracked (PATs passed as CLI args at runtime, never hardcoded).
+- scripts/audit.py: 7-check audit suite (secrets in git history, dep vulnerabilities, license compliance MIT/Apache/BSD/ISC, PII regex sweep, .env gitignore coverage, workflow security, PAT rotation reminder). Emits audit-report.json.
+- scripts/test.py: full test suite (ESLint, tsc --noEmit, smoke test on all 15 routes, HTML validation for <title>+<h1>, agent endpoint smoke, 404 page test).
+- scripts/fetch-live-research.py: CLI for batch refresh of arXiv+GitHub+PwC+S2 per topic.
+- MultiLangSamples component (src/app/_components/multi-lang-samples.tsx): tabbed code-block selector for comparing idiomatic implementations.
+- Databricks page: added PySpark + Scala Spark + Rust UDF samples for same Silver conformance.
+- CI/CD page: added Bash + Go + Python samples for same Snowflake grant audit.
+- LiveResearchDrawer component (src/app/_components/live-research-drawer.tsx): right-side Sheet drawer that fetches real-time data client-side from arXiv (latest papers), GitHub (top repos), Papers with Code (datasets+benchmarks), Semantic Scholar (citation graph). All client-side, no backend needed (works on static GitHub Pages). Results cached in localStorage for 24h.
+- Research page: "View live research" button per paper card → opens drawer pre-filtered to that paper's topic.
+- Animated Knowledge Shorts (src/app/_components/knowledge-shorts.tsx): complete rebuild with Framer Motion
+  - 18-second auto-play animation per short (was static text)
+  - 10 custom animated SVG diagrams — one per short topic (BronzeAppend, SCD2, DeltaLog, RLS, SlimCI, Medallion, Tagging, ReverseETL, HybridOrch, SemanticLayer)
+  - Subtitle-style word-by-word text reveal synced to progress
+  - Progress bar at bottom
+  - Play/pause + restart + prev/next controls
+  - Pulsing glow effect when playing
+- Thompson sampling bandit: per-short Beta(α, β) posterior in localStorage (mdse-shorts-bandit-v1). Sample via Marsaglia-Tsang Gamma → Beta ratio. Wins: click + completion → α+1; Skips: skip → β+1. Visible "Adaptive recommendation" panel showing all 10 shorts' posterior P(click) percentages (color-coded). Persists across sessions (learns user's topic preferences).
+- BUG FIX: route files were using ../../_pages/ but should be ../_pages/ (one level up to src/app/, then into _pages/). ESLint didn't catch this (build-time resolution issue, not lint rule). Was causing GitHub Pages deploy #5, #6, #7 to fail with module-not-found. After fix, deploy #8 succeeded.
+- Verified live: HEAD = 655b838 on both repos. Deploy #8 succeeded. Live site at https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/ — all 15 routes return HTTP 200, multi-language samples render on Databricks page, "View live research" button present on Research page, animated Knowledge Shorts + Thompson sampling panel visible on Knowledge page. URL bar shows clean path (no hash).
+
+Stage Summary:
+- Live URLs verified: /, /databricks, /knowledge, /research, /dashboard all HTTP 200
+- 9 new files added: 14 route files + audit.py + test.py + fetch-live-research.py + live-research-drawer.tsx + multi-lang-samples.tsx + (rewritten) knowledge-shorts.tsx
+- HEAD = 655b838 on both private + public repos (sync workflow #11 skipped correctly on public)
+- Deploy workflow #8 succeeded on public — all build + deploy steps green
+- 24/7/365 public preview now uses clean URLs with the new agentic + adaptive features
