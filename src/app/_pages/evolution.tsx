@@ -1,0 +1,195 @@
+"use client";
+
+import Link from "next/link";
+import { SectionCard, PageHeader } from "../_components/section-card";
+import { InlineCode } from "../_components/code-block";
+import { EVOLUTION_VERSIONS, TECH_RADAR, ROADMAP } from "../_data/synthetic";
+import { hrefFor } from "../_lib/router";
+import { Badge } from "@/components/ui/badge";
+import {
+  GitCompare,
+  History,
+  Radar,
+  Calendar,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
+
+const RING_STYLE: Record<string, { color: string; label: string; icon: typeof CheckCircle2 }> = {
+  adopt: { color: "var(--chart-1)", label: "Adopt", icon: CheckCircle2 },
+  trial: { color: "var(--chart-5)", label: "Trial", icon: AlertTriangle },
+  assess: { color: "var(--chart-3)", label: "Assess", icon: Sparkles },
+  hold: { color: "var(--chart-2)", label: "Hold", icon: XCircle },
+};
+
+const RISK_STYLE: Record<string, "default" | "outline" | "secondary" | "destructive"> = {
+  low: "default",
+  medium: "outline",
+  high: "destructive",
+};
+
+export function EvolutionPage() {
+  // Group radar items by quadrant
+  const quadrants = Array.from(new Set(TECH_RADAR.map((t) => t.quadrant))).sort();
+  const rings = ["adopt", "trial", "assess", "hold"];
+
+  return (
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Knowledge Loop · when"
+        title="Evolution Timeline"
+        description="The platform today is the sum of every decision made since v1.0. The timeline shows what changed at each major version, what we learned, and where we're going next. The technology radar shows what we're adopting, trialling, assessing or holding. The roadmap shows our hypotheses for the next 3, 6, 12 and 24 months."
+        right={
+          <Badge variant="outline" className="gap-1.5">
+            <History className="h-3 w-3" /> v1.0 → v3.0
+          </Badge>
+        }
+      />
+
+      {/* Timeline */}
+      <SectionCard
+        title="Version history"
+        description="Horizontal scroll on mobile — each card is a snapshot of the platform at that version."
+        icon={<GitCompare className="h-5 w-5" />}
+        contentClassName="p-0"
+      >
+        <div className="overflow-x-auto code-scroll">
+          <div className="flex gap-4 p-5 min-w-max">
+            {EVOLUTION_VERSIONS.map((v, i) => (
+              <div key={v.version} className="flex items-stretch gap-4">
+                <div className="w-72 shrink-0 rounded-md border border-border/60 p-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="h-3 w-3 rounded-full" style={{ background: v.color }} />
+                    <p className="font-mono text-sm font-semibold">{v.version}</p>
+                    <Badge variant="outline" className="ml-auto text-[10px]">{v.date}</Badge>
+                  </div>
+                  <p className="text-base font-semibold mb-1">{v.label}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">{v.summary}</p>
+                  <div className="mb-3">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Decisions</p>
+                    <ul className="space-y-0.5">
+                      {v.decisions.map((d) => (
+                        <li key={d} className="text-[11px] text-foreground/80 flex items-start gap-1">
+                          <span className="text-primary shrink-0">•</span>
+                          <span>{d}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="mb-3 pt-2 border-t border-border/40">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Lesson learned</p>
+                    <p className="text-[11px] text-muted-foreground italic leading-relaxed">"{v.lessons}"</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Tech stack</p>
+                    <div className="flex flex-wrap gap-1">
+                      {v.tech.map((t) => (
+                        <span key={t} className="text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {i < EVOLUTION_VERSIONS.length - 1 && (
+                  <div className="flex items-center text-muted-foreground/40 text-2xl">→</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Tech radar */}
+      <SectionCard
+        title="Technology radar"
+        description="Inspired by Thoughtworks radar. Adopt = production-ready. Trial = real investment underway. Assess = actively investigating. Hold = paused or being migrated away."
+        icon={<Radar className="h-5 w-5" />}
+        contentClassName="p-0"
+      >
+        <div className="grid lg:grid-cols-4 divide-x divide-border/60">
+          {rings.map((ring) => {
+            const items = TECH_RADAR.filter((t) => t.ring === ring);
+            const S = RING_STYLE[ring];
+            return (
+              <div key={ring} className="p-4">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/60">
+                  <span className="h-3 w-3 rounded-full" style={{ background: S.color }} />
+                  <p className="text-sm font-semibold uppercase tracking-wider">{S.label}</p>
+                  <Badge variant="outline" className="ml-auto text-[10px]">{items.length}</Badge>
+                </div>
+                <ul className="space-y-2.5">
+                  {items.map((t) => (
+                    <li key={t.name} className="text-xs">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="font-medium leading-tight">{t.name}</p>
+                        <span className="text-[10px] text-muted-foreground shrink-0">{t.quadrant}</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{t.notes}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </SectionCard>
+
+      {/* Future roadmap */}
+      <SectionCard
+        title="Future roadmap"
+        description="Horizon-based. Each item is a hypothesis with an expected impact + risk level — not a commitment."
+        icon={<Calendar className="h-5 w-5" />}
+      >
+        <div className="space-y-5">
+          {ROADMAP.map((h) => (
+            <div key={h.horizon} className="rounded-md border border-border/60 p-4">
+              <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" /> {h.horizon}
+              </p>
+              <div className="grid md:grid-cols-2 gap-3">
+                {h.items.map((item) => (
+                  <div key={item.title} className="rounded-md border border-border/40 p-3 bg-muted/10">
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <p className="text-sm font-medium leading-tight">{item.title}</p>
+                      <Badge variant={RISK_STYLE[item.risk]} className="text-[9px] shrink-0">{item.risk} risk</Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      <strong className="text-foreground/80">Expected impact:</strong> {item.impact}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* Honest framing */}
+      <SectionCard title="Honest framing" icon={<Sparkles className="h-5 w-5" />}>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          The roadmap is not a promise — it's a published set of bets. Some will land, some won't, and the world
+          will shift in ways nobody anticipated. The point of writing them down is to make the bets falsifiable:
+          if <InlineCode>agentic DQ triage</InlineCode> doesn't cut on-call load by 40% in two quarters, we'll know,
+          and we'll either fix the approach or kill it. The platform evolves because the team is honest about
+          which assumptions held and which didn't.
+        </p>
+      </SectionCard>
+
+      <div className="flex flex-wrap gap-2">
+        <Link href={hrefFor("research")} className="text-sm text-primary hover:underline">
+          → Academic foundations (Research)
+        </Link>
+        <span className="text-muted-foreground">·</span>
+        <Link href={hrefFor("dashboard")} className="text-sm text-primary hover:underline">
+          → See the platform live today (Dashboard)
+        </Link>
+        <span className="text-muted-foreground">·</span>
+        <Link href={hrefFor("knowledge")} className="text-sm text-primary hover:underline">
+          → Why each decision (Knowledge)
+        </Link>
+      </div>
+    </div>
+  );
+}

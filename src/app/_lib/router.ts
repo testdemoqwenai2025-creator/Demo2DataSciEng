@@ -15,13 +15,17 @@ export type PageId =
   | "orchestration"
   | "governance"
   | "cicd"
-  | "about";
+  | "about"
+  | "knowledge"
+  | "dashboard"
+  | "evolution"
+  | "research";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop";
   icon: string; // lucide icon name
   description: string;
 }
@@ -114,6 +118,38 @@ export const PAGES: PageMeta[] = [
     group: "About",
     icon: "Info",
     description: "Mission, synthetic-data disclaimer, GDPR compliance, contact and repository links.",
+  },
+  {
+    id: "knowledge",
+    label: "Knowledge Hub",
+    shortLabel: "Knowledge",
+    group: "Knowledge Loop",
+    icon: "BookOpen",
+    description: "Architecture Decision Records, pattern library, trade-off matrices — the why behind every choice.",
+  },
+  {
+    id: "dashboard",
+    label: "Live Dashboard",
+    shortLabel: "Dashboard",
+    group: "Knowledge Loop",
+    icon: "Activity",
+    description: "Synthetic real-time pipeline observatory — runs, cost, anomalies, what-if simulator.",
+  },
+  {
+    id: "evolution",
+    label: "Evolution Timeline",
+    shortLabel: "Evolution",
+    group: "Knowledge Loop",
+    icon: "GitCompare",
+    description: "Versioned history of the platform — decisions made, lessons learned, future roadmap.",
+  },
+  {
+    id: "research",
+    label: "Research Papers",
+    shortLabel: "Research",
+    group: "Knowledge Loop",
+    icon: "GraduationCap",
+    description: "Academic foundations — papers that inspired each component, with citation graph.",
   },
 ];
 

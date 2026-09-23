@@ -24,6 +24,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Analytics", ids: ["tableau"] },
   { title: "Governance", ids: ["governance"] },
   { title: "About", ids: ["about"] },
+  { title: "Knowledge Loop", ids: ["knowledge", "dashboard", "evolution", "research"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
@@ -92,7 +93,7 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
         )}
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-mono text-sm font-bold">
-            N
+            M
           </div>
           <div className="hidden md:flex flex-col leading-tight min-w-0">
             <p className="text-xs text-muted-foreground truncate">ModernDataSciEng Platform</p>
@@ -180,7 +181,7 @@ export function AppShell({ active, children }: AppShellProps) {
               </Button>
               <div className="ml-2 flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-mono text-sm font-bold">
-                  N
+                  M
                 </div>
                 <p className="text-sm font-semibold">ModernDataSciEng Platform</p>
               </div>
@@ -208,7 +209,7 @@ export function AppShell({ active, children }: AppShellProps) {
           <div className="sticky top-0 bg-sidebar/40 backdrop-blur px-4 py-4 border-b border-border/60">
             <Link href={hrefFor("home")} className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground font-mono font-bold">
-                N
+                M
               </div>
               <div className="flex flex-col leading-tight">
                 <p className="text-xs text-muted-foreground">ModernDataSciEng</p>

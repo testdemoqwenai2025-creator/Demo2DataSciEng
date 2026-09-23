@@ -24,6 +24,9 @@ import {
   CircleCheck,
   Cpu,
   Cloud,
+  BookOpen,
+  GitCompare,
+  GraduationCap,
 } from "lucide-react";
 import {
   AreaChart,
@@ -106,6 +109,37 @@ const PILLARS = [
     desc: "Trunk-based flow, GitHub Actions, dbt state-aware CI, Terraform for Snowflake / Databricks / S3.",
     icon: GitMerge,
     tone: "muted" as const,
+  },
+];
+
+const KNOWLEDGE_LOOP = [
+  {
+    id: "knowledge",
+    title: "Knowledge Hub",
+    desc: "12 Architecture Decision Records, 8 patterns, 4 trade-off matrices. Every architectural choice explained with context, alternatives and consequences.",
+    icon: BookOpen,
+    color: "var(--chart-1)",
+  },
+  {
+    id: "dashboard",
+    title: "Live Dashboard",
+    desc: "Synthetic real-time observatory — pipeline runs tick in every 3s, credits burn, anomalies flow, what-if simulator projects cost + latency.",
+    icon: Activity,
+    color: "var(--chart-2)",
+  },
+  {
+    id: "evolution",
+    title: "Evolution Timeline",
+    desc: "Versioned history v1.0 → v2.4 → v3.0. Each version: what changed, why, lessons learned. Tech radar + 4-horizon future roadmap.",
+    icon: GitCompare,
+    color: "var(--chart-3)",
+  },
+  {
+    id: "research",
+    title: "Research Papers",
+    desc: "16 academic foundations — MapReduce, Delta Lake, Kimball, RDDs, Lakehouse, OpenLineage. Interactive citation graph + paper-to-platform mapping.",
+    icon: GraduationCap,
+    color: "var(--chart-4)",
   },
 ];
 
@@ -401,6 +435,56 @@ export function HomePage() {
               </ResponsiveContainer>
             </div>
           </SectionCard>
+        </div>
+      </section>
+
+      {/* Knowledge Loop */}
+      <section>
+        <PageHeader
+          eyebrow="Knowledge Loop — what makes this different"
+          title="Four pages that close the loop: research → knowledge → architecture → dashboard"
+          description="Most reference architectures are read-once diagrams. The Knowledge Loop turns this platform into a living organism — every architectural choice traceable to its academic origin, every component with a decision record explaining why, and a live synthetic dashboard that breathes."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {KNOWLEDGE_LOOP.map((p, i) => {
+            const LoopIcon = p.icon;
+            return (
+              <SectionCard key={p.id} className="hover:border-primary/40 transition-colors">
+                <div className="flex items-start gap-2 mb-2">
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
+                    style={{ background: `${p.color}15`, color: p.color }}
+                  >
+                    <LoopIcon className="h-4 w-4" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-tight">{p.title}</p>
+                    <p className="text-[10px] text-muted-foreground">Step {i + 1} of the loop</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{p.desc}</p>
+                <Button asChild variant="ghost" size="sm" className="-ml-2 -mb-1 text-primary">
+                  <Link href={hrefFor(p.id as never)}>
+                    Open <ArrowRight className="h-3 w-3 ml-1" />
+                  </Link>
+                </Button>
+              </SectionCard>
+            );
+          })}
+        </div>
+        {/* Loop diagram */}
+        <div className="mt-6 rounded-md border border-border/60 bg-muted/20 p-4">
+          <div className="flex items-center justify-center gap-2 flex-wrap text-xs font-mono text-muted-foreground">
+            <span className="px-2 py-1 rounded border border-border/60 bg-background">Research</span>
+            <span>→</span>
+            <span className="px-2 py-1 rounded border border-border/60 bg-background">Knowledge</span>
+            <span>→</span>
+            <span className="px-2 py-1 rounded border border-border/60 bg-background">Architecture</span>
+            <span>→</span>
+            <span className="px-2 py-1 rounded border border-border/60 bg-background">Dashboard</span>
+            <span className="text-primary">↻</span>
+            <span className="text-[10px] italic">back to Research</span>
+          </div>
         </div>
       </section>
 

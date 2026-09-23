@@ -13,6 +13,10 @@ import { OrchestrationPage } from "./_pages/orchestration";
 import { GovernancePage } from "./_pages/governance";
 import { CicdPage } from "./_pages/cicd";
 import { AboutPage } from "./_pages/about";
+import { KnowledgePage } from "./_pages/knowledge";
+import { DashboardPage } from "./_pages/dashboard";
+import { EvolutionPage } from "./_pages/evolution";
+import { ResearchPage } from "./_pages/research";
 
 /**
  * ModernDataSciEng Platform — MPA entry point.
@@ -38,6 +42,10 @@ export default function Home() {
       case "governance": return <GovernancePage />;
       case "cicd": return <CicdPage />;
       case "about": return <AboutPage />;
+      case "knowledge": return <KnowledgePage />;
+      case "dashboard": return <DashboardPage />;
+      case "evolution": return <EvolutionPage />;
+      case "research": return <ResearchPage />;
       default: return <HomePage />;
     }
   })();
