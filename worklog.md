@@ -556,3 +556,25 @@ Stage Summary:
 - Deploy #37 succeeded
 - 24 pages, 21 ADRs, 17 pages with Pyodide, 3 with WasmRunner
 - /neural-networks → HTTP 200 (188KB), NN: True, Pyodide: True, Transformer: True
+
+---
+Task ID: ml-subpages-rag-llms
+Agent: Super Z (main)
+Task: 4 new ML pages — Feature Store (#25), Model Registry (#26), Model Monitoring (#27), RAG & LLMs (#28).
+
+Work Log:
+- Feature Store page (#25): train/serve consistency, Feast code, Pyodide feature consistency demo
+- Model Registry page (#26): 4 stages, MLflow API, Pyodide registry lifecycle simulation
+- Model Monitoring page (#27): 3 drift types, Evidently code, Pyodide PSI computation + drift detection
+- RAG & LLMs page (#28): RAG pipeline diagram, 6 vector DBs, 'Gold tables ARE embeddings' insight,
+  Pyodide cosine similarity search, LangChain code
+- All 4 pages have Pyodide executable demos (4 new demos)
+- New sidebar groups: MLOps (3 pages) + GenAI (1 page)
+- FloatingLiveButton topics configured for all 4
+
+Stage Summary:
+- HEAD = c9c362a on both repos
+- Deploy #39 succeeded
+- 28 pages, 21 ADRs, 21 pages with Pyodide, 3 with WasmRunner
+- 7 languages in multi-lang samples
+- All 28 routes return HTTP 200
