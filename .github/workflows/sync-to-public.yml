@@ -35,11 +35,17 @@ jobs:
         env:
           GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
         run: |
-          # Use a PAT-scoped remote (the secret must grant repo:public_repo on DemoAppDataSci)
+          # Mirror is one-way: private → public, always overwrite main on public.
+          # Plain --force is intentional here because the public repo is a pure
+          # preview mirror; only this workflow is allowed to push to it (enforced
+          # via branch protection on the public repo).
           git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/DemoAppDataSci.git"
-          # Push all branches + tags; --force-with-lease keeps history safe
-          git push --force-with-lease public refs/heads/main:refs/heads/main
-          git push --tags public || true
+          # Fetch public's current main so we can detect divergent history
+          git fetch public main || true
+          # Push main → main, force-overwriting public main with the latest private commit
+          git push --force public refs/heads/main:refs/heads/main
+          # Mirror tags too
+          git push --tags --force public || true
 
       - name: Notify on failure
         if: failure()
