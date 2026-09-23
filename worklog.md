@@ -650,3 +650,30 @@ Stage Summary:
 - Deploy #45 succeeded
 - 32 pages, 24 ADRs, 27 pages with Pyodide, 3 with WasmRunner
 - /transformer → HTTP 200 (207KB), Attention: True, Pyodide: True, 3D: True
+
+---
+Task ID: adr025-comp-sci-gen-ai-patterns
+Agent: Super Z (main)
+Task: ADR-025 (agentic roadmap) + Computational Science & Materials (#33) + Gen AI Patterns (#34).
+
+Work Log:
+- ADR-025: formalise 4-stage ISR evolution as platform's agentic roadmap
+- Comp Sci & Materials page (#33):
+  * Materials→AI pipeline: silica→silicon→wafer→chip→GPU→CUDA→PyTorch→Transformer→LLM
+  * Matrix multiply: the core operation (CPU/GPU/TPU comparison)
+  * Pyodide matmul benchmark: ijk vs ikj vs blocked (cache effects)
+  * DFT→DL variational connection (E[n(r)] ↔ L(θ), SCF ↔ SGD)
+  * Roofline model ASCII (compute-bound vs memory-bound)
+  * Materials science research → AI hardware (EUV, HBM3, neuromorphic, 2D, quantum)
+- Gen AI Patterns page (#34):
+  * Autoregressive decoding math (chain rule, KV cache)
+  * Pyodide BPE tokeniser training (learn merges + tokenise)
+  * 4 sampling strategies (greedy/temperature/top-k/top-p) with math
+  * Pyodide sampling demo (all 4 methods + entropy + perplexity)
+  * Low-level PyTorch generate() loop (KV cache + top-k + top-p + multinomial)
+  * 'Generation IS iterative Bayesian inference' deeper-thought insight
+
+Stage Summary:
+- HEAD = 688cdcd on both repos
+- Deploy #47 succeeded
+- 34 pages, 25 ADRs, 29 pages with Pyodide, 3 with WasmRunner
