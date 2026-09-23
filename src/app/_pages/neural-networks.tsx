@@ -590,7 +590,7 @@ val trainer = new MultilayerPerceptronClassifier()
   .setSeed(42)
 
 val model = trainer.fit(data)
-println(s"Trained MLP: ${model}")
+println(s"Trained MLP: \\\${model}")
 // Log to MLflow (Scala API)`,
               highlight: [5, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
             },
