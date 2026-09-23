@@ -51,13 +51,14 @@ export type PageId =
   | "multimodal-rag"
   | "bioinformatics"
   | "cheminformatics"
-  | "molecular-modelling";
+  | "molecular-modelling"
+  | "genetic-materials";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials";
   icon: string;
   description: string;
 }
@@ -422,6 +423,14 @@ export const PAGES: PageMeta[] = [
     group: "Molecular Modelling",
     icon: "Atom",
     description: "3D molecular dynamics animation, AMBER force field math, Verlet integration, E(n)-equivariant GNN, AlphaFold3 diffusion, low-level PyTorch AMBERForceField+verlet_integrate+EquivariantGraphConvolutionLayer+AlphaFold3DiffusionModule.",
+  },
+  {
+    id: "genetic-materials",
+    label: "Genetic Materials — DNA, RNA, CRISPR, GWAS at HPC Scale",
+    shortLabel: "Genetic Materials",
+    group: "Genetic Materials",
+    icon: "Dna",
+    description: "AI-generated scientific illustrations + CRISPR editing short, HMM Viterbi gene finding, BLOSUM log-odds, GWAS logistic regression, ENCODE/GTEx/UK Biobank papers, 100K-genome Spark pipeline, low-level PyTorch HMM+CRISPRGuideDesigner+GWAS.",
   },
 ];
 

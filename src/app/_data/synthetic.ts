@@ -888,6 +888,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["molecular-modelling", "amber", "force-field", "verlet", "equivariant", "e3nn", "equiformer", "alphafold3", "diffusion", "patterns", "genai"],
   },
+  {
+    id: "ADR-037",
+    title: "Adopt BWA-MEM2 + GATK4 + HMM Viterbi for production genetic materials analysis at 100K-genome scale",
+    status: "accepted",
+    date: "FY30-Q2",
+    deciders: "Data Platform, Genomics, Bioinformatics, Architecture",
+    context:
+      "ADR-034 adopted ESM-2 + pgvector for protein sequences. The bioinformatics page (#43) documented sequence alignment (NW/SW DP) and the genomics pipeline (BWA-MEM → GATK → VEP). Three deeper problems now require dedicated infrastructure: (1) Gene finding via Hidden Markov Models — the GENSCAN algorithm (Burge & Karlin 1997) uses a 5th-order HMM with states for exon/intron/UTR/intergenic, decoded via Viterbi. (2) CRISPR-Cas9 guide RNA design — the guide RNA (20nt) must be unique in the 3.2 Gbp human genome (no off-target cleavage), computed via the Doench 2016 on-target score (a logistic regression on 60-mer features) + the Hsu 2013 MIT off-target score (weighted mismatch penalties). (3) Genome-Wide Association Studies (GWAS) — for each of ~10M SNPs × N=500K samples (UK Biobank), fit a logistic regression P(disease | SNP) = σ(β₀ + β·SNP + covariates). The BLOSUM matrices derive from observed substitution frequencies in aligned protein families — log-odds s(i,j) = log2(p_ij / (p_i·p_j)) = 2·log2(odds ratio). The ENCODE project (2012, 2020) annotated 1.3M candidate regulatory elements across the human genome; GTEx (2020) mapped eQTLs (expression Quantitative Trait Loci) — SNPs that affect gene expression in 49 tissues. The UK Biobank (500K whole genomes) is the largest open dataset.",
+    decision:
+      "Adopt a four-layer genetic materials stack: (1) Read alignment via BWA-MEM2 (BWT-based, SIMD-optimised — 2× faster than BWA-MEM); (2) Variant calling via GATK4 HaplotypeCaller (HMM-based genotyping, gVCF output for sparse storage in Parquet); (3) Gene prediction via HMM Viterbi (5th-order HMM with state space: exon/intron/UTR5/UTR3/intergenic, transition probabilities trained on GENCODE annotation); (4) GWAS via PLINK 2.0 (logistic regression with covariates, BOLT-LMM for mixed-model when population stratification present). Storage: gVCF → Parquet via ADAM (Berkeley) — 5× compression vs VCF, columnar access to specific variants. Reference: GRCh38 + 1000 Genomes Project allele frequencies for ancestry-aware normalisation. CRISPR guide design via off-target scoring on the cluster — for each guide, scan the genome with up to 3 mismatches + PAM, compute Doench score, exclude guides with off-targets in exonic regions. Connects to ADR-034 ESM-2: variant → protein translation → ESM-2 embedding → pgvector → functional RAG retrieval. Connects to ADR-022 pgvector: 10M SNP embeddings (one per LD block) for variant similarity search.",
+    consequences:
+      "+ Handles 100K-genome cohorts on Spark (1000 cores, 1 day per chromosome). + gVCF → Parquet = 5× storage reduction vs VCF, columnar access. + HMM Viterbi for gene finding is interpretable — state probabilities per position. + GWAS at UK Biobank scale = ~1000 trait associations per night. + CRISPR guide design = systematic, reproducible, auditable. − BWA-MEM2 needs 80GB RAM for the GRCh38 index (BWT). − Gene-finding HMMs need retraining per species — transfer learning is non-trivial. − GWAS p-values need multiple-testing correction (Bonferroni 5×10⁻⁸ for genome-wide significance). − CRISPR off-target effects can be silent in cell culture but manifest in vivo — wet-lab validation required.",
+    alternatives: [
+      "Minimap2 (long-read aligner) — better for PacBio HiFi / Nanopore but slower for short reads",
+      "Deep learning gene callers (HelixFun, Augustus-CNN) — better on novel species but less interpretable",
+      "SAIGE (GWAS with mixed model) — better for imbalanced case/control, but slower than BOLT-LMM",
+      "Cas-OFFinder (CUDA) for CRISPR off-target — fast but requires GPU + custom kernels",
+    ],
+    tags: ["genetics", "dna", "rna", "crispr", "gwas", "hmm", "viterbi", "blosum", "encode", "uk-biobank", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

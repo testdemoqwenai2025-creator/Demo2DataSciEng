@@ -74,6 +74,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "bioinformatics":         { topic: "bioinformatics sequence alignment Needleman-Wunsch Smith-Waterman BLAST BWA ESM-2 AlphaFold2 protein",      label: "Bioinformatics", codeRepo: "facebookresearch/esm/main/README.md" },
   "cheminformatics":         { topic: "cheminformatics ECFP fingerprint Tanimoto similarity ChemBERTa RDKit SMILES molecular virtual screening drug discovery",      label: "Cheminformatics", codeRepo: "rdkit/rdkit/main/README.md" },
   "molecular-modelling":      { topic: "molecular dynamics force field AMBER CHARMM Verlet integration E(n)-equivariant neural network AlphaFold3 SchNet Equiformer",      label: "Molecular Mod.",  codeRepo: "openmm/openmm/main/README.md" },
+  "genetic-materials":         { topic: "genetics DNA RNA CRISPR Cas9 GWAS HMM Viterbi BLOSUM ENCODE GTEx UK Biobank BWA GATK genomics",      label: "Genetics",       codeRepo: "samtools/bcftools/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
