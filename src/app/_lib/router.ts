@@ -21,13 +21,14 @@ export type PageId =
   | "knowledge"
   | "dashboard"
   | "evolution"
-  | "research";
+  | "research"
+  | "modern-big-data";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data";
   icon: string;
   description: string;
 }
@@ -152,6 +153,14 @@ export const PAGES: PageMeta[] = [
     group: "Knowledge Loop",
     icon: "GraduationCap",
     description: "Academic foundations — papers that inspired each component, with citation graph.",
+  },
+  {
+    id: "modern-big-data",
+    label: "Modern Big Data Stack",
+    shortLabel: "Big Data",
+    group: "Modern Big Data",
+    icon: "Database",
+    description: "BigQuery, DuckDB, Spark Streaming, Flink, Kafka, Pulsar, Iceberg — the modern open + serverless stack with code + free tiers.",
   },
 ];
 

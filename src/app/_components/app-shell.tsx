@@ -27,6 +27,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Governance", ids: ["governance"] },
   { title: "About", ids: ["about"] },
   { title: "Knowledge Loop", ids: ["knowledge", "dashboard", "evolution", "research"] },
+  { title: "Modern Big Data", ids: ["modern-big-data"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
