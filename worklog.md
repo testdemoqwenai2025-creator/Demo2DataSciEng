@@ -877,3 +877,26 @@ FINAL TOTALS — full platform state after 4 stages:
   #40 /inference-serving (vLLM, PagedAttention, continuous batching)
   #41 /rag-deep-dive (hybrid BM25+vector, RRF, cross-encoder)
   #42 /multimodal-rag (CLIP, SigLIP, cross-modal pgvector) — FINAL
+
+---
+Task ID: adr034-bioinformatics-b1
+Agent: Super Z (main)
+Task: Stage 1/3 of "bioinformatics + cheminformatics + molecular modelling" — ADR-034 (ESM-2) + Bioinformatics page (#43). User requested modern scientific papers + HPC/Big Data applications + exceptional insights.
+
+Work Log:
+- ADR-034: ESM-2 (650M params, 33 layers, MLM on 250M sequences) + pgvector for bioinformatics — proteins as embeddable documents
+- Bioinformatics page (#43):
+  * 3D DNA helix + alignment animation (6 phases: introduce two strands Seq A/B → NW score matrix init → DP fill → traceback reveals alignment → aligned sequences with | match indicators → ESM-2 → pgvector RAG)
+  * Alignment math: F[i,j] = max(F[i-1,j-1]+s(x,y), F[i-1,j]+d, F[i,j-1]+d) — NW global, SW local (max(0,...) — never go below 0); structurally identical to Bellman-Ford shortest path on alignment graph
+  * Three sub-algorithms: match score (BLOSUM62 substitution matrices — observed substitution frequencies), gap penalty (affine Gotoh 1982: open -10 + extend -0.5), complexity O(n·m) with Hirschberg O(min(n,m)) space via recursive divide-and-conquer
+  * Pyodide demo: full Needleman-Wunsch (GATTACA vs GCATGCU, score + alignment + match line) + Smith-Waterman (finds conserved 'AACGCG' motif in 26bp + 14bp sequences, ignoring surrounding non-matching bases) + simulated ESM-2 embeddings for 4 proteins (hemoglobin_alpha, hemoglobin_beta paralog, myoglobin ortholog, insulin unrelated — shows cosine sim 0.9+ for related, ~0.5 for unrelated)
+  * Modern papers: ESM-2 (Lin et al. 2023, 'Language models of protein sequences at the scale of evolution', Science 378.6624 — 650M params, 33 layers, 1280-dim, MLM on UniProt 250M sequences, unsupervised recovery of functional sites) + AlphaFold2 (Jumper et al. 2021, Nature 596.596.7873, CASP14 GDT_TS 92.4 — first method to reach experimental accuracy, Evoformer transformer over MSA + SE(3)-equivariant Structure Module with Invariant Point Attention)
+  * HPC/Big Data pipeline ASCII: 6Tb Illumina FASTQ → Spark partition by barcode (96 samples × 200M reads) → BWA-MEM with BWT index on GRCh38 reference (O(n) per read, 200M reads × 150bp = 30Gbp/sample, parallelised 96×8=768 workers) → GATK HaplotypeCaller (statistical model, 4M variants/genome) → VEP annotation (consequence per variant) → translate to protein → ESM-2 → pgvector → AlphaFold2 → LLM drug target summary — ALL on same platform (Databricks, Parquet/Arrow, pgvector, vLLM, OTel)
+  * Low-level PyTorch: ESM2Tokenizer (20 amino acids A C D E F G H I K L M N P Q R S T V W Y + special tokens <pad>/<mask>/<cls>/<eos>/<unk>, mask() for BERT-style MLM training), ESM2Model (33-layer transformer with RoPE positional embeddings generalising to longer seqs than sinusoidal, pre-LayerNorm GPT-2 style for stability, weight-tied LM head = input embedding like GPT), RotaryPositionalEmbedding (Su et al. 2021 — rotation-of-pairs formulation), StructureModule (AlphaFold2's structure head — SE(3)-equivariant, iterative refinement from random 3D coords), InvariantPointAttention (combines standard attention Q/K/V via linear with 3D geometric point attention q_pt/k_pt/v_pt via Gaussian falloff — rotation-equivariant by construction)
+  * 'Evolution IS contrastive learning' deeper-thought insight (masked-LM on 250M UniProt sequences IS unsupervised contrastive learning on evolution — 4 billion years of descent with modification produces (sequence, function) positives; ESM-2's loss function IS the evolutionary fitness function computed retroactively via masked-LM; unifies ADR-033 SigLIP + ADR-034 ESM-2 under one principle — both transformer encoder with masked-objective training, both produce embeddings where cosine sim is semantically meaningful, both store in pgvector, modality differs but algorithm identical; AlphaFold2 structure head IS a conditional diffusion model — same DDPM math as ADR-027, protein folding = denoising from random 3D coords to ground-state structure, Anfinsen's 1973 thermodynamic minimum IS the variational principle of reverse SDE; AlphaFold2 didn't invent new math — it ported diffusion models to molecular structure with SE(3)-equivariance as the inductive bias that respects 3D physics)
+
+Stage Summary:
+- HEAD = dead2cf on both repos (private + public)
+- 43 pages, 34 ADRs, 40 pages with Pyodide, 3 with WasmRunner
+- /bioinformatics → HTTP 200 (343KB), ESM-2: True, AlphaFold2: True, Needleman: True, Smith-Waterman: True, BLAST: True, BWT: True, Pyodide: True, 3D: True, ADR-034: True
+- Production build succeeded (47 routes total, 1 new)
