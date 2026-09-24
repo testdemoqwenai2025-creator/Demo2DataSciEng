@@ -14,6 +14,7 @@ import {
   Sparkles, TrendingUp, Boxes, GitBranch, ArrowRight,
   Terminal, Activity, Database, ShieldCheck, Gauge,
 } from "lucide-react";
+import { StreamingCaseStudy } from "../_components/streaming-case-study";
 
 const KPIS = [
   { label: "Streaming engines", value: "4", hint: "Spark · Flink · Kafka · Pulsar", deltaTone: "flat" as const },
@@ -379,6 +380,15 @@ client.close()`,
             </ul>
           </div>
         </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Real-world case study — Kafka at LinkedIn (7T messages/day)"
+        description="The world's largest Kafka deployment: 7 trillion messages/day, 100+ clusters, 14,000+ topics, 1,500 brokers, 2.5 PB/day. Animated pipeline visualization (producers → brokers → consumers), data toggle (real LinkedIn stats vs synthetic Kafka events), Pyodide-runnable Kafka producer/consumer simulation, and architecture deep-dive popup. Same patterns as the platform — 1000x smaller scale."
+        icon={<Radio className="h-5 w-5" />}
+        badge="Case study"
+      >
+        <StreamingCaseStudy />
       </SectionCard>
 
       <div className="flex flex-wrap gap-2">
