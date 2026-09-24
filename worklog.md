@@ -1967,3 +1967,42 @@ Stage Summary:
       - 6 cross-links to related pages
       - Interactive L1 trigger simulator (sliders + event dots)
       - Binary parser demo (click to parse CMS RD5)
+
+---
+Task ID: etl-card-synthetic-toggle-fix
+Agent: Super Z (main)
+Task: Fix synthetic data button + add ETL (Data Warehouse) Python card + start next-phase suggestions
+
+Work Log:
+- Verified synthetic data toggle IS present and functional on live page:
+  "Real binary data (hex dump)" and "Synthetic data (structured)" buttons both visible
+  (user may have missed them — they're in the LHC section, requires scrolling)
+- Added 5th code card: "ETL (Data Warehouse) — Extract → Transform → Load"
+  - Python (Pyodide-runnable): full ETL pipeline with Shopify + Stripe data
+  - EXTRACT: 4 orders + 3 payments from 2 sources
+  - TRANSFORM: currency normalization (EUR/GBP→USD), referential join,
+    customer aggregation, 5 Great Expectations quality checks
+  - LOAD: Snowflake warehouse (MERGE/upsert on email)
+  - ETL vs ELT comparison: ETL transforms before load, ELT loads raw first
+  - LHC pipeline = ETL pattern (trigger+zero-suppress=transform, EOS=load)
+  - ETL_CODE moved before CODE_CARDS array to fix JS TDZ error
+  - Avoided $-interpolation bug by using string concat instead of f-strings for $
+- Commit 258cbca, deploy #115 succeeded
+- All 5 code cards now Pyodide-runnable:
+  1. Python (LHC data reduction) 2. Rust (binary parser) + Python equiv
+  3. Scala (Spark Streaming) + Python equiv 4. Elixir (GenStage) + Python equiv
+  5. ETL (Data Warehouse) — NEW
+
+Next-phase suggestions (in progress):
+  1. Apply LHC-style scenario to Streaming/Databricks/Orchestration pages — NOT YET DONE
+  2. Real-time WebSocket data feed for trigger simulator — NOT YET DONE
+  3. WASM binary parser — NOT YET DONE
+  4. Page-level interactive gallery for ingestion page — NOT YET DONE
+  5. Cross-page topic threads — NOT YET DONE (cross-links added in Step 3 of LHC section)
+
+Stage Summary:
+- HEAD = 258cbca on both repos
+- Ingestion page now has 5 code cards (all Pyodide-runnable) + 5 LHC features
+  (CMS Open Data, HL-LHC upgrade, cross-links, trigger simulator, binary parser)
+- Synthetic data toggle confirmed working
+- Next-phase suggestions 1-5 are the next work items
