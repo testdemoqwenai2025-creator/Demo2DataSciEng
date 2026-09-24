@@ -2123,3 +2123,51 @@ Stage Summary:
 - Orchestration page: Airflow@Airbnb case study live
 - Ingestion page: real-time 40 Hz trigger stream + enhanced DataView binary parser live
 - All pushed to private repo including worklog + scripts
+
+---
+Task ID: next-phase-suggestions-4-5-complete
+Agent: Super Z (main)
+Task: Complete suggestions 4-5 of 5 — ingestion gallery + cross-page topic threads
+
+Work Log:
+Suggestion 4 (COMPLETED): Page-level interactive gallery for ingestion page
+  - src/app/_components/ingestion-gallery.tsx (~490 lines)
+  - Layer 1: 3D animated concept gallery (4 cards + n-D toggle + floating background)
+    * Medallion architecture (Bronze→Silver→Gold→Platinum, animated SVG)
+    * Kafka streaming (Producer→Topics→Consumer, animated dots flowing)
+    * Airflow DAG (task grid with active-task highlighting)
+    * Snowflake external tables (S3→external table→views, animated layers)
+    * n-D toggle: 3D (simplest) → 4D (standard) → 5D (full) → N-D (extreme)
+    * Floating math/code background (25 data engineering snippets)
+  - Layer 2: Concept shorts (4 cards with Pyodide-runnable Python code)
+    * SCD2 (Slowly Changing Dimension Type 2)
+    * Schema drift handling (Fivetran auto-detect → PR → review)
+    * Reverse-ETL (Hightouch: warehouse → CRM/ads/email)
+    * ELT vs ETL comparison
+  - Layer 3: Interactive calculators (2 cards with live sliders)
+    * Throughput calculator (sources × rows/sec → TB/month)
+    * Latency calculator (batch size vs streaming latency)
+  - Live verified: "YES - gallery" on fivetran-hightouch page
+
+Suggestion 5 (COMPLETED): Cross-page topic threads
+  - src/app/_components/related-topics.tsx (~40 lines)
+  - Reusable RelatedTopics component
+  - Wired into 6 key pages, all verified live:
+    * fivetran-hightouch: "YES - cross-links" (6 links: streaming, databricks, orchestration, snowflake, arrow, patterns)
+    * streaming: "YES - cross-links" (4 links: fivetran-hightouch, databricks, modern-big-data, orchestration)
+    * orchestration: "YES - cross-links" (4 links: fivetran-hightouch, cicd, governance, databricks)
+    * quantum-computing: "YES - cross-links" (4 links: neural-network-potentials, molecular-modelling, diffusion-models, knowledge)
+    * space-science: "YES - cross-links" (4 links: databricks, streaming, quantum-computing, arrow)
+    * fintech: "YES - cross-links" (4 links: databricks, streaming, neural-networks, quantum-computing)
+  - Total: 26 cross-page links across 6 pages
+  - Pattern reusable for all 60+ pages (component takes {id, reason} pairs)
+
+All 5 suggestions COMPLETE:
+  1. ✅ Case studies on Streaming (Kafka@LinkedIn) + Orchestration (Airflow@Airbnb)
+  2. ✅ Real-time 40 Hz trigger stream (Start/Stop + LIVE indicator)
+  3. ✅ Enhanced binary parser (DataView zero-copy with throughput stats)
+  4. ✅ Page-level interactive gallery for ingestion page (3-layer architecture)
+  5. ✅ Cross-page topic threads (RelatedTopics on 6 key pages)
+
+- Commit 29e639c, deploy #122 succeeded
+- All files pushed to private repo including worklog + scripts
