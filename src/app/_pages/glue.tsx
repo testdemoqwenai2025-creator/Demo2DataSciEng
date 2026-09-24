@@ -7,11 +7,14 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { GLUE_EXAMPLES } from "../_components/_dataset_examples2";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Workflow, Database, Boxes, Activity, Cpu, Sparkles,
   Network, FileText, TrendingUp, Atom, ShieldCheck, Layers, Zap, History,
+  Server, Cloud,
 } from "lucide-react";
 
 // ============================================================
@@ -621,6 +624,100 @@ export function GluePage() {
         icon={<Boxes className="h-5 w-5" />}
       >
         <CatalogComparisonTable />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why Glue evolved — shortfalls of Hive Metastore on EMR"
+        description="AWS launched Glue at re:Invent 2016 to fix three operational pain points customers faced when running Hive Metastore on EMR. Glue replaced self-managed catalog + on-demand Spark with a serverless, fully-managed control plane that auto-discovers schema."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Glue"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1: Self-managed Hive Metastore was operational burden.</strong> EMR customers had to provision an RDS-backed Hive Metastore, monitor it, patch it, and back it up. Every cluster restart reattached to the same HMS; failures meant manual recovery. <strong className="text-foreground/80">Result:</strong> Glue Data Catalog is fully managed — no EC2, no RDS to babysit, multi-tenant by design, free for Athena/Redshift Spectrum queries.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2: No managed, serverless offering.</strong> Pre-Glue, every Spark job required spinning up an EMR cluster (10+ minute startup), running the job, then tearing it down — idle minutes burned money. <strong className="text-foreground/80">Result:</strong> Glue Spark is serverless — submit a job, pay per DPU-second while it runs, zero cost when idle. Workers scale 2–298 DPUs auto.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3: No auto-discovery.</strong> HMS required hand-written DDL (<code className="font-mono">CREATE EXTERNAL TABLE</code>) for every new S3 prefix — analysts adding a new dataset had to file a ticket with the data platform team. <strong className="text-foreground/80">Result:</strong> Glue Crawlers classify S3 prefixes (CSV/JSON/Parquet) and infer schema + partitions automatically — new data is queryable within minutes of arriving in S3.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique Glue features (vs EMR + Athena alone)"
+        description="Four Glue capabilities that no other managed-data service offers — they are AWS-specific and structurally different from running Spark on EMR or querying S3 with Athena alone."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. Crawler auto-discovery</p>
+            <p className="text-muted-foreground">Classify S3 prefixes (CSV/JSON/Parquet/Avro) and infer schema + partition keys automatically. <strong>No other catalog has native crawlers</strong> — HMS, Unity, Polaris all expect pre-declared DDL.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. Serverless Spark (Glue ETL)</p>
+            <p className="text-muted-foreground">Submit PySpark/Scala jobs without provisioning a cluster — workers scale 2–298 DPUs and you pay per-second. <strong>EMR Serverless exists now (2021) but Glue was first (2017) and has tighter catalog + crawler integration.</strong></p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Lake Formation RLS</p>
+            <p className="text-muted-foreground">Row-level + column-level security on top of Glue Catalog tables, enforced through Athena/Redshift/EMR. <strong>Unity has column RBAC but not row; HMS has neither.</strong> LF-tags are the only AWS-native row-level enforcement.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. Glue Studio visual editor</p>
+            <p className="text-muted-foreground">Drag-and-drop source → transform → sink editor that emits editable PySpark. <strong>~40% of Glue jobs today are written via Studio (AWS internal stat).</strong> No other Spark distribution ships a visual editor of this depth.</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style Glue scenarios (multi-source ETL, S3 crawler auto-discovery, Lake Formation RLS enforcement). Each is a clickable card opening a lazy popup with: scenario brief, dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={GLUE_EXAMPLES}
+          intro="Production-style ETL + crawl + governance scenarios on AWS Glue. Each card has Scala/Rust/Go/Elixir/Zig code with Glue-specific APIs (Crawlers, Job Bookmarks, Lake Formation RLS, serverless Spark)."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the Glue ecosystem"
+        description="Glue sits at the center of the AWS lakehouse: it stores metadata (Catalog), runs Spark (ETL), enforces governance (Lake Formation), and feeds Athena/Redshift/EMR/Iceberg. The breadth of native integrations is Glue's #1 moat."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (6+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>AWS Glue ETL (serverless Spark 3.5)</strong> — primary write engine, PySpark/Scala/SQL</li>
+              <li>• <strong>AWS Glue Ray (serverless Ray)</strong> — Python-native parallel ETL (2022 GA)</li>
+              <li>• <strong>AWS Glue Streaming</strong> — serverless Flink/Spark Structured Streaming on Kinesis</li>
+              <li>• <strong>Amazon Athena</strong> — serverless Trino reads Glue Catalog tables</li>
+              <li>• <strong>Amazon Redshift Spectrum</strong> — federated reads on Glue Catalog tables</li>
+              <li>• <strong>Amazon EMR (Spark/Trino/Flink)</strong> — persistent clusters, native Glue Catalog integration</li>
+              <li>• <strong>AWS Lambda (Glue connectors)</strong> — JDBC sources (Snowflake, RDS, Aurora)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Catalogs + governance (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>AWS Glue Data Catalog</strong> — managed Hive-Metastore-compatible catalog (multi-tenant)</li>
+              <li>• <strong>AWS Lake Formation</strong> — column/row-level security + LF-tags on Glue Catalog tables</li>
+              <li>• <strong>AWS Glue Schema Registry</strong> — Avro/JSON/Protobuf schema evolution + compatibility checks</li>
+              <li>• <strong>AWS Glue Crawlers</strong> — auto-classifier for S3/JDBC/DynamoDB (no other catalog has this)</li>
+              <li>• <strong>AWS Glue Studio</strong> — visual ETL editor (drag-and-drop, emits editable PySpark)</li>
+              <li>• <strong>AWS Glue Data Quality</strong> — DQDL rules + auto-generated Great Expectations checks</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}

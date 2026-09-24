@@ -7,11 +7,14 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { HUDI_EXAMPLES } from "../_components/_dataset_examples2";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Database, Layers, Boxes, Activity, Atom, Zap, History,
   FileText, TrendingUp, Sparkles, Cpu, ShieldCheck,
+  Server, Cloud,
 } from "lucide-react";
 
 // ============================================================
@@ -691,6 +694,101 @@ export function HudiPage() {
         icon={<Boxes className="h-5 w-5" />}
       >
         <HudiComparisonTable />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why Hudi evolved — shortfalls of Hive on append-only S3"
+        description="Uber launched Hudi in 2017 (open-sourced 2018) to fix the catastrophic write-amplification that Hive-on-S3 imposed on CDC-heavy workloads — every update meant a full partition rewrite. Hudi brought LSM-tree-style log-structured writes to S3, enabling upserts without rewrites."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Hudi"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1: Every CDC update = full partition rewrite.</strong> Hive partitioned data by date and treated each partition as immutable — updating one customer record on a 1 TB daily partition required rewriting the entire 1 TB. Uber's <code className="font-mono">users</code> table updates every login, every order, every address change — millions of daily updates against multi-TB partitions. <strong className="text-foreground/80">Result:</strong> Hudi MOR writes append-only delta-log files (no rewrite); reads merge on demand. Write amplification drops from 10⁶× to ~1×.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2: No incremental query primitive.</strong> Hive had no notion of "give me rows changed since timestamp X" — pipelines consuming CDC had to either re-scan the full table or maintain their own offset tracking. <strong className="text-foreground/80">Result:</strong> Hudi exposes <code className="font-mono">FOR SYSTEM_TIME FROM '...' TO '...'</code> as a first-class query — downstream consumers fetch only changed rows since their last checkpoint.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3: No async compaction.</strong> Hive required manual <code className="font-mono">ALTER TABLE ... CONCATENATE</code> to merge small files — a synchronous, blocking operation. <strong className="text-foreground/80">Result:</strong> Hudi runs compaction as an asynchronous background service — delta-log files fold into base Parquet without blocking writers or readers. The LSM-tree discipline on S3 was Hudi's structural innovation.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique Hudi features (vs Iceberg + Delta)"
+        description="Four Hudi capabilities that no other open table format has matched — they reflect Uber's CDC-native DNA. Hudi is the only format with an on-S3 LSM-tree, native incremental query syntax, and native CDC ingestion."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. MOR LSM-tree on S3</p>
+            <p className="text-muted-foreground">Merge-on-Read tables write append-only delta logs, then merge with base Parquet on read — writes never block, reads can choose snapshot vs read-optimized. <strong>Iceberg + Delta both require full file rewrite for upserts.</strong> The only LSM-on-S3 of the three.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. Incremental queries</p>
+            <p className="text-muted-foreground"><code>FOR SYSTEM_TIME FROM '...' TO '...'</code> returns only rows changed in the window — a first-class SQL syntax. <strong>Iceberg has incremental via snapshot diff; Delta has CDF (similar but log-based).</strong> Hudi's is the cleanest syntax.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Native CDC ingestion</p>
+            <p className="text-muted-foreground">Hudi's <code>deltaStreamer</code> ingests MySQL binlog/Postgres WAL/Kafka natively, applies schema evolution, and writes upserts to MOR tables in one tool. <strong>Iceberg + Delta both require external Flink/Spark pipelines.</strong> No other format ships a CDC ingest tool.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. Async compaction</p>
+            <p className="text-muted-foreground">Background service folds delta-log files into base Parquet without blocking writers or readers — Hudi's compaction runs on a schedule (e.g. every 5 commits) without coordination. <strong>Iceberg + Delta <code>OPTIMIZE</code> are synchronous; readers see partial state during.</strong></p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style Hudi scenarios (MOR upsert on CDC stream, incremental pull, async compaction tuning). Each is a clickable card opening a lazy popup with: scenario brief, dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={HUDI_EXAMPLES}
+          intro="Production-style CDC upsert + incremental query + compaction scenarios on Apache Hudi. Each card has Scala/Rust/Go/Elixir/Zig code with Hudi-specific primitives (MOR tables, delta-log files, FOR SYSTEM_TIME incremental queries, async compaction)."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the Hudi ecosystem"
+        description="Hudi's ecosystem is Uber-flavored: Spark-primary, Flink for streaming CDC, deltaStreamer as the native ingest tool. Compute (6+ engines) and catalog (HMS-primary, with Unity + Glue as federated options)."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (6+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Spark 3.5+ (hudi-spark)</strong> — primary write engine, PySpark/Scala/SQL</li>
+              <li>• <strong>Apache Flink 1.18+ (hudi-flink)</strong> — streaming CDC ingestion + exactly-once sinks</li>
+              <li>• <strong>Hoodie FlinkStreamer</strong> — Kafka → Hudi MOR table, native CDC pipeline</li>
+              <li>• <strong>Trino 425+ (Hudi connector)</strong> — federated SQL reads (snapshot + read-optimized)</li>
+              <li>• <strong>Presto 0.285+ (Hudi connector)</strong> — federated SQL reads on MOR + COW</li>
+              <li>• <strong>Apache Hive 3.1+ (hudi-hive)</strong> — legacy Hive reads on Hudi tables</li>
+              <li>• <strong>Apache Impala</strong> — Cloudera cluster reads on Hudi</li>
+              <li>• <strong>DuckDB (community extension)</strong> — laptop-scale Hudi reads (experimental)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Ingest + catalogs (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Hoodie DeltaStreamer</strong> — native CDC ingest from MySQL binlog/Postgres WAL/Kafka</li>
+              <li>• <strong>Apache Hive Metastore</strong> — primary catalog (Hudi is Hive-origin)</li>
+              <li>• <strong>AWS Glue Data Catalog</strong> — Hudi tables on S3 registered into Glue</li>
+              <li>• <strong>Databricks Unity Catalog</strong> — Hudi tables on Databricks via HMS shim</li>
+              <li>• <strong>Confluent Kafka Connect (Hudi Sink)</strong> — managed CDC pipeline into Hudi MOR</li>
+              <li>• <strong>Debezium + Hudi</strong> — open-source CDC: binlog → Kafka → DeltaStreamer</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}

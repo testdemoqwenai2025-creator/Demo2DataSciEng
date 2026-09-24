@@ -7,11 +7,14 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { DELTA_EXAMPLES } from "../_components/_dataset_examples2";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Boxes, Layers, Database, History, Zap, Activity, Atom,
   FileText, TrendingUp, Sparkles, Cpu, ShieldCheck,
+  Server, Cloud,
 } from "lucide-react";
 
 // ============================================================
@@ -662,6 +665,101 @@ export function DeltaLakePage() {
         icon={<Boxes className="h-5 w-5" />}
       >
         <DeltaComparisonTable />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why Delta evolved — shortfalls of Hive-on-S3 (Era 2)"
+        description="Databricks launched Delta Lake in 2017 (open-sourced 2019) to fix three critical shortfalls of Hive-on-S3 that broke analytical workloads on cloud object storage. Delta layered an ACID transaction log over Parquet files, the same primitive Iceberg and Hudi chose independently."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Delta"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1: No ACID on S3.</strong> Hive-on-S3 had no atomic commit — concurrent writers clobbered each other, appends were visible mid-write, and an interrupted job left torn Parquet files visible to readers. <strong className="text-foreground/80">Result:</strong> Delta's <code className="font-mono">_delta_log/</code> JSON commit log uses compare-and-swap on the latest version file; only one writer wins, others retry. Atomic multi-file commits make S3 look transactional.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2: Slow MERGE for upserts.</strong> Hive required rewriting the entire partition for a single-row CDC update — updating one customer record on a 1 TB partition meant rewriting 1 TB. <strong className="text-foreground/80">Result:</strong> Delta MERGE does row-level predicate pushdown — only affected Parquet files are rewritten, the rest are untouched. MERGE on a 10-row update to a 10 TB table rewrites only a few files.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3: Schema drift broke downstream.</strong> Hive bound schema to Parquet file footers — adding a column with a different type silently broke readers. <strong className="text-foreground/80">Result:</strong> Delta stores schema in the transaction log with explicit IDs; <code className="font-mono">ALTER TABLE</code> is metadata-only, old readers see the old schema, new readers see the new one. Add/drop/rename columns without rewriting data.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique Delta features (vs Iceberg + Hudi)"
+        description="Four Delta capabilities that no other open table format has matched — they reflect Databricks' Spark-native + research-heavy DNA. Delta is the only format with a pure-Rust client, a multidim clustering primitive, and a streaming CDF."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. Liquid Clustering (2023)</p>
+            <p className="text-muted-foreground">Multi-dimensional adaptive clustering — re-cluster only the affected stripes on write, no <code>OPTIMIZE</code> job needed. <strong>Iceberg Sort Order is single-dim; Hudi Clustering Keys are static.</strong> Liquid replaced Z-Order as the default Databricks layout.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. CDF (Change Data Feed)</p>
+            <p className="text-muted-foreground">Built-in CDC stream — <code>table_changes()</code> returns inserted/updated/deleted rows as a streaming source. <strong>Iceberg + Hudi both rely on extra config or incremental queries.</strong> CDF is the only native CDC-from-table feature among the three.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Z-Order multidim</p>
+            <p className="text-muted-foreground">Z-Order interleaves multiple high-cardinality columns (e.g. user_id, event_ts) into a single sort key — range queries on any Z-ordered column skip most files. <strong>Iceberg Sort Order is one column; Hudi has no multidim primitive.</strong> Superseded by Liquid Clustering but still widely deployed.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. delta-rs (pure Rust)</p>
+            <p className="text-muted-foreground">Pure-Rust implementation — write Delta tables from Python, Rust, JS without a JVM or Spark. <strong>Iceberg has pyiceberg + Rust bindings; Hudi has hudi-rs.</strong> delta-rs is the most mature, used by Polars, Daft, LanceDB natively.</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style Delta scenarios (MERGE upsert, Liquid Clustering, CDF streaming). Each is a clickable card opening a lazy popup with: scenario brief, dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={DELTA_EXAMPLES}
+          intro="Production-style ACID upsert + Liquid Clustering + CDF streaming scenarios on Delta Lake. Each card has Scala/Rust/Go/Elixir/Zig code with Delta-specific primitives (MERGE, CDF, Z-Order, delta-rs)."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the Delta ecosystem"
+        description="Delta's ecosystem is Spark-centric but delta-rs has opened it to non-JVM engines. Compute (8+ engines) and catalog (1 native + 3 federated) — Databricks Unity is the canonical catalog, but Delta tables on S3/ADLS/GCS can be queried by any engine that reads the _delta_log."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (8+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Spark 3.5+ (delta-spark)</strong> — primary write engine, PySpark/Scala/SQL/R</li>
+              <li>• <strong>delta-rs (Python/Rust)</strong> — pure-Rust writer, no JVM (used by Polars/Daft/LanceDB)</li>
+              <li>• <strong>Apache Flink (delta-connector)</strong> — streaming CDC ingestion + exactly-once sinks</li>
+              <li>• <strong>Trino 425+ (Delta connector)</strong> — federated SQL reads</li>
+              <li>• <strong>Presto / Starrocks / Apache Doris</strong> — lakehouse reads via Delta connector</li>
+              <li>• <strong>Athena / Glue</strong> — AWS-managed reads on Delta tables on S3</li>
+              <li>• <strong>Apache Beam</strong> — batch + streaming pipelines writing Delta</li>
+              <li>• <strong>DuckDB (delta extension)</strong> — laptop-scale analytics (community)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Catalogs + integrations (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Databricks Unity Catalog</strong> — native Delta catalog, column-level RBAC, lineage</li>
+              <li>• <strong>Apache Hive Metastore</strong> — legacy path (self-hosted, DDL-driven)</li>
+              <li>• <strong>AWS Glue Data Catalog</strong> — Delta tables on S3 registered into Glue</li>
+              <li>• <strong>Snowflake (external Delta)</strong> — Snowflake reads external Delta on S3/ADLS</li>
+              <li>• <strong>Polars / Daft / LanceDB</strong> — pure-Rust readers via delta-rs, no cluster</li>
+              <li>• <strong>Kafka + Delta (Delta Sink connector)</strong> — exactly-once CDC ingest from Kafka</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}

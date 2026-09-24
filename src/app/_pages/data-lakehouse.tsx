@@ -7,11 +7,14 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { LAKEHOUSE_EXAMPLES } from "../_components/_dataset_examples3";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Boxes, Layers, Database, Atom, Zap, Activity,
   FileText, TrendingUp, Sparkles, Cpu, ShieldCheck, Network, History,
+  Server, Cloud,
 } from "lucide-react";
 
 // ============================================================
@@ -479,6 +482,104 @@ export function DataLakehousePage() {
         badge="executable"
       >
         <PyodideRunner code={MEDALLION_PYODIDE} buttonLabel="Run Medallion simulation (Pyodide)" />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why the lakehouse evolved — four eras of analytics platforms"
+        description="The lakehouse is not a single invention but the convergence of four 5-year eras: Hadoop-on-HDFS (2006-2011), Hive-on-S3 (2012-2016), open table formats (2017-2022), and vendor-neutral catalogs (2023-2024). Each era fixed a structural shortfall of the prior — the lakehouse is the cumulative result."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Lakehouse"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1 (Hadoop + HDFS, 2006-2011): Storage tied to compute.</strong> HDFS co-located data blocks with compute nodes — to scale storage you scaled compute, and vice versa. Petabyte-scale data on a 50-node HDFS cluster meant 50 nodes of idle compute during quiet hours. <strong className="text-foreground/80">Result:</strong> Object storage (S3, 2006; ADLS, 2015; GCS, 2010) decoupled them — storage is now ~$23/TB/mo flat, compute spins up on demand.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2 (Hive-on-S3, 2012-2016): No ACID, no schema enforcement.</strong> Customers moved Hive tables to S3 to decouple storage from compute — but S3 has no rename, so Hive commits were non-atomic (concurrent writers clobbered each other, schema drift broke readers silently). The lake had warehouse economics but no warehouse semantics. <strong className="text-foreground/80">Result:</strong> Iceberg/Delta/Hudi (2017) added transaction logs + schema-in-metadata, restoring ACID + schema on top of cheap S3.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3 (Open table formats, 2017-2022): No vendor-neutral control plane.</strong> Each format shipped its own catalog — Iceberg used HMS, Delta used Unity, Hudi used HMS. Multi-format, multi-cloud lakehouses required per-vendor integrations. <strong className="text-foreground/80">Result:</strong> Polaris (Snowflake, 2024) + Nessie (Dremio, 2020) + Unity (Databricks, 2021) converged on the Iceberg REST catalog spec — one protocol, multiple vendors, portability wins.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 4 (Pre-lakehouse era): Warehouse + lake duplication.</strong> Companies ran a Snowflake/BigQuery warehouse for BI + a Spark-on-S3 lake for ML, duplicating data, schema, and governance across the two. Pipeline drift between warehouse and lake caused reconciliations daily. <strong className="text-foreground/80">Result:</strong> The lakehouse unifies them — one copy of data on S3, governed by one catalog, queried by SQL engines (Trino/Athena) and ML engines (Spark/Ray) on the same files.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique lakehouse features (vs warehouse + lake)"
+        description="Four structural advantages of the lakehouse pattern — they make it qualitatively different from running a warehouse and a lake in parallel, not just an incremental improvement."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. Lake + warehouse unification</p>
+            <p className="text-muted-foreground">One copy of data on cheap object storage, served by both BI engines (Trino, Snowflake, Athena) and ML engines (Spark, Ray) reading the same Parquet files. <strong>Pre-lakehouse required duplicated ETL into a warehouse + lake, with reconciliation pipelines in between.</strong></p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. Medallion pattern</p>
+            <p className="text-muted-foreground">Bronze (raw) → Silver (cleansed) → Gold (curated) layers on the same storage, with one governance layer. <strong>Warehouses have no equivalent of the medallion — they have one curated layer and lose the raw data lineage.</strong></p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Open-format vendor-neutrality</p>
+            <p className="text-muted-foreground">Parquet + Iceberg/Delta/Hudi are Apache-licensed — tables on S3 are readable by any compliant engine. <strong>Snowflake + BigQuery + Redshift internal formats are closed and proprietary.</strong> The lakehouse gives customers exit options.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. Catalog-as-control-plane</p>
+            <p className="text-muted-foreground">Unity, Polaris, Nessie treat the catalog as the governance plane (RBAC, lineage, audit) above multiple compute engines. <strong>Pre-lakehouse catalogs were just metastores; lakehouse catalogs are the security + governance layer.</strong></p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style lakehouse scenarios (Bronze→Silver→Gold medallion, multi-engine query, cross-cloud catalog). Each is a clickable card opening a lazy popup with: scenario brief, dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={LAKEHOUSE_EXAMPLES}
+          intro="Production-style lakehouse scenarios showing the unification pattern: Bronze→Silver→Gold medallion ETL, multi-engine (Trino + Spark + Flink) cross-query, and Polaris/Nessie/Unity cross-cloud catalogs. Each card has Scala/Rust/Go/Elixir/Zig code with lakehouse-specific primitives."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the lakehouse ecosystem"
+        description="The lakehouse is the union of three ecosystems: open table formats (Iceberg/Delta/Hudi), 8+ compute engines, and 5+ catalogs. No single vendor owns it — Databricks, Snowflake, AWS, Apache, and Dremio each ship pieces."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (8+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Spark 3.5+</strong> — primary write engine across all 3 formats</li>
+              <li>• <strong>Trino 425+</strong> — federated SQL reads (fastest lakehouse BI engine)</li>
+              <li>• <strong>Apache Flink 1.18+</strong> — streaming CDC ingestion (Iceberg/Delta/Hudi)</li>
+              <li>• <strong>DuckDB 0.10+</strong> — laptop-scale analytics on Iceberg + Delta</li>
+              <li>• <strong>Apache Iceberg engines</strong> — Spark, Trino, Flink, DuckDB, Athena, Snowflake, Impala, BeeHyve (8+)</li>
+              <li>• <strong>Databricks Photon</strong> — C++ rewrite of Spark, 4× faster on Delta</li>
+              <li>• <strong>Snowflake (external tables)</strong> — Iceberg + Delta federation</li>
+              <li>• <strong>Amazon Athena + Redshift</strong> — serverless reads via Glue Catalog</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Catalogs + formats (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Iceberg</strong> — Netflix origin, vendor-neutral catalogs, hidden partitioning</li>
+              <li>• <strong>Delta Lake</strong> — Databricks origin, Liquid Clustering, CDF, delta-rs</li>
+              <li>• <strong>Apache Hudi</strong> — Uber origin, MOR LSM-tree, native CDC ingestion</li>
+              <li>• <strong>Databricks Unity Catalog</strong> — Delta-native, column RBAC, lineage</li>
+              <li>• <strong>Snowflake Polaris (2024)</strong> — Apache-licensed REST catalog, multi-cloud</li>
+              <li>• <strong>Project Nessie (Dremio)</strong> — Git-for-data branching on Iceberg</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}

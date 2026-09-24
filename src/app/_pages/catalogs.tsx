@@ -7,11 +7,14 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { CATALOG_EXAMPLES } from "../_components/_dataset_examples3";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Network, Database, Boxes, Atom, Zap, History, ShieldCheck,
   FileText, TrendingUp, Sparkles, Cpu, Layers, Activity,
+  Server, Cloud,
 } from "lucide-react";
 
 // ============================================================
@@ -569,6 +572,103 @@ export function CatalogsPage() {
         icon={<Boxes className="h-5 w-5" />}
       >
         <FullComparisonTable />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why catalogs evolved — shortfalls of Hive Metastore"
+        description="The Hive Metastore (Apache, 2010) was the lakehouse catalog for a decade — self-hosted, single-region, no branching, no governance. The 2020-2024 catalog wave (Nessie, Unity, Polaris) fixed four structural shortfalls of HMS that broke multi-cloud, multi-tenant, governed lakehouses."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Catalogs"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1: Legacy architecture, no cloud-native.</strong> HMS was designed in 2010 for on-prem Hadoop — it uses a relational backend (MySQL/Postgres) for table metadata and a Thrift API for clients. It has no native multi-cloud support, no S3-aware listing, and no incremental notification (clients must poll). <strong className="text-foreground/80">Result:</strong> Polaris (Snowflake, 2024) is cloud-native: REST API, multi-region, S3/ADLS/GCS abstraction, native event notifications.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2: Single-region, no branching.</strong> HMS has no concept of "dev branch of the catalog" — analysts experimenting with schema changes had to copy tables, modify the copy, and rewire jobs. Production + dev catalogs were separate HMS instances with no shared lineage. <strong className="text-foreground/80">Result:</strong> Nessie (Dremio, 2020) adds Git-style branching to the catalog itself — analysts create branches, experiment, merge or discard, with full audit and rollback.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3: No governance, no RBAC.</strong> HMS granted only database + table-level access — no column-level RBAC, no row-level security, no PII tagging. Governance had to be bolted on via Ranger/Atlas plugins, often inconsistent across engines. <strong className="text-foreground/80">Result:</strong> Unity (Databricks, 2021) provides column + row-level RBAC, PII tags, lineage, audit — enforced across all Databricks engines (Spark, Photon, SQL, ML) consistently.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 4: No multi-vendor federation.</strong> HMS spoke one protocol (Thrift). To query across catalogs (Snowflake + HMS + Glue) required per-vendor connectors with different auth models. <strong className="text-foreground/80">Result:</strong> The Iceberg REST catalog spec (2023) provides a single protocol — Polaris, Tabular, Unity (via shim), Nessie all conform — any Iceberg engine can read from any REST-compliant catalog.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique catalog features (vs HMS)"
+        description="Four capabilities that distinguish the 2020-2024 catalog wave from HMS — each catalog owns one of them as its structural differentiator."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. Polaris multi-cloud</p>
+            <p className="text-muted-foreground">Snowflake's Polaris (2024) is Apache-licensed and cloud-agnostic — same REST API on AWS, Azure, GCP, no vendor lock-in. <strong>HMS is single-region; Unity is Databricks-bound; Glue is AWS-only.</strong> Polaris is the only multi-cloud open catalog.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. Nessie Git-for-data</p>
+            <p className="text-muted-foreground">Dremio's Nessie (2020) adds branching/merging to the catalog itself — analysts experiment on a branch, merge or discard. <strong>No other catalog has branches; tables are mutable singletons in HMS/Unity/Glue/Polaris.</strong> Git-for-data is structurally unique.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Unity column-level RBAC</p>
+            <p className="text-muted-foreground">Databricks Unity (2021) enforces column + row-level RBAC, PII tags, lineage across all Databricks engines consistently. <strong>HMS has database/table-level only; Glue RLS needs Lake Formation; Polaris is just REST.</strong> Unity is the governance-first catalog.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. REST catalog spec</p>
+            <p className="text-muted-foreground">The Iceberg REST catalog spec (2023) is the open protocol — Polaris, Tabular, Nessie, Unity (via shim), custom all conform. <strong>HMS uses Thrift; Glue uses its own JSON API; Unity uses Databricks RPC.</strong> REST spec wins on interoperability.</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style catalog scenarios (Polaris multi-cloud setup, Nessie branch-and-merge, Unity column RBAC enforcement). Each is a clickable card opening a lazy popup with: scenario brief, dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={CATALOG_EXAMPLES}
+          intro="Production-style catalog scenarios showing the 2020-2024 wave: Polaris multi-cloud setup on AWS+Azure+GCP, Nessie branch-and-merge for analyst experimentation, Unity column + row RBAC enforcement. Each card has Scala/Rust/Go/Elixir/Zig code with catalog-specific primitives."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the catalog ecosystem"
+        description="The catalog layer is the control plane of the lakehouse — it decides who can read what, which engines can access which tables, and how governance is enforced. Compute engines (6+) consume catalogs via the REST spec or Thrift; 5 catalog backends offer different trade-offs."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (6+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Spark 3.5+</strong> — REST catalog + Glue + HMS + Nessie + Unity clients</li>
+              <li>• <strong>Trino 425+</strong> — Iceberg REST, Glue, HMS, Nessie, Unity federated</li>
+              <li>• <strong>Apache Flink 1.18+</strong> — REST catalog + HMS for streaming ingest</li>
+              <li>• <strong>DuckDB 0.10+</strong> — REST catalog + Glue + HMS (laptop-scale)</li>
+              <li>• <strong>AWS Athena + Redshift</strong> — Glue Catalog native, REST catalog via federated query</li>
+              <li>• <strong>Snowflake</strong> — Polaris + Glue + Unity federation (external tables)</li>
+              <li>• <strong>Databricks Photon</strong> — Unity-native, REST catalog via Iceberg connector</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Catalog backends (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Snowflake Polaris (2024)</strong> — Apache-licensed REST catalog, multi-cloud, OSS</li>
+              <li>• <strong>Databricks Unity Catalog (2021)</strong> — Delta + Iceberg, column RBAC, lineage, audit</li>
+              <li>• <strong>Project Nessie (Dremio 2020)</strong> — Git-for-data branching on Iceberg tables</li>
+              <li>• <strong>AWS Glue Data Catalog (2016)</strong> — managed HMS-compatible, multi-tenant</li>
+              <li>• <strong>Apache Hive Metastore (2010)</strong> — legacy, self-hosted, Thrift API</li>
+              <li>• <strong>Tabular (acquired by Databricks 2024)</strong> — SaaS REST catalog on S3</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}
