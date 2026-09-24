@@ -550,6 +550,198 @@ GenStage.sync_subscribe(storage,  to: compress,  max_demand: 100)
 # demand drops → compress slows → filter slows → readout slows.
 # The pipeline NEVER overflows — GenStage handles it automatically.`;
 
+
+// Python equivalents for Rust/Scala/Elixir cards (Pyodide-runnable)
+const RUST_PYTHON_EQUIV = `import struct
+import numpy as np
+
+# Python equivalent of the Rust zero-copy binary parser
+# Parses CMS RD5 format binary data (simulated)
+
+def generate_cms_binary(n_events=10):
+    """Generate synthetic CMS RD5 binary data."""
+    data = b''
+    for i in range(n_events):
+        event_id = i + 1
+        bx = (i * 2549) % 4096
+        timestamp = 1000000 + i * 25
+        lumi_block = 42 + i
+        n_channels = 3
+        payload_len = n_channels * 8
+        header = struct.pack('<QIqIII', event_id, bx, timestamp, lumi_block, payload_len, 0)
+        payload = b''
+        for c in range(n_channels):
+            channel_id = c + i * 3
+            energy = 50.0 + (np.random.random() - 0.5) * 20
+            payload += struct.pack('<If', channel_id, energy)
+        data += header + payload
+    return data
+
+def parse_cms_binary(data):
+    """Parse CMS RD5 binary data (Python equiv of Rust zero-copy)."""
+    events = []
+    offset = 0
+    while offset + 32 <= len(data):
+        event_id, bx, timestamp, lumi_block, payload_len, _ = struct.unpack_from('<QIqIII', data, offset)
+        n_channels = payload_len // 8
+        energies = []
+        for c in range(n_channels):
+            ch_offset = offset + 32 + c * 8
+            channel_id, energy = struct.unpack_from('<If', data, ch_offset)
+            energies.append((channel_id, round(energy, 1)))
+        events.append({
+            'event_id': event_id,
+            'bx': bx,
+            'lumi_block': lumi_block,
+            'energies': energies,
+        })
+        offset += 32 + payload_len
+    return events
+
+binary_data = generate_cms_binary(10)
+print(f"Generated {len(binary_data)} bytes of CMS RD5 binary data")
+print(f"({len(binary_data) // 80} events x 80 bytes each)")
+print()
+
+events = parse_cms_binary(binary_data)
+print(f"Parsed {len(events)} events:")
+for e in events:
+    energy_strs = [f"ch{ch}={en:.1f}GeV" for ch, en in e['energies']]
+    print(f"  Event #{e['event_id']} | BX={e['bx']} | Lumi={e['lumi_block']} | {', '.join(energy_strs)}")
+print()
+print("Rust advantage: zero-copy (mmap), SIMD (8 floats/cycle), ~80 GB/s/core")
+print("Python: struct.unpack + numpy, ~100 MB/s (1000x slower but same logic)")`;
+
+const SCALA_PYTHON_EQUIV = `import numpy as np
+np.random.seed(42)
+
+# Python equivalent of the Scala Spark Structured Streaming code
+# Simulates: CMS HLT events -> filter -> aggregate -> EOS storage
+# In production: runs on Apache Spark cluster at CERN
+
+print("=== PySpark Structured Streaming (CMS HLT events) ===")
+print()
+print("Production code (runs on Spark cluster at CERN):")
+print("  events = spark.readStream.format('kafka') \")
+print("    .option('subscribe', 'cms-hlt-events').load()")
+print("  parsed = events.select(from_json(...)).filter(...)")
+print("  agg = parsed.withWatermark('timestamp', '30s') \")
+print("    .groupBy(window('timestamp', '10s')).agg(count('*'), avg('energy'))")
+print("  query = agg.writeStream.format('parquet').trigger('5s').start()")
+print()
+
+# Simulate the streaming aggregation in browser
+n_events = 1000
+energies = np.random.exponential(50, n_events)
+met_values = np.random.exponential(20, n_events)
+trigger_types = np.random.choice(['single_muon', 'double_muon', 'jet', 'met'], n_events)
+
+# Filter: energy > 50 GeV, MET > 20 GeV
+mask = (energies > 50) & (met_values > 20)
+selected = mask.sum()
+
+print(f"=== Simulated stream (1000 events, ~10 ms of HLT data) ===")
+print(f"  Input rate: 100 kHz (CMS HLT output)")
+print(f"  Total events in window: {n_events}")
+print(f"  After filter (E>50 GeV, MET>20 GeV): {selected} events ({selected/n_events*100:.1f}%)")
+print(f"  Average energy: {energies[mask].mean():.1f} GeV")
+print(f"  Total energy in window: {energies[mask].sum():.0f} GeV")
+print()
+
+# Aggregate by trigger type (like groupBy in Spark)
+for t in ['single_muon', 'double_muon', 'jet', 'met']:
+    t_mask = mask & (trigger_types == t)
+    n = t_mask.sum()
+    if n > 0:
+        avg_e = energies[t_mask].mean()
+        print(f"  {t:>15}: {n:>4} events, avg E={avg_e:.1f} GeV")
+    else:
+        print(f"  {t:>15}: {n:>4} events")
+print()
+print("Spark advantage: distributed across cluster, fault-tolerant, checkpointed")
+print("Python: single-node, but same aggregation logic (groupBy + agg)")`;
+
+const ELIXIR_PYTHON_EQUIV = `import queue
+import threading
+import time
+import random
+
+# Python equivalent of the Elixir GenStage backpressure pipeline
+# Pipeline: Readout -> ZeroSuppress -> Compress -> Store
+# Elixir: automatic backpressure via demand signaling
+# Python: manual backpressure via bounded Queue
+
+class PipelineStage(threading.Thread):
+    def __init__(self, name, input_q, output_q, fn):
+        super().__init__(daemon=True)
+        self.name = name
+        self.input_q = input_q
+        self.output_q = output_q
+        self.fn = fn
+        self.processed = 0
+    
+    def run(self):
+        while True:
+            item = self.input_q.get()
+            if item is None: break
+            result = self.fn(item)
+            if result is not None:
+                self.output_q.put(result)
+            self.processed += 1
+
+# Bounded queues = backpressure (like GenStage max_demand)
+q1 = queue.Queue(maxsize=100)
+q2 = queue.Queue(maxsize=50)
+q3 = queue.Queue(maxsize=20)
+
+def readout(n):
+    return {'id': n, 'channels': [random.gauss(50, 10) for _ in range(10)]}
+
+def zero_suppress(event):
+    event['channels'] = [c for c in event['channels'] if c > 10.0]
+    return event
+
+def compress(event):
+    event['compressed'] = True
+    return event
+
+def store(event):
+    return None
+
+# Start stages
+s2 = PipelineStage("ZeroSuppress", q1, q2, zero_suppress)
+s3 = PipelineStage("Compress", q2, q3, compress)
+s4 = PipelineStage("Storage", q3, None, store)
+s2.start(); s3.start(); s4.start()
+
+print("=== GenStage-equivalent pipeline (Python) ===")
+print("Pipeline: Readout -> ZeroSuppress(max=100) -> Compress(max=50) -> Storage(max=20)")
+print()
+
+n = 500
+start = time.time()
+for i in range(n):
+    q1.put(readout(i))
+
+q1.put(None)
+s2.join(timeout=5)
+q2.put(None)
+s3.join(timeout=5)
+q3.put(None)
+s4.join(timeout=5)
+elapsed = time.time() - start
+
+print(f"Events processed: {n}")
+print(f"Zero-suppress: {s2.processed} | Compress: {s3.processed} | Storage: {s4.processed}")
+print(f"Time: {elapsed:.2f}s ({n/elapsed:.0f} events/sec)")
+print()
+print("Backpressure: bounded queues (maxsize) prevent overflow.")
+print("If storage slows -> q3 fills -> compress blocks -> q2 fills ->")
+print("zero-suppress blocks -> q1 fills -> readout blocks.")
+print()
+print("Elixir advantage: backpressure is AUTOMATIC (built into GenStage)")
+print("Python: must manually use bounded queues + blocking put/get")`;
+
 // ============================================================
 // 4 code cards
 // ============================================================
@@ -564,6 +756,7 @@ interface CodeCard {
   language: string;
   code: string;
   runnable: boolean;
+  pythonCode?: string;
   mathExpr: string;
   intent: string;
   insight: string;
@@ -594,6 +787,7 @@ const CODE_CARDS: CodeCard[] = [
     language: "rust",
     code: RUST_CODE,
     runnable: false,
+    pythonCode: RUST_PYTHON_EQUIV,
     mathExpr: "Throughput: ~80 GB/s per core (zero-copy mmap + AVX2 SIMD) · 32B header + N×4B channels per event",
     intent: "Parse CMS raw binary event format (RD5) at wire speed using memory-mapped I/O (zero-copy) and AVX2 SIMD for energy extraction. No allocation — all slices point into the mmap.",
     insight: "CERN's new DAQ (Data Acquisition) system for HL-LHC (2029+) is evaluating Rust for the high-throughput readout path. Current C++ code achieves ~40 GB/s per node; Rust with mmap + SIMD matches this with safer memory semantics. The zero-copy pattern is identical to what Apache Arrow uses for columnar IPC.",
@@ -608,6 +802,7 @@ const CODE_CARDS: CodeCard[] = [
     language: "scala",
     code: SCALA_CODE,
     runnable: false,
+    pythonCode: SCALA_PYTHON_EQUIV,
     mathExpr: "Throughput: 100 kHz events → 10s windows → 1 row/window · watermark 30s · checkpoint to EOS",
     intent: "Process real-time CMS HLT events via Kafka + Spark Structured Streaming. Aggregate luminosity + trigger rates in 10-second windows with watermark-based late-event handling.",
     insight: "CMS and ATLAS use Apache Spark (Scala) for their physics analysis workflows (Spark-root). The Structured Streaming pipeline shown here is the same pattern used for online monitoring at the CMS control room — real-time dashboards showing trigger rates, luminosity, and data quality.",
@@ -622,6 +817,7 @@ const CODE_CARDS: CodeCard[] = [
     language: "elixir",
     code: ELIXIR_CODE,
     runnable: false,
+    pythonCode: ELIXIR_PYTHON_EQUIV,
     mathExpr: "max_demand: 1000→500→100 (stages scale down) · backpressure automatic · 1 OTP process per stage",
     intent: "Build a concurrent event-processing pipeline with GenStage + Flow. Each stage (readout → filter → compress → store) runs as an OTP process with automatic backpressure — the pipeline never overflows.",
     insight: "Elixir/Erlang's GenStage is the only framework that handles backpressure natively (via demand signaling). CERN's DAQ team evaluated Erlang for DAQ control plane monitoring (not data path — that stays in C++) because of its fault tolerance and hot code-swapping. The pattern shown here mirrors how CMS DAQ handles rate fluctuations during beam intensity ramps.",
@@ -1107,7 +1303,20 @@ for i in range(len(stages)-1):
                 code={openCard.code}
               />
             ) : (
-              <CodeBlock language={openCard.language} filename={`lhc_${openCard.id}.${openCard.language === "rust" ? "rs" : openCard.language === "scala" ? "scala" : "ex"}`} code={openCard.code} />
+              <div className="space-y-3">
+                <CodeBlock language={openCard.language} filename={`lhc_${openCard.id}.${openCard.language === "rust" ? "rs" : openCard.language === "scala" ? "scala" : "ex"}`} code={openCard.code} />
+                {openCard.pythonCode && (
+                  <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" /> Python equivalent — run in browser (Pyodide)
+                    </p>
+                    <PyodideRunner
+                      buttonLabel={`Run Python equivalent (Pyodide)`}
+                      code={openCard.pythonCode}
+                    />
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Data toggle inside modal */}
