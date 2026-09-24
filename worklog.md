@@ -2255,3 +2255,31 @@ Stage Summary:
 - Same 4 models as PyTorch block: BlackScholesModel, MonteCarloPricer, LSTMPredictor, FraudGNN — but implemented in Rust/Scala/Elixir/C instead of Python.
 - 5 deployment contexts now documented: PyTorch (research/training), Rust (production CPU/GPU inference), Scala (distributed batch jobs), Elixir (streaming real-time inference on BEAM), C (ultra-low-latency HFT kernels).
 - QuantTradeCards popup restructured: InfoCallout now appears BEFORE the code, so brief + math foundation + implementation insight are visible without scrolling past code blocks.
+
+---
+Task ID: fintech-restructure-and-static-export
+Agent: Super Z (main)
+Task: User reported that the deployed URL (https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/) was missing the new cards. Diagnosis: deployed site was stale (only had "Low-level PyTorch" section). User also requested the cards be placed at the end of the Python code section. Restructured the page order to PyTorch → Quant scenarios → Low-level systems languages, then ran the static export build.
+
+Work Log:
+- Fetched deployed URL via curl: confirmed only "Low-level PyTorch" section was visible — deployment was stale.
+- Restructured src/app/_pages/fintech.tsx: moved the "Quant scenarios in 4 languages" SectionCard (8 cards) to be IMMEDIATELY after the PyTorch section, and moved the "Low-level systems languages" SectionCard to be AFTER the Quant scenarios section.
+  - Old order: PyTorch → Low-level systems langs → Quant scenarios
+  - New order: PyTorch → Quant scenarios → Low-level systems langs
+- Fixed a typo introduced during the swap: `text-muted-uffled-foreground` → `text-muted-foreground`.
+- Lint clean.
+- Reproduced the GitHub Actions deploy workflow locally:
+  - Moved src/app/api → .api-routes-backup/api (API routes incompatible with output: export).
+  - Ran `GITHUB_PAGES=true bun run build:static` — built successfully.
+  - Restored src/app/api.
+  - Added out/.nojekyll.
+- Verified the static export out/fintech/index.html contains:
+  - All 3 section titles in correct order: Low-level PyTorch → Quant scenarios → Low-level systems languages.
+  - All 8 scenario cards: Dynamic Delta Hedging, Monte Carlo Asian Option, LSTM Price-Direction, GNN Fraud Ring Detection, SVI Volatility Surface, Markowitz Efficient Frontier, Deep Hedging (Buehler 2019), CVA / XVA.
+  - All 4 low-level code filenames: fintech_quant_lowlevel.rs, FintechQuantLowLevel.scala, fintech_quant_lowlevel.ex, fintech_quant_lowlevel.c.
+
+Stage Summary:
+- Static export at out/ is ready to deploy.
+- Page order on /fintech: PyTorch section → 8 scenario cards (Quant scenarios) → Low-level systems languages (Rust/Scala/Elixir/C).
+- Deploy workflow (.github/workflows/deploy-pages.yml) will run on next push to main and publish to https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/.
+- User needs to commit and push these changes to trigger the deploy, OR manually copy out/ to the gh-pages branch.
