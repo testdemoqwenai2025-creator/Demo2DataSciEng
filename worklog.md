@@ -2227,3 +2227,31 @@ Stage Summary:
 - Each popup has: scenario brief (Derivative/Problem/Solution), visualisation matrix, 4-tab multi-language code, Pyodide runner, math foundation callout, implementation insight callout.
 - The new scenarios round out the quant stack: pricing (Black-Scholes, MC Asian), ML (LSTM, GNN), market microstructure (SVI), portfolio theory (Markowitz), ML control (Deep Hedging), counterparty risk (CVA/XVA).
 - Pattern matches LHC ingestion on ELT+ETL page — same LazyModal architecture.
+
+---
+Task ID: fintech-lowlevel-rust-scala-elixir-c
+Agent: Super Z (main)
+Task: (1) Restructure the QuantTradeCards popup so the brief + math-foundation + implementation-insight callouts appear BEFORE the code block (user reported they couldn't see the callouts because they were below the long code blocks). (2) Add a new low-level systems-language section below the existing PyTorch section, implementing the same 4 models (BlackScholesModel, MonteCarloPricer, LSTMPredictor, FraudGNN) in Rust, Scala, Elixir, and C.
+
+Work Log:
+- Modal restructure (quant-trade-cards.tsx):
+  - Old order: Brief → Matrix → MultiLangCode → InfoCallout
+  - New order: Brief → Matrix → InfoCallout → MultiLangCode
+  - InfoCallout (intent / math / insight) now appears above the code, so users see the qualitative context immediately upon opening a popup — without scrolling past the (long) 4-language code blocks + Pyodide runner.
+- Created src/app/_components/_quant_trade_lowlevel.ts (~700 lines):
+  - LOWLEVEL_RUST: 4 models in Rust (tch-rs LSTM/GNN, rayon parallel MC, statrs Normal dist for BS).
+  - LOWLEVEL_SCALA: 4 models in Scala (Spark UDF for BS, RDD for distributed MC, DL4J for LSTM training, GraphX for GNN).
+  - LOWLEVEL_ELIXIR: 4 models in Elixir (Nx for tensor ops, GenServer for inference, Flow for parallel MC, streaming GNN with ETS-backed graph).
+  - LOWLEVEL_C: 4 models in C (AVX2 __m256d intrinsics for batch Black-Scholes, OpenMP parallel MC, hand-rolled single-layer LSTM forward, pointer-based graph with 2-layer message passing).
+- Added new SectionCard in src/app/_pages/fintech.tsx, placed immediately BELOW the existing "Low-level PyTorch" SectionCard and ABOVE the existing "Quant scenarios in 4 languages" SectionCard.
+  - Each language has a one-paragraph intro explaining the deployment context.
+  - 4 CodeBlocks in vertical layout (Rust → Scala → Elixir → C).
+- Imported LOWLEVEL_* constants into fintech.tsx.
+- Lint clean across all touched files.
+- Dev server smoke test: HTTP 200, all 4 code filenames render in HTML output (fintech_quant_lowlevel.rs, FintechQuantLowLevel.scala, fintech_quant_lowlevel.ex, fintech_quant_lowlevel.c).
+
+Stage Summary:
+- The "Low-level systems languages" section is now live on the Fintech page, immediately below the existing PyTorch section.
+- Same 4 models as PyTorch block: BlackScholesModel, MonteCarloPricer, LSTMPredictor, FraudGNN — but implemented in Rust/Scala/Elixir/C instead of Python.
+- 5 deployment contexts now documented: PyTorch (research/training), Rust (production CPU/GPU inference), Scala (distributed batch jobs), Elixir (streaming real-time inference on BEAM), C (ultra-low-latency HFT kernels).
+- QuantTradeCards popup restructured: InfoCallout now appears BEFORE the code, so brief + math foundation + implementation insight are visible without scrolling past code blocks.

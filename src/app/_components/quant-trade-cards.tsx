@@ -1210,21 +1210,21 @@ export function QuantTradeCards() {
               {openCard.matrix}
             </div>
 
-            {/* Multi-language code */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
-                Code — 4 languages (Python · Rust · Scala · Elixir)
-              </p>
-              <MultiLangCode tabs={openCard.codeTabs} runnablePython={openCard.runnablePython} />
-            </div>
-
-            {/* Info callout */}
+            {/* Info callout — math foundation + implementation insight (BEFORE code) */}
             <InfoCallout
               intent={openCard.intent}
               math={openCard.mathExpr}
               insight={openCard.insight}
               accent={openCard.accent}
             />
+
+            {/* Multi-language code — moved below InfoCallout so the callouts are visible without scrolling */}
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                Code — 4 languages (Python · Rust · Scala · Elixir) · scroll for Pyodide runner
+              </p>
+              <MultiLangCode tabs={openCard.codeTabs} runnablePython={openCard.runnablePython} />
+            </div>
           </div>
         )}
       </LazyModal>

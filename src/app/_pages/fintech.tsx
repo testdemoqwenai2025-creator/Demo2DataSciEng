@@ -11,6 +11,12 @@ import { FintechInteractives } from "../_components/fintech-interactives";
 import { FintechShortsCarousel } from "../_components/fintech-shorts";
 import { FintechGallery3D } from "../_components/fintech-gallery-3d";
 import { QuantTradeCards } from "../_components/quant-trade-cards";
+import {
+  LOWLEVEL_RUST,
+  LOWLEVEL_SCALA,
+  LOWLEVEL_ELIXIR,
+  LOWLEVEL_C,
+} from "../_components/_quant_trade_lowlevel";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
@@ -906,6 +912,60 @@ export function FintechPage() {
           ]}
           code={PYTORCH_CODE}
         />
+      </SectionCard>
+
+      {/* Low-level systems-language implementations of the same 4 models */}
+      <SectionCard
+        title="Low-level systems languages — Rust, Scala, Elixir, C implementations of the same 4 models"
+        description="Production-style low-level implementations of BlackScholesModel, MonteCarloPricer, LSTMPredictor, and FraudGNN in four systems languages: Rust (tch-rs + rayon + statrs for production quant libraries), Scala (Spark + DL4J for distributed training across a cluster), Elixir (Nx + GenStage for streaming inference with backpressure on BEAM), and C (AVX2 SIMD + OpenMP for sub-microsecond HFT kernels). The same 4 models as the PyTorch block above, but in lower-level languages used in different deployment contexts — PyTorch for research/training, Rust for production CPU/GPU inference, Scala for distributed batch jobs, Elixir for streaming real-time inference, C for ultra-low-latency option desks."
+        icon={<Cpu className="h-5 w-5" />}
+        badge="low-level × 4 langs"
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">
+              <strong className="text-foreground/80">Rust</strong> — production quant library. Uses tch-rs (PyTorch bindings) for the LSTM/GNN, rayon for parallel Monte Carlo, statrs for the normal CDF. Compiles to native code; ~50 ns/option on a single core.
+            </p>
+            <CodeBlock
+              language="rust"
+              filename="fintech_quant_lowlevel.rs"
+              code={LOWLEVEL_RUST}
+            />
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">
+              <strong className="text-foreground/80">Scala</strong> — distributed quant via Spark + DL4J. Black-Scholes is a Spark UDF applied across the option book; Monte Carlo is an RDD of paths distributed across the cluster; LSTM training uses DL4J's SparkComputationGraph; the GNN uses GraphX message passing across a billion-edge transaction graph.
+            </p>
+            <CodeBlock
+              language="scala"
+              filename="FintechQuantLowLevel.scala"
+              code={LOWLEVEL_SCALA}
+            />
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">
+              <strong className="text-foreground/80">Elixir</strong> — streaming inference on the BEAM VM. Each model is a GenServer subscribing to a PubSub topic (e.g. <code className="font-mono">ticks:AAPL</code>); a new tick triggers a forward pass and broadcasts a signal. GenStage handles backpressure automatically — the pipeline never overflows. Uses Nx for tensor ops (BEAM JIT-compiled).
+            </p>
+            <CodeBlock
+              language="elixir"
+              filename="fintech_quant_lowlevel.ex"
+              code={LOWLEVEL_ELIXIR}
+            />
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">
+              <strong className="text-foreground/80">C</strong> — ultra-low-latency kernels for HFT. AVX2 SIMD (4 doubles/cycle via <code className="font-mono">__m256d</code> intrinsics) for batch Black-Scholes; OpenMP parallel Monte Carlo; minimal hand-rolled single-layer LSTM forward pass; pointer-based graph with 2-layer message passing. Used in HFT option desks (Citadel Securities, Virtu, Jump Trading) where ~50 ns/option is required.
+            </p>
+            <CodeBlock
+              language="c"
+              filename="fintech_quant_lowlevel.c"
+              code={LOWLEVEL_C}
+            />
+          </div>
+        </div>
       </SectionCard>
 
       {/* Multi-language quant scenarios — cards with lazy popups */}
