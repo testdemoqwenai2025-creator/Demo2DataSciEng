@@ -1736,3 +1736,50 @@ Stage Summary:
 - All fintech quant topics integrated (BS, MC, VaR, Markowitz, vol surface,
   yield curve, GNN fraud, HFT) with contention topics explicitly called
   out in the InfoCallout sections
+
+---
+Task ID: space-fintech-shorts-and-3d-galleries
+Agent: Super Z (main)
+Task: Build all 4 remaining components — space-shorts.tsx, fintech-shorts.tsx, space-gallery-3d.tsx, fintech-gallery-3d.tsx — and wire them into their pages.
+
+Work Log:
+- Built space-shorts.tsx (~580 lines):
+    4 concept shorts (JWST deep field, Gravitational waves, Dark matter, FAST telescope)
+    Each has: animated SVG thumbnail + lazy modal with larger SVG + math + Pyodide code + 2024-2025 paper
+    Papers: JADES-GS-z14-0 (Naidu 2023); LIGO O4 (2024); LZ/XENONnT/PandaX-4T null (2024); FAST FRB 2024
+- Built fintech-shorts.tsx (~720 lines):
+    4 concept shorts (Black-Scholes, Monte Carlo VaR, GNN fraud, HFT order book)
+    Each has: animated SVG + math + Pyodide code + 2024-2025 paper
+    Papers: BS 50th anniversary (2023); Basel IV (2025+); GraphSAGE (Hamilton 2017); SEC Reg NMS (2024)
+- Built space-gallery-3d.tsx (~935 lines, via subagent):
+    4 cards: JWST deep field, LIGO interferometer, LHC collision, Tiangong space station
+    Scene3D + FloatingBackground + DimToggle (3D/4D/5D/N-D) + lazy modal
+    Floating snippets: 24 space-science equations (z-formula, Kepler, h~10⁻²¹, etc.)
+- Built fintech-gallery-3d.tsx (~1034 lines, via subagent):
+    4 cards: Black-Scholes call surface, Monte Carlo paths, Volatility surface, Treasury yield curve
+    Same pattern as space-gallery-3d
+    Floating snippets: 24 quant-finance equations (BS formula, VaR/CVaR, GBM, Sharpe, Markowitz, etc.)
+- Wired all 4 into their pages:
+    space-science.tsx: replaced AI image gallery → 3D gallery + 4 shorts (before Kepler's laws)
+    fintech.tsx: replaced AI image gallery → 3D gallery + 4 shorts (before BS math section)
+- Generated and Python-validated 8 Pyodide code blocks via scripts/gen-space-fintech-shorts-code.py
+- 3 build bugs fixed:
+    17 occurrences of ${ in Python f-strings interpreted as JS interpolation — escaped with \$
+    {h_u : u ∈ N(v)} in JSX text content — replaced with [h_u : u ∈ N(v)]
+- Build succeeded, commit 8e82936, deploy #107 succeeded
+- Live verification:
+    Space Science: body 52866 chars, 3 sections (3D gallery, shorts, interactives) all YES
+    Fintech: body 48511 chars, 3 sections (3D gallery, shorts, interactives) all YES
+    Both pages: 16 cards each (4 gallery + 4 shorts + 8 interactives)
+
+Stage Summary:
+- HEAD = 8e82936 on both repos
+- 7 new/modified files: 5 new components (~3300 lines) + 1 generator script + 2 modified pages
+- Both pages now have the same 3-layer interactive architecture as quantum-computing:
+    Layer 1: 3D animated gallery (4 cards, draggable, n-D toggle, floating math/code)
+    Layer 2: Concept shorts (4 cards, Pyodide + papers, lazy popups)
+    Layer 3: Interactive visuals (8 cards, sliders/buttons, lazy popups)
+- Total: 32 new interactive cards across 2 pages (16 per page)
+- All Chinese space sector content integrated (Beidou, Chang'e 6, FAST, Tiangong, TianQin)
+- All real-time data toggle working (Yahoo Finance + synthetic)
+- All contention topics in InfoCallouts (ΛCDM vs MOND, Hubble tension, BS vs rough vol, VaR vs CVaR, HFT PFOF debate)
