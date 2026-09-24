@@ -2345,3 +2345,42 @@ Stage Summary:
 - Scenarios span pricing (Black-Scholes, MC Asian, Heston, Black-76, SABR), portfolio theory (Markowitz), ML (LSTM, GNN, Deep Hedging), risk (CVA/XVA, Bond Duration), market microstructure (LOB replay), and rates (Hull-White).
 - All 6 new scenarios include synthetic market data + hypothetical scenario context (Bloomberg quotes, WTI futures curve, E-mini S&P 500 LOB, USD 100M 10y Treasury, USD 10M 5y IRS, 5y10y swaption book).
 - Each popup has the InfoCallout (math foundation + implementation insight) placed BEFORE the code block, so users see the qualitative context without scrolling past the long code blocks.
+
+---
+Task ID: data-lakehouse-group-5-pages
+Agent: Super Z (main)
+Task: Build 5 more Data Lakehouse group pages (/glue, /delta-lake, /hudi, /data-lakehouse, /catalogs) following the /iceberg page layout pattern. Each with: PageHeader + KPIs + architecture diagram + multi-language code blocks + Pyodide demo with synthetic data + comparison table + research section + deeper-thought insight + RelatedTopics + cross-links.
+
+Work Log:
+- Built /glue page — AWS Glue (architecture diagram S3→Crawler→Catalog→Athena/Redshift/Iceberg, PySpark + Crawler + Bookmarks code, in-browser Glue Crawler simulation, 5-catalog comparison, Netflix/Hudl case studies).
+- Built /delta-lake page — Databricks Delta (transaction-log diagram with JSON commits + Parquet checkpoints, Delta SQL + delta-rs + Flink code, in-browser Delta log-replay simulation, 12-feature comparison, Uber/Airbnb case studies, Liquid Clustering/Z-Order/CDF research).
+- Built /hudi page — Apache Hudi (interactive COW vs MOR diagram with toggle, Spark SQL + PySpark streaming CDC + Flink code, in-browser COW/MOR benchmark simulation with write+read latency comparison, 12-feature comparison, Uber/Walmart/ByteDance case studies, LSM-tree insight).
+- Built /data-lakehouse concept anchor page (4-era evolution timeline Hadoop→S3→Iceberg/Delta→2024 convergence, SQL-evolution code showing the same DDL across eras, medallion Bronze→Silver→Gold diagram, in-browser medallion ETL simulation with synthetic CDC events + validation + DLQ, Armbrust 2020 paper + three independent origins research, '40-year-old database patterns on object storage' insight).
+- Built /catalogs comparison page (interactive 6-catalog diagram, Polaris YAML config, Spark multi-catalog federated JOIN SQL, Nessie Git-for-data branching CLI, in-browser 6-catalog latency + feature matrix simulation, 15-feature full comparison table, 2024 catalog battle research with Snowflake Polaris + Tabular acquisition, 'catalog IS the new database' insight).
+- Created 5 route stubs (src/app/{glue,delta-lake,hudi,data-lakehouse,catalogs}/page.tsx) for the new pages.
+- All pages lint clean (bunx eslint --max-warnings=0 passes on each).
+- All 5 pages render on dev server (HTTP 200, page sizes 230-355 KB).
+- Static export build succeeded (GITHUB_PAGES=true, after moving src/app/api out of build path) — all 5 pages in /out/.
+- Committed + pushed: 0035c58..c891818 on private/main.
+- Sync workflow mirrored to public/main, deploy workflow built and published to GitHub Pages.
+- Verified live at https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/ — all 6 Data Lakehouse group pages return HTTP 200 with correct section headers:
+  * /iceberg — Apache Iceberg —
+  * /glue — AWS Glue —
+  * /delta-lake — Delta Lake —
+  * /hudi — Apache Hudi —
+  * /data-lakehouse — Data Lakehouse —
+  * /catalogs — Catalogs —
+- Sidebar now shows all 6 entries (Data Lakehouse, Apache Iceberg, AWS Glue, Apache Hudi, Delta Lake, Catalogs).
+
+Stage Summary:
+- Data Lakehouse group complete: 6 pages, all live.
+- Each page mirrors the /iceberg layout: PageHeader → 4 KPIs → architecture diagram → multi-language code blocks (SQL/Python/Scala) → Pyodide demo with synthetic data → comparison table → research section → deeper-thought insight → RelatedTopics → cross-links.
+- Cross-links wired between all 6 pages (every page links to all 5 siblings).
+- RelatedTopics on each page cross-references existing pages (databricks, snowflake, streaming, arrow, modern-big-data).
+- All Pyodide demos include synthetic data + hypothetical scenarios:
+  * /iceberg: manifest tree simulation with 5 micro-batch commits
+  * /glue: Crawler simulation auto-discovering S3 orders data
+  * /delta-lake: transaction-log replay with CREATE/INSERT/MERGE/OPTIMIZE/VACUUM
+  * /hudi: COW vs MOR benchmark with 10 upserts + 3 reads
+  * /data-lakehouse: Bronze→Silver→Gold medallion ETL with 100 synthetic CDC events + validation + DLQ
+  * /catalogs: 6-catalog latency comparison + feature matrix + Nessie branching scenario
