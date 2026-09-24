@@ -10,6 +10,7 @@ import { ImageModal } from "../_components/image-modal";
 import { FintechInteractives } from "../_components/fintech-interactives";
 import { FintechShortsCarousel } from "../_components/fintech-shorts";
 import { FintechGallery3D } from "../_components/fintech-gallery-3d";
+import { QuantTradeCards } from "../_components/quant-trade-cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
@@ -905,6 +906,16 @@ export function FintechPage() {
           ]}
           code={PYTORCH_CODE}
         />
+      </SectionCard>
+
+      {/* Multi-language quant scenarios — cards with lazy popups */}
+      <SectionCard
+        title="Quant scenarios in 4 languages — Dynamic Delta Hedging, Monte Carlo Asian, LSTM, GNN Fraud"
+        description="Four production-style quant scenarios presented as cards that open lazy popups (mirroring the LHC ingestion pattern on the ELT+ETL page). Each popup contains the scenario brief (Derivative, Problem, Quant Solution), a visualisation matrix (rebalancing table / payoff diagram / LSTM architecture / fraud-ring graph), multi-language code in Python + Rust + Scala + Elixir, an in-browser Pyodide runner for the Python version, and math-foundation + implementation-insight callouts. Scenarios: (1) Dynamic Delta Hedging — short 1 European call, rebalance Δ daily over 10 days (Black 1973). (2) Monte Carlo Asian Option — arithmetic-average path-dependent payoff via 10⁴ antithetic GBM paths (Boyle 1977, Kemna-Vorst 1990). (3) LSTM Price-Direction Predictor — 60-day OHLCV lookback, 2-layer LSTM(64), ~52% hit rate (Fischer 2018). (4) GNN Fraud Ring Detection — 2-layer GraphSAGE on transaction graph (Weber 2019 'Scale')."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="4 scenarios × 4 languages"
+      >
+        <QuantTradeCards />
       </SectionCard>
 
       {/* Modern papers */}

@@ -2171,3 +2171,28 @@ All 5 suggestions COMPLETE:
 
 - Commit 29e639c, deploy #122 succeeded
 - All files pushed to private repo including worklog + scripts
+
+---
+Task ID: fintech-quant-trade-cards
+Agent: Super Z (main)
+Task: Return to Fintech page; apply LHC-ingestion pattern (cards with lazy popups + multi-language code) to the quant trade section; include the user-provided Dynamic Delta Hedging example with 10-day rebalancing matrix; add 3 more scenarios (Asian option, LSTM, GNN); write code in Python, Rust, Scala, Elixir for each.
+
+Work Log:
+- Read existing fivetran-hightouch.tsx + lhc-ingestion.tsx to extract the canonical pattern: clickable cards → lazy modal with math/code/insight callouts, multi-language code (Python Pyodide-runnable + Rust/Scala/Elixir syntax-highlighted).
+- Created 3 new files:
+  1. src/app/_components/_quant_trade_code.ts (~585 lines): multi-language constants for scenarios 1 (Delta Hedging) and 2 (Monte Carlo Asian). Python is Pyodide-runnable.
+  2. src/app/_components/_quant_trade_code2.ts (~880 lines): multi-language constants for scenarios 3 (LSTM) and 4 (GNN Fraud).
+  3. src/app/_components/quant-trade-cards.tsx (~750 lines): main component with LazyModal, MultiLangCode (4-tab switcher), InfoCallout, 4 scenario diagrams (DeltaHedgeMatrix / AsianPayoffDiagram / LSTMArchitecture / FraudRingDiagram), and the main QuantTradeCards export.
+- Wired QuantTradeCards into src/app/_pages/fintech.tsx as a new SectionCard right below the existing "Low-level PyTorch" section. Section title: "Quant scenarios in 4 languages — Dynamic Delta Hedging, Monte Carlo Asian, LSTM, GNN Fraud".
+- Fixed Scala syntax issues: removed invalid `map Partitions` and undefined `rddFeatures` references.
+- Fixed TypeScript template-literal parsing issue: Python f-strings use `${...}` which TypeScript interprets as interpolation. Escaped each `${` to `\${` in the JS template literals (Python sees `${...}` literal, JS sees `\$` escaped + `{...}` literal).
+- Lint: clean (eslint passes with no warnings on all 4 files).
+- TypeScript: no new errors in the 4 files (pre-existing errors in other files unchanged).
+- Dev server: HTTP 200 on /fintech; all 4 scenario cards render with their badges (Black-Scholes Δ / MC + antithetic / Fischer 2018 / Weber 2019); section header renders; "Python · Rust · Scala · Elixir" labels present.
+
+Stage Summary:
+- QuantTradeCards component is LIVE on the Fintech page, just below the existing Low-level PyTorch section.
+- 4 scenarios × 4 languages = 16 code examples total. Each scenario card opens a lazy popup with: scenario brief (Derivative / Problem / Quant Solution), visualisation matrix (10-day rebalancing table for delta-hedge, payoff diagram for Asian, architecture diagram for LSTM, fraud-ring graph for GNN), 4-language code tabs (Python runnable in-browser via Pyodide), math foundation callout, implementation insight callout.
+- Dynamic Delta Hedging example follows user-provided spec: K=$100, T=10 days, σ=20%, r=5%, 10-day rebalancing matrix table showing Day / Spot / T(yrs) / Delta / Action.
+- All 4 scenarios reference foundational papers: Black 1973 (Black-Scholes), Boyle 1977 (Monte Carlo), Kemna-Vorst 1990 (Asian closed form), Fischer 2018 (LSTM trading), Weber 2019 (GNN fraud), Buehler 2019 (deep hedging).
+- Pattern matches LHC ingestion on the ELT+ETL page — same LazyModal architecture, different domain (quant finance vs physics data).
