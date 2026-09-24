@@ -1048,6 +1048,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["alphaproteo", "rfdiffusion", "proteinmpnn", "esm-if", "inverse-folding", "protein-design", "diffusion", "generative-biology", "patterns", "genai"],
   },
+  {
+    id: "ADR-045",
+    title: "Adopt Boltz-1 (open AlphaFold3) for multi-chain biomolecular complex prediction",
+    status: "accepted",
+    date: "FY32-Q2",
+    deciders: "Data Platform, Structural Biology, ML Engineering, Architecture",
+    context:
+      "ADR-036 documented AlphaFold3 (Abramson 2024, Nature) — predicts ANY biomolecular interaction (protein-protein, protein-ligand, protein-DNA/RNA, protein-glycan) via diffusion over mixed atom types. The limitation: AlphaFold3 weights are NOT publicly released — only the inference server (AlphaFold Server) with strict use limits (20 predictions/day, non-commercial only). Boltz-1 (Wu 2024, MIT/Harvard) is the open-source alternative — same architecture (MSA + pair + diffusion structure module) with publicly-released weights under MIT licence. Boltz-2 (2025) extends with confidence-weighted multi-state prediction + improved ligand handling. Chai-1 (Chai Discovery, 2024) is a commercial alternative with similar architecture. The math is the same as ADR-036: diffusion over (N×3) atom coords with SE(3)-equivariant denoising, atom types (C/N/O/S/P/H/metals) as different 'channels'. Per-atom confidence (pLDDT-equivalent) + per-pair interface confidence (ipTM-equivalent) for filtering.",
+    decision:
+      "Adopt Boltz-1 as the default open-source biomolecular complex prediction (replaces the need for AlphaFold Server access). Three use cases: (1) Protein-ligand docking (drug discovery — small molecule to protein target, Boltz-1 trained on PDBbind); (2) Protein-protein interaction (antibody-antigen, protein complex assembly); (3) Protein-nucleic-acid (transcription factor on DNA, RNA-binding protein). Pipeline: input sequences + ligand SMILES → Boltz-1 forward pass → 5 candidate structures + per-atom pLDDT + interface ipTM → filter by ipTM > 0.7 → top-1 structure for downstream (ADR-035 cheminformatics, ADR-044 design). Connects to ADR-036 AlphaFold3 (same architecture, different weights), ADR-038 AlphaFold DB (single-chain predictions), ADR-044 AlphaProteo (binder design).",
+    consequences:
+      "+ Open-source MIT licence — commercial use allowed, unlimited predictions. + Same architecture as AlphaFold3 — comparable accuracy. + Handles multi-chain (antibody-antigen, ribosome) + protein-ligand (drug discovery). + Boltz-2 confidence calibration improves filtering. − Lower accuracy than AlphaFold3 on some benchmarks (Boltz-1: 70-80% vs AF3: 76% on PoseBusters). − Boltz-1 trained on 200K PDB structures vs AlphaFold3's curated 1M — less diverse training. − Inference time: ~10 min per complex on 1× A100 vs AlphaFold Server's 5 min (server-side optimisation). − Multi-state prediction (alternative conformations) is Boltz-2+ only.",
+    alternatives: [
+      "AlphaFold3 Server (DeepMind) — higher accuracy but 20 predictions/day limit, non-commercial only",
+      "Chai-1 (Chai Discovery 2024) — commercial SaaS, comparable accuracy, pay-per-prediction",
+      "RoseTTAFold-AllAtom (Baek 2024) — alternative open-source, slightly lower accuracy",
+      "AutoDock Vina (legacy docking) — physics-based, less accurate but free + fast",
+    ],
+    tags: ["boltz-1", "boltz-2", "alphafold3", "open-source", "biomolecular-complex", "protein-ligand", "multi-chain", "diffusion", "chai-1", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

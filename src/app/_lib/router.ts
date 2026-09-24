@@ -59,13 +59,14 @@ export type PageId =
   | "spatial-transcriptomics"
   | "singlecell-multiomics"
   | "alphamissense"
-  | "alphaproteo";
+  | "alphaproteo"
+  | "boltz";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz";
   icon: string;
   description: string;
 }
@@ -494,6 +495,14 @@ export const PAGES: PageMeta[] = [
     group: "AlphaProteo",
     icon: "Sparkles",
     description: "AI-generated illustrations + binder design short, RFdiffusion DDPM on 3D backbones + ProteinMPNN inverse folding + AlphaFold2 self-consistency, AlphaProteo 60-90% wet-lab success, low-level PyTorch SE3EquivariantDenoiseLayer+RFdiffusion+ProteinMPNN+AlphaFold2SelfConsistency.",
+  },
+  {
+    id: "boltz",
+    label: "Boltz-1/2 — Open-Source AlphaFold3 Alternative",
+    shortLabel: "Boltz",
+    group: "Boltz",
+    icon: "Boxes",
+    description: "AI-generated illustrations + multi-chain diffusion short, open AlphaFold3 architecture (MSA+pair+diffusion+SE(3)), PoseBusters 70-80%, MIT licence, Boltz-2 multi-state, low-level PyTorch AtomTypeEmbedding+MSAEncoder+BoltzStructureModule+IPALayer+ConfidenceHead+Boltz1.",
   },
 ];
 

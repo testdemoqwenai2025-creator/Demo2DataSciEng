@@ -82,6 +82,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "singlecell-multiomics":      { topic: "single-cell multi-omics scVI WNN RNA velocity Harmony 10x Genomics scVelo Seurat multi-modal integration",      label: "Single-cell",   codeRepo: "scvi-tools/scvi-tools/main/README.md" },
   "alphamissense":              { topic: "AlphaMissense variant pathogenicity ClinVar gnomAD PolyPhen CADD REVEL missense variant interpretation ACMG classification",      label: "AlphaMissense", codeRepo: "deepmind/alphamissense/main/README.md" },
   "alphaproteo":                { topic: "AlphaProteo RFdiffusion ProteinMPNN de novo protein design binder diffusion inverse folding ESM-IF",      label: "AlphaProteo",   codeRepo: "RosettaCommons/RFdiffusion/main/README.md" },
+  "boltz":                       { topic: "Boltz-1 Boltz-2 open AlphaFold3 multi-chain complex MIT license PoseBusters drug discovery Chai-1",      label: "Boltz",         codeRepo: "jwohlwend/boltz/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
