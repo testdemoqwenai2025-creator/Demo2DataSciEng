@@ -26,29 +26,70 @@ import { LogIn, LogOut, Sparkles, User } from "lucide-react";
  */
 
 const DEMO_USER = {
-  email: "demo@moderndatascieng.io",
-  password: "demo-password",
-  name: "Demo Analyst",
-  role: "Analytics Consumer",
+  username: "admin",
+  password: "admin",
+  name: "Admin Analyst",
+  role: "Platform Administrator",
 };
 
 const STORAGE_KEY = "mdse_demo_auth";
 
 interface AuthState {
-  email: string;
+  username: string;
   name: string;
   role: string;
   signedInAt: string;
 }
 
-// Lazy initialiser that reads localStorage only on the client (no SSR hydration mismatch)
+/**
+ * useSyncExternalStore snapshot cache.
+ *
+ * React requires that the getSnapshot function returns a STABLE reference
+ * if the underlying data has not changed. JSON.parse() always produces a
+ * new object, so naively returning it from getSnapshot causes React to
+ * think the store has changed on every render —> infinite re-render loop
+ * —> Next.js error boundary catches it as "Application error: a
+ * client-side exception has occurred".
+ *
+ * We cache the parsed object keyed on the raw localStorage string so the
+ * same stored value returns the same object reference across renders.
+ */
+let cachedRaw: string | null | undefined = undefined; // undefined = not yet read
+let cachedSnapshot: AuthState | null = null;
+
 function readStoredAuth(): AuthState | null {
   if (typeof window === "undefined") return null;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as AuthState) : null;
+    // Same raw string → return cached object reference (stability for useSyncExternalStore)
+    if (stored === cachedRaw) return cachedSnapshot;
+    cachedRaw = stored;
+    cachedSnapshot = stored ? (JSON.parse(stored) as AuthState) : null;
+    return cachedSnapshot;
   } catch {
+    cachedRaw = null;
+    cachedSnapshot = null;
     return null;
+  }
+}
+
+/**
+ * Mutating the store — call after writing to localStorage so the cached
+ * snapshot is invalidated and useSyncExternalStore picks up the change.
+ */
+function writeStoredAuth(state: AuthState | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (state === null) {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    // Invalidate cache — next getSnapshot will re-read and return a new ref
+    cachedRaw = undefined;
+    cachedSnapshot = null;
+  } catch {
+    // ignore
   }
 }
 
@@ -60,30 +101,38 @@ const getServerAuth = () => null;
 
 export function LoginButton() {
   const [open, setOpen] = useState(false);
-  // Read once on client mount, falls back to null on server
-  const initialAuth = useSyncExternalStore(noopSubscribe, getStoredAuth, getServerAuth);
-  const [authState, setAuthState] = useState<AuthState | null>(initialAuth);
-  const [email, setEmail] = useState(DEMO_USER.email);
+  // useSyncExternalStore reads localStorage after hydration. We need to sync
+  // its value into local state so user actions (sign in / sign out) can also
+  // update the UI immediately without waiting for the next getSnapshot call.
+  // The useEffect bridges the gap: on mount and whenever the snapshot changes,
+  // copy it into authState.
+  const storedAuth = useSyncExternalStore(noopSubscribe, getStoredAuth, getServerAuth);
+  const [authState, setAuthState] = useState<AuthState | null>(storedAuth);
+  const [username, setUsername] = useState(DEMO_USER.username);
   const [password, setPassword] = useState(DEMO_USER.password);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync the external store snapshot into local state. On the initial mount
+  // (after hydration), this picks up any persisted auth state from a previous
+  // session. The dependency array tracks storedAuth so the local state mirrors
+  // the snapshot whenever it changes (e.g. another tab signed in/out).
+  useEffect(() => {
+    setAuthState(storedAuth);
+  }, [storedAuth]);
 
   const signIn = (e?: React.FormEvent) => {
     e?.preventDefault();
     setError(null);
     // Demo auth — accept the demo credentials only
-    if (email === DEMO_USER.email && password === DEMO_USER.password) {
+    if (username === DEMO_USER.username && password === DEMO_USER.password) {
       const state: AuthState = {
-        email,
+        username,
         name: DEMO_USER.name,
         role: DEMO_USER.role,
         signedInAt: new Date().toISOString(),
       };
       setAuthState(state);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // ignore
-      }
+      writeStoredAuth(state);
       setOpen(false);
     } else {
       setError("Invalid credentials. Use the demo account below, or click 'Auto-fill & sign in'.");
@@ -91,33 +140,25 @@ export function LoginButton() {
   };
 
   const autoSignIn = () => {
-    setEmail(DEMO_USER.email);
+    setUsername(DEMO_USER.username);
     setPassword(DEMO_USER.password);
     // Defer sign-in so the state updates visually first
     setTimeout(() => {
       const state: AuthState = {
-        email: DEMO_USER.email,
+        username: DEMO_USER.username,
         name: DEMO_USER.name,
         role: DEMO_USER.role,
         signedInAt: new Date().toISOString(),
       };
       setAuthState(state);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // ignore
-      }
+      writeStoredAuth(state);
       setOpen(false);
     }, 200);
   };
 
   const signOut = () => {
     setAuthState(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    writeStoredAuth(null);
   };
 
   if (authState) {
@@ -152,14 +193,14 @@ export function LoginButton() {
 
         <form onSubmit={signIn} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="login-email">Email</Label>
+            <Label htmlFor="login-username">Username</Label>
             <Input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@moderndatascieng.io"
-              autoComplete="email"
+              id="login-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              autoComplete="username"
               required
             />
           </div>
@@ -195,7 +236,7 @@ export function LoginButton() {
           <p className="text-[11px] text-muted-foreground">
             <strong className="text-foreground/80">Demo credentials (pre-filled):</strong>
             <br />
-            Email: <code className="font-mono">{DEMO_USER.email}</code>
+            Username: <code className="font-mono">{DEMO_USER.username}</code>
             <br />
             Password: <code className="font-mono">{DEMO_USER.password}</code>
             <br />

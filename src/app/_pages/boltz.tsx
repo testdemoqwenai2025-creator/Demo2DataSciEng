@@ -172,7 +172,7 @@ function MultiChainDiffusionShort() {
             {step === 6 && (
               <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {atoms.map((a, i) => {
-                  const confidence = Math.random() > 0.3 ? 0.9 : 0.5; // random for demo
+                  const confidence = (i * 7 % 3) > 0 ? 0.9 : 0.5; // deterministic for SSR safety
                   const color = confidence > 0.7 ? 'oklch(0.55 0.16 165)' : 'oklch(0.6 0.20 25)';
                   return (
                     <motion.circle

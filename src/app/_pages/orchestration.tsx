@@ -7,6 +7,8 @@ import { PIPELINE_RUNS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Workflow, Activity, Clock, RefreshCw, ShieldCheck, AlertTriangle, Gauge } from "lucide-react";
+import { OrchestrationCaseStudy } from "../_components/orchestration-case-study";
+import { RelatedTopics } from "../_components/related-topics";
 
 const AIRFLOW_DAG = `# ============================================================
 # dags/gold_sales_mart_dag.py
@@ -312,6 +314,22 @@ export function OrchestrationPage() {
           </ul>
         </SectionCard>
       </div>
+
+      <SectionCard
+        title="Real-world case study — Airflow at Airbnb (3,000+ DAGs)"
+        description="The world's largest Airflow deployment: 3,000+ DAGs, 100M+ task instances/year, 500+ K8s worker pods, 99.7% SLA. Airbnb created Airflow in 2015 (now Apache) — the de-facto standard for data orchestration. Animated pipeline viz (scheduler → executor → workers → metadata DB → UI → alerts), data toggle (real Airbnb stats vs synthetic task instances), Pyodide-runnable DAG scheduler simulation."
+        icon={<Workflow className="h-5 w-5" />}
+        badge="Case study"
+      >
+        <OrchestrationCaseStudy />
+      </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "fivetran-hightouch" as const, reason: "Pipeline for ELT ingestion" },
+        { id: "cicd" as const, reason: "CI/CD for DAG deployment" },
+        { id: "governance" as const, reason: "DQ checks + lineage" },
+        { id: "databricks" as const, reason: "Spark job orchestration" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("governance")} className="text-sm text-primary hover:underline">

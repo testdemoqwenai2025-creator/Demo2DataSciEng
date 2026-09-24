@@ -59,7 +59,7 @@ function NeuralNetworkAnimation() {
       for (const n2 of nodes[l + 1]) {
         connections.push({
           x1: n1.x, y1: n1.y, x2: n2.x, y2: n2.y,
-          delay: Math.random() * 2 + l * 0.5,
+          delay: (l * 0.5 + (n2.y / 100)),  // deterministic for SSR safety
         });
       }
     }

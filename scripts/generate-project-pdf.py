@@ -143,7 +143,7 @@ class PageNumCanvas(canvas.Canvas):
         # Right: page number
         self.drawRightString(PAGE_W - RIGHT_MARGIN, BOTTOM_MARGIN - 14, f"Page {page_num} of {total}")
         # Bottom line — contact
-        self.drawString(LEFT_MARGIN, BOTTOM_MARGIN - 22, "Contact: testdemoqwenai2025-creator@users.noreply.github.com  ·  github.com/testdemoqwenai2025-creator")
+        self.drawString(LEFT_MARGIN, BOTTOM_MARGIN - 22, "Contact: testdemoqwenai2025@gmail.com  ·  github.com/testdemoqwenai2025-creator")
         self.drawRightString(PAGE_W - RIGHT_MARGIN, BOTTOM_MARGIN - 22, "ModernDataSciEng-Platform.pdf")
 
 def cover_page(canvas_obj, doc):
@@ -195,7 +195,7 @@ cover_meta_data = [
     ["Compliance",      "GDPR Reg. 2016/679 — PII tagged + masked via Unity Catalogue"],
     ["Public repo",     "github.com/testdemoqwenai2025-creator/DemoAppDataSci"],
     ["Private repo",    "github.com/testdemoqwenai2025-creator/AppDataSci-Advanced"],
-    ["Contact",         "testdemoqwenai2025-creator@users.noreply.github.com"],
+    ["Contact",         "testdemoqwenai2025@gmail.com"],
 ]
 cover_meta_table = Table(cover_meta_data, colWidths=[40 * mm, USABLE_W - 40 * mm])
 cover_meta_table.setStyle(TableStyle([

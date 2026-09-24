@@ -14,6 +14,8 @@ import {
   Sparkles, TrendingUp, Boxes, GitBranch, ArrowRight,
   Terminal, Activity, Database, ShieldCheck, Gauge,
 } from "lucide-react";
+import { StreamingCaseStudy } from "../_components/streaming-case-study";
+import { RelatedTopics } from "../_components/related-topics";
 
 const KPIS = [
   { label: "Streaming engines", value: "4", hint: "Spark · Flink · Kafka · Pulsar", deltaTone: "flat" as const },
@@ -380,6 +382,22 @@ client.close()`,
           </div>
         </div>
       </SectionCard>
+
+      <SectionCard
+        title="Real-world case study — Kafka at LinkedIn (7T messages/day)"
+        description="The world's largest Kafka deployment: 7 trillion messages/day, 100+ clusters, 14,000+ topics, 1,500 brokers, 2.5 PB/day. Animated pipeline visualization (producers → brokers → consumers), data toggle (real LinkedIn stats vs synthetic Kafka events), Pyodide-runnable Kafka producer/consumer simulation, and architecture deep-dive popup. Same patterns as the platform — 1000x smaller scale."
+        icon={<Radio className="h-5 w-5" />}
+        badge="Case study"
+      >
+        <StreamingCaseStudy />
+      </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "fivetran-hightouch" as const, reason: "ELT + reverse-ETL ingestion" },
+        { id: "databricks" as const, reason: "Spark Structured Streaming" },
+        { id: "modern-big-data" as const, reason: "Kafka + Flink + Pulsar stack" },
+        { id: "orchestration" as const, reason: "Airflow triggers for streams" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("modern-big-data")} className="text-sm text-primary hover:underline">

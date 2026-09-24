@@ -28,7 +28,7 @@ OWNER="testdemoqwenai2025-creator"
 API="https://api.github.com"
 API_HDR=(-H "Authorization: token ${GH_PAT}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
 GIT_AUTHOR_NAME="testdemoqwenai2025-creator"
-GIT_AUTHOR_EMAIL="testdemoqwenai2025-creator@users.noreply.github.com"
+GIT_AUTHOR_EMAIL="testdemoqwenai2025@gmail.com"
 
 REPO_PRIVATE="AppDataSci-Advanced"
 REPO_PUBLIC="DemoAppDataSci"

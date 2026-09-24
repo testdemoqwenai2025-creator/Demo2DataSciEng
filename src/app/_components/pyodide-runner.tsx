@@ -85,20 +85,44 @@ export function PyodideRunner({
         runPythonAsync: (code: string, options?: { stdout?: (s: string) => void; stderr?: (s: string) => void }) => Promise<unknown>;
         setStdout: (fn: (s: string) => void) => void;
         setStderr: (fn: (s: string) => void) => void;
+        loadPackage: (names: string | string[]) => Promise<void>;
       };
       const loadMs = Math.round(performance.now() - start);
       setLoadTimeMs(loadMs);
 
       // Capture stdout/stderr
+      // Pyodide 0.26+ API: setStdout takes { batched: (msg: string) => void }
+      // (older versions took a plain function — wrap to support both)
       const lines: string[] = [];
       const writer = (s: string) => {
         lines.push(s);
       };
       try {
-        py.setStdout(writer);
-        py.setStderr(writer);
+        // Try the new Pyodide 0.26+ API first
+        // @ts-expect-error — Pyodide's setStdout signature varies across versions
+        py.setStdout({ batched: writer });
+        // @ts-expect-error — same for stderr
+        py.setStderr({ batched: writer });
       } catch {
-        // Older Pyodide versions don't have setStdout — fall back to runPythonAsync options
+        // Fall back to older Pyodide API (plain function)
+        try {
+          py.setStdout(writer);
+          py.setStderr(writer);
+        } catch {
+          // Older Pyodide versions don't have setStdout — fall back to runPythonAsync options
+        }
+      }
+
+      // Auto-load numpy if the code looks like it needs it (saves users
+      // from the "ModuleNotFoundError: No module named 'numpy'" traceback).
+      // Pyodide ships numpy in its standard distribution — we just have to
+      // ask for it explicitly. Cost: ~3-5s on first run, instant after.
+      if (/\bnumpy\b|\bnp\./.test(code) || (preamble && /\bnumpy\b/.test(preamble))) {
+        try {
+          await py.loadPackage("numpy");
+        } catch {
+          // Best-effort — if numpy fails to load, let the code error out naturally
+        }
       }
 
       setStatus("running");

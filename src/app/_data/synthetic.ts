@@ -1128,6 +1128,126 @@ export const ADRS: ADR[] = [
     ],
     tags: ["dca", "direct-coupling-analysis", "mutual-information", "potts-model", "mean-field", "apc", "co-evolution", "attention-equivalence", "contact-prediction", "patterns", "genai"],
   },
+  {
+    id: "ADR-049",
+    title: "Adopt MACE (higher-order equivariant GNN) as the default neural network potential for molecular property prediction",
+    status: "accepted",
+    date: "FY33-Q1",
+    deciders: "Data Platform, Molecular Modelling, ML Engineering, Architecture",
+    context:
+      "ADR-036 covered classical force fields (AMBER) and E(n)-equivariant NNs. The field has advanced dramatically: SchNet (Schütt 2017) introduced continuous-filter CNNs; DimeNet (Gasteiger 2020) added directional message passing; GemNet (Gasteiger 2021) extended to geometric; NequIP (Batzner 2022) introduced E(3)-equivariance via tensor products; MACE (Batatia 2022) added higher-order Clebsch-Gordan products (body order > 2), achieving <1 meV/atom on QM9. The math: SO(3) irreducible representations are labeled by angular momentum l=0,1,2,... with spherical harmonics Y_l^m as basis. Clebsch-Gordan coefficients C(l1 m1 l2 m2 | L M) give the coupling rules — same as quantum mechanics angular momentum coupling. Body-order expansion: k-body interactions decomposed via CG products of k representations. MACE uses O(3)-equivariant messages with higher-order tensor products — capturing 3-body and 4-body interactions that lower-order models miss.",
+    decision:
+      "Adopt MACE as the default neural network potential for molecular property prediction. Architecture: O(3)-equivariant message passing with higher-order Clebsch-Gordan tensor products. Trained on QM9 (130K molecules + DFT properties), extends to ANI-1x (5M conformers) for production. Connects to ADR-036 (replaces AMBER for ML-based force fields), ADR-035 (ChemBERTa for 2D, MACE for 3D), ADR-044 (RFdiffusion uses MACE-style layers), ADR-045 (Boltz-1 uses IPA which IS a special case of CG tensor product).",
+    consequences:
+      "+ <1 meV/atom on QM9 — state-of-the-art accuracy. + 1000× faster than DFT at inference. + Captures many-body interactions via higher-order CG products. + Same SE(3)-equivariance as AlphaFold (ADR-036). − Higher-order CG products are O(L^3) per message — expensive for large L. − Training requires DFT data (expensive). − Transferability across element types is limited (need per-element embeddings).",
+    alternatives: [
+      "NequIP (Batzner 2022) — lower body order, slightly less accurate but faster",
+      "SchNet (Schütt 2017) — simpler, no equivariance, lower accuracy",
+      "ANI-2x (Devereux 2020) — non-equivariant, trained on larger dataset but lower ceiling",
+      "Allegro (Musaelian 2023) — local equivariant, scales better but loses long-range",
+    ],
+    tags: ["neural-network-potential", "mace", "schNet", "dimenet", "gemnet", "nequip", "clebsch-gordan", "spherical-harmonics", "so3", "representation-theory", "body-order", "patterns", "genai"],
+  },
+  {
+    id: "ADR-050",
+    title: "Adopt metadynamics + REMD + MSMs for enhanced sampling beyond μs-timescale molecular dynamics",
+    status: "accepted",
+    date: "FY33-Q2",
+    deciders: "Data Platform, Molecular Modelling, ML Engineering, Architecture",
+    context:
+      "ADR-036 covered classical MD (AMBER + Verlet) and ADR-049 covers neural network potentials. The fundamental bottleneck of MD is the timescale problem: biological processes (protein folding, ligand binding, conformational transitions) occur on μs-ms timescales, but even with GPU acceleration, MD can only reach μs for large systems. Enhanced sampling methods solve this by biasing the simulation to explore rare events faster. Five methods: (1) Metadynamics (Laio & Parrinello 2003) — history-dependent bias potential V(s,t) = Σ W exp(-|s-s(t')|²/2σ²) fills free energy wells; (2) Replica Exchange MD (Sugita & Okamoto 1999) — N replicas at different temperatures, periodic swaps via Metropolis criterion P_swap = min(1, exp(Δβ·ΔE)); (3) Markov State Models (Pande et al. 2010) — discretise conformational space, compute transition matrix T_ij(τ), eigenvalues give timescales; (4) TICA — time-lagged independent component analysis, finds slowest collective variables; (5) Neural ODEs (Chen 2018) — continuous-depth models for learning dynamics from MD trajectories.",
+    decision:
+      "Adopt a multi-method enhanced sampling stack: (1) Metadynamics for free energy surface mapping (well-tempered variant, bias factor γ=10); (2) REMD for temperature-accelerated exploration (32 replicas, T=300-600K); (3) MSMs for trajectory analysis (Pande's MSMBuilder); (4) TICA for collective variable discovery; (5) Neural ODEs for learned dynamics. Connects to ADR-036 (AMBER force field + these methods), ADR-049 (MACE potential + enhanced sampling = fast + accurate), ADR-029 (OpenTelemetry traces each MD phase), ADR-045 (Boltz-1 provides starting structures for MD).",
+    consequences:
+      "+ Metadynamics gives free energy surfaces in hours (vs years for brute-force MD). + REMD explores rare events via temperature scaling. + MSMs extract kinetics (rates, pathways) from short trajectories. + TICA discovers optimal collective variables without manual selection. + Neural ODEs learn continuous dynamics from discrete MD data. − Metadynamics requires good CV selection (bad CVs = wasted compute). − REMD needs N replicas (N× compute). − MSMs need many short trajectories (1000s) for convergence. − Neural ODE training is unstable (vanishing gradients in long trajectories).",
+    alternatives: [
+      "Brute-force MD (no enhancement) — only reaches μs, misses rare events",
+      "Accelerated MD (Hamelberg 2004) — simpler than metadynamics, less accurate",
+      "Adaptive sampling (no MSM) — fewer trajectories, higher variance",
+      "Steered MD — pulling simulations, biased toward specific pathway",
+    ],
+    tags: ["enhanced-sampling", "metadynamics", "remd", "markov-state-models", "tica", "neural-ode", "free-energy", "rare-events", "patterns", "genai"],
+  },
+  {
+    id: "ADR-051",
+    title: "Adopt EDM + DiffDock + GFlowNet for generative chemistry 2.0 — diffusion and flow networks for 3D molecule design",
+    status: "accepted",
+    date: "FY33-Q3",
+    deciders: "Data Platform, Cheminformatics, ML Engineering, Architecture",
+    context:
+      "ADR-035 covered ECFP + ChemBERTa (2D fingerprints). ADR-046 covered Insilico VAE (1D SMILES generation). ADR-044 covered RFdiffusion (protein backbone design). The next frontier is 3D molecule generation: design small molecules directly in 3D space with equivariant diffusion. Three methods: (1) EDM (Hoogeboom 2022) — Equivariant Diffusion Model, DDPM on R^(N×3) atom coordinates with SE(3)-equivariance, same math as ADR-027 (image diffusion) + ADR-044 (RFdiffusion); (2) DiffDock (Corso 2023) — diffusion-based protein-ligand docking, replaces AutoDock Vina with learned diffusion over binding poses; (3) GFlowNet (Bengio 2023) — generative flow networks that match the reward distribution (not maximise), frames molecular design as sequential MDP. Plus optimal transport: Sinkhorn iteration (Cuturi 2013) for Wasserstein distance between molecular distributions — a geometry-aware metric on molecular space more informative than Tanimoto.",
+    decision:
+      "Adopt a three-method generative chemistry 2.0 stack: (1) EDM for de novo 3D molecule generation (SE(3)-equivariant DDPM on coordinates); (2) DiffDock for protein-ligand docking (replaces ADR-036 AutoDock Vina); (3) GFlowNet for reward-matched molecular design (alternative to VAE from ADR-046). Plus Sinkhorn optimal transport for molecular similarity (replaces Tanimoto from ADR-035 for 3D-aware comparison). Connects to ADR-027 (same DDPM math), ADR-035 (ECFP for 2D, EDM for 3D), ADR-044 (RFdiffusion for proteins, EDM for small molecules), ADR-046 (Insilico VAE for 1D SMILES, GFlowNet for graph-structured generation), ADR-045 (Boltz-1 docking replaced by DiffDock).",
+    consequences:
+      "+ EDM generates novel 3D molecules not seen in training — explores chemical space. + DiffDock outperforms AutoDock Vina by 20%+ on PoseBusters. + GFlowNet matches reward distribution (diverse candidates vs VAE's mode collapse). + Sinkhorn gives geometry-aware molecular similarity (respects 3D shape). + All use SE(3)-equivariance — same inductive bias as ADR-036/044/045. − EDM training is unstable (high variance in 3D coordinate diffusion). − DiffDock requires protein structure (from ADR-038 AlphaFold DB). − GFlowNet training requires careful reward shaping. − Sinkhorn is O(n²) per iteration — expensive for large molecules.",
+    alternatives: [
+      "GeoDiff (Xu 2022) — alternative 3D diffusion, similar architecture",
+      "GraphAF (Shi 2020) — autoregressive flow (no diffusion), less diverse",
+      "MolGAN (De Cao 2018) — GAN for molecules (mode collapse, no likelihood)",
+      "Tanimoto on ECFP (ADR-035) — 2D-only, ignores 3D shape",
+    ],
+    tags: ["generative-chemistry-2", "edm", "diffdock", "gflownet", "optimal-transport", "sinkhorn", "wasserstein", "3d-molecule-generation", "diffusion", "patterns", "genai"],
+  },
+  {
+    id: "ADR-052",
+    title: "Adopt Qiskit + PyTorch quantum for hybrid quantum-classical ML — VQE, QAOA, quantum kernel methods",
+    status: "accepted",
+    date: "FY33-Q4",
+    deciders: "Data Platform, Quantum Computing, ML Engineering, Architecture",
+    context:
+      "ADR-049 covers SO(3) representation theory for classical ML. Quantum computing adds a fundamentally different computational paradigm: qubits exist in superposition |ψ⟩ = α|0⟩ + β|1⟩, entanglement creates correlations impossible classically (Bell states), and quantum gates are unitary matrices U ∈ U(2^n). The math: Schrödinger equation iℏ d|ψ⟩/dt = H|ψ⟩ governs quantum dynamics. VQE (Variational Quantum Eigensolver, Peruzzo 2014) finds molecular ground states via hybrid quantum-classical optimization: quantum circuit prepares trial state |ψ(θ)⟩, classical optimizer (COBYLA/SPSA) minimises ⟨ψ|H|ψ⟩. QAOA (Quantum Approximate Optimization Algorithm, Farhi 2014) solves combinatorial optimisation via p-layer quantum+classical alternation. Grover's algorithm gives quadratic speedup for unstructured search: O(√N) vs O(N). Quantum Fourier Transform (QFT) is exponentially faster than FFT: O(n log n) vs O(N log N) where N=2^n. Datasets: IBM Quantum (real quantum hardware, 127-qubit Eagle), Google Sycamore (53-qubit, quantum supremacy 2019), CERN Open Data (particle collision events for quantum ML).",
+    decision:
+      "Adopt Qiskit as the quantum computing SDK with PyTorch integration for hybrid quantum-classical ML. Three-layer stack: (1) Quantum simulation: Qiskit Aer (statevector + noise simulators) on GPU; (2) Hybrid algorithms: VQE for molecular ground states (connects to ADR-049 neural network potentials), QAOA for combinatorial optimisation (portfolio optimisation, graph problems); (3) Quantum ML: quantum kernel methods (quantum-enhanced SVM), quantum neural networks (parameterised quantum circuits as ML models). Datasets: IBM Quantum Experience for real hardware runs, CERN Open Data for particle physics quantum ML benchmarks. Connects to ADR-049 (VQE replaces DFT for ground state — same variational principle), ADR-036 (quantum MD simulation), ADR-027 (diffusion on quantum states).",
+    consequences:
+      "+ Quantum speedup for specific problems (Grover √N, QFT n log n). + VQE gives molecular ground states without full diagonalisation. + Quantum kernels capture correlations invisible to classical kernels. + Same variational principle as ADR-049 (minimise ⟨ψ|H|ψ⟩ = minimise loss). − Current hardware: 127 qubits (IBM Eagle), decoherence limits depth to ~100 gates. − Noise: NISQ (Noisy Intermediate-Scale Quantum) era — error correction not yet practical. − Quantum advantage demonstrated only for contrived problems (random circuit sampling). − Hybrid algorithms still need classical optimisation loop.",
+    alternatives: [
+      "PennyLane (Xanadu) — alternative quantum ML framework, similar capabilities",
+      "Cirq (Google) — quantum circuit framework, focused on Google hardware",
+      "Classical simulation only — no real quantum hardware, exponentially expensive O(2^n)",
+      "Annealing (D-Wave) — different paradigm, optimisation-focused, no universal gates",
+    ],
+    tags: ["quantum-computing", "vqe", "qaoa", "grover", "qft", "qiskit", "superposition", "entanglement", "bell-states", "quantum-ml", "patterns", "genai"],
+  },
+  {
+    id: "ADR-053",
+    title: "Adoint ML pipeline for space science — exoplanets, gravitational waves, LHC/CERN particle physics, JWST",
+    status: "accepted",
+    date: "FY34-Q1",
+    deciders: "Data Platform, Space Science, ML Engineering, Architecture",
+    context:
+      "ADR-049 covers SO(3) representation theory (spherical harmonics, Clebsch-Gordan). Space science is the ultimate application: orbital mechanics (Kepler's laws, N-body problem, Gauss's method for orbit determination), exoplanet detection (transit method — TESS/Kepler light curves, radial velocity — Doppler spectroscopy), gravitational waves (LIGO/Virgo — matched filtering, Bayesian parameter estimation), JWST imaging (infrared astronomy, spectroscopy), and LHC/CERN particle physics (jet classification, Higgs discovery, dark matter search). The math: Kepler's third law T² = (4π²/GM)a³, transit depth ΔF/F = (R_p/R_s)², radial velocity K = (2πG/P)^(1/3) · M_p sin(i) / (M_s+M_p)^(2/3) · 1/√(1-e²), gravitational wave strain h(t) = (4G/c⁴) · (d²I_ij/dt²) / r (quadrupole formula). LHC data: particle collision events (jets, leptons, MET), jet substructure (n-subjettiness, energy correlation functions), ML for jet classification (top vs QCD, signal vs background). Datasets: Kepler/K2 (300K light curves), TESS (200M+ light curves), Gaia (1.8 billion stars), LIGO/Virgo (90 gravitational wave events), CERN Open Data (1 PB collision data), JWST (Early Release Science).",
+    decision:
+      "Adopt a multi-domain space science ML stack: (1) Exoplanet detection: 1D CNN on transit light curves (TESS/Kepler) + Gaussian process detrending; (2) Gravitational wave detection: matched filtering (template bank) + deep learning (CNN on spectrograms); (3) LHC particle physics: Graph Neural Networks for jet classification ( jets as graphs of particles), transformer for event reconstruction; (4) JWST spectral analysis: autoencoder for galaxy classification. Datasets: NASA MAST Archive (Kepler/TESS), Gaia Archive, LIGO Open Data, CERN Open Data Portal. Connects to ADR-049 (SO(3) for orbital mechanics + particle scattering), ADR-029 (OpenTelemetry for pipeline tracing), ADR-022 (pgvector for similar-event search).",
+    consequences:
+      "+ Kepler/TESS: 5000+ confirmed exoplanets, ML finds candidates missed by classical methods. + LIGO: 90 GW events, ML reduces false alarm rate by 10×. + LHC: Higgs discovery (2012), ML improves signal/background by 30%. + JWST: earliest galaxies (z>13), ML for automated redshift. + Same math as ADR-049 (SO(3) for orbital mechanics, spherical harmonics for CMB). − Exoplanet ML has high false positive rate (10-20%) — needs human validation. − LIGO data volume: ~1 TB/day — needs real-time processing. − LHC data: 1 PB/year — needs distributed processing (Spark). − JWST: only ~100 targets in early release — limited training data.",
+    alternatives: [
+      "Classical methods only (transit fitting, template matching) — proven but misses complex signals",
+      "Commercial space data (Planet Labs, Maxar) — Earth observation, not astrophysics",
+      "Classical statistical methods (Bayesian inference) — principled but slow for large N",
+      "AstroML (VanderPlas 2014) — Python library for astro ML, good starting point",
+    ],
+    tags: ["space-science", "exoplanets", "gravitational-waves", "lhc", "cern", "jwst", "transit-method", "matched-filtering", "jet-classification", "kepler", "tess", "patterns", "genai"],
+  },
+  {
+    id: "ADR-054",
+    title: "Adopt Black-Scholes + Monte Carlo + GNN for quantitative finance — derivatives pricing, risk, fraud detection",
+    status: "accepted",
+    date: "FY34-Q2",
+    deciders: "Data Platform, Fintech, ML Engineering, Architecture",
+    context:
+      "ADR-019 covers the contextual bandit for recommendations. Fintech is the other major ML application domain for the platform. Three core problems: (1) Derivatives pricing — Black-Scholes formula C = S·N(d₁) - K·e^(-rT)·N(d₂) where d₁ = (ln(S/K)+(r+σ²/2)T)/(σ√T), d₂ = d₁ - σ√T. Monte Carlo simulation: simulate S_T = S₀·exp((r-σ²/2)T + σ√T·Z) for N paths, price = e^(-rT)·E[payoff]. Itô's lemma: df = (∂f/∂t + μ∂f/∂x + ½σ²∂²f/∂x²)dt + σ∂f/∂x·dW. (2) Risk metrics — Value at Risk (VaR): the quantile q_α such that P(L > VaR) = 1-α. Conditional VaR (CVaR/ES): E[L | L > VaR]. (3) Algorithmic trading + fraud detection — LSTM time series prediction, GNN for blockchain transaction graphs. Datasets: market data (OHLCV), Level 2 order book, blockchain transactions (Ethereum).",
+    decision:
+      "Adopt a three-pillar fintech stack: (1) Derivatives: Black-Scholes closed-form + Monte Carlo for path-dependent (Asian, barrier, lookback), GPU-accelerated (100M paths/sec on A100). (2) Risk: VaR via historical simulation + Monte Carlo, CVaR via Rockafellar-Uryasev formula. (3) ML: LSTM for price prediction, GNN for fraud detection on transaction graphs. Datasets: Yahoo Finance API (OHLCV), Binance API (crypto order book), Ethereum blockchain (on-chain analytics). Connects to ADR-019 (bandit for dynamic pricing), ADR-029 (OpenTelemetry for trade audit trail — MiFID II compliance), ADR-039 (PPI graph = transaction graph, same GNN architecture).",
+    consequences:
+      "+ Black-Scholes is O(1) — instant pricing for vanilla options. + Monte Carlo on GPU: 100M paths/sec — real-time exotic pricing. + GNN fraud detection: 95%+ precision on Ethereum transaction graphs. + Connects to ADR-019 (bandit for adaptive pricing). − Black-Scholes assumes constant volatility — fails for smile/skew (need Heston/SABR). − VaR is not subadditive (portfolio VaR > sum of individual VaRs) — use CVaR instead. − LSTM for price prediction: 52% accuracy (barely better than random) — markets are near-efficient. − Regulatory: MiFID II requires audit trail for every trade — OpenTelemetry integration essential.",
+    alternatives: [
+      "Heston model (stochastic volatility) — more accurate than Black-Scholes but 10× slower",
+      "Deep hedging (Buehler 2019) — neural network for hedging, no closed-form needed",
+      "Reinforcement learning for trading — explores action space but unstable in non-stationary markets",
+      "Classical statistical arbitrage (cointegration) — proven but low alpha in modern markets",
+    ],
+    tags: ["fintech", "black-scholes", "monte-carlo", "ito-lemma", "var", "cvar", "algorithmic-trading", "fraud-detection", "gnn", "lstm", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

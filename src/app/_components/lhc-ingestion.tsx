@@ -1,0 +1,1662 @@
+"use client";
+
+import { useState, useEffect, useRef, type ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  X, Atom, Zap, Sparkles, Cpu, Activity, Database, ArrowRight,
+  Play, RotateCcw, Binary, FileText, ExternalLink, Gauge, Layers, TrendingUp,
+} from "lucide-react";
+import { PyodideRunner } from "./pyodide-runner";
+import { CodeBlock } from "./code-block";
+import { hrefFor } from "../_lib/router";
+
+/**
+ * LHCIngestion — extreme-scale data ingestion scenario for the
+ * fivetran-hightouch (ELT + rETL) page. Shows how CMS/ATLAS at CERN
+ * handle 40 TB/s raw data through a multi-stage pipeline to 1 PB/year
+ * stored.
+ *
+ * Features:
+ *   - LHC pipeline overview (KPIs + animated pipeline SVG)
+ *   - Data toggle: "real binary data" (hex dump of CMS raw events) vs
+ *     "synthetic data" (Python-generated event data)
+ *   - 4 code cards in lazy popups: Python (Pyodide-runnable), Rust
+ *     (zero-copy binary parser), Scala (Spark Structured Streaming),
+ *     Elixir (GenStage pipeline)
+ *   - Data reduction calculator (slider showing reduction at each stage)
+ *   - All in browser popups (lazy evaluation concept)
+ */
+
+// ============================================================
+// Shared utilities
+// ============================================================
+
+interface LazyModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  accent: string;
+  icon: ReactNode;
+  children: ReactNode;
+}
+
+function LazyModal({ open, onClose, title, subtitle, accent, icon, children }: LazyModalProps) {
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 md:p-6 overflow-y-auto"
+          onClick={onClose}
+        >
+          <button
+            type="button" onClick={onClose}
+            className="absolute top-3 right-3 z-30 p-2 rounded-full bg-background/90 border border-border hover:bg-accent transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="absolute top-3 left-3 z-30 px-3 py-1.5 rounded-full bg-background/90 border border-border flex items-center gap-2 text-xs font-semibold">
+            <span style={{ color: accent }}>{icon}</span>
+            <span style={{ color: accent }}>{title}</span>
+            {subtitle && <span className="text-muted-foreground font-normal hidden md:inline">· {subtitle}</span>}
+          </div>
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ duration: 0.25 }}
+            className="relative w-full max-w-4xl my-8 rounded-xl border border-border bg-background shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="border-b border-border/40 bg-muted/20 px-4 md:px-6 py-3 flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
+                style={{ backgroundColor: accent + "20" }}>
+                {icon}
+              </div>
+              <div className="min-w-0">
+                <p className="text-base font-bold leading-tight" style={{ color: accent }}>{title}</p>
+                {subtitle && <p className="text-xs text-muted-foreground font-mono">{subtitle}</p>}
+              </div>
+            </div>
+            <div className="p-4 md:p-6 max-h-[80vh] overflow-y-auto">{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function InfoCallout({ intent, math, insight, accent }: { intent: string; math: string; insight: string; accent?: string }) {
+  return (
+    <div className="mt-4 space-y-2 text-xs">
+      <div className="rounded-md border border-border/60 bg-muted/30 p-2.5">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Design intent</p>
+        <p className="text-foreground/80 leading-relaxed">{intent}</p>
+      </div>
+      <div className="rounded-md border border-primary/30 bg-primary/5 p-2.5">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Math foundation</p>
+        <p className="font-mono text-[11px] text-primary leading-relaxed">{math}</p>
+      </div>
+      <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">
+        <p className="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-0.5">Implementation insight</p>
+        <p className="text-emerald-700 dark:text-emerald-400 leading-relaxed">{insight}</p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// LHC Pipeline visualization
+// ============================================================
+
+function LHCPipelineViz() {
+  const [activeStage, setActiveStage] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setActiveStage(s => (s + 1) % 6), 1500);
+    return () => clearInterval(id);
+  }, []);
+
+  const stages = [
+    { name: "Detector", rate: "40 TB/s", desc: "100M+ channels at 40 MHz" },
+    { name: "L1 Trigger", rate: "100 GB/s", desc: "FPGA hardware, 3 µs latency" },
+    { name: "HLT", rate: "1 GB/s", desc: "Software farm, ~100 kHz kept" },
+    { name: "Readout", rate: "500 MB/s", desc: "Zero-suppress + compress" },
+    { name: "EOS Storage", rate: "1 PB/yr", desc: "CERN EOS, XRootD protocol" },
+    { name: "WLCG Grid", rate: "250 sites", desc: "Distributed to 60+ countries" },
+  ];
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card p-4">
+      <svg viewBox="0 0 500 200" className="w-full h-auto">
+        {/* Pipeline boxes */}
+        {stages.map((s, i) => {
+          const x = 30 + i * 80;
+          const isActive = i === activeStage;
+          return (
+            <motion.g key={i}
+              animate={{ opacity: isActive ? 1 : 0.4 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Arrow between stages */}
+              {i < stages.length - 1 && (
+                <motion.line x1={x + 55} y1="100" x2={x + 75} y2="100"
+                  stroke={isActive ? "oklch(0.75 0.16 250)" : "oklch(0.55 0.05 250 / 0.3)"}
+                  strokeWidth={isActive ? 2 : 1}
+                  markerEnd="url(#arrow)"
+                />
+              )}
+              {/* Box */}
+              <motion.rect
+                x={x} y="60" width="55" height="50" rx="4"
+                fill={isActive ? "oklch(0.65 0.16 250 / 0.3)" : "oklch(0.55 0.05 250 / 0.1)"}
+                stroke={isActive ? "oklch(0.75 0.16 250)" : "oklch(0.55 0.05 250)"}
+                strokeWidth={isActive ? 1.5 : 0.8}
+                animate={{ scale: isActive ? 1.05 : 1 }}
+                style={{ transformOrigin: `${x + 27.5}px 85px` }}
+              />
+              <text x={x + 27.5} y="82" textAnchor="middle" fontSize="8" fill={isActive ? "oklch(0.85 0.16 250)" : "oklch(0.55 0.05 250)"} fontWeight="bold">
+                {s.name}
+              </text>
+              <text x={x + 27.5} y="92" textAnchor="middle" fontSize="7" fill={isActive ? "oklch(0.75 0.10 250)" : "oklch(0.45 0.05 250)"}>
+                {s.rate}
+              </text>
+              {/* Data flow dots */}
+              {isActive && (
+                <motion.circle cx={x + 27.5} cy="125" r="3" fill="oklch(0.85 0.16 250)"
+                  animate={{ cx: [x + 5, x + 50, x + 5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+            </motion.g>
+          );
+        })}
+        {/* Active stage description */}
+        <text x="250" y="160" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.16 250)" fontWeight="bold">
+          {stages[activeStage].name}: {stages[activeStage].desc}
+        </text>
+        <text x="250" y="175" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.05 250)">
+          Data rate: {stages[activeStage].rate}
+        </text>
+        <defs>
+          <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6" fill="oklch(0.55 0.05 250 / 0.5)" />
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+// ============================================================
+// Data toggle: real binary vs synthetic
+// ============================================================
+
+function DataToggle() {
+  const [mode, setMode] = useState<"binary" | "synthetic">("binary");
+  const [events, setEvents] = useState<number[]>([]);
+
+  const generateBinary = () => {
+    // Simulate CMS raw event bytes (32-byte header + 48 bytes data = 80 bytes/event)
+    // Event header: 8B event_id + 4B bunch_crossing + 8B timestamp + 4B lumi_block + 4B payload_len + 4B reserved
+    // Event data: 12 channels × 4B energy each = 48 bytes
+    const binary: string[] = [];
+    for (let i = 0; i < 8; i++) {
+      const eventId = (0x0001 + i).toString(16).padStart(8, '0');
+      const bx = ((i * 2549) % 4096).toString(16).padStart(8, '0');
+      const ts = (Date.now() + i * 25).toString(16).padStart(16, '0');
+      const lb = (42 + i).toString(16).padStart(8, '0');
+      const len = (48).toString(16).padStart(8, '0');
+      const res = '00000000';
+      // 3 channels with energies (in GeV, ~50 GeV mean)
+      const energies = [];
+      for (let c = 0; c < 3; c++) {
+        const e = Math.floor(50 + (Math.random() - 0.5) * 20);
+        const ch = (c + i * 3).toString(16).padStart(8, '0');
+        energies.push(ch + e.toString(16).padStart(8, '0'));
+      }
+      binary.push(`${eventId} ${bx} ${ts} ${lb} ${len} ${res}`);
+      binary.push(`  ${energies.join(' ')}`);
+    }
+    return binary.join('\n');
+  };
+
+  const generateSynthetic = () => {
+    // Generate synthetic CMS event data as structured numbers
+    const lines: string[] = [];
+    lines.push('event_id | bunch_crossing | timestamp | lumi_block | channels');
+    lines.push('---------|----------------|-----------|-----------|---------');
+    for (let i = 0; i < 6; i++) {
+      const eid = 1 + i;
+      const bx = (i * 2549) % 4096;
+      const ts = new Date(Date.now() + i * 25).toISOString().slice(11, 19);
+      const lb = 42 + i;
+      const channels = Array.from({ length: 3 }, (_, c) => {
+        const e = (50 + (Math.random() - 0.5) * 20).toFixed(1);
+        const ch = c + i * 3;
+        return `ch${ch}=${e}GeV`;
+      }).join(', ');
+      lines.push(`${eid.toString().padStart(8)} | ${bx.toString().padStart(14)} | ${ts} | ${lb.toString().padStart(9)} | ${channels}`);
+    }
+    return lines.join('\n');
+  };
+
+  useEffect(() => {
+    setEvents([]);
+  }, [mode]);
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setMode("binary")}
+          className={`h-10 rounded-md border text-xs font-semibold transition-all ${mode === "binary" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:border-primary hover:bg-accent"}`}
+        >
+          <Binary className="h-3 w-3 inline mr-1.5" /> Real binary data (hex dump)
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("synthetic")}
+          className={`h-10 rounded-md border text-xs font-semibold transition-all ${mode === "synthetic" ? "bg-amber-600 text-white border-amber-600" : "bg-card border-border hover:border-amber-500"}`}
+        >
+          <FileText className="h-3 w-3 inline mr-1.5" /> Synthetic data (structured)
+        </button>
+      </div>
+      <div className="rounded-md border border-border/60 bg-card p-3">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+          {mode === "binary" ? "CMS raw event binary (RD5 format — 80 bytes/event)" : "Synthetic CMS events (Python-generated, structured)"}
+        </p>
+        <pre className="text-[10px] font-mono text-foreground/80 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+          {mode === "binary" ? generateBinary() : generateSynthetic()}
+        </pre>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        {mode === "binary"
+          ? "Real binary: CMS detectors output raw binary via VME/FPGA front-ends. Each event is a 32-byte header (event_id, bunch_crossing, timestamp, lumi_block, payload_length) followed by channel energy readings. Parsed at wire speed by zero-copy Rust code."
+          : "Synthetic: Python generates structured events with channel energies (Gaussian ~50 GeV mean). Used for pipeline testing, Monte Carlo studies, and CI/CD validation — same code path as real data."}
+      </p>
+    </div>
+  );
+}
+
+// ============================================================
+// Code constants
+// ============================================================
+
+const PYTHON_CODE = `import struct
+import numpy as np
+
+# LHC data reduction pipeline (Python/PySpark simulation)
+# CMS detector: 100M+ channels at 40 MHz → 40 TB/s raw
+
+def generate_cms_event(n_channels=1000):
+    """Generate synthetic CMS event data."""
+    channels = np.random.normal(50, 10, n_channels)  # GeV
+    channel_ids = np.arange(n_channels, dtype=np.uint16)
+    timestamps = np.full(n_channels, np.random.randint(0, 2**32), dtype=np.uint32)
+    return np.stack([channels, channel_ids, timestamps], axis=1)
+
+def zero_suppression(event, threshold=10.0):
+    """Zero suppression — keep only channels above threshold."""
+    mask = event[:, 0] > threshold
+    return event[mask]
+
+def compress_event(event):
+    """Simulate compression (zstd level 3 — typical 3x for CMS data)."""
+    raw_size = event.nbytes
+    compressed_size = raw_size // 3
+    return compressed_size, raw_size
+
+# Simulate pipeline
+n_events = 1000
+raw_data = [generate_cms_event() for _ in range(n_events)]
+raw_total = sum(e.nbytes for e in raw_data)
+
+# Stage 1: Zero suppression
+filtered = [zero_suppression(e) for e in raw_data]
+filtered_total = sum(e.nbytes for e in filtered)
+
+# Stage 2: Compression
+compressed = [compress_event(e) for e in filtered]
+compressed_total = sum(c[0] for c in compressed)
+
+print("=== LHC Data Reduction Pipeline ===")
+print(f"Raw data:        {raw_total:>12,} bytes ({raw_total/1e6:.1f} MB)")
+print(f"After zero-supp: {filtered_total:>12,} bytes ({filtered_total/1e6:.1f} MB)  [{filtered_total/raw_total*100:.1f}% of raw]")
+print(f"After compress:  {compressed_total:>12,} bytes ({compressed_total/1e6:.1f} MB)  [{compressed_total/raw_total*100:.1f}% of raw]")
+print(f"Reduction:       {raw_total/compressed_total:.1f}x")
+print()
+reduction = raw_total / compressed_total
+print(f"At LHC scale: 40 TB/s raw -> {40e12 / reduction / 1e9:.1f} GB/s after pipeline")
+print(f"Annual storage: {40e12 / reduction * 3.15e7 / 1e15:.2f} PB/year")`;
+
+const RUST_CODE = `use memmap2::Mmap;
+use std::fs::File;
+use std::error::Error;
+
+// CMS Raw Data Format (RD5) — zero-copy binary parser
+// 40 MHz crossing rate, ~2 MB/event = 80 GB/s per detector half
+// Memory-mapped I/O for zero-copy parsing at wire speed
+
+#[repr(C, packed)]
+struct EventHeader {
+    event_id: u64,        // 8 bytes — unique event identifier
+    bunch_crossing: u32,  // 4 bytes — BX number (0-4095)
+    timestamp: u64,       // 8 bytes — nanosecond timestamp
+    lumi_block: u32,      // 4 bytes — luminosity block number
+    payload_len: u32,     // 4 bytes — detector data length
+    reserved: u32,        // 4 bytes — alignment padding
+    // Total: 32 bytes
+}
+
+struct CMSEvent<'a> {
+    header: &'a EventHeader,
+    detector_data: &'a [u8],  // zero-copy slice into mmap
+}
+
+fn parse_cms_raw(path: &str) -> Result<Vec<CMSEvent>, Box<dyn Error>> {
+    let file = File::open(path)?;
+    let mmap = unsafe { Mmap::map(&file)? };
+    let bytes = &mmap[..];
+
+    let mut events = Vec::new();
+    let mut offset = 0;
+
+    while offset + 32 <= bytes.len() {
+        // Zero-copy: just reference the mmap'd bytes
+        let header: &EventHeader = unsafe {
+            &*(bytes[offset..].as_ptr() as *const EventHeader)
+        };
+
+        let payload_end = offset + 32 + header.payload_len as usize;
+        if payload_end > bytes.len() { break; }
+
+        let detector_data = &bytes[offset + 32..payload_end];
+
+        events.push(CMSEvent { header, detector_data });
+        offset = payload_end;
+    }
+
+    Ok(events)  // All slices point into the mmap — zero copy
+}
+
+// SIMD-optimized energy extraction (8 channels at once)
+#[cfg(target_arch = "x86_64")]
+fn extract_energies_simd(data: &[u8]) -> Vec<f32> {
+    use std::arch::x86_64::*;
+    let floats: Vec<f32> = data.chunks_exact(4)
+        .map(|c| f32::from_le_bytes(c.try_into().unwrap()))
+        .collect();
+    // Process 8 floats at once with AVX2
+    floats.chunks_exact(8)
+        .map(|chunk| {
+            let v = unsafe { _mm256_loadu_ps(chunk.as_ptr()) };
+            let mut result = [0.0f32; 8];
+            unsafe { _mm256_storeu_ps(result.as_mut_ptr(), v); }
+            result
+        })
+        .flatten()
+        .collect()
+}`;
+
+const SCALA_CODE = `import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.streaming.Trigger
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+
+// Real-time CMS event stream processing via Kafka + Spark Structured Streaming
+// HLT outputs ~100 kHz events → aggregate luminosity + trigger rates
+
+val spark = SparkSession.builder()
+  .appName("CMS-LHC-Streaming")
+  .config("spark.sql.streaming.checkpointLocation", "/checkpoint/cms")
+  .getOrCreate()
+
+// Schema for CMS HLT events (JSON-encoded from HLT farm)
+val eventSchema = StructType(Array(
+  StructField("event_id", LongType, false),
+  StructField("bunch_crossing", IntegerType, false),
+  StructField("timestamp", TimestampType, false),
+  StructField("lumi_block", IntegerType, false),
+  StructField("trigger_type", StringType, false),
+  StructField("energy", DoubleType, false),
+  StructField("missing_et", DoubleType, false),
+  StructField("jets", ArrayType(StructType(Array(
+    StructField("pt", DoubleType),
+    StructField("eta", DoubleType),
+    StructField("phi", DoubleType)
+  ))),
+  StructField("met", DoubleType, false)
+))
+
+// Read from CMS Kafka cluster at CERN
+val events = spark.readStream
+  .format("kafka")
+  .option("kafka.bootstrap.servers", "cms-kafka.cern.ch:9092")
+  .option("subscribe", "cms-hlt-events")
+  .option("startingOffsets", "latest")
+  .option("failOnDataLoss", "false")
+  .load()
+
+// Parse + filter (physics trigger selection)
+val parsed = events
+  .select(from_json(col("value").cast("string"), eventSchema)
+    .as("event"))
+  .select("event.*")
+  .filter($"energy" > 50.0 && $"met" > 20.0)  // physics threshold
+
+// Aggregate: luminosity + trigger rates per 10-second window
+val aggregated = parsed
+  .withWatermark("timestamp", "30 seconds")
+  .groupBy(
+    window($"timestamp", "10 seconds"),
+    $"trigger_type"
+  )
+  .agg(
+    count("*").as("event_count"),
+    avg("energy").as("avg_energy"),
+    sum("energy").as("total_energy"),
+    approx_count_distinct("event_id").as("unique_events")
+  )
+
+// Write to CERN EOS storage (Parquet, partitioned by date)
+val query = aggregated.writeStream
+  .outputMode("append")
+  .trigger(Trigger.ProcessingTime("5 seconds"))
+  .format("parquet")
+  .option("path", "/eos/cms/store/streaming/aggregated")
+  .option("checkpointLocation", "/checkpoint/cms-agg")
+  .partitionBy("trigger_type")
+  .start()
+
+query.awaitTermination()`;
+
+const ELIXIR_CODE = `defmodule CMS.EventPipeline do
+  @moduledoc """
+  Real-time CMS event processing using GenStage + Flow.
+  
+  100 kHz HLT event rate with backpressure handling via GenStage demand.
+  Pipeline stages: Readout → ZeroSuppress → Compress → Store
+  
+  Each stage runs concurrently with Flow.map/2 (1 stage = 1 OTP process).
+  Backpressure is automatic: downstream demands upstream only when ready.
+  """
+  
+  use GenStage
+  
+  def start_link(opts) do
+    GenStage.start_link(__MODULE__, :ok, opts)
+  end
+  
+  # --- Producer: reads from CMS readout system ---
+  def init(:ok) do
+    {:producer, %{demand: 0, queue: :queue.new()}}
+  end
+  
+  def handle_demand(demand, state) when demand > 0 do
+    # Fetch events from CMS readout (FEE — Front-End Electronics)
+    events = CMS.Readout.fetch_events(demand)
+    {:noreply, events, %{state | demand: state.demand - length(events)}}
+  end
+  
+  # --- ProducerConsumer: zero-suppression filter ---
+  def handle_events(events, _from, _state) do
+    # Keep only channels above energy threshold (10 GeV)
+    filtered = Enum.filter(events, fn e ->
+      e.energy > 10.0  # GeV threshold
+    end)
+    # ~80% of channels are noise — big reduction
+    {:noreply, filtered}
+  end
+  
+  # --- Consumer: writes compressed events to EOS storage ---
+  def handle_events(events, _from, _state) do
+    # Batch write to CERN EOS (XRootD protocol)
+    :ok = CMS.EOS.write_batch(events, "/eos/cms/store/raw")
+    {:noreply, [], :ok}
+  end
+end
+
+# Build the pipeline with backpressure
+# Producer → ProducerConsumer → Consumer (demand-driven)
+{:ok, readout}  = CMS.EventPipeline.start_link(name: :readout)
+{:ok, filter}   = CMS.EventPipeline.start_link(name: :filter)
+{:ok, compress} = CMS.EventPipeline.start_link(name: :compress)
+{:ok, storage}  = CMS.EventPipeline.start_link(name: :storage)
+
+# Wire the pipeline — demand flows upstream (right to left)
+GenStage.sync_subscribe(filter,   to: readout,  max_demand: 1000)
+GenStage.sync_subscribe(compress, to: filter,   max_demand: 500)
+GenStage.sync_subscribe(storage,  to: compress,  max_demand: 100)
+
+# Backpressure: if storage slows down (EOS write latency),
+# demand drops → compress slows → filter slows → readout slows.
+# The pipeline NEVER overflows — GenStage handles it automatically.`;
+
+
+// Python equivalents for Rust/Scala/Elixir cards (Pyodide-runnable)
+const RUST_PYTHON_EQUIV = `import struct
+import numpy as np
+
+# Python equivalent of the Rust zero-copy binary parser
+# Parses CMS RD5 format binary data (simulated)
+
+def generate_cms_binary(n_events=10):
+    """Generate synthetic CMS RD5 binary data."""
+    data = b''
+    for i in range(n_events):
+        event_id = i + 1
+        bx = (i * 2549) % 4096
+        timestamp = 1000000 + i * 25
+        lumi_block = 42 + i
+        n_channels = 3
+        payload_len = n_channels * 8
+        header = struct.pack('<QIqIII', event_id, bx, timestamp, lumi_block, payload_len, 0)
+        payload = b''
+        for c in range(n_channels):
+            channel_id = c + i * 3
+            energy = 50.0 + (np.random.random() - 0.5) * 20
+            payload += struct.pack('<If', channel_id, energy)
+        data += header + payload
+    return data
+
+def parse_cms_binary(data):
+    """Parse CMS RD5 binary data (Python equiv of Rust zero-copy)."""
+    events = []
+    offset = 0
+    while offset + 32 <= len(data):
+        event_id, bx, timestamp, lumi_block, payload_len, _ = struct.unpack_from('<QIqIII', data, offset)
+        n_channels = payload_len // 8
+        energies = []
+        for c in range(n_channels):
+            ch_offset = offset + 32 + c * 8
+            channel_id, energy = struct.unpack_from('<If', data, ch_offset)
+            energies.append((channel_id, round(energy, 1)))
+        events.append({
+            'event_id': event_id,
+            'bx': bx,
+            'lumi_block': lumi_block,
+            'energies': energies,
+        })
+        offset += 32 + payload_len
+    return events
+
+binary_data = generate_cms_binary(10)
+print(f"Generated {len(binary_data)} bytes of CMS RD5 binary data")
+print(f"({len(binary_data) // 80} events x 80 bytes each)")
+print()
+
+events = parse_cms_binary(binary_data)
+print(f"Parsed {len(events)} events:")
+for e in events:
+    energy_strs = [f"ch{ch}={en:.1f}GeV" for ch, en in e['energies']]
+    print(f"  Event #{e['event_id']} | BX={e['bx']} | Lumi={e['lumi_block']} | {', '.join(energy_strs)}")
+print()
+print("Rust advantage: zero-copy (mmap), SIMD (8 floats/cycle), ~80 GB/s/core")
+print("Python: struct.unpack + numpy, ~100 MB/s (1000x slower but same logic)")`;
+
+const SCALA_PYTHON_EQUIV = `import numpy as np
+np.random.seed(42)
+
+# Python equivalent of the Scala Spark Structured Streaming code
+# Simulates: CMS HLT events -> filter -> aggregate -> EOS storage
+# In production: runs on Apache Spark cluster at CERN
+
+print("=== PySpark Structured Streaming (CMS HLT events) ===")
+print()
+print("Production code (runs on Spark cluster at CERN):")
+print("  events = spark.readStream.format('kafka') \")
+print("    .option('subscribe', 'cms-hlt-events').load()")
+print("  parsed = events.select(from_json(...)).filter(...)")
+print("  agg = parsed.withWatermark('timestamp', '30s') \")
+print("    .groupBy(window('timestamp', '10s')).agg(count('*'), avg('energy'))")
+print("  query = agg.writeStream.format('parquet').trigger('5s').start()")
+print()
+
+# Simulate the streaming aggregation in browser
+n_events = 1000
+energies = np.random.exponential(50, n_events)
+met_values = np.random.exponential(20, n_events)
+trigger_types = np.random.choice(['single_muon', 'double_muon', 'jet', 'met'], n_events)
+
+# Filter: energy > 50 GeV, MET > 20 GeV
+mask = (energies > 50) & (met_values > 20)
+selected = mask.sum()
+
+print(f"=== Simulated stream (1000 events, ~10 ms of HLT data) ===")
+print(f"  Input rate: 100 kHz (CMS HLT output)")
+print(f"  Total events in window: {n_events}")
+print(f"  After filter (E>50 GeV, MET>20 GeV): {selected} events ({selected/n_events*100:.1f}%)")
+print(f"  Average energy: {energies[mask].mean():.1f} GeV")
+print(f"  Total energy in window: {energies[mask].sum():.0f} GeV")
+print()
+
+# Aggregate by trigger type (like groupBy in Spark)
+for t in ['single_muon', 'double_muon', 'jet', 'met']:
+    t_mask = mask & (trigger_types == t)
+    n = t_mask.sum()
+    if n > 0:
+        avg_e = energies[t_mask].mean()
+        print(f"  {t:>15}: {n:>4} events, avg E={avg_e:.1f} GeV")
+    else:
+        print(f"  {t:>15}: {n:>4} events")
+print()
+print("Spark advantage: distributed across cluster, fault-tolerant, checkpointed")
+print("Python: single-node, but same aggregation logic (groupBy + agg)")`;
+
+const ELIXIR_PYTHON_EQUIV = `import queue
+import threading
+import time
+import random
+
+# Python equivalent of the Elixir GenStage backpressure pipeline
+# Pipeline: Readout -> ZeroSuppress -> Compress -> Store
+# Elixir: automatic backpressure via demand signaling
+# Python: manual backpressure via bounded Queue
+
+class PipelineStage(threading.Thread):
+    def __init__(self, name, input_q, output_q, fn):
+        super().__init__(daemon=True)
+        self.name = name
+        self.input_q = input_q
+        self.output_q = output_q
+        self.fn = fn
+        self.processed = 0
+    
+    def run(self):
+        while True:
+            item = self.input_q.get()
+            if item is None: break
+            result = self.fn(item)
+            if result is not None:
+                self.output_q.put(result)
+            self.processed += 1
+
+# Bounded queues = backpressure (like GenStage max_demand)
+q1 = queue.Queue(maxsize=100)
+q2 = queue.Queue(maxsize=50)
+q3 = queue.Queue(maxsize=20)
+
+def readout(n):
+    return {'id': n, 'channels': [random.gauss(50, 10) for _ in range(10)]}
+
+def zero_suppress(event):
+    event['channels'] = [c for c in event['channels'] if c > 10.0]
+    return event
+
+def compress(event):
+    event['compressed'] = True
+    return event
+
+def store(event):
+    return None
+
+# Start stages
+s2 = PipelineStage("ZeroSuppress", q1, q2, zero_suppress)
+s3 = PipelineStage("Compress", q2, q3, compress)
+s4 = PipelineStage("Storage", q3, None, store)
+s2.start(); s3.start(); s4.start()
+
+print("=== GenStage-equivalent pipeline (Python) ===")
+print("Pipeline: Readout -> ZeroSuppress(max=100) -> Compress(max=50) -> Storage(max=20)")
+print()
+
+n = 500
+start = time.time()
+for i in range(n):
+    q1.put(readout(i))
+
+q1.put(None)
+s2.join(timeout=5)
+q2.put(None)
+s3.join(timeout=5)
+q3.put(None)
+s4.join(timeout=5)
+elapsed = time.time() - start
+
+print(f"Events processed: {n}")
+print(f"Zero-suppress: {s2.processed} | Compress: {s3.processed} | Storage: {s4.processed}")
+print(f"Time: {elapsed:.2f}s ({n/elapsed:.0f} events/sec)")
+print()
+print("Backpressure: bounded queues (maxsize) prevent overflow.")
+print("If storage slows -> q3 fills -> compress blocks -> q2 fills ->")
+print("zero-suppress blocks -> q1 fills -> readout blocks.")
+print()
+print("Elixir advantage: backpressure is AUTOMATIC (built into GenStage)")
+print("Python: must manually use bounded queues + blocking put/get")`;
+
+// ============================================================
+// 4 code cards
+// ============================================================
+
+interface CodeCard {
+  id: string;
+  step: string;
+  title: string;
+  subtitle: string;
+  accent: string;
+  icon: ReactNode;
+  language: string;
+  code: string;
+  runnable: boolean;
+  pythonCode?: string;
+  mathExpr: string;
+  intent: string;
+  insight: string;
+}
+
+// ETL (Data Warehouse) — classic Extract -> Transform -> Load pipeline
+const ETL_CODE = `from collections import defaultdict
+
+print("=== ETL Pipeline (Data Warehouse) ===")
+print()
+
+sources = {
+    "Shopify": [
+        {"order_id": 1001, "email": "alice@example.com", "amount": 125.50, "currency": "USD"},
+        {"order_id": 1002, "email": "bob@example.com", "amount": 89.99, "currency": "USD"},
+        {"order_id": 1003, "email": "alice@example.com", "amount": 250.00, "currency": "EUR"},
+        {"order_id": 1004, "email": "carol@example.com", "amount": 45.00, "currency": "GBP"},
+    ],
+    "Stripe": [
+        {"payment_id": "PAY001", "order_id": 1001, "amount": 125.50, "status": "paid", "fee": 3.56},
+        {"payment_id": "PAY002", "order_id": 1002, "amount": 89.99, "status": "paid", "fee": 2.55},
+        {"payment_id": "PAY003", "order_id": 1003, "amount": 250.00, "status": "paid", "fee": 7.10},
+    ],
+}
+
+print("=== EXTRACT ===")
+total_rows = sum(len(rows) for rows in sources.values())
+for source, rows in sources.items():
+    print("  " + source + ": " + str(len(rows)) + " rows extracted")
+print("  Total: " + str(total_rows) + " rows from " + str(len(sources)) + " sources")
+print()
+
+print("=== TRANSFORM ===")
+fx_rate = {"USD": 1.0, "EUR": 1.09, "GBP": 1.27}
+orders = sources["Shopify"]
+for o in orders:
+    o["amount_usd"] = round(o["amount"] * fx_rate.get(o["currency"], 1.0), 2)
+    print("  Normalize: order " + str(o["order_id"]) + " " + str(o["amount"]) + " " + o["currency"] + " -> $ " + str(o["amount_usd"]) + " USD")
+
+payments = sources["Stripe"]
+enriched = []
+for o in orders:
+    payment = next((p for p in payments if p["order_id"] == o["order_id"]), None)
+    if payment:
+        enriched.append({
+            "order_id": o["order_id"],
+            "email": o["email"],
+            "amount_usd": o["amount_usd"],
+            "payment_status": payment["status"],
+            "fee": payment["fee"],
+            "net_amount": round(o["amount_usd"] - payment["fee"], 2),
+        })
+print("  Join: " + str(len(enriched)) + "/" + str(len(orders)) + " orders matched with payments")
+
+customer_agg = defaultdict(lambda: {"orders": 0, "revenue": 0.0, "fees": 0.0})
+for e in enriched:
+    customer_agg[e["email"]]["orders"] += 1
+    customer_agg[e["email"]]["revenue"] += e["net_amount"]
+    customer_agg[e["email"]]["fees"] += e["fee"]
+
+print("  Aggregate: " + str(len(customer_agg)) + " unique customers")
+for email, agg in customer_agg.items():
+    print("    " + email + ": " + str(agg["orders"]) + " orders, $ " + str(round(agg["revenue"], 2)) + " net, $ " + str(round(agg["fees"], 2)) + " fees")
+
+print()
+print("=== DATA QUALITY CHECKS ===")
+checks = [
+    ("No null emails", all(e["email"] for e in enriched)),
+    ("All amounts positive", all(e["amount_usd"] > 0 for e in enriched)),
+    ("Payment status is paid", all(e["payment_status"] == "paid" for e in enriched)),
+    ("Net revenue > 0", all(e["net_amount"] > 0 for e in enriched)),
+    ("No duplicate order IDs", len(set(e["order_id"] for e in enriched)) == len(enriched)),
+]
+all_pass = True
+for check_name, passed in checks:
+    status = "PASS" if passed else "FAIL"
+    if not passed: all_pass = False
+    print("  [" + status + "] " + check_name)
+print("  Overall: " + ("ALL PASS" if all_pass else "SOME FAILED"))
+
+print()
+print("=== LOAD ===")
+print("  Target: Snowflake (data_warehouse.gold.customer_aggregations)")
+print("  Rows loaded: " + str(len(customer_agg)))
+print("  Load method: MERGE (upsert on email)")
+print()
+print("ETL complete: " + str(total_rows) + " source rows -> " + str(len(enriched)) + " enriched -> " + str(len(customer_agg)) + " aggregated -> warehouse")
+print()
+print("=== ETL vs ELT ===")
+print("  ETL (this card): Transform BEFORE load -> warehouse-ready data")
+print("  ELT (Fivetran):  Load RAW first -> transform IN the warehouse")
+print("  ELT advantage:   warehouse compute is cheaper than ETL server")
+print("  ETL advantage:   warehouse stays clean (no raw data)")
+print("  LHC pipeline:     ETL pattern (trigger+zero-suppress = transform, EOS = load)")
+print("  Same pattern, different domain, different scale")`;
+
+// ELT (Modern Lakehouse) — Extract -> Load RAW -> Transform in warehouse
+const ELT_CODE = `print("=== ELT Approach (Modern Lakehouse Architecture) ===")
+print()
+print("Pattern: Extract -> Load RAW -> Transform IN warehouse")
+print("vs ETL:  Extract -> Transform -> Load (transform BEFORE load)")
+print()
+print("=== Step 1: EXTRACT + LOAD raw binary to object storage ===")
+print("# DAQ captures raw binary (zero preprocessing)")
+print("# Stream directly to S3/GCS/Ceph as immutable binary blobs")
+print()
+raw_blobs = [
+    {"key": "s3://cms-daq/2024/run3/bucket_0001.bin", "size_bytes": 1048576, "events": 12500},
+    {"key": "s3://cms-daq/2024/run3/bucket_0002.bin", "size_bytes": 1048576, "events": 12480},
+    {"key": "s3://cms-daq/2024/run3/bucket_0003.bin", "size_bytes": 1048576, "events": 12510},
+]
+total_bytes = sum(b["size_bytes"] for b in raw_blobs)
+total_events = sum(b["events"] for b in raw_blobs)
+print("Loaded " + str(len(raw_blobs)) + " binary blobs to S3:")
+for b in raw_blobs:
+    print("  " + b["key"] + " (" + str(b["size_bytes"]) + " bytes, " + str(b["events"]) + " events)")
+print("  Total: " + str(total_bytes) + " bytes (" + str(round(total_bytes / 1048576, 1)) + " MB), " + str(total_events) + " events")
+print("  Zero preprocessing - raw binary stored as-is (immutable)")
+print()
+print("=== Step 2: Register external table in Snowflake ===")
+print("-- Snowflake reads S3 directly via external stage (zero-copy)")
+print("CREATE OR REPLACE STAGE cms_daq_stage")
+print("  URL = 's3://cms-daq/2024/run3/'")
+print("  STORAGE_INTEGRATION = s3_read_integration;")
+print()
+print("CREATE OR REPLACE EXTERNAL TABLE cms_raw_events (")
+print("  event_id VARCHAR AS (value:event_id::VARCHAR),")
+print("  bunch_crossing INT AS (value:bx::INT),")
+print("  timestamp TIMESTAMP AS (value:ts::TIMESTAMP),")
+print("  energy FLOAT AS (value:energy::FLOAT),")
+print("  met FLOAT AS (value:met::FLOAT)")
+print(")")
+print("  WITH LOCATION = @cms_daq_stage")
+print("  FILE_FORMAT = (TYPE = PARQUET)")
+print("  AUTO_REFRESH = TRUE;")
+print()
+print("-- External table: zero-copy, no data duplication")
+print("-- Snowflake reads S3 files on every query")
+print()
+print("=== Step 3: Transform IN the warehouse (SQL UDFs) ===")
+print("-- Create a SQL UDF to parse raw binary fields")
+print("CREATE OR REPLACE FUNCTION parse_cms_event(raw_bytes BINARY)")
+print("  RETURNS TABLE (event_id BIGINT, bx INT, energy FLOAT)")
+print("  LANGUAGE PYTHON RUNTIME_VERSION = '3.8'")
+print("  HANDLER = 'parse_event'")
+print("  AS $$")
+print("import struct")
+print("def parse_event(raw_bytes):")
+print("    events = []")
+print("    offset = 0")
+print("    while offset + 32 <= len(raw_bytes):")
+print("        eid, bx, ts, lb, plen, _ = struct.unpack_from(raw_bytes, offset)")
+print("        energy = struct.unpack_from(raw_bytes, offset + 32)[0]")
+print("        events.append((eid, bx, energy))")
+print("        offset += 32 + plen")
+print("    return events")
+print("$$;")
+print()
+print("-- Query external table + UDF (in-warehouse transform)")
+print("SELECT event_id, bunch_crossing, energy, met,")
+print("  CASE WHEN energy > 50 AND met > 20 THEN 'physics' ELSE 'noise' END AS class")
+print("FROM cms_raw_events")
+print("WHERE energy > 50 AND met > 20")
+print("LIMIT 100;")
+print()
+print("=== Step 4: Populate production analytics table ===")
+print("CREATE OR REPLACE TABLE gold.physics_events AS")
+print("SELECT event_id, bunch_crossing, timestamp, energy, met,")
+print("  energy + met AS total_energy,")
+print("  DATE_TRUNC('hour', timestamp) AS hour_bucket")
+print("FROM cms_raw_events")
+print("WHERE energy > 50 AND met > 20;")
+print()
+import random
+random.seed(42)
+selected = sum(1 for _ in range(total_events) if random.random() > 0.95)
+print("=== Results ===")
+print("  Raw blobs in S3: " + str(len(raw_blobs)) + " files, " + str(total_events) + " events")
+print("  External table: zero-copy read from S3")
+print("  After SQL transform: " + str(selected) + " events pass selection")
+print("  Reduction: " + str(round(total_events / max(selected, 1), 1)) + "x")
+print()
+print("=== ELT vs ETL ===")
+print("  ELT: Extract -> Load RAW to S3 -> Transform IN Snowflake")
+print("  ETL: Extract -> Transform on ETL server -> Load to warehouse")
+print("  ELT advantage: raw data preserved, warehouse compute elastic")
+print("  ELT advantage: external tables = no data duplication")
+print("  ELT advantage: SQL UDFs run distributed across warehouse nodes")
+print("  ELT advantage: replayable (re-process raw data anytime)")
+print("  Modern pattern: ELT + materialized views for hot tables")`;
+
+const CODE_CARDS: CodeCard[] = [
+  {
+    id: "python",
+    step: "1",
+    title: "Python — LHC data reduction pipeline",
+    subtitle: "PySpark / Dask — zero-suppress + compress",
+    accent: "oklch(0.55 0.16 30)",
+    icon: <Activity className="h-4 w-4" />,
+    language: "python",
+    code: PYTHON_CODE,
+    runnable: true,
+    mathExpr: "Raw 40 TB/s → zero-suppress (80% reduction) → compress (3x) → ~3.3 GB/s → 1 PB/yr",
+    intent: "Simulate the full CMS data reduction pipeline: raw 1000-channel events → zero-suppression → zstd compression. Run in browser via Pyodide to see the actual data reduction ratios.",
+    insight: "Python/PySpark is the analysis language for LHC physicists — used for skim production, histogram filling, and ML inference. The CMS Open Data Portal ships ~4 PB of real collision data in this format. The same pipeline runs at CERN's Tier-0 (T0_CH_CERN) computing center.",
+  },
+  {
+    id: "rust",
+    step: "2",
+    title: "Rust — zero-copy binary parser",
+    subtitle: "memmap2 + SIMD — wire-speed parsing",
+    accent: "oklch(0.55 0.16 250)",
+    icon: <Cpu className="h-4 w-4" />,
+    language: "rust",
+    code: RUST_CODE,
+    runnable: false,
+    pythonCode: RUST_PYTHON_EQUIV,
+    mathExpr: "Throughput: ~80 GB/s per core (zero-copy mmap + AVX2 SIMD) · 32B header + N×4B channels per event",
+    intent: "Parse CMS raw binary event format (RD5) at wire speed using memory-mapped I/O (zero-copy) and AVX2 SIMD for energy extraction. No allocation — all slices point into the mmap.",
+    insight: "CERN's new DAQ (Data Acquisition) system for HL-LHC (2029+) is evaluating Rust for the high-throughput readout path. Current C++ code achieves ~40 GB/s per node; Rust with mmap + SIMD matches this with safer memory semantics. The zero-copy pattern is identical to what Apache Arrow uses for columnar IPC.",
+  },
+  {
+    id: "scala",
+    step: "3",
+    title: "Scala — Spark Structured Streaming",
+    subtitle: "Kafka + Spark — real-time HLT aggregation",
+    accent: "oklch(0.55 0.16 165)",
+    icon: <Database className="h-4 w-4" />,
+    language: "scala",
+    code: SCALA_CODE,
+    runnable: false,
+    pythonCode: SCALA_PYTHON_EQUIV,
+    mathExpr: "Throughput: 100 kHz events → 10s windows → 1 row/window · watermark 30s · checkpoint to EOS",
+    intent: "Process real-time CMS HLT events via Kafka + Spark Structured Streaming. Aggregate luminosity + trigger rates in 10-second windows with watermark-based late-event handling.",
+    insight: "CMS and ATLAS use Apache Spark (Scala) for their physics analysis workflows (Spark-root). The Structured Streaming pipeline shown here is the same pattern used for online monitoring at the CMS control room — real-time dashboards showing trigger rates, luminosity, and data quality.",
+  },
+  {
+    id: "elixir",
+    step: "4",
+    title: "Elixir — GenStage event pipeline",
+    subtitle: "Backpressure + Flow — 100 kHz event processing",
+    accent: "oklch(0.55 0.16 320)",
+    icon: <Atom className="h-4 w-4" />,
+    language: "elixir",
+    code: ELIXIR_CODE,
+    runnable: false,
+    pythonCode: ELIXIR_PYTHON_EQUIV,
+    mathExpr: "max_demand: 1000→500→100 (stages scale down) · backpressure automatic · 1 OTP process per stage",
+    intent: "Build a concurrent event-processing pipeline with GenStage + Flow. Each stage (readout → filter → compress → store) runs as an OTP process with automatic backpressure — the pipeline never overflows.",
+    insight: "Elixir/Erlang's GenStage is the only framework that handles backpressure natively (via demand signaling). CERN's DAQ team evaluated Erlang for DAQ control plane monitoring (not data path — that stays in C++) because of its fault tolerance and hot code-swapping. The pattern shown here mirrors how CMS DAQ handles rate fluctuations during beam intensity ramps.",
+  },
+  {
+    id: "etl",
+    step: "5",
+    title: "ETL (Data Warehouse) — Extract → Transform → Load",
+    subtitle: "Classic ETL: source APIs → normalize/join/validate → warehouse",
+    accent: "oklch(0.55 0.16 60)",
+    icon: <Database className="h-4 w-4" />,
+    language: "python",
+    code: ETL_CODE,
+    runnable: true,
+    mathExpr: "Extract (source APIs) → Transform (normalize, join, aggregate, validate) → Load (warehouse MERGE)",
+    intent: "Classic ETL pipeline: extract from Shopify + Stripe, transform (currency normalization, referential join, customer aggregation, Great Expectations validation), load to Snowflake warehouse. This is the Fivetran pattern at business scale — same skeleton as the LHC pipeline but business domain.",
+    insight: "ETL vs ELT: ETL transforms BEFORE loading (warehouse era — 2000s). ELT loads FIRST then transforms in the warehouse (modern — Snowflake/BigQuery). The LHC pipeline IS ETL (trigger+zero-suppress = transform, EOS = load). Same pattern, different domain (business vs physics), different scale (3.1B rows/month vs 40 TB/s).",
+  },
+  {
+    id: "elt-lakehouse",
+    step: "6",
+    title: "ELT (Modern Lakehouse) — Extract → Load RAW → Transform IN warehouse",
+    subtitle: "S3/GCS external tables → Snowflake SQL UDFs → analytics",
+    accent: "oklch(0.55 0.16 200)",
+    icon: <Database className="h-4 w-4" />,
+    language: "python",
+    code: ELT_CODE,
+    runnable: true,
+    mathExpr: "Extract (DAQ) → Load (S3 immutable blobs) → Transform (warehouse SQL UDFs) → Materialized views",
+    intent: "Modern ELT pattern: load raw binary directly to S3 (zero preprocessing), register as Snowflake external table (zero-copy, no data moved), transform via SQL UDFs running distributed across warehouse nodes. Same LHC data, different architecture than ETL.",
+    insight: "ELT vs ETL: ELT loads RAW first, transforms IN the warehouse (Snowflake/BigQuery/Delta Lake). ETL transforms BEFORE loading. The LHC pipeline can be EITHER — current CMS is ETL (trigger+zero-suppress before storage), but HL-LHC is moving toward ELT (raw to S3 + in-warehouse transforms). Same physics data, different compute architecture.",
+  },
+];
+
+// ============================================================
+// Step 4: L1 Trigger simulator — interactive trigger cuts
+// ============================================================
+function TriggerSimulator() {
+  const [energyThresh, setEnergyThresh] = useState(30);  // GeV
+  const [metThresh, setMetThresh] = useState(20);          // GeV
+  const [jetCount, setJetCount] = useState(2);
+  const [streaming, setStreaming] = useState(false);
+  const [liveEvents, setLiveEvents] = useState<{ id: number; nJets: number; leadingPt: number; met: number }[]>([]);
+  const [totalProcessed, setTotalProcessed] = useState(0);
+  const [totalPassed, setTotalPassed] = useState(0);
+  const eventIdRef = useRef(0);
+
+  // Real-time WebSocket-like feed at 40 Hz (25ms = simulated CMS crossing rate)
+  useEffect(() => {
+    if (!streaming) return;
+    const id = setInterval(() => {
+      // Generate 1 new event per tick (simulating 40 Hz CMS beam crossing)
+      const ev = {
+        id: eventIdRef.current++,
+        nJets: Math.floor(Math.random() * 8) + 1,
+        leadingPt: 20 + Math.random() * 80,
+        met: Math.random() * 60,
+      };
+      setLiveEvents(prev => {
+        const next = [...prev, ev];
+        return next.length > 200 ? next.slice(-200) : next; // keep last 200
+      });
+      setTotalProcessed(prev => prev + 1);
+      if (ev.nJets >= jetCount && ev.leadingPt > energyThresh && ev.met > metThresh) {
+        setTotalPassed(prev => prev + 1);
+      }
+    }, 25); // 40 Hz
+    return () => clearInterval(id);
+  }, [streaming, jetCount, energyThresh, metThresh]);
+
+  // Seed initial 200 events when not streaming
+  const events = streaming ? liveEvents : (() => {
+    const evts = [];
+    for (let i = 0; i < 200; i++) {
+      evts.push({
+        id: i,
+        nJets: Math.floor(Math.random() * 8) + 1,
+        leadingPt: 20 + Math.random() * 80,
+        met: Math.random() * 60,
+      });
+    }
+    return evts;
+  })();
+
+  // Apply trigger cuts
+  const passed = events.filter(e =>
+    e.nJets >= jetCount &&
+    e.leadingPt > energyThresh &&
+    e.met > metThresh
+  );
+  const passRate = streaming
+    ? (totalProcessed > 0 ? (totalPassed / totalProcessed) * 100 : 0)
+    : (passed.length / events.length) * 100;
+  const outputRate = (passRate / 100) * 40000;
+
+  const toggleStream = () => {
+    if (!streaming) {
+      setLiveEvents([]);
+      setTotalProcessed(0);
+      setTotalPassed(0);
+      eventIdRef.current = 0;
+    }
+    setStreaming(!streaming);
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-3">
+        <Button size="sm" variant={streaming ? "destructive" : "default"} onClick={toggleStream} className="w-full gap-1.5">
+          {streaming ? <><Activity className="h-3.5 w-3.5 animate-pulse" /> Stop live stream (40 Hz)</> : <><Play className="h-3.5 w-3.5" /> Start live stream (40 Hz)</>}
+        </Button>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Leading jet pT threshold</span>
+            <span className="font-mono font-semibold text-primary">{energyThresh} GeV</span>
+          </div>
+          <input type="range" min={10} max={100} step={1} value={energyThresh}
+            onChange={(e) => setEnergyThresh(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Missing ET threshold</span>
+            <span className="font-mono font-semibold text-primary">{metThresh} GeV</span>
+          </div>
+          <input type="range" min={0} max={60} step={1} value={metThresh}
+            onChange={(e) => setMetThresh(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Min jet count</span>
+            <span className="font-mono font-semibold text-primary">{jetCount} jets</span>
+          </div>
+          <input type="range" min={1} max={6} step={1} value={jetCount}
+            onChange={(e) => setJetCount(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+
+        <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-center">
+          <p className="font-mono text-sm text-primary">40 MHz &times; {passRate.toFixed(1)}% = {outputRate.toFixed(0)} Hz output</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {streaming
+              ? `${totalPassed}/${totalProcessed} events passed trigger (live)`
+              : `${passed.length}/${events.length} events pass trigger cuts`}
+          </p>
+          {streaming && (
+            <p className="text-[10px] text-emerald-600 mt-1">● LIVE — streaming at 40 Hz (simulated CMS beam crossing rate)</p>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border/60 bg-card p-3">
+        <svg viewBox="0 0 280 280" className="w-full h-auto">
+          {events.slice(-200).map((e, i) => {
+            const col = i % 20;
+            const row = Math.floor(i / 20);
+            const x = 20 + col * 12;
+            const y = 20 + row * 12;
+            const isPassed = e.nJets >= jetCount && e.leadingPt > energyThresh && e.met > metThresh;
+            return (
+              <motion.circle key={e.id} cx={x} cy={y} r="3"
+                fill={isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)"}
+                animate={{ fill: isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)" }}
+                transition={{ duration: 0.2 }}
+              />
+            );
+          })}
+          <text x="140" y="270" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.05 250)">
+            {streaming ? "live event stream (40 Hz)" : "static events — click Start to stream"}
+          </text>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Step 5: Binary parser demo — parse CMS RD5 hex in browser (JS equivalent of WASM)
+// ============================================================
+function BinaryParserDemo() {
+  const [parsed, setParsed] = useState<{ eventId: number; bx: number; ts: number; lb: number; energies: { ch: number; e: number }[] }[] | null>(null);
+  const [parseStats, setParseStats] = useState<{ bytesParsed: number; eventsParsed: number; parseTimeMs: number } | null>(null);
+
+  const parseHex = () => {
+    // Generate raw CMS RD5 binary bytes (simulating what a DAQ system outputs)
+    // Then parse them using DataView (JS equivalent of Rust struct.unpack + mmap)
+    const startTime = performance.now();
+
+    // Generate 10 events worth of raw binary data
+    const nEvents = 10;
+    const headerSize = 32; // 8B event_id + 4B BX + 8B ts + 4B lumi + 4B payload_len + 4B reserved
+    const nChannels = 3;
+    const channelSize = 8; // 4B channel_id + 4B energy (float32)
+    const eventSize = headerSize + nChannels * channelSize;
+    const totalBytes = nEvents * eventSize;
+
+    // Allocate raw buffer (like Rust's mmap)
+    const buffer = new ArrayBuffer(totalBytes);
+    const dv = new DataView(buffer);
+
+    // Write raw binary (simulating DAQ output)
+    let offset = 0;
+    for (let i = 0; i < nEvents; i++) {
+      // Header
+      dv.setBigUint64(offset, BigInt(i + 1), true); offset += 8; // event_id
+      dv.setUint32(offset, (i * 2549) % 4096, true); offset += 4; // BX
+      dv.setBigInt64(offset, BigInt(Date.now() + i * 25), true); offset += 8; // timestamp
+      dv.setUint32(offset, 42 + i, true); offset += 4; // lumi_block
+      dv.setUint32(offset, nChannels * channelSize, true); offset += 4; // payload_len
+      dv.setUint32(offset, 0, true); offset += 4; // reserved
+      // Channels
+      for (let c = 0; c < nChannels; c++) {
+        dv.setUint32(offset, c + i * 3, true); offset += 4; // channel_id
+        dv.setFloat32(offset, 50 + (Math.random() - 0.5) * 20, true); offset += 4; // energy
+      }
+    }
+
+    // Parse the raw binary (zero-copy: all reads from the same buffer)
+    const results: { eventId: number; bx: number; ts: number; lb: number; energies: { ch: number; e: number }[] }[] = [];
+    let parseOffset = 0;
+    while (parseOffset + headerSize <= buffer.byteLength) {
+      const eventId = Number(dv.getBigUint64(parseOffset, true)); parseOffset += 8;
+      const bx = dv.getUint32(parseOffset, true); parseOffset += 4;
+      const ts = Number(dv.getBigInt64(parseOffset, true)); parseOffset += 8;
+      const lb = dv.getUint32(parseOffset, true); parseOffset += 4;
+      const payloadLen = dv.getUint32(parseOffset, true); parseOffset += 4;
+      parseOffset += 4; // skip reserved
+      const energies: { ch: number; e: number }[] = [];
+      for (let c = 0; c < payloadLen / channelSize; c++) {
+        const ch = dv.getUint32(parseOffset, true); parseOffset += 4;
+        const e = dv.getFloat32(parseOffset, true); parseOffset += 4;
+        energies.push({ ch, e: Math.round(e * 10) / 10 });
+      }
+      results.push({ eventId, bx, ts, lb, energies });
+    }
+
+    const parseTime = performance.now() - startTime;
+    setParsed(results);
+    setParseStats({ bytesParsed: totalBytes, eventsParsed: results.length, parseTimeMs: Math.round(parseTime * 1000) / 1000 });
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <Button size="sm" variant="default" onClick={parseHex} className="gap-1.5">
+          <Binary className="h-3.5 w-3.5" /> Parse CMS RD5 binary (DataView)
+        </Button>
+        {parsed && (
+          <Button size="sm" variant="outline" onClick={() => { setParsed(null); setParseStats(null); }} className="gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" /> Clear
+          </Button>
+        )}
+      </div>
+
+      {!parsed && (
+        <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground">
+          Click &ldquo;Parse CMS RD5 binary&rdquo; to parse raw CMS event data using JavaScript <code className="font-mono">DataView</code>
+          (the JS equivalent of Rust&apos;s <code className="font-mono">memmap2 + struct.unpack</code>).
+          Allocates a raw <code className="font-mono">ArrayBuffer</code>, writes binary event headers + channel energies,
+          then parses them back using zero-copy <code className="font-mono">DataView</code> reads — same logic as the Rust parser,
+          but in the browser. In production, Rust+WASM would run ~1000x faster.
+        </div>
+      )}
+
+      {parseStats && (
+        <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2 text-[11px] text-emerald-700 dark:text-emerald-300">
+          Parsed {parseStats.bytesParsed} bytes ({parseStats.eventsParsed} events) in {parseStats.parseTimeMs}ms
+          {" → "}throughput: {parseStats.bytesParsed > 0 ? (parseStats.bytesParsed / (parseStats.parseTimeMs / 1000) / 1e6).toFixed(1) : "0"} MB/s
+          {" (JS DataView equivalent of Rust zero-copy parser)"}
+        </div>
+      )}
+
+      {parsed && (
+        <div className="rounded-md border border-border/60 bg-card p-3 space-y-2">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Parsed events (DataView zero-copy reads from ArrayBuffer)</p>
+          {parsed.map((e, i) => (
+            <div key={i} className="border-l-2 border-primary/30 pl-3 space-y-0.5">
+              <p className="font-mono text-[11px] font-semibold text-primary">
+                Event #{e.eventId} | BX: {e.bx} | Lumi block: {e.lb}
+              </p>
+              <p className="font-mono text-[10px] text-muted-foreground">
+                Timestamp: {e.ts} | Header: 32 bytes | Payload: 24 bytes
+              </p>
+              <div className="flex flex-wrap gap-2 pl-2">
+                {e.energies.map((en, j) => (
+                  <span key={j} className="font-mono text-[10px] bg-muted/40 px-1.5 py-0.5 rounded text-foreground/80">
+                    ch{en.ch} = {en.e} GeV
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// Main component
+// ============================================================
+
+export function LHCIngestion() {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const openCard = openId ? CODE_CARDS.find(c => c.id === openId) : null;
+
+  return (
+    <div className="space-y-4">
+      {/* LHC KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="rounded-md border border-border/60 bg-card p-3 text-center">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Raw data rate</p>
+          <p className="font-mono text-base font-bold text-primary">40 TB/s</p>
+          <p className="text-[10px] text-muted-foreground">per detector (CMS/ATLAS)</p>
+        </div>
+        <div className="rounded-md border border-border/60 bg-card p-3 text-center">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Detector channels</p>
+          <p className="font-mono text-base font-bold text-primary">100M+</p>
+          <p className="text-[10px] text-muted-foreground">per experiment</p>
+        </div>
+        <div className="rounded-md border border-border/60 bg-card p-3 text-center">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Annual storage</p>
+          <p className="font-mono text-base font-bold text-primary">1 PB/yr</p>
+          <p className="text-[10px] text-muted-foreground">after trigger + compression</p>
+        </div>
+        <div className="rounded-md border border-border/60 bg-card p-3 text-center">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">WLCG sites</p>
+          <p className="font-mono text-base font-bold text-primary">250+</p>
+          <p className="text-[10px] text-muted-foreground">in 60+ countries</p>
+        </div>
+      </div>
+
+      {/* Pipeline visualization */}
+      <LHCPipelineViz />
+
+      {/* Data toggle */}
+      <div className="rounded-md border border-border/60 bg-card p-4">
+        <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+          <Binary className="h-4 w-4 text-primary" /> Data format: real binary vs synthetic
+        </p>
+        <DataToggle />
+      </div>
+
+      {/* 4 code cards */}
+      <p className="text-[11px] text-muted-foreground text-center flex items-center justify-center gap-1.5 flex-wrap">
+        <Zap className="h-3 w-3 text-amber-500" />
+        Click any card to open a lazy popup with the full code example — Python is Pyodide-runnable (in browser), Rust/Scala/Elixir are syntax-highlighted.
+        <span className="text-[10px]">Modal content only mounts on click.</span>
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {CODE_CARDS.map(c => (
+          <motion.button
+            key={c.id}
+            type="button"
+            onClick={() => setOpenId(c.id)}
+            className="relative rounded-xl overflow-hidden border border-border/60 hover:border-primary/60 hover:shadow-lg transition-all bg-gradient-to-br from-card to-muted/30 group"
+            whileHover={{ y: -4 }}
+            whileTap={{ scale: 0.98 }}
+            aria-label={`Open code: ${c.title}`}
+          >
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
+                  style={{ backgroundColor: c.accent + "20" }}>
+                  {c.icon}
+                </div>
+                <Badge variant="outline" className="text-[10px]" style={{ color: c.accent }}>
+                  {c.language.toUpperCase()}
+                </Badge>
+              </div>
+              <p className="text-xs font-semibold leading-tight" style={{ color: c.accent }}>
+                {c.title}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-1 font-mono">{c.subtitle}</p>
+              <div className="mt-2 flex items-center gap-1.5">
+                {c.runnable ? (
+                  <Badge className="text-[9px] gap-0.5"><Play className="h-2 w-2" /> Pyodide</Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-[9px]">syntax only</Badge>
+                )}
+              </div>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 1: CMS Open Data integration                            */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <ExternalLink className="h-4 w-4 text-amber-600" />
+          <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">CMS Open Data — 4 PB of real collision data at opendata.cern.ch</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-xs">
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Years</p>
+            <p className="font-mono font-bold">2010-2012</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Total size</p>
+            <p className="font-mono font-bold">~4 PB</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Format</p>
+            <p className="font-mono font-bold">ROOT/AOD</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Events</p>
+            <p className="font-mono font-bold">~10 billion</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <a href="https://opendata.cern.ch" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" className="gap-1.5">
+              <ExternalLink className="h-3 w-3" /> Open opendata.cern.ch
+            </Button>
+          </a>
+          <a href="https://opendata.cern.ch/record/8000" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="ghost" className="gap-1.5">
+              <FileText className="h-3 w-3" /> MiniAOD sample
+            </Button>
+          </a>
+        </div>
+        <PyodideRunner
+          buttonLabel="Run CMS Open Data analysis (Pyodide)"
+          code={`import numpy as np
+
+# CMS Open Data analysis simulation
+# In production: use uproot to read ROOT files from opendata.cern.ch
+# Here: simulate the AOD -> MiniAOD -> skim -> histogram pipeline
+
+print("=== CMS Open Data Analysis Pipeline ===")
+print()
+print("Real pipeline (at CERN):")
+print("  1. AOD (Analysis Object Data) — ~1 MB/event, full detector info")
+print("  2. MiniAOD — ~50 kB/event, physics objects only (jets, muons, electrons)")
+print("  3. NanoAOD — ~2 kB/event, flat ntuple for analysis")
+print("  4. Skim — selected events only (e.g. H->bb candidates)")
+print()
+
+# Simulate event selection (Higgs -> bb analysis)
+n_total = 100000  # 100k MiniAOD events
+np.random.seed(42)
+
+# Each event has: n_jets, jet_pt[], jet_eta[], missing_et
+n_jets = np.random.poisson(5, n_total)  # ~5 jets per event on average
+jet_pts = [np.random.exponential(40, n) for n in n_jets]  # pT ~ Exp(40 GeV)
+missing_ets = np.random.exponential(20, n_total)  # MET ~ Exp(20 GeV)
+
+# Selection: >= 2 jets with pT > 30 GeV, MET > 20 GeV
+selected = 0
+for i in range(n_total):
+    if n_jets[i] >= 2:
+        pts = sorted(jet_pts[i], reverse=True)
+        if pts[0] > 30 and pts[1] > 30 and missing_ets[i] > 20:
+            selected += 1
+
+print(f"MiniAOD events: {n_total:,}")
+print(f"After selection (>= 2 jets pT>30, MET>20): {selected:,} ({selected/n_total*100:.1f}%)")
+print(f"Reduction: {n_total/selected:.1f}x")
+print()
+print("At full CMS scale:")
+print(f"  10 billion MiniAOD events -> {int(10e9 * selected/n_total):,} selected")
+print(f"  = {10e9 * selected/n_total * 50e3 / 1e15:.2f} PB of skimmed data")
+print(f"  (from {10e9 * 50e3 / 1e15:.1f} PB MiniAOD)")
+print()
+print("=== Cross-references ===")
+print("  NanoAOD format = Apache Arrow-compatible flat ntuples")
+print("  uproot library = reads ROOT files without CERN ROOT framework")
+print("  Dask-awkward = parallel NanoAOD analysis on WLCG grid")
+print("  Same patterns as the platform's Bronze->Silver->Gold medallion!")
+
+
+print()
+print("=== Data reduction at each stage ===")
+stages = [("AOD", 1000), ("MiniAOD", 50), ("NanoAOD", 2), ("Skim", 0.2)]
+for i in range(len(stages)-1):
+    name1, size1 = stages[i]
+    name2, size2 = stages[i+1]
+    ratio = size1 / size2
+    print(f"  {name1} -> {name2}: {size1} kB -> {size2} kB ({ratio:.0f}x reduction)")`}
+        />
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 2: HL-LHC (2029+) upgrade scenario                     */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">HL-LHC (2029+) — 10x more data, new challenges</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40">
+              <tr>
+                <th className="text-left p-2 font-semibold">Parameter</th>
+                <th className="text-right p-2 font-semibold">Run 2 (2015-18)</th>
+                <th className="text-right p-2 font-semibold">Run 3 (2022-26)</th>
+                <th className="text-right p-2 font-semibold">HL-LHC (2029+)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              <tr><td className="p-2 font-medium">Luminosity</td><td className="p-2 text-right font-mono">150 fb⁻¹</td><td className="p-2 text-right font-mono">300 fb⁻¹</td><td className="p-2 text-right font-mono text-primary font-bold">3000 fb⁻¹</td></tr>
+              <tr><td className="p-2 font-medium">Data stored</td><td className="p-2 text-right font-mono">50 PB</td><td className="p-2 text-right font-mono">100 PB</td><td className="p-2 text-right font-mono text-primary font-bold">1000 PB (1 EB)</td></tr>
+              <tr><td className="p-2 font-medium">Pileup (interactions/BX)</td><td className="p-2 text-right font-mono">~40</td><td className="p-2 text-right font-mono">~55</td><td className="p-2 text-right font-mono text-primary font-bold">~200</td></tr>
+              <tr><td className="p-2 font-medium">HLT technology</td><td className="p-2 text-right">CPU farm</td><td className="p-2 text-right">CPU + GPU</td><td className="p-2 text-right text-primary font-bold">GPU + AI trigger</td></tr>
+              <tr><td className="p-2 font-medium">L1 Trigger</td><td className="p-2 text-right">FPGA, 3 us</td><td className="p-2 text-right">FPGA, 3 us</td><td className="p-2 text-right text-primary font-bold">FPGA + ML, 1 us</td></tr>
+              <tr><td className="p-2 font-medium">WLCG sites</td><td className="p-2 text-right font-mono">~250</td><td className="p-2 text-right font-mono">~250</td><td className="p-2 text-right font-mono text-primary font-bold">~300 (cloud)</td></tr>
+              <tr><td className="p-2 font-medium">Raw rate</td><td className="p-2 text-right font-mono">40 TB/s</td><td className="p-2 text-right font-mono">40 TB/s</td><td className="p-2 text-right font-mono text-primary font-bold">~80 TB/s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          HL-LHC will produce <strong>10x more data</strong> with <strong>5x more pileup</strong> (overlapping collisions per bunch crossing).
+          The HLT will use <strong>GPU acceleration</strong> and <strong>AI-assisted trigger</strong> (Graph Neural Networks for pileup mitigation).
+          This is why CERN is evaluating Rust for the new DAQ readout and investing in heterogeneous computing (CPU+GPU+FPGA).
+        </p>
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 3: Cross-links to related pages                         */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-muted/20 p-4">
+        <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+          <Layers className="h-3.5 w-3.5 text-primary" /> Cross-references — LHC ingestion connects to the entire platform
+        </p>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <Link href={hrefFor("streaming")} className="text-primary hover:underline">
+            &rarr; Streaming (Kafka + Flink for real-time event streams)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("databricks")} className="text-primary hover:underline">
+            &rarr; Databricks (Spark for physics analysis &amp; skim production)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("quantum-computing")} className="text-primary hover:underline">
+            &rarr; Quantum Computing (LHC jet substructure &tau;<sub>N</sub>)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("space-science")} className="text-primary hover:underline">
+            &rarr; Space Science (JWST/LIGO raw data ingestion at smaller scale)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("orchestration")} className="text-primary hover:underline">
+            &rarr; Orchestration (Airflow DAGs for skim production)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("arrow")} className="text-primary hover:underline">
+            &rarr; Arrow (NanoAOD = flat ntuples, Arrow-compatible)
+          </Link>
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-2">
+          The LHC ingestion pipeline uses the SAME patterns as the platform&apos;s commercial ELT (Fivetran):
+          source &rarr; trigger/filter &rarr; zero-suppress &rarr; compress &rarr; store &rarr; distribute.
+          The only difference is scale (40 TB/s vs 3.1 B rows/month) and domain (physics vs business).
+        </p>
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 4: Real-time trigger simulator                          */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Gauge className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">L1 Trigger simulator &mdash; 40 MHz &rarr; ~1 kHz</p>
+        </div>
+        <TriggerSimulator />
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 5: Binary data parser demo                               */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Binary className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">Binary parser demo &mdash; parse CMS RD5 format in browser</p>
+        </div>
+        <BinaryParserDemo />
+      </div>
+
+      {/* LAZY modal */}
+      <LazyModal
+        open={!!openCard}
+        onClose={() => setOpenId(null)}
+        title={openCard?.title ?? ""}
+        subtitle={openCard?.subtitle}
+        accent={openCard?.accent ?? "oklch(0.55 0.16 250)"}
+        icon={openCard?.icon ?? <Cpu className="h-4 w-4" />}
+      >
+        {openCard && (
+          <div className="space-y-4">
+            {/* Math foundation */}
+            <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Math foundation</p>
+              <p className="font-mono text-xs text-primary leading-relaxed">{openCard.mathExpr}</p>
+            </div>
+
+            {/* Code preview — always show CodeBlock (like Rust/Scala/Elixir) */}
+            <CodeBlock language={openCard.language} filename={`lhc_${openCard.id}.${openCard.language === "rust" ? "rs" : openCard.language === "scala" ? "scala" : openCard.language === "elixir" ? "ex" : "py"}`} code={openCard.code} />
+
+            {/* Run button — for runnable cards (Python, ETL, ELT) */}
+            {openCard.runnable && (
+              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> Python code — run in browser (Pyodide)
+                </p>
+                <PyodideRunner
+                  buttonLabel={`Run ${openCard.language} code (Pyodide)`}
+                  code={openCard.code}
+                />
+              </div>
+            )}
+
+            {/* Python equivalent — for non-runnable cards (Rust/Scala/Elixir) */}
+            {!openCard.runnable && openCard.pythonCode && (
+              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> Python equivalent — run in browser (Pyodide)
+                </p>
+                <PyodideRunner
+                  buttonLabel={`Run Python equivalent (Pyodide)`}
+                  code={openCard.pythonCode}
+                />
+              </div>
+            )}
+
+            {/* Data toggle inside modal */}
+            <div className="rounded-md border border-border/60 bg-card p-3">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Data format preview</p>
+              <DataToggle />
+            </div>
+
+            {/* Info callout */}
+            <InfoCallout
+              intent={openCard.intent}
+              math={openCard.mathExpr}
+              insight={openCard.insight}
+              accent={openCard.accent}
+            />
+          </div>
+        )}
+      </LazyModal>
+    </div>
+  );
+}

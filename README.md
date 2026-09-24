@@ -84,8 +84,8 @@ bun run build:static     # static export with GITHUB_PAGES=true for Pages-style 
 ```
 
 **Demo login** (on the Sign in button in the header):
-- Email: `demo@moderndatascieng.io`
-- Password: `demo-password`
+- Username: `admin`
+- Password: `admin`
 - Or click "Auto-fill & sign in" — the form pre-fills and submits in one click.
 
 ## Project PDF
@@ -101,7 +101,7 @@ A 6-page project PDF lives at [`download/ModernDataSciEng-Platform.pdf`](./downl
 
 ## Contact
 
-- Email: `testdemoqwenai2025-creator@users.noreply.github.com`
+- Email: `testdemoqwenai2025@gmail.com`
 - GitHub: [@testdemoqwenai2025-creator](https://github.com/testdemoqwenai2025-creator)
 - Live preview: <https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/>
 

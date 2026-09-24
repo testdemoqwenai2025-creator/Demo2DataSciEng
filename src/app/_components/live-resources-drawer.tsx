@@ -97,28 +97,84 @@ async function fetchJson(url: string, timeoutMs = 15000): Promise<unknown> {
   }
 }
 
-async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arxiv"]>> {
+/**
+ * fetchJsonWithCorsFallback — try direct fetch first; on failure (CORS,
+ * 403, network error), retry through a public CORS proxy.
+ *
+ * Why: the static GitHub Pages preview can't reach APIs that don't set
+ * `Access-Control-Allow-Origin: *`. Verified failures (Oct 2026):
+ *   - export.arxiv.org          — no CORS headers, blocked
+ *   - api.github.com/search      — works for unauthenticated requests
+ *                                  but rate-limited (60/hr/IP)
+ *   - huggingface.co/api/datasets — CORS-friendly (works direct)
+ *   - paperswithcode.com/api/v1   — sometimes flaky from GH Pages
+ *
+ * Public CORS proxies used as fallback (in order):
+ *   1. https://corsproxy.io/?url=<encoded>   — fast, reliable
+ *   2. https://api.allorigins.win/raw?url=<encoded>  — slower, more permissive
+ *
+ * Both are read-only GET proxies. They DON'T forward POST/cookies/headers.
+ */
+async function fetchJsonWithCorsFallback(url: string, timeoutMs = 15000): Promise<unknown> {
+  // Try direct first
   try {
-    const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(topic)}&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending`;
-    const text = (await fetchJson(url, 20000)) as string;
-    const papers: ArxivPaper[] = [];
-    const entries = text.match(/<entry>([\s\S]*?)<\/entry>/g) || [];
-    for (const entry of entries) {
-      const title = entry.match(/<title>([\s\S]*?)<\/title>/);
-      const summary = entry.match(/<summary>([\s\S]*?)<\/summary>/);
-      const published = entry.match(/<published>([^<]+)<\/published>/);
-      const id = entry.match(/<id>([^<]+)<\/id>/);
-      const authors = (entry.match(/<name>([^<]+)<\/name>/g) || []).map((a) => a.replace(/<\/?name>/g, "")).slice(0, 5);
-      if (title) {
-        papers.push({
-          title: title[1].replace(/\s+/g, " ").trim(),
-          authors,
-          published: published ? published[1] : "",
-          url: id ? id[1].trim() : "",
-          summary: summary ? summary[1].replace(/\s+/g, " ").trim().slice(0, 280) + "..." : "",
-        });
+    return await fetchJson(url, timeoutMs);
+  } catch (directErr) {
+    const msg = directErr instanceof Error ? directErr.message : String(directErr);
+    // If it's a CORS / network error, retry through proxies
+    if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("CORS") || msg.includes("HTTP 403") || msg.includes("HTTP 0")) {
+      const encoded = encodeURIComponent(url);
+      const proxies = [
+        `https://corsproxy.io/?url=${encoded}`,
+        `https://api.allorigins.win/raw?url=${encoded}`,
+      ];
+      for (const proxyUrl of proxies) {
+        try {
+          return await fetchJson(proxyUrl, timeoutMs);
+        } catch {
+          // try next proxy
+        }
       }
+      // All proxies failed — rethrow the original error
+      throw directErr;
     }
+    // Non-CORS error (e.g. HTTP 404, 500) — don't retry
+    throw directErr;
+  }
+}
+
+async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arxiv"]>> {
+  // Crossref API — CORS-friendly, free, no auth needed (replaces arXiv which has no CORS headers)
+  // URL: https://api.crossref.org/works?query=<topic>&rows=5&select=title,author,published-print,abstract,DOI,URL
+  // Returns: { message: { items: [{ title: ["..."], author: [{given, family}], "published-print": {date-parts}, abstract, DOI, URL }] } }
+  try {
+    // Take first 3 keywords for better search results (Crossref searches full text)
+    const shortTopic = topic.split(" ").slice(0, 3).join(" ");
+    const url = `https://api.crossref.org/works?query=${encodeURIComponent(shortTopic)}&rows=5&select=title,author,published-print,abstract,DOI,URL`;
+    const data = (await fetchJsonWithCorsFallback(url, 20000)) as {
+      message?: { items?: Array<Record<string, unknown>> };
+    };
+    const items = data?.message?.items || [];
+    const papers: ArxivPaper[] = items.map((item) => {
+      const titleArr = item.title as string[] | undefined;
+      const title = titleArr && titleArr.length > 0 ? titleArr[0] : "Untitled";
+      const authorArr = item.author as Array<{ given?: string; family?: string }> | undefined;
+      const authors = (authorArr || []).slice(0, 5).map((a) =>
+        [a.given, a.family].filter(Boolean).join(" ")
+      );
+      const pubPrint = item["published-print"] as { "date-parts"?: number[][] } | undefined;
+      const dateParts = pubPrint?.["date-parts"]?.[0];
+      const published = dateParts
+        ? `${dateParts[0]}-${String(dateParts[1] || 1).padStart(2, "0")}-${String(dateParts[2] || 1).padStart(2, "0")}`
+        : "";
+      const doi = item.DOI as string | undefined;
+      const url = (item.URL as string) || (doi ? `https://doi.org/${doi}` : "");
+      const abstract = item.abstract as string | undefined;
+      const summary = abstract
+        ? abstract.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 280) + "..."
+        : "";
+      return { title, authors, published, url, summary };
+    });
     return { count: papers.length, papers };
   } catch (err) {
     return { error: err instanceof Error ? err.message : String(err) };
@@ -127,9 +183,14 @@ async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arx
 
 async function fetchGitHub(topic: string, language = ""): Promise<NonNullable<ResourcesData["github"]>> {
   try {
+    // GitHub search doesn't return good results for long multi-word queries
+    // like "quantum computing VQE QAOA Grover QFT Qiskit superposition...".
+    // Take just the first 2 keywords of the topic for the search query,
+    // and lower the stars filter to >50 (so we still get popular repos).
+    const shortTopic = topic.split(" ").slice(0, 2).join(" ");
     const langQ = language ? `+language:${language}` : "";
-    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(topic)}${langQ}+stars:>10&sort=stars&order=desc&per_page=5`;
-    const data = (await fetchJson(url, 15000)) as { items?: Array<Record<string, unknown>> };
+    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(shortTopic)}${langQ}+stars:>50&sort=stars&order=desc&per_page=5`;
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as { items?: Array<Record<string, unknown>> };
     const repos: GitHubRepo[] = (data.items || []).map((repo) => ({
       name: String(repo.full_name ?? repo.name ?? "?"),
       url: String(repo.html_url ?? ""),
@@ -148,8 +209,9 @@ async function fetchGitHub(topic: string, language = ""): Promise<NonNullable<Re
 async function fetchHuggingFace(topic: string): Promise<NonNullable<ResourcesData["huggingface"]>> {
   try {
     // Hugging Face datasets search API — public, no auth needed
-    const url = `https://huggingface.co/api/datasets?search=${encodeURIComponent(topic)}&limit=5&full=false`;
-    const data = (await fetchJson(url, 15000)) as Array<Record<string, unknown>>;
+    const shortTopic = topic.split(" ").slice(0, 1).join(" ");
+    const url = `https://huggingface.co/api/datasets?search=${encodeURIComponent(shortTopic)}&limit=5&full=false`;
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as Array<Record<string, unknown>>;
     const datasets: HFDataset[] = (Array.isArray(data) ? data : []).map((d) => ({
       id: String(d.id ?? d.name ?? "?"),
       url: `https://huggingface.co/datasets/${d.id ?? d.name ?? ""}`,
@@ -166,8 +228,9 @@ async function fetchHuggingFace(topic: string): Promise<NonNullable<ResourcesDat
 async function fetchPwCDatasets(topic: string): Promise<NonNullable<ResourcesData["pwc_datasets"]>> {
   try {
     // Papers with Code datasets API
-    const url = `https://paperswithcode.com/api/v1/datasets/?search=${encodeURIComponent(topic)}&page=1&page_size=5`;
-    const data = (await fetchJson(url, 15000)) as { results?: Array<Record<string, unknown>> };
+    const shortTopic = topic.split(" ").slice(0, 1).join(" ");
+    const url = `https://paperswithcode.com/api/v1/datasets/?search=${encodeURIComponent(shortTopic)}&page=1&page_size=5`;
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as { results?: Array<Record<string, unknown>> };
     const datasets: PwCDataset[] = (data.results || []).map((d) => ({
       name: String(d.name ?? ""),
       url: `https://paperswithcode.com/dataset/${d.slug ?? d.name ?? ""}`,
@@ -185,7 +248,7 @@ async function fetchCodeSnippets(topic: string, sampleRepo?: string): Promise<No
       // Fetch a specific file from a known repo via raw.githubusercontent
       // e.g. "owner/repo/main/path/to/file.py"
       const url = `https://raw.githubusercontent.com/${sampleRepo}`;
-      const text = (await fetchJson(url, 15000)) as string;
+      const text = (await fetchJsonWithCorsFallback(url, 15000)) as string;
       return {
         count: 1,
         snippets: [{

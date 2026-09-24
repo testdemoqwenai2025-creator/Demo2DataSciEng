@@ -63,13 +63,25 @@ export type PageId =
   | "boltz"
   | "ai-drug-discovery"
   | "spatial-multiomics"
-  | "coevolution-dca";
+  | "coevolution-dca"
+  | "neural-network-potentials"
+  | "enhanced-sampling"
+  | "generative-chemistry-2"
+  | "quantum-computing"
+  | "space-science"
+  | "fintech"
+  | "data-lakehouse"
+  | "iceberg"
+  | "glue"
+  | "hudi"
+  | "delta-lake"
+  | "catalogs";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs";
   icon: string;
   description: string;
 }
@@ -530,6 +542,102 @@ export const PAGES: PageMeta[] = [
     group: "Coevolution & DCA",
     icon: "Network",
     description: "AI-generated illustrations + co-evolution short, mutual information I(i,j) + Potts model + mean-field DCA J=-(C^-1) + APC correction + attention QK^T≈J equivalence, low-level PyTorch MSAParser+FrequencyLayer+MutualInformationLayer+MeanFieldDCA+ContactPredictor+AttentionAsDCA.",
+  },
+  {
+    id: "neural-network-potentials",
+    label: "Neural Network Potentials — SchNet to MACE via SO(3) Representation Theory",
+    shortLabel: "NN Potentials",
+    group: "Neural Network Potentials",
+    icon: "Atom",
+    description: "AI illustrations + CG tensor product short, SchNet→DimeNet→GemNet→NequIP→MACE, SO(3) irreps + spherical harmonics + Clebsch-Gordan coefficients, body-order expansion, low-level PyTorch real_spherical_harmonics+CGTensorProduct+SchNetInteraction+NequIPLayer+MACEModel.",
+  },
+  {
+    id: "enhanced-sampling",
+    label: "Enhanced Sampling & Free Energy — Metadynamics, REMD, MSMs, Neural ODEs",
+    shortLabel: "Enhanced Sampling",
+    group: "Enhanced Sampling",
+    icon: "Waves",
+    description: "AI illustrations + free energy short, metadynamics V(s,t)=Σ W exp(-|s-s'|²/2σ²) + REMD P=min(1,exp(ΔβΔE)) + MSMs T_ij(τ) τ_k=-τ/log(λ_k) + TICA C(τ) + Neural ODEs, low-level PyTorch NeuralODE+MetadynamicsSimulator+MSMEstimator+TICA.",
+  },
+  {
+    id: "generative-chemistry-2",
+    label: "Generative Chemistry 2.0 — EDM, DiffDock, GFlowNet, Optimal Transport",
+    shortLabel: "Gen Chem 2.0",
+    group: "Generative Chemistry 2.0",
+    icon: "FlaskConical",
+    description: "AI illustrations + Sinkhorn short, EDM SE(3)-equivariant DDPM on R^(N×3) + DiffDock diffusion on SE(3) + GFlowNet trajectory balance + Sinkhorn optimal transport W_ε=min⟨T,C⟩+εH(T), low-level PyTorch SinkhornDistance+EDMDenoiser+GFlowNet.",
+  },
+  {
+    id: "quantum-computing",
+    label: "Quantum Computing — VQE, QAOA, Grover, Quantum ML",
+    shortLabel: "Quantum",
+    group: "Quantum Computing",
+    icon: "Atom",
+    description: "AI illustrations + circuit short, qubit superposition + Hadamard/CNOT/Pauli gates + Bell states + VQE variational principle + Grover O(√N) + QFT, low-level PyTorch QuantumGate+QuantumCircuit+VQE+GroverCircuit.",
+  },
+  {
+    id: "space-science",
+    label: "Space Science — Exoplanets, Gravitational Waves, LHC/CERN, JWST",
+    shortLabel: "Space Science",
+    group: "Space Science",
+    icon: "Network",
+    description: "AI illustrations + transit short, Kepler laws + transit method + GW strain + LHC jet substructure + JWST, low-level PyTorch TransitCNN+GravitationalWaveClassifier+JetGNN.",
+  },
+  {
+    id: "fintech",
+    label: "Fintech — Black-Scholes, Monte Carlo, VaR, Algorithmic Trading",
+    shortLabel: "Fintech",
+    group: "Fintech",
+    icon: "Activity",
+    description: "AI illustrations + pricing short, Black-Scholes formula + Ito lemma + Monte Carlo + VaR/CVaR + LSTM trading + GNN fraud, low-level PyTorch BlackScholesModel+MonteCarloPricer+LSTMPredictor+FraudGNN.",
+  },
+  {
+    id: "data-lakehouse",
+    label: "Data Lakehouse — Lake + Warehouse Unified",
+    shortLabel: "Lakehouse",
+    group: "Data Lakehouse",
+    icon: "Boxes",
+    description: "The lake→lakehouse evolution: Hadoop → S3+Hive → Iceberg/Delta/Hudi. Vendor-neutral open table formats giving ACID + SQL to cheap object storage. Anchor page for the Data Lakehouse group.",
+  },
+  {
+    id: "iceberg",
+    label: "Apache Iceberg — Open Table Format",
+    shortLabel: "Iceberg",
+    group: "Apache Iceberg",
+    icon: "Layers",
+    description: "Netflix-origin open table format with manifest trees, hidden partitioning, time travel, schema evolution. Production at Netflix, Apple, Stripe. SQL+PyIceberg+Trino code, manifest tree diagram, NYC Taxi on Iceberg Pyodide demo.",
+  },
+  {
+    id: "glue",
+    label: "AWS Glue — Serverless ETL + Data Catalog",
+    shortLabel: "Glue",
+    group: "AWS Glue",
+    icon: "Workflow",
+    description: "Serverless Spark ETL, Data Catalog, Crawlers, Glue Studio, Schema Registry. The most-used data-lake catalog on AWS. Code: Glue PySpark jobs, crawler configs, cross-account catalog access.",
+  },
+  {
+    id: "hudi",
+    label: "Apache Hudi — Incremental/UPSERT Tables",
+    shortLabel: "Hudi",
+    group: "Apache Hudi",
+    icon: "Database",
+    description: "Uber-origin open table format for incremental/UPSERT workloads. COW vs MOR table types, CDC ingestion, change-logs. Production at Uber, Walmart, ByteDance. Distinct from Iceberg/Delta because of upsert-first design.",
+  },
+  {
+    id: "delta-lake",
+    label: "Delta Lake — Databricks Open Format",
+    shortLabel: "Delta",
+    group: "Delta Lake",
+    icon: "Boxes",
+    description: "Most widely-deployed open table format. ACID transactions, time travel, Change Data Feed, Z-Order, Liquid Clustering. Production on every Databricks deployment. Transaction-log replay Pyodide demo.",
+  },
+  {
+    id: "catalogs",
+    label: "Catalogs — Glue vs Hive vs Nessie vs Unity vs Polaris vs REST",
+    shortLabel: "Catalogs",
+    group: "Catalogs",
+    icon: "Network",
+    description: "Comparison of metadata/catalog systems: AWS Glue Data Catalog, Hive Metastore, Nessie (Git-for-data), Databricks Unity Catalog, Snowflake Polaris, Iceberg REST Catalog. The metadata-layer battle.",
   },
 ];
 

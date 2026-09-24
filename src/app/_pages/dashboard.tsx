@@ -129,24 +129,30 @@ const LAYER_COLORS: Record<string, string> = {
 
 export function DashboardPage() {
   const [live, setLive] = useState(true);
-  const [runs, setRuns] = useState<PipelineRun[]>(() => Array.from({ length: 8 }, genRun));
-  const [anomalies, setAnomalies] = useState<Anomaly[]>(() => Array.from({ length: 5 }, () => {
-    // Each initial anomaly needs a unique id for agent state tracking
-    const a = ANOMALY_TEMPLATES[Math.floor(Math.random() * ANOMALY_TEMPLATES.length)];
-    return { ts: fmtTime(new Date(Date.now() - Math.random() * 60000)), id: `init-${Math.random().toString(36).slice(2, 10)}`, ...a };
-  }));
+  // FIX: Initialize with EMPTY arrays to avoid hydration mismatch
+  // (Math.random() and new Date() produce different values on server vs client)
+  const [runs, setRuns] = useState<PipelineRun[]>([]);
+  const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [creditsBurned, setCreditsBurned] = useState(2847.32);
   const [p95Latency, setP95Latency] = useState(1.4);
   const [throughput, setThroughput] = useState(8.42);
-  const [history, setHistory] = useState(
-    Array.from({ length: 24 }, (_, i) => ({
+  const [history, setHistory] = useState<{ t: number; tb: number; cost: number }[]>([]);
+
+  const [agentStates, setAgentStates] = useState<Record<string, AgentState>>({});
+
+  // FIX: Generate random data AFTER mount (client-only, no hydration mismatch)
+  useEffect(() => {
+    setRuns(Array.from({ length: 8 }, genRun));
+    setAnomalies(Array.from({ length: 5 }, () => {
+      const a = ANOMALY_TEMPLATES[Math.floor(Math.random() * ANOMALY_TEMPLATES.length)];
+      return { ts: fmtTime(new Date(Date.now() - Math.random() * 60000)), id: `init-${Math.random().toString(36).slice(2, 10)}`, ...a };
+    }));
+    setHistory(Array.from({ length: 24 }, (_, i) => ({
       t: i,
       tb: Math.round((0.27 + Math.random() * 0.08) * 1000) / 1000,
       cost: Math.round((20 + Math.random() * 8) * 10) / 10,
-    }))
-  );
-
-  const [agentStates, setAgentStates] = useState<Record<string, AgentState>>({});
+    })));
+  }, []);
   const [autoTriage, setAutoTriage] = useState(true);
 
   // Call the agent API for an anomaly
