@@ -29,6 +29,22 @@ interface ImageModalProps {
   float?: "left" | "right" | undefined;
 }
 
+/**
+ * Prefix image src with basePath for GitHub Pages deployment.
+ *
+ * Next.js <Link> and <Image> auto-prefix with basePath, but raw <img> tags
+ * do NOT. This helper ensures /images/... becomes /DemoAppDataSci/images/...
+ * when deployed to GitHub Pages.
+ */
+function withBasePath(src: string): string {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  // Only prefix absolute paths (start with /) — relative paths pass through
+  if (src.startsWith("/") && basePath) {
+    return `${basePath}${src}`;
+  }
+  return src;
+}
+
 export function ImageModal({
   src,
   alt,
@@ -55,7 +71,7 @@ export function ImageModal({
   }, [open]);
 
   const openInNewTab = useCallback(() => {
-    window.open(src, "_blank", "noopener,noreferrer");
+    window.open(withBasePath(src), "_blank", "noopener,noreferrer");
   }, [src]);
 
   const floatStyle = float === "left"
@@ -77,7 +93,7 @@ export function ImageModal({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={src}
+          src={withBasePath(src)}
           alt={alt}
           width={thumbWidth}
           className="w-full h-auto block"
@@ -141,7 +157,7 @@ export function ImageModal({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={src}
+                src={withBasePath(src)}
                 alt={alt}
                 className="max-w-full max-h-[80vh] object-contain rounded-lg border-2 border-border/60 shadow-2xl"
               />

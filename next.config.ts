@@ -7,11 +7,17 @@ import type { NextConfig } from "next";
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 const repoName = "DemoAppDataSci";
 
+const basePath = isGitHubPages ? `/${repoName}` : "";
+
 const nextConfig: NextConfig = {
   // In dev: standalone (server runtime). On GitHub Pages build: export (static).
   output: isGitHubPages ? "export" : "standalone",
   // basePath only when building for GitHub Pages
-  basePath: isGitHubPages ? `/${repoName}` : "",
+  basePath: basePath,
+  // Expose basePath to client-side code so <img> tags can prefix their src
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   // Static export can't optimise images
   images: isGitHubPages ? { unoptimized: true } : undefined,
   // Append trailing slash so all routes resolve on GitHub Pages static hosting
