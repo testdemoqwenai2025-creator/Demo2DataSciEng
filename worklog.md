@@ -1141,3 +1141,39 @@ Stage Summary:
 - HEAD = 4bea052 on both private (AppDataSci-Advanced) and public (DemoAppDataSci) repos
 - Live site confirmed: hash URLs (#/<page>) now redirect correctly to real routes while preserving the /DemoAppDataSci basePath — no more "page disappears after first render" bug
 - Browser console error that the user was referring to: a 404 Not Found on the document request triggered by the redirect to the wrong (basePath-less) URL
+
+---
+Task ID: login-admin-creds-fix
+Agent: Super Z (main)
+Task: Switch the demo login credentials to user=admin / password=admin and verify the login flow works on the live site.
+
+Work Log:
+- Updated DEMO_USER in src/app/_components/login-button.tsx: username=admin (was email=demo@moderndatascieng.io), password=admin (was demo-password), name=Admin Analyst, role=Platform Administrator
+- Form field renamed from Email (type=email) to Username (type=text), autoComplete=username, placeholder=admin
+- README demo login section updated to Username: admin / Password: admin
+- Committed f765faf, pushed to private, sync workflow mirrored to public, deploy #92 succeeded
+- First live test FAILED: clicking Auto-fill & sign in caused an "Application error: a client-side exception has occurred" — the page disappeared
+- Root cause: the useSyncExternalStore getSnapshot function (readStoredAuth) called JSON.parse(localStorage.getItem(...)) on every render, returning a NEW object reference each time. React's useSyncExternalStore compares snapshots with Object.is — a new reference looks like the store has changed → schedules a re-render → getSnapshot returns another new reference → infinite loop → Next.js error boundary catches it
+- Fix 1 (commit a94f0d1): cached the parsed object keyed on the raw localStorage string so the same stored value returns the same object reference across renders. Added a writeStoredAuth helper that invalidates the cache after every mutation so the next getSnapshot picks up the new value
+- Second live test STILL failed after reload: page rendered the signed-out UI even though localStorage had the auth state
+- Root cause 2: useState(initialAuth) only uses the initial value on the FIRST render (which is the SSR snapshot = null, to match server-rendered HTML). When useSyncExternalStore then returned the post-hydration snapshot (the actual localStorage value), local state didn't automatically update to match — useState's initialiser is not re-called
+- Fix 2 (commit 2a7e5fa): added a useEffect that copies the useSyncExternalStore snapshot into local state whenever it changes. After hydration React fires the effect, setAuthState(storedAuth) runs, and the Admin Analyst badge appears
+- Final live verification (deploy #94 on public repo, 2026-09-24 09:46 UTC):
+    Test 1 — Auto-fill & sign in with admin/admin → body 20430→20445, "Sign out" button appears ✅
+    Test 2 — Reload → body stays at 20445, "Sign out" persists across reload ✅
+    Test 3 — Sign out → body 20445→20430, "Sign in" button reappears ✅
+    Wrong creds (separate earlier test) → "Invalid credentials. Use the demo account below, or click 'Auto-fill & sign in'." shown, dialog stays open ✅
+    Manual admin/admin entry → form submits, user signed in ✅
+
+Stage Summary:
+- HEAD = 2a7e5fa on both private (AppDataSci-Advanced) and public (DemoAppDataSci) repos
+- Live site confirmed: login flow works end-to-end with admin/admin
+  - Sign in dialog pre-fills Username: admin / Password: admin
+  - "Auto-fill & sign in" button works (one click signs in)
+  - Manual Sign in button works (form submit with admin/admin)
+  - Wrong credentials show error message and keep dialog open
+  - Signed-in state persisted in localStorage survives page reloads
+  - Sign out clears localStorage and returns to signed-out UI
+- Two latent bugs fixed along the way:
+  - useSyncExternalStore infinite re-render loop (snapshot returning new object refs every render)
+  - useState initialiser not re-called after useSyncExternalStore snapshot changes (need useEffect bridge)
