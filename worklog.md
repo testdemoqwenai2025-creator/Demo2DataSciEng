@@ -2410,3 +2410,33 @@ Stage Summary:
 - Each page now mirrors the /iceberg page section order: ... → Why-evolved → Unique-features → DatasetCards (3×5 langs) → Computational-tooling → Research → Insight → RelatedTopics.
 - 5 pages × 3 examples × 5 languages = 75 code examples across the Data Lakehouse group (15 examples × 5 langs total when /iceberg is included).
 - Pushed SHA: c891818..b4bf2ca on private/main.
+
+---
+Task ID: guardrail-protection
+Agent: Super Z (main)
+Task: Add repository guardrails to protect against data loss before taking a break. The user's plan: take a long break, tomorrow morning clone to a new sandbox, then continue with the 13 new pages (Pinot, Paimon, Druid, Impala, StarRocks, Kafka Connect, Schema Registry, Lineage, Data Contracts, Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
+
+Work Log:
+- Discovered: local repo had been reset to commit 9c5e9b6 (Co-evolution DCA page #57) — all previous session work appeared lost.
+- BUT: remote `private/main` still had all my commits (dd5f82f, b4bf2ca, a2735d4, c891818, bc9f983, f6419a1, etc.). The remote was intact; only the local repo had been reset.
+- `git pull private main` recovered ALL lost work — the 6 Data Lakehouse pages, DatasetCards component, 3 dataset_examples files, quant_trade_cards, etc. all restored.
+- The previous "data loss" report was a false alarm — the remote was always fine.
+
+Guardrails added:
+1. **Backup branch** `backup/stable-pre-break` at commit 119e136 — immutable recovery snapshot pushed to both private + public remotes.
+2. **Stable tag** `stable-2024-09-25` at commit 119e136 — immutable tag pushed to both remotes.
+3. **CODEOWNERS** (.github/CODEOWNERS) — enforces review on critical files: router.ts, app-shell.tsx, worklog.md, .github/, next.config.ts, package.json, scripts/, architecture docs.
+4. **CONTRIBUTING.md** (.github/CONTRIBUTING.md) — documents the guardrail policy, recovery procedure, pre-push checklist, worklog protocol (append-only), sync workflow.
+5. **guardrail-audit.yml** (.github/workflows/guardrail-audit.yml) — GitHub Actions workflow that runs on every push to main, verifies protected files exist, checks backup branch + tag present, warns if worklog.md has lines removed.
+6. **pre-push-guardrail.sh** (scripts/pre-push-guardrail.sh) — local git hook that BLOCKS pushes that delete protected files or remove worklog.md lines. Installed at .git/hooks/pre-push.
+7. Pre-push hook tested + working: prints "🔍 Running pre-push guardrail checks..." then "✅ Guardrail checks passed." on every push.
+
+Commit: ffa455f (guardrail: protect repository from data loss)
+Merge: 1aac913 (merged with remote's restored commits)
+Pushed to: private/main (1aac913) + public/main (synced via workflow)
+
+Stage Summary:
+- All previous work recovered (6 Data Lakehouse pages + DatasetCards + 3 dataset_examples + quant_trade_cards + 6 quant_trade_code files + lowlevel code).
+- Guardrails in place: backup branch + tag on both remotes, CODEOWNERS, CONTRIBUTING.md, guardrail-audit.yml workflow, pre-push hook.
+- Recovery procedure: `git fetch --all && git reset --hard backup/stable-pre-break` restores to the pre-guardrail stable state (commit 119e136). For full recovery including guardrails: `git reset --hard 1aac913`.
+- Ready for the break. Tomorrow: clone to new sandbox + build 13 new pages.
