@@ -1177,3 +1177,50 @@ Stage Summary:
 - Two latent bugs fixed along the way:
   - useSyncExternalStore infinite re-render loop (snapshot returning new object refs every render)
   - useState initialiser not re-called after useSyncExternalStore snapshot changes (need useEffect bridge)
+
+---
+Task ID: quantum-shorts-and-email-fix
+Agent: Super Z (main)
+Task: Fix contact email → testdemoqwenai2025@gmail.com; research YouTube short format; design 4 quantum shorts (superposition, entanglement, quantum algorithm, decoherence) with math + code + lazy popups; cite recent 2024-2025 papers; add to quantum-computing page; provide deeper thoughts & improvement suggestions.
+
+Work Log:
+- Fixed contact email in 5 places (app-shell.tsx footer, about.tsx, README.md, generate-project-pdf.py, setup-github.sh): testdemoqwenai2025-creator@users.noreply.github.com → testdemoqwenai2025@gmail.com (commit 2e9b7fe)
+- Researched the YouTube short (https://www.youtube.com/shorts/TOPgZ-AbFwo) — title "Quantum Superposition Explained in 30 Seconds" — confirmed vertical 9:16 format with hook title
+- Researched recent (2024-2025) quantum breakthroughs via web_search:
+    * Google Willow (Dec 2024 / Nature 2025) — 105 qubits, first QEC below surface-code threshold, Λ = 2.14 ± 0.02
+    * IBM Heron R2 (Nov 2024) — 156 qubits, TLS + tensor-network error mitigation
+    * Quantinuum H2-1 + Microsoft (Sep 2024) — 56 trapped-ion qubits, 99.8% 2-qubit fidelity, 12 logical qubits
+    * Microsoft Majorana 1 (Feb 2025) — 8 topological qubits, first topoconductor
+- Built new component src/app/_components/quantum-shorts.tsx (~600 lines):
+    * 4 vertical 9:16 cards with animated SVG thumbnails (Bloch sphere rotating, Bell pair pulsing, Grover bars growing, decay curve falling)
+    * Click any card → lazy modal popup (AnimatePresence) with animated SVG + math equations + Pyodide-runnable Python + 2024-2025 paper citation
+    * Lazy: the heavy modal content (animated SVG + Pyodide bundle) only mounts when user clicks the card
+- Wired the carousel into quantum-computing.tsx as a new SectionCard after the existing Bell state short
+- Added a second SectionCard "Recent breakthroughs (2024-2025)" with hardware comparison table (4 chips × 6 columns) + a Pyodide-runnable hardware-comparison + scalability model
+- Three small bugs found + fixed during build (commit 863642e):
+    * Missing closing '"' on a Python f-string in superposition code block (SWC parse error)
+    * Missing closing '"' on a Python f-string in Grover code block (same SWC parse error)
+    * Escaped Lindblad master equation's '{L_k†L_k, ρ}' as JSX string literal so SWC doesn't try to parse it as JSX expression
+- Bonus fixes while testing live:
+    * PyodideRunner was failing on every numpy import — added auto-load of numpy when code references /\bnumpy\b|\bnp\./ (commit 1b5de62)
+    * PyodideRunner's setStdout(writer) was silently failing on Pyodide 0.26.2 because the API changed to setStdout({ batched: writer }) — fixed with try-the-new-API-first + fallback (commit 45d6f45). This bug was affecting ALL PyodideRunner calls on the site, not just my new ones — every existing demo was showing "(no output)" even when the code ran successfully
+- Final live verification (commit 45d6f45 deployed, run #98):
+    * Open quantum-computing page → 4 vertical short cards visible (SHORT 1 / 2 / 3 / 4 badges with hook titles)
+    * Click short 1 → modal pops up with animated Bloch sphere SVG + |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)·sin(θ/2)|1⟩ + Born's rule math + Run superposition simulator button + Recent research (Dec 2024) Google Willow citation
+    * Click Run → Pyodide loads in 3525ms, numpy auto-loaded, code executes, OUTPUT CAPTURED:
+        "After H|0⟩: [0.70710678 0.70710678]
+         |α|² = 0.5000  (probability of measuring |0⟩)
+         |β|² = 0.5000  (probability of measuring |1⟩)
+         1000-shot simulation:
+           empirical P(0) = 0.497  (theory: 0.500)
+         Applying H again: H^2|0> = [1. 0.]  (H is Hermitian — H^2 = I)"
+
+Stage Summary:
+- HEAD = 45d6f45 on both private (AppDataSci-Advanced) and public (DemoAppDataSci) repos
+- 4 commits in this task: 2e9b7fe (email) → 863642e (shorts+breakthroughs) → 1b5de62 (numpy auto-load) → 45d6f45 (Pyodide 0.26 stdout API)
+- Live site confirmed: https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/quantum-computing/ now has:
+    * New "Quantum concept shorts" section with 4 lazy-popup cards
+    * New "Recent breakthroughs (2024-2025)" section with hardware comparison table
+    * All 5 Pyodide code blocks (4 in shorts + 1 in breakthroughs) now execute successfully with numpy + stdout capture
+- Email updated to testdemoqwenai2025@gmail.com in all 5 contact locations
+- Three latent bugs fixed along the way (numpy loading, Pyodide 0.26 stdout API)
