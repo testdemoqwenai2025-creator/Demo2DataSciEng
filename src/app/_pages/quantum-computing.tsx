@@ -7,6 +7,7 @@ import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
 import { QuantumShortsCarousel } from "../_components/quantum-shorts";
+import { QuantumGallery3D } from "../_components/quantum-gallery-3d";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
@@ -1326,41 +1327,13 @@ export function QuantumComputingPage() {
         ))}
       </div>
 
-      <SectionCard title="AI-generated illustrations — click to expand" icon={<Atom className="h-5 w-5" />} badge="AI gallery">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <ImageModal
-              src="/images/quantum/quantum-circuit.png"
-              alt="Quantum circuit"
-              caption="Quantum circuit — qubits as horizontal rails, gates as boxes (H, X, Z) and connection symbols (• for control, ⊕ for CNOT target). The Hadamard creates superposition, CNOT entangles, measurement collapses to classical bits. This is the visual language of quantum programming (OpenQASM 3.0)."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Quantum circuit — gates on qubit rails</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/quantum/bloch-sphere.png"
-              alt="Bloch sphere"
-              caption="Bloch sphere — the geometric representation of a single qubit state. The north pole is |0⟩, south pole |1⟩, equator is the |+⟩/|-⟩ superposition. Any pure state |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)·sin(θ/2)|1⟩ corresponds to a point (θ, φ) on the unit sphere."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Bloch sphere — qubit state geometry</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/quantum/entanglement.png"
-              alt="Quantum entanglement"
-              caption="Quantum entanglement — Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2. The two qubits are non-separable: measuring one instantly determines the other, regardless of distance. Einstein called this 'spooky action at a distance' — Bell's theorem (1964) proved it cannot be explained by classical hidden variables."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Entanglement — non-separable Bell pairs</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/quantum/vqe-hybrid.png"
-              alt="VQE hybrid quantum-classical"
-              caption="VQE hybrid quantum-classical loop — quantum device prepares parameterised ansatz |ψ(θ)⟩ and measures energy E(θ) = ⟨ψ|H|ψ⟩; classical optimiser updates θ to minimise E. The variational principle guarantees E(θ) ≥ E_0 (ground state). Loop converges to ground state energy + state."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">VQE — hybrid quantum-classical loop</p>
-          </div>
-        </div>
+      <SectionCard
+        title="Quantum concept gallery — 3D animated, click to expand (lazy popup)"
+        description="Replaces the previous AI-generated static image gallery. The old gallery had 4 PNGs, two of which contained random Chinese characters hallucinated by the AI image generator ('睿加意' on the circuit image, '已知'/'求解' on the VQE image). The new gallery is procedural — pure SVG + CSS 3D transforms + framer-motion, no AI images, no Chinese-text issue. Each card opens a lazy modal with: (1) an animated 3D scene, (2) an n-D toggle showing how the concept scales across Hilbert-space dimensions (3D single-qubit Bloch → 4D Bell pair → 5D GHZ → N-D cluster), and (3) a floating math/code background with the actual equations and Python snippets that power the visual."
+        icon={<Atom className="h-5 w-5" />}
+        badge="3D gallery"
+      >
+        <QuantumGallery3D />
       </SectionCard>
 
       <SectionCard title="Bell state short — quantum circuit → superposition → entanglement → Bell state → measurement (loop)" icon={<Atom className="h-5 w-5" />} badge="short">
