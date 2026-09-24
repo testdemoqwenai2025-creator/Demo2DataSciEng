@@ -2083,3 +2083,43 @@ Suggestion 2: Real-time WebSocket-like data feed for trigger simulator
 
 - Commit afe9058, deploy #119 succeeded
 - Both suggestions verified on live site
+
+---
+Task ID: next-phase-suggestions-1-3-complete
+Agent: Super Z (main)
+Task: Complete suggestions 1-3 of 5 — case studies + real-time stream + binary parser
+
+Work Log:
+Suggestion 1 (COMPLETED): Real-world case studies
+  - Streaming page: Kafka at LinkedIn (7T msgs/day) — streaming-case-study.tsx
+  - Orchestration page: Airflow at Airbnb (3,000+ DAGs) — orchestration-case-study.tsx
+  - Both verified live: KPIs + pipeline viz + data toggle + Pyodide code + architecture notes
+  - Databricks deferred per user request
+
+Suggestion 2 (COMPLETED): Real-time WebSocket-like data feed (40 Hz)
+  - TriggerSimulator upgraded with Start/Stop live stream
+  - Streams at 25ms intervals (40 Hz = CMS beam crossing rate)
+  - Live verified: Start button → LIVE indicator → live counter → Stop button
+
+Suggestion 3 (COMPLETED): Enhanced binary parser (DataView zero-copy)
+  - BinaryParserDemo now uses JavaScript DataView (JS equivalent of Rust memmap2)
+  - Allocates ArrayBuffer, writes CMS RD5 binary using setBigUint64/setUint32/setFloat32
+  - Parses back using getBigUint64/getUint32/getFloat32 — zero-copy reads
+  - Shows parse statistics: bytes, events, time, throughput (MB/s)
+  - Compares JS DataView vs Rust+WASM (~1000x faster)
+  - Live verified: "DataView" present, parser ran, "MB/s" throughput shown
+
+Commits: fcea582 (case studies) → afe9058 (trigger stream) → a9f2c4c (binary parser)
+Deploys: #118, #119, #120 all succeeded
+
+Suggestions 4-5 are PENDING (next phase):
+  4. Page-level interactive gallery for ingestion page (3D gallery + shorts + interactives)
+  5. Cross-page topic threads — extend cross-link pattern to all 60+ pages
+
+Stage Summary:
+- HEAD = a9f2c4c on both repos
+- 3 of 5 suggestions completed and verified live
+- Streaming page: Kafka@LinkedIn case study live
+- Orchestration page: Airflow@Airbnb case study live
+- Ingestion page: real-time 40 Hz trigger stream + enhanced DataView binary parser live
+- All pushed to private repo including worklog + scripts
