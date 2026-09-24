@@ -1064,3 +1064,50 @@ THE ADVANCED-SCIENCE ARC:
 - AlphaMissense (#52): IS evolution's experimental log queried via ML, precision medicine IS multi-modal RAG on the human genome
 
 The grand pattern across all 52 pages and 43 ADRs: every scientific domain — bioinformatics, cheminformatics, molecular modelling, genetics, macro structures, systems biology, cryo-EM, spatial transcriptomics, single-cell multi-omics, AlphaMissense — is a different modality of the SAME contrastive-learning + DP + LP + graph-theory + matrix-factorisation + ODE algorithmic stack. The platform's pgvector IS the shared embedding space for all of them. Biology IS the original cloud; the cell IS the original distributed system; evolution IS the original contrastive-learning experiment.
+
+---
+Task ID: adr047-spatial-multiomics-d4-FINAL
+Agent: Super Z (main)
+Task: Stage 4/4 (FINAL) of "advanced design: AlphaProteo + Boltz + AI drug + Spatial multi-omics" — ADR-047 (DBiT-seq + spatial-CUT&Tag) + Spatial Multi-omics page (#56). User requested deeper low-level code + math on all four.
+
+Work Log:
+- ADR-047: DBiT-seq + spatial-CUT&Tag + Spatial ATAC-RNA for spatial multi-omics (chromatin + RNA + protein co-profiling with spatial coordinates)
+- Spatial Multi-omics page (#56) — FINAL of the advanced-design series:
+  * 4 AI-generated illustrations (DBiT-seq chip, spatial chromatin H3K4me3/H3K27me3, multi-modal overlay, spatial ATAC-RNA) via z-ai-web-dev-sdk
+  * Multi-modal spatial 'short' — looping 6-phase animation (3 modality heatmaps on 8×8 tissue grid → cross-attention RNA↔chromatin↔protein → joint 30-dim latent → spatial domains emerge)
+  * DBiT-seq math: pixel_id = (row_barcode, col_barcode), two perpendicular microfluidic passes, poly-T + antibody-DNA conjugates, 50μm pixels
+  * spatial-CUT&Tag math: antibody-guided Tn5 transposase, signal(pixel, mark) = Σ reads in peaks, H3K4me3/H3K27me3/H3K27ac marks
+  * Pyodide: DBiT-seq barcode grid + spatial-CUT&Tag signal + cross-attention + multi-modal STAGATE joint latent + spatial domain clustering + production comparison table
+  * Modern papers: DBiT-seq (Liu 2020 Nature Biotech), spatial-CUT&Tag (Tian 2023 Nature Methods), Spatial ATAC-RNA-seq (Zhang 2023 Nature Biotech), Seurat v5 spatial WNN (Hao 2024)
+  * HPC pipeline: 3 matrices per tissue (3×10^9 entries) → Spark Parquet ~10GB → MultiModalSTAGATE → spatial domains → LLM RAG
+  * Low-level PyTorch: MultiModalGraphConvolution (3 modality encoders + cross-attention RNA↔chromatin↔protein + spatial graph attention), MultiModalSTAGATE (full multi-modal VAE autoencoder), SpatialWNN (extends WNN ADR-042 to spatial context)
+  * 'Spatial multi-omics IS the regulatory layer biology was missing' deeper-thought insight (RNA-only shows what's expressed, spatial multi-omics adds WHY (chromatin) and WHAT (protein) — three layers regulatory→expression→functional = complete causal chain; multi-modal STAGATE IS multi-modal RAG on spatial graphs — cross-attention structurally identical to CLIP/SigLIP ADR-033; unifies platform's spatial + multi-modal stack — ADR-041 + ADR-042 + ADR-047 = complete, precision medicine IS multi-modal RAG on patient's spatial biology)
+
+Stage Summary — ALL 4 ADVANCED-DESIGN STAGES COMPLETE:
+- HEAD = 55e04e1 on both repos (private + public)
+- 56 pages, 47 ADRs, 53 pages with Pyodide, 3 with WasmRunner
+- /spatial-multiomics → HTTP 200 (429KB)
+- Production build succeeded (57 routes total, 1 new)
+
+FINAL TOTALS — full platform state after advanced-design series:
+- 56 pages (started this conversation at 52)
+- 47 ADRs (started at 43)
+- 53 pages with Pyodide demos (started at 49)
+- 3 pages with WasmRunner (unchanged)
+- 57 routes (started at 53)
+- 4 new pages in this advanced-design series:
+  #53 /alphaproteo (RFdiffusion, ProteinMPNN, AlphaProteo — de novo protein design via diffusion)
+  #54 /boltz (Boltz-1/2 — open AlphaFold3, MIT licence, multi-chain complex)
+  #55 /ai-drug-discovery (Insilico Chemistry42, Recursion phenomics, ADMET, ISM042-2-048 Phase II)
+  #56 /spatial-multiomics (DBiT-seq, spatial-CUT&Tag, cross-attention STAGATE) — FINAL
+
+TOTAL AI-GENERATED IMAGES ACROSS ALL SCIENCE PAGES: 44
+(4 per page × 11 science pages: genetics, macro, systemsbio, cryoem, spatialtx, singlecell, alphamissense, alphaproteo, boltz, aidrug, spatialmulti)
+
+THE ADVANCED-DESIGN ARC:
+- AlphaProteo (#53): protein design IS the inverse function of evolution (RFdiffusion = natural selection filter made computational, 4B years → 2 hours)
+- Boltz (#54): Boltz-1 IS the democratisation of AlphaFold3 (MIT licence restores open model, same pattern as Linux/PyTorch/Stable Diffusion)
+- AI Drug Discovery (#55): AI drug discovery IS search at unprecedented scale (10^60 chemical space → 64-dim latent = 10^45× speedup, phenomics IS search without hypothesis)
+- Spatial Multi-omics (#56): spatial multi-omics IS the regulatory layer biology was missing (RNA shows what, chromatin shows why, protein shows what — complete causal chain)
+
+The grand pattern across all 56 pages and 47 ADRs: the platform is a complete bidirectional map of biological space — forward (predict: variant → protein → structure → function → disease) and inverse (design: target → binder → drug → clinical candidate). Every modality (DNA, RNA, protein, chromatin, small molecule, cell, tissue) has both a forward predictor and an inverse designer. The platform's pgvector IS the shared embedding space for all of them. Precision medicine IS multi-modal RAG on the patient's biology.
