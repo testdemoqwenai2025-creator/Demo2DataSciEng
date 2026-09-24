@@ -890,7 +890,485 @@ function CVAExposureDiagram() {
   );
 }
 
-export { LazyModal, InfoCallout, MultiLangCode, DeltaHedgeMatrix, AsianPayoffDiagram, LSTMArchitecture, FraudRingDiagram, SVISmileDiagram, EfficientFrontierDiagram, DeepHedgingPnLDiagram, CVAExposureDiagram };
+// (exports moved below — after all visualisation component definitions)
+
+// ============================================================
+// Heston stochastic volatility path diagram
+// ============================================================
+
+function HestonVolPathDiagram() {
+  // Simulated spot path + variance path under Heston
+  // ρ<0 produces leverage smile (spot down → vol up)
+  const n = 60;
+  const spotPath: number[] = [100.0];
+  const varPath: number[] = [0.04];
+  for (let i = 1; i < n; i++) {
+    const dt = 1 / 252;
+    const z1 = Math.sin(i * 0.7) * 0.7;
+    const z2 = -0.7 * z1 + Math.sqrt(1 - 0.49) * Math.cos(i * 0.3);
+    const v_prev = varPath[i - 1];
+    const v_new = Math.max(0, v_prev + 2.0 * (0.04 - v_prev) * dt + 0.3 * Math.sqrt(Math.max(v_prev, 0)) * Math.sqrt(dt) * z2);
+    const s_new = spotPath[i - 1] * Math.exp((0.05 - 0.5 * v_prev) * dt + Math.sqrt(Math.max(v_prev, 0)) * Math.sqrt(dt) * z1);
+    spotPath.push(s_new);
+    varPath.push(v_new);
+  }
+  const minS = Math.min(...spotPath), maxS = Math.max(...spotPath);
+  const minV = Math.min(...varPath), maxV = Math.max(...varPath);
+  const rangeS = maxS - minS || 1;
+  const rangeV = maxV - minV || 0.001;
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          Heston stochastic vol — spot (top) + variance (bottom), ρ=-0.7
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 220" className="w-full h-auto">
+          {/* Spot path */}
+          <line x1="30" y1="80" x2="380" y2="80" stroke="var(--border)" strokeWidth="0.5" />
+          <polyline
+            points={spotPath.map((s, i) => `${30 + (i / (n - 1)) * 350},${80 - ((s - minS) / rangeS) * 60 - 5}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="1.8" />
+          <text x="35" y="20" fontSize="9" fill="var(--chart-2)" fontWeight="bold">Spot S(t)</text>
+          {/* Variance path */}
+          <line x1="30" y1="180" x2="380" y2="180" stroke="var(--border)" strokeWidth="0.5" />
+          <polyline
+            points={varPath.map((v, i) => `${30 + (i / (n - 1)) * 350},${180 - ((v - minV) / rangeV) * 60 - 5}`).join(" ")}
+            fill="none" stroke="var(--chart-1)" strokeWidth="1.8" />
+          <text x="35" y="120" fontSize="9" fill="var(--chart-1)" fontWeight="bold">Variance v(t)</text>
+          {/* Inverse correlation annotation */}
+          <text x="200" y="210" textAnchor="middle" fontSize="8" fill="var(--muted-foreground)">
+            ρ=-0.7: spot down → vol up (leverage effect)
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Heston's variance is mean-reverting (Ornstein-Uhlenbeck on √v).
+          The negative correlation between dW_s and dW_v produces the
+          equity-index leverage smile — when spot drops, vol spikes.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Hull-White interest rate path diagram
+// ============================================================
+
+function HullWhiteRatePathDiagram() {
+  // Simulated short-rate paths + discount curve
+  const n = 100;
+  const paths: number[][] = [];
+  for (let p = 0; p < 5; p++) {
+    const r: number[] = [0.035];
+    for (let i = 1; i < n; i++) {
+      const dt = 5.0 / n;
+      const z = Math.sin(i * 0.5 + p) * 0.5 + Math.cos(i * 0.3) * 0.3;
+      const theta = 0.04 + 0.001 * (i * dt);
+      const r_new = r[i - 1] + (theta - 0.1 * r[i - 1]) * dt + 0.012 * Math.sqrt(dt) * z;
+      r.push(r_new);
+    }
+    paths.push(r);
+  }
+  const allR = paths.flat();
+  const minR = Math.min(...allR), maxR = Math.max(...allR);
+  const rangeR = maxR - minR || 0.001;
+  // Discount curve P(0, t) = exp(-∫r dt) — single average path
+  const avgPath = Array.from({ length: n }, (_, i) => paths.reduce((s, p) => s + p[i], 0) / paths.length);
+  const discPath = [1.0];
+  for (let i = 1; i < n; i++) {
+    const dt = 5.0 / n;
+    discPath.push(discPath[i - 1] * Math.exp(-avgPath[i] * dt));
+  }
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          Hull-White short rate (5 paths, top) + discount curve P(0,t) (bottom)
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 220" className="w-full h-auto">
+          {/* Rate paths */}
+          <line x1="30" y1="80" x2="380" y2="80" stroke="var(--border)" strokeWidth="0.5" />
+          {paths.map((p, idx) => (
+            <polyline key={idx}
+              points={p.map((r, i) => `${30 + (i / (n - 1)) * 350},${80 - ((r - minR) / rangeR) * 60 - 5}`).join(" ")}
+              fill="none" stroke="var(--chart-2)" strokeWidth="0.8" opacity={0.5} />
+          ))}
+          <text x="35" y="20" fontSize="9" fill="var(--chart-2)" fontWeight="bold">Short rate r(t)</text>
+          <text x="30" y="73" fontSize="7" fill="var(--muted-foreground)">5%</text>
+          <text x="30" y="86" fontSize="7" fill="var(--muted-foreground)">3.5%</text>
+          {/* Discount curve */}
+          <line x1="30" y1="180" x2="380" y2="180" stroke="var(--border)" strokeWidth="0.5" />
+          <polyline
+            points={discPath.map((d, i) => `${30 + (i / (n - 1)) * 350},${180 - (d - 0.7) / 0.3 * 60}`).join(" ")}
+            fill="none" stroke="var(--chart-3)" strokeWidth="2" />
+          <text x="35" y="120" fontSize="9" fill="var(--chart-3)" fontWeight="bold">P(0,t) — discount factor</text>
+          <text x="200" y="210" textAnchor="middle" fontSize="8" fill="var(--muted-foreground)">
+            a=0.10 (slow mean reversion), σ=1.2%, T=5y
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Hull-White mean-reverts toward θ(t) which is calibrated to the
+          current zero curve. Slow mean-reversion (a=0.10) lets 5y rates
+          wander far from r0; the discount curve declines smoothly.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SABR vol smile diagram
+// ============================================================
+
+function SABRSmileDiagram() {
+  // SABR smile: F=4%, α=0.003, β=0.5, ρ=-0.2, ν=0.3, T=5y
+  const F = 0.04, alpha = 0.003, beta = 0.5, rho = -0.2, nu = 0.3, T = 5.0;
+  const points = Array.from({ length: 60 }, (_, i) => {
+    const k = 0.01 + (i / 59) * 0.06;  // 1% to 7%
+    let vol;
+    if (Math.abs(F - k) < 1e-10) {
+      const t1 = (1 - beta) ** 2 / 24 * alpha ** 2 / F ** (2 - 2 * beta);
+      const t2 = rho * beta * nu * alpha / (4 * F ** (1 - beta));
+      const t3 = (2 - 3 * rho * rho) / 24 * nu * nu;
+      vol = alpha / F ** (1 - beta) * (1 + (t1 + t2 + t3) * T);
+    } else {
+      const z = nu / alpha * (F * k) ** ((1 - beta) / 2) * Math.log(F / k);
+      const x_z = Math.log((Math.sqrt(1 - 2 * rho * z + z * z) + z - rho) / (1 - rho));
+      const fk_pow = (F * k) ** ((1 - beta) / 2);
+      const t1 = (1 - beta) ** 2 / 24 * alpha ** 2 / fk_pow ** 2;
+      const t2 = rho * beta * nu * alpha / (4 * fk_pow);
+      const t3 = (2 - 3 * rho * rho) / 24 * nu * nu;
+      vol = alpha / fk_pow * z / x_z * (1 + (t1 + t2 + t3) * T);
+    }
+    return { k, vol: Math.abs(vol) };
+  });
+  const vols = points.map(p => p.vol);
+  const minV = Math.min(...vols), maxV = Math.max(...vols);
+  const range = maxV - minV || 0.001;
+  const atmVol = points.find(p => Math.abs(p.k - F) < 0.001)?.vol || 0.3;
+
+  // Synthetic market quotes (noisy)
+  const marketPts = points.filter((_, i) => i % 8 === 0).map(p => ({
+    ...p, mktVol: p.vol * (1 + (Math.sin(p.k * 1000) * 0.05))
+  }));
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          SABR smile — 5y10y swaption, F=4%, β=0.5, ρ=-0.2, ν=0.3
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          <line x1="40" y1="170" x2="380" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          <line x1="40" y1="20" x2="40" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          {/* ATM marker */}
+          <line x1={40 + ((F - 0.01) / 0.06) * 340} y1="20"
+            x2={40 + ((F - 0.01) / 0.06) * 340} y2="170"
+            stroke="var(--chart-3)" strokeWidth="1" strokeDasharray="4,3" />
+          <text x={40 + ((F - 0.01) / 0.06) * 340 + 4} y="30" fontSize="9" fill="var(--chart-3)">ATM</text>
+          {/* SABR curve */}
+          <polyline
+            points={points.map((p, i) => `${40 + (i / 59) * 340},${170 - ((p.vol - minV) / range) * 130 - 20}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="2"
+          />
+          {/* Market quotes */}
+          {marketPts.map((p, i) => (
+            <circle key={i}
+              cx={40 + (((p.k - 0.01) / 0.06) * 340)}
+              cy={170 - ((p.mktVol - minV) / range) * 130 - 20}
+              r="3" fill="var(--chart-1)" opacity="0.7" />
+          ))}
+          <text x="20" y="100" textAnchor="middle" fontSize="9" fill="var(--foreground)"
+            transform="rotate(-90 20 100)">σ_imp</text>
+          <text x="210" y="190" textAnchor="middle" fontSize="9" fill="var(--foreground)">strike K</text>
+          <text x="50" y="14" fontSize="9" fill="var(--foreground)" fontWeight="bold">
+            SABR: σ_imp = α / F^(1-β) · [1 + ...]
+          </text>
+          <text x="270" y="55" fontSize="9" fill="var(--chart-2)">ATM vol = {(atmVol * 100).toFixed(2)}%</text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          β controls backbone shape (0=normal, 1=lognormal, 0.5=typical rates).
+          ρ controls skew (negative → left-skew). ν controls convexity.
+          SABR calibrated per swaption bucket at rates desks.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// LOB depth diagram (heatmap-style)
+// ============================================================
+
+function LOBDepthDiagram() {
+  // Synthetic L2 book around mid=5400 (E-mini S&P)
+  const mid = 5400, tick = 0.25;
+  const levels = 8;
+  const bids: number[] = [];
+  const asks: number[] = [];
+  let seed = 42;
+  for (let i = 0; i < levels; i++) {
+    seed = (seed * 9301 + 49297) % 233280;
+    bids.push(50 + (seed / 233280) * 200);
+    seed = (seed * 9301 + 49297) % 233280;
+    asks.push(50 + (seed / 233280) * 200);
+  }
+  const maxSize = Math.max(...bids, ...asks);
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          L2 order book — ES (E-mini S&amp;P 500), mid={mid}, tick={tick}
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Mid price line */}
+          <line x1="200" y1="10" x2="200" y2="190" stroke="var(--chart-3)" strokeWidth="1" strokeDasharray="3,2" />
+          <text x="200" y="8" textAnchor="middle" fontSize="8" fill="var(--chart-3)" fontWeight="bold">mid</text>
+          {/* Bid levels (left side) */}
+          {bids.map((size, i) => {
+            const y = 30 + i * 20;
+            const width = (size / maxSize) * 150;
+            return (
+              <g key={`b-${i}`}>
+                <rect x={200 - width} y={y} width={width} height="16"
+                  fill="var(--chart-4)" opacity={0.5 + (1 - i / levels) * 0.4} />
+                <text x={195} y={y + 11} textAnchor="end" fontSize="7" fill="var(--foreground)">{(mid - (i + 1) * tick).toFixed(2)}</text>
+                <text x={205 - width} y={y + 11} textAnchor="end" fontSize="7" fill="var(--foreground)" fontWeight="bold">{size}</text>
+              </g>
+            );
+          })}
+          {/* Ask levels (right side) */}
+          {asks.map((size, i) => {
+            const y = 30 + i * 20;
+            const width = (size / maxSize) * 150;
+            return (
+              <g key={`a-${i}`}>
+                <rect x={200} y={y} width={width} height="16"
+                  fill="var(--chart-1)" opacity={0.5 + (1 - i / levels) * 0.4} />
+                <text x="205" y={y + 11} fontSize="7" fill="var(--foreground)">{(mid + (i + 1) * tick).toFixed(2)}</text>
+                <text x={195 + width} y={y + 11} fontSize="7" fill="var(--foreground)" fontWeight="bold">{size}</text>
+              </g>
+            );
+          })}
+          <text x="50" y="195" fontSize="8" fill="var(--chart-4)">← bids</text>
+          <text x="350" y="195" textAnchor="end" fontSize="8" fill="var(--chart-1)">asks →</text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Order-flow imbalance (OFI) at top-of-book predicts mid moves:
+          heavy bids → mid rises; heavy asks → mid falls. Cont 2010.
+          HFT firms use this with sub-microsecond latency.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Black-76 futures curve diagram
+// ============================================================
+
+function Black76FuturesDiagram() {
+  // WTI futures curve (backwardation): 78.50 → 76.20
+  const contracts = [
+    { name: "CLM4", expiry: 0.2, price: 78.50 },
+    { name: "CLN4", expiry: 0.28, price: 78.20 },
+    { name: "CLQ4", expiry: 0.36, price: 77.90 },
+    { name: "CLV4", expiry: 0.45, price: 77.60 },
+    { name: "CLX4", expiry: 0.53, price: 77.30 },
+    { name: "CLZ4", expiry: 0.70, price: 76.80 },
+    { name: "CLF5", expiry: 0.78, price: 76.50 },
+    { name: "CLG5", expiry: 0.86, price: 76.20 },
+  ];
+  const prices = contracts.map(c => c.price);
+  const minP = Math.min(...prices) - 0.2;
+  const maxP = Math.max(...prices) + 0.2;
+  const range = maxP - minP;
+
+  // Option strikes + prices on the front month
+  const optStrikes = [76, 77, 78, 79, 80];
+  const optVols = [0.40, 0.36, 0.34, 0.33, 0.32];
+  const optPrices = optStrikes.map((k, i) => {
+    // Black-76 ATM-ish
+    const F = 78.50, T = 0.25, r = 0.05, sigma = optVols[i];
+    const d1 = (Math.log(F / k) + 0.5 * sigma * sigma * T) / (sigma * Math.sqrt(T));
+    const d2 = d1 - sigma * Math.sqrt(T);
+    return Math.exp(-r * T) * (F * 0.5 * (1 + erf_approx(d1)) - k * 0.5 * (1 + erf_approx(d2)));
+  });
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          Black-76 — WTI futures curve (backwardation) + ATM call prices
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Futures curve */}
+          <line x1="40" y1="100" x2="380" y2="100" stroke="var(--border)" strokeWidth="0.5" />
+          <polyline
+            points={contracts.map((c, i) => `${40 + (i / (contracts.length - 1)) * 340},${100 - ((c.price - minP) / range) * 60 - 30}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="2" />
+          {/* Contract markers */}
+          {contracts.map((c, i) => (
+            <g key={c.name}>
+              <circle cx={40 + (i / (contracts.length - 1)) * 340}
+                cy={100 - ((c.price - minP) / range) * 60 - 30} r="3"
+                fill="var(--chart-2)" />
+              <text x={40 + (i / (contracts.length - 1)) * 340}
+                y={100 - ((c.price - minP) / range) * 60 - 38}
+                textAnchor="middle" fontSize="7" fill="var(--foreground)">{c.name}</text>
+            </g>
+          ))}
+          <text x="20" y="65" fontSize="9" fill="var(--chart-2)" fontWeight="bold">F (USD/bbl)</text>
+          {/* Option strikes on the right axis */}
+          <line x1="380" y1="110" x2="380" y2="180" stroke="var(--border)" strokeWidth="0.5" />
+          {optStrikes.map((k, i) => {
+            const y = 180 - (optPrices[i] / Math.max(...optPrices)) * 60 - 10;
+            return (
+              <g key={`opt-${k}`}>
+                <rect x="385" y={y - 4} width="10" height="8"
+                  fill="var(--chart-3)" opacity="0.6" />
+                <text x="395" y={y + 3} textAnchor="end" fontSize="6" fill="var(--foreground)">{k}</text>
+              </g>
+            );
+          })}
+          <text x="350" y="115" fontSize="8" fill="var(--chart-3)" fontWeight="bold">Calls</text>
+          <text x="200" y="195" textAnchor="middle" fontSize="9" fill="var(--foreground)">contract expiry (years)</text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Backwardation: front &gt; back → roll yield positive for longs.
+          Black-76 prices options on F (forward) not S (spot) — used on
+          NYMEX, ICE, CBOT commodity futures options.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Abramowitz-Stegun erf approximation for the SVG calc only
+function erf_approx(x: number): number {
+  const t = 1.0 / (1.0 + 0.3275911 * Math.abs(x));
+  const y = 1.0 - (((((1.061405429*t - 1.453152027)*t) + 1.421413741)*t
+                   - 0.284496736)*t + 0.254829592) * t * Math.exp(-x*x);
+  return x >= 0 ? y : -y;
+}
+
+// ============================================================
+// Bond duration + convexity diagram
+// ============================================================
+
+function BondDurationConvexityDiagram() {
+  // Price-yield curve for a 10y bond
+  // Show tangent line (duration) + curvature (convexity)
+  const coupon = 0.04, face = 100.0, tYears = 10.0, freq = 2;
+  const ytmBase = 0.042;
+  const points = Array.from({ length: 60 }, (_, i) => {
+    const ytm = 0.02 + (i / 59) * 0.05;  // 2% to 7%
+    const n = tYears * freq;
+    const dt = 1.0 / freq;
+    let price = 0.0;
+    for (let t = 1; t <= n; t++) {
+      let cf = coupon * face / freq;
+      if (t === n) cf += face;
+      price += cf * Math.exp(-ytm * t * dt);
+    }
+    return { ytm, price };
+  });
+  const prices = points.map(p => p.price);
+  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const range = maxP - minP;
+
+  // Tangent line at base ytm (duration = slope)
+  const basePrice = points.find(p => Math.abs(p.ytm - ytmBase) < 0.001)?.price || 100;
+  const baseMacaulay = 8.5;  // approx for 10y 4% bond at 4.2%
+  const baseMod = baseMacaulay / (1 + ytmBase / freq);
+  // Tangent: price_tan(y) = basePrice * (1 - baseMod * (y - ytmBase))
+  const tanPoints = points.map(p => ({
+    ytm: p.ytm,
+    price: basePrice * (1 - baseMod * (p.ytm - ytmBase))
+  }));
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          Bond price-yield curve — tangent = duration, curvature = convexity
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          <line x1="40" y1="170" x2="380" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          <line x1="40" y1="20" x2="40" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          {/* Tangent (duration approximation) */}
+          <polyline
+            points={tanPoints.map((p, i) => `${40 + (i / 59) * 340},${170 - ((p.price - minP) / range) * 130 - 20}`).join(" ")}
+            fill="none" stroke="var(--chart-3)" strokeWidth="1.5" strokeDasharray="4,3" />
+          <text x="80" y="40" fontSize="8" fill="var(--chart-3)">tangent (duration)</text>
+          {/* Actual price-yield curve (convex) */}
+          <polyline
+            points={points.map((p, i) => `${40 + (i / 59) * 340},${170 - ((p.price - minP) / range) * 130 - 20}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="2" />
+          <text x="240" y="60" fontSize="8" fill="var(--chart-2)">actual (convex)</text>
+          {/* Base point */}
+          {(() => {
+            const baseIdx = points.findIndex(p => Math.abs(p.ytm - ytmBase) < 0.001);
+            const x = 40 + (baseIdx / 59) * 340;
+            const y = 170 - ((basePrice - minP) / range) * 130 - 20;
+            return (
+              <>
+                <circle cx={x} cy={y} r="4" fill="var(--chart-1)" stroke="var(--background)" strokeWidth="1.5" />
+                <text x={x + 6} y={y - 6} fontSize="8" fill="var(--chart-1)" fontWeight="bold">y={(ytmBase * 100).toFixed(1)}%</text>
+              </>
+            );
+          })()}
+          <text x="20" y="100" textAnchor="middle" fontSize="9" fill="var(--foreground)"
+            transform="rotate(-90 20 100)">price</text>
+          <text x="210" y="190" textAnchor="middle" fontSize="9" fill="var(--foreground)">yield y</text>
+          <text x="50" y="14" fontSize="9" fill="var(--foreground)" fontWeight="bold">
+            ΔP/P ≈ -D·Δy + ½·C·(Δy)²
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Duration (tangent) is the linear approximation; convexity is the
+          curvature. For large |Δy|, convexity matters — long bonds gain
+          more from rate drops than they lose from rate rises (asymmetric).
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export { LazyModal, InfoCallout, MultiLangCode, DeltaHedgeMatrix, AsianPayoffDiagram, LSTMArchitecture, FraudRingDiagram, SVISmileDiagram, EfficientFrontierDiagram, DeepHedgingPnLDiagram, CVAExposureDiagram, HestonVolPathDiagram, HullWhiteRatePathDiagram, SABRSmileDiagram, LOBDepthDiagram, Black76FuturesDiagram, BondDurationConvexityDiagram };
 
 // ============================================================
 // Main component — QuantTradeCards
@@ -912,6 +1390,16 @@ import {
   DEEP_HEDGE_PYTHON, DEEP_HEDGE_RUST, DEEP_HEDGE_SCALA, DEEP_HEDGE_ELIXIR,
   CVA_PYTHON, CVA_RUST, CVA_SCALA, CVA_ELIXIR,
 } from "./_quant_trade_code4";
+import {
+  HESTON_PYTHON, HESTON_RUST, HESTON_SCALA, HESTON_ELIXIR,
+  HULL_WHITE_PYTHON, HULL_WHITE_RUST, HULL_WHITE_SCALA, HULL_WHITE_ELIXIR,
+  SABR_PYTHON, SABR_RUST, SABR_SCALA, SABR_ELIXIR,
+} from "./_quant_trade_code5";
+import {
+  LOB_PYTHON, LOB_RUST, LOB_SCALA, LOB_ELIXIR,
+  BLACK76_PYTHON, BLACK76_RUST, BLACK76_SCALA, BLACK76_ELIXIR,
+  BOND_PYTHON, BOND_RUST, BOND_SCALA, BOND_ELIXIR,
+} from "./_quant_trade_code6";
 
 const SCENARIOS: ScenarioCard[] = [
   {
@@ -1114,6 +1602,156 @@ const SCENARIOS: ScenarioCard[] = [
     intent: "Compute CVA — the credit valuation adjustment — via Monte Carlo exposure simulation. This is the regulatory capital metric under Basel III FRTB and the foundation of the broader XVA framework (DVA, FVA, MVA, KVA) used by every bank's counterparty risk desk.",
     insight: "CVA is computed daily on the full OTC derivatives portfolio (10⁵-10⁶ trades × 10⁴ paths each = 10⁹-10¹⁰ simulation steps). The XVA desk is now a profit centre at every major bank — AFRM (JP Morgan), EQD (Goldman), etc. pre-trade price XVA, post-trade hedge it. The same exposure profile feeds CVA, DVA, FVA, MVA, and KVA — one simulation, five adjustments.",
   },
+  {
+    id: "heston-stoch-vol",
+    step: "9",
+    title: "Heston Stochastic Volatility",
+    subtitle: "Mean-reverting variance + correlated Brownian (Heston 1993)",
+    accent: "oklch(0.65 0.16 30)",
+    icon: <Activity className="h-4 w-4" />,
+    badge: "Heston 1993",
+    brief: {
+      derivative: "1-year European call on AAPL with stochastic volatility. Heston params: v₀=0.04, κ=2.0, θ=0.04, ξ=0.3, ρ=-0.7. Synthetic market: Bloomberg-style implied-vol smile on 7 strikes.",
+      problem: "Black-Scholes assumes constant vol — but real vol is stochastic. The equity-index leverage smile (spot down → vol up) requires a stochastic-vol model with negative correlation.",
+      solution: "Heston's mean-reverting variance SDE: dv_t = κ(θ-v_t)dt + ξ·√v_t·dW_v with correlation ρ to spot. Monte Carlo via Euler-Maruyama with full truncation (neg-var fix). Negative ρ produces the leverage smile.",
+    },
+    matrix: <HestonVolPathDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "heston.py", code: HESTON_PYTHON },
+      { lang: "rust", filename: "heston.rs", code: HESTON_RUST },
+      { lang: "scala", filename: "HestonModel.scala", code: HESTON_SCALA },
+      { lang: "elixir", filename: "heston.ex", code: HESTON_ELIXIR },
+    ],
+    runnablePython: HESTON_PYTHON,
+    mathExpr: "dv_t = κ(θ-v_t)dt + ξ·√v_t·dW_v  ·  dS_t = μ·S_t·dt + √v_t·S_t·dW_s  ·  corr(dW_s, dW_v) = ρ",
+    intent: "Implement Heston's stochastic volatility model (Heston 1993) with mean-reverting variance and correlated Brownian motions. The negative correlation ρ produces the equity-index leverage smile.",
+    insight: "Heston with ρ<0 produces the equity leverage smile (spot down → vol up). ξ controls vol-of-vol and tail fatness. Production calibration runs every minute at JPM/GS exotic desks via Levenberg-Marquardt on the option surface.",
+  },
+  {
+    id: "hull-white-rates",
+    step: "10",
+    title: "Hull-White Interest Rate Model",
+    subtitle: "Mean-reverting short rate + θ(t) calibrated to curve",
+    accent: "oklch(0.65 0.16 60)",
+    icon: <TrendingUp className="h-4 w-4" />,
+    badge: "Hull-White 1990",
+    brief: {
+      derivative: "5-year USD 10M notional interest rate swap — receive fixed 4% vs floating 3M LIBOR. Synthetic yield curve: 3M=3.5%, 5y=4.2% (upward-sloping).",
+      problem: "Black-Scholes assumes deterministic rates — real rates are stochastic. Bond prices depend on the rate path, not just today's curve. Hull-White calibrates θ(t) to the current strip and adds stochastic dynamics.",
+      solution: "Hull-White SDE: dr_t = (θ(t) - a·r_t)dt + σ·dW_t. Calibrate θ(t) via strip of zero-coupon yields; simulate paths via Euler; value swap as PV of (fixed - floating) cashflows.",
+    },
+    matrix: <HullWhiteRatePathDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "hull_white.py", code: HULL_WHITE_PYTHON },
+      { lang: "rust", filename: "hull_white.rs", code: HULL_WHITE_RUST },
+      { lang: "scala", filename: "HullWhiteModel.scala", code: HULL_WHITE_SCALA },
+      { lang: "elixir", filename: "hull_white.ex", code: HULL_WHITE_ELIXIR },
+    ],
+    runnablePython: HULL_WHITE_PYTHON,
+    mathExpr: "dr_t = (θ(t) - a·r_t)·dt + σ·dW_t  ·  P(0,t) = E[exp(-∫r ds)]",
+    intent: "Implement Hull-White one-factor interest-rate model with time-dependent drift θ(t) calibrated to the current yield curve. Value a 5y IRS via Monte Carlo on simulated rate paths.",
+    insight: "θ(t) is calibrated to the stripped zero curve — without this, the model prices bonds inconsistently with the market. The mean-reversion a controls how fast rates return to θ(t); slow reversion (a=0.10) lets 5y rates wander far from r0. Production: PIMCO, BlackRock fixed-income desks.",
+  },
+  {
+    id: "sabr-vol-surface",
+    step: "11",
+    title: "SABR Volatility Surface (Rates)",
+    subtitle: "Hagan 2002 asymptotic formula — swaption smile",
+    accent: "oklch(0.65 0.16 200)",
+    icon: <Activity className="h-4 w-4" />,
+    badge: "Hagan 2002",
+    brief: {
+      derivative: "5y10y swaption book — ATM F=4%, synthetic market quotes across 5 strikes from 200bp OTM payer to 200bp OTM receiver.",
+      problem: "SVI is equity-focused; rates need a model that captures the rate-specific smile (negative rates, low-vol environment). SABR's CEV-style forward SDE handles both normal (β=0) and lognormal (β=1) limits.",
+      solution: "SABR model: dF = α·F^β·dW_F, dα = ν·α·dW_α. Hagan's asymptotic formula gives σ_imp(K,F) in closed form (4 params: α, β, ρ, ν). β controls backbone shape, ρ controls skew, ν controls convexity.",
+    },
+    matrix: <SABRSmileDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "sabr.py", code: SABR_PYTHON },
+      { lang: "rust", filename: "sabr.rs", code: SABR_RUST },
+      { lang: "scala", filename: "SABRModel.scala", code: SABR_SCALA },
+      { lang: "elixir", filename: "sabr.ex", code: SABR_ELIXIR },
+    ],
+    runnablePython: SABR_PYTHON,
+    mathExpr: "σ_imp(K,F) ≈ α/(F^(1-β)) · (1 + correction terms)  ·  dF = α·F^β·dW_F, dα = ν·α·dW_α",
+    intent: "Implement Hagan 2002's SABR asymptotic implied-vol formula for swaption smile calibration. SABR is the rates-desk standard (vs SVI for equities) because its CEV-style forward SDE handles both normal and lognormal rate regimes.",
+    insight: "SABR is calibrated per swaption bucket (e.g. 5y10y, 10y10y) at every major bank's rates desk. β=0.5 typical for rates, β=1 for high-rate envs and equities, β=0 for negative rates (JGB, Bund). ρ<0 produces left-skew typical of rate payer pressure.",
+  },
+  {
+    id: "lob-replay",
+    step: "12",
+    title: "Real-time Limit Order Book Replay",
+    subtitle: "ITCH feed → L2 book → OFI signal (Cont 2010)",
+    accent: "oklch(0.65 0.16 250)",
+    icon: <Cpu className="h-4 w-4" />,
+    badge: "Cont 2010",
+    brief: {
+      derivative: "HFT market-making on E-mini S&P 500 futures (ESM4). Replay 1000 synthetic ITCH events (add/cancel/trade) against an L2 book around mid=5400, tick=0.25.",
+      problem: "HFT firms need to track every order-book mutation in microseconds. The L2 book is a sorted bid/ask ladder; each event (add/cancel/trade) mutates it. Order-flow imbalance (OFI) at the top predicts short-term mid moves.",
+      solution: "Build an OrderBook class with BTreeMap/sorted-dict bid/ask ladders. Replay events; compute OFI = bid_top_size / (bid_top + ask_top). OFI > 0.5 → bid pressure → mid rises. CME/Nasdaq ITCH parsed at sub-microsecond latency.",
+    },
+    matrix: <LOBDepthDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "lob_replay.py", code: LOB_PYTHON },
+      { lang: "rust", filename: "lob_replay.rs", code: LOB_RUST },
+      { lang: "scala", filename: "LOBReplay.scala", code: LOB_SCALA },
+      { lang: "elixir", filename: "lob_replay.ex", code: LOB_ELIXIR },
+    ],
+    runnablePython: LOB_PYTHON,
+    mathExpr: "OFI = bid_top_size / (bid_top_size + ask_top_size)  ·  OFI > 0.5 → mid rises",
+    intent: "Implement a real-time L2 order-book reconstruction engine that consumes ITCH/Mold UDP market data, maintains a sorted bid/ask ladder, and emits order-flow-imbalance (OFI) signals.",
+    insight: "OFI is a leading indicator of mid-price moves — Cont 2010 shows OFI predicts 40%+ of next-10-second mid variance. Production HFT firms (Citadel Securities, Virtu, Jump) process this in <1μs via FPGA + custom C — the Elixir UDP multicast version here is the same pattern at lower throughput.",
+  },
+  {
+    id: "black76-commodity",
+    step: "13",
+    title: "Black-76 Commodity Futures Option",
+    subtitle: "Options on futures — WTI crude oil (Black 1976)",
+    accent: "oklch(0.65 0.16 165)",
+    icon: <TrendingUp className="h-4 w-4" />,
+    badge: "Black 1976",
+    brief: {
+      derivative: "3-month ATM call on WTI crude oil futures (CLM4). Synthetic curve: 8 contracts from CLM4 (front) at USD 78.50/bbl to CLG5 (back) at USD 76.20/bbl — backwardation.",
+      problem: "Options on futures (not spot) need a modified Black-Scholes — the forward price F replaces spot S, and the entire payoff is discounted at r (no continuous yield q).",
+      solution: "Black-76 formula: C = e^(-rT)·[F·N(d1) - K·N(d2)], d1 = (ln(F/K) + σ²/2·T)/(σ·√T). Used on NYMEX, ICE, CBOT commodity futures options. Backwardation means front > back → positive roll yield for longs.",
+    },
+    matrix: <Black76FuturesDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "black76.py", code: BLACK76_PYTHON },
+      { lang: "rust", filename: "black76.rs", code: BLACK76_RUST },
+      { lang: "scala", filename: "Black76.scala", code: BLACK76_SCALA },
+      { lang: "elixir", filename: "black76.ex", code: BLACK76_ELIXIR },
+    ],
+    runnablePython: BLACK76_PYTHON,
+    mathExpr: "C = e^(-rT)·[F·N(d1) - K·N(d2)]  ·  d1 = (ln(F/K) + σ²/2·T)/(σ·√T)",
+    intent: "Implement Black-76 — the standard model for options on commodity futures. Differs from Black-Scholes by using forward F instead of spot S, and discounting the entire payoff.",
+    insight: "Black-76 powers every oil major (BP, Shell, XOM) and commodity hedge fund (Citadel Commodities, Trafigura). The backwardation curve (front > back) gives longs a positive roll yield — they capture it by rolling futures before expiry.",
+  },
+  {
+    id: "bond-duration-convexity",
+    step: "14",
+    title: "Bond Duration & Convexity",
+    subtitle: "ΔP/P ≈ -D·Δy + ½·C·(Δy)² (Macaulay 1938, Hicks 1939)",
+    accent: "oklch(0.65 0.16 320)",
+    icon: <Brain className="h-4 w-4" />,
+    badge: "Macaulay 1938",
+    brief: {
+      derivative: "USD 100M position in 10-year Treasury bond (coupon 4%, semi-annual, YTM 4.2%). Yield curve shifts +100bp. Estimate loss via duration + convexity; hedge via short 10y Treasury futures.",
+      problem: "Bond prices change non-linearly with yield. Duration (first-order) is a linear approximation that breaks down for large yield moves. Convexity (second-order) captures the curvature.",
+      solution: "Macaulay duration = weighted-average time-to-cashflow. Modified duration = D_mac / (1 + y/m). Convexity = Σ t²·CF_t·DF_t / P. Price change: ΔP/P ≈ -D_mod·Δy + ½·C·(Δy)². Hedge: short Treasury futures to bring portfolio DV01 to zero.",
+    },
+    matrix: <BondDurationConvexityDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "bond_duration.py", code: BOND_PYTHON },
+      { lang: "rust", filename: "bond_duration.rs", code: BOND_RUST },
+      { lang: "scala", filename: "BondAnalytics.scala", code: BOND_SCALA },
+      { lang: "elixir", filename: "bond_analytics.ex", code: BOND_ELIXIR },
+    ],
+    runnablePython: BOND_PYTHON,
+    mathExpr: "ΔP/P ≈ -D_mod·Δy + ½·C·(Δy)²  ·  D_mod = D_mac / (1 + y/m)  ·  DV01 = -P · D_mod · 0.0001",
+    intent: "Implement bond duration and convexity — the foundational interest-rate risk metrics. Used by pension funds, insurance companies, and asset managers for ALM (asset-liability management) and duration-hedge design.",
+    insight: "Convexity is always positive for long bonds — gains from rate drops exceed losses from rate rises (asymmetric). Duration alone is a linear approximation that underestimates gains and overestimates losses. Production: CalPERS, MetLife, PIMCO use this for daily ALM with Treasury futures hedges.",
+  },
 ];
 
 export function QuantTradeCards() {
@@ -1125,14 +1763,17 @@ export function QuantTradeCards() {
       {/* Intro */}
       <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
         <p className="text-sm font-semibold text-primary mb-1 flex items-center gap-1.5">
-          <Sparkles className="h-4 w-4" /> 8 quant scenarios · 4 languages each · click any card
+          <Sparkles className="h-4 w-4" /> 14 quant scenarios · 4 languages each · click any card
         </p>
         <p className="text-xs text-muted-foreground leading-relaxed">
           Each card opens a lazy popup with the scenario brief (Derivative, Problem, Quant Solution),
-          a visualisation matrix (rebalancing table / vol smile / efficient frontier / fraud-ring graph / etc.),
-          multi-language code (Python / Rust / Scala / Elixir), an in-browser Pyodide runner, and the
-          math-foundation + implementation-insight callouts. The pattern mirrors the LHC ingestion cards
-          on the ELT+ETL page — same lazy-modal architecture, different domain (quant finance vs physics data).
+          a visualisation matrix (rebalancing table / vol smile / efficient frontier / fraud-ring graph /
+          P&amp;L distribution / exposure profile / spot+variance paths / order-book depth / futures curve /
+          price-yield curve), multi-language code (Python / Rust / Scala / Elixir), an in-browser Pyodide
+          runner for the Python version, and math-foundation + implementation-insight callouts.
+          Scenarios span pricing (Black-Scholes, MC Asian, Heston, Black-76, SABR), portfolio theory
+          (Markowitz), ML (LSTM, GNN, Deep Hedging), risk (CVA/XVA, Bond Duration), market microstructure
+          (LOB replay), and rates (Hull-White).
         </p>
       </div>
 
@@ -1165,7 +1806,7 @@ export function QuantTradeCards() {
 
               {/* Mini preview: scenario card step indicator */}
               <div className="mt-3 flex items-center gap-2 text-[10px] text-muted-foreground">
-                <span className="font-mono">step {s.step}/8</span>
+                <span className="font-mono">step {s.step}/14</span>
                 <span>·</span>
                 <span className="font-mono">Python · Rust · Scala · Elixir</span>
               </div>

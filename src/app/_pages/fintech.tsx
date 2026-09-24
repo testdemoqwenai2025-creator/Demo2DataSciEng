@@ -914,13 +914,13 @@ export function FintechPage() {
         />
       </SectionCard>
 
-      {/* Multi-language quant scenarios — 8 cards with lazy popups,
+      {/* Multi-language quant scenarios — 14 cards with lazy popups,
           placed right after the PyTorch code section */}
       <SectionCard
-        title="Quant scenarios in 4 languages — Delta Hedging, MC Asian, LSTM, GNN, SVI, Markowitz, Deep Hedging, CVA/XVA"
-        description="Eight production-style quant scenarios presented as cards that open lazy popups (mirroring the LHC ingestion pattern on the ELT+ETL page). Each popup contains the scenario brief (Derivative, Problem, Quant Solution), a visualisation matrix (rebalancing table / vol smile / efficient frontier / fraud-ring graph / P&L distribution / exposure profile), multi-language code in Python + Rust + Scala + Elixir, an in-browser Pyodide runner for the Python version, and math-foundation + implementation-insight callouts. Scenarios: (1) Dynamic Delta Hedging — short 1 European call, rebalance Δ daily over 10 days (Black 1973). (2) Monte Carlo Asian Option — arithmetic-average path-dependent payoff via 10⁴ antithetic GBM paths (Boyle 1977, Kemna-Vorst 1990). (3) LSTM Price-Direction Predictor — 60-day OHLCV lookback, 2-layer LSTM(64), ~52% hit rate (Fischer 2018). (4) GNN Fraud Ring Detection — 2-layer GraphSAGE on transaction graph (Weber 2019 'Scale'). (5) SVI Volatility Surface — 5-parameter vol smile calibration (Gatheral 2004). (6) Markowitz Efficient Frontier — closed-form QP, tangency max-Sharpe (Markowitz 1952, Nobel 1990). (7) Deep Hedging — NN learns hedge action via CVaR minimisation (Buehler 2019). (8) CVA/XVA — counterparty credit risk under Basel III FRTB."
+        title="Quant scenarios in 4 languages — Delta Hedging, MC Asian, LSTM, GNN, SVI, Markowitz, Deep Hedging, CVA/XVA, Heston, Hull-White, SABR, LOB Replay, Black-76, Bond Duration"
+        description="Fourteen production-style quant scenarios presented as cards that open lazy popups (mirroring the LHC ingestion pattern on the ELT+ETL page). Each popup contains the scenario brief (Derivative, Problem, Quant Solution), a visualisation matrix (rebalancing table / vol smile / efficient frontier / fraud-ring graph / P&L distribution / exposure profile / spot+variance paths / order-book depth / futures curve / price-yield curve), multi-language code in Python + Rust + Scala + Elixir, an in-browser Pyodide runner for the Python version, and math-foundation + implementation-insight callouts. Scenarios span pricing (Black-Scholes, MC Asian, Heston, Black-76, SABR), portfolio theory (Markowitz), ML (LSTM, GNN, Deep Hedging), risk (CVA/XVA, Bond Duration), market microstructure (LOB replay), and rates (Hull-White). All Python examples include synthetic market data + hypothetical scenarios."
         icon={<Sparkles className="h-5 w-5" />}
-        badge="8 scenarios × 4 languages"
+        badge="14 scenarios × 4 languages"
       >
         <QuantTradeCards />
       </SectionCard>
