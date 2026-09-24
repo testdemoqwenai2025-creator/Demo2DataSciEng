@@ -69,13 +69,19 @@ export type PageId =
   | "generative-chemistry-2"
   | "quantum-computing"
   | "space-science"
-  | "fintech";
+  | "fintech"
+  | "data-lakehouse"
+  | "iceberg"
+  | "glue"
+  | "hudi"
+  | "delta-lake"
+  | "catalogs";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs";
   icon: string;
   description: string;
 }
@@ -584,6 +590,54 @@ export const PAGES: PageMeta[] = [
     group: "Fintech",
     icon: "Activity",
     description: "AI illustrations + pricing short, Black-Scholes formula + Ito lemma + Monte Carlo + VaR/CVaR + LSTM trading + GNN fraud, low-level PyTorch BlackScholesModel+MonteCarloPricer+LSTMPredictor+FraudGNN.",
+  },
+  {
+    id: "data-lakehouse",
+    label: "Data Lakehouse — Lake + Warehouse Unified",
+    shortLabel: "Lakehouse",
+    group: "Data Lakehouse",
+    icon: "Boxes",
+    description: "The lake→lakehouse evolution: Hadoop → S3+Hive → Iceberg/Delta/Hudi. Vendor-neutral open table formats giving ACID + SQL to cheap object storage. Anchor page for the Data Lakehouse group.",
+  },
+  {
+    id: "iceberg",
+    label: "Apache Iceberg — Open Table Format",
+    shortLabel: "Iceberg",
+    group: "Apache Iceberg",
+    icon: "Layers",
+    description: "Netflix-origin open table format with manifest trees, hidden partitioning, time travel, schema evolution. Production at Netflix, Apple, Stripe. SQL+PyIceberg+Trino code, manifest tree diagram, NYC Taxi on Iceberg Pyodide demo.",
+  },
+  {
+    id: "glue",
+    label: "AWS Glue — Serverless ETL + Data Catalog",
+    shortLabel: "Glue",
+    group: "AWS Glue",
+    icon: "Workflow",
+    description: "Serverless Spark ETL, Data Catalog, Crawlers, Glue Studio, Schema Registry. The most-used data-lake catalog on AWS. Code: Glue PySpark jobs, crawler configs, cross-account catalog access.",
+  },
+  {
+    id: "hudi",
+    label: "Apache Hudi — Incremental/UPSERT Tables",
+    shortLabel: "Hudi",
+    group: "Apache Hudi",
+    icon: "Database",
+    description: "Uber-origin open table format for incremental/UPSERT workloads. COW vs MOR table types, CDC ingestion, change-logs. Production at Uber, Walmart, ByteDance. Distinct from Iceberg/Delta because of upsert-first design.",
+  },
+  {
+    id: "delta-lake",
+    label: "Delta Lake — Databricks Open Format",
+    shortLabel: "Delta",
+    group: "Delta Lake",
+    icon: "Boxes",
+    description: "Most widely-deployed open table format. ACID transactions, time travel, Change Data Feed, Z-Order, Liquid Clustering. Production on every Databricks deployment. Transaction-log replay Pyodide demo.",
+  },
+  {
+    id: "catalogs",
+    label: "Catalogs — Glue vs Hive vs Nessie vs Unity vs Polaris vs REST",
+    shortLabel: "Catalogs",
+    group: "Catalogs",
+    icon: "Network",
+    description: "Comparison of metadata/catalog systems: AWS Glue Data Catalog, Hive Metastore, Nessie (Git-for-data), Databricks Unity Catalog, Snowflake Polaris, Iceberg REST Catalog. The metadata-layer battle.",
   },
 ];
 

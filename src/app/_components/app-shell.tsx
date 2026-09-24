@@ -73,6 +73,12 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Quantum Computing", ids: ["quantum-computing"] },
   { title: "Space Science", ids: ["space-science"] },
   { title: "Fintech", ids: ["fintech"] },
+  { title: "Data Lakehouse", ids: ["data-lakehouse"] },
+  { title: "Apache Iceberg", ids: ["iceberg"] },
+  { title: "AWS Glue", ids: ["glue"] },
+  { title: "Apache Hudi", ids: ["hudi"] },
+  { title: "Delta Lake", ids: ["delta-lake"] },
+  { title: "Catalogs", ids: ["catalogs"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
