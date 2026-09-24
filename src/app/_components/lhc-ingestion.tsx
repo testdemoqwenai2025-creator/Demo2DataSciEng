@@ -762,6 +762,97 @@ interface CodeCard {
   insight: string;
 }
 
+// ETL (Data Warehouse) — classic Extract -> Transform -> Load pipeline
+const ETL_CODE = `from collections import defaultdict
+
+print("=== ETL Pipeline (Data Warehouse) ===")
+print()
+
+sources = {
+    "Shopify": [
+        {"order_id": 1001, "email": "alice@example.com", "amount": 125.50, "currency": "USD"},
+        {"order_id": 1002, "email": "bob@example.com", "amount": 89.99, "currency": "USD"},
+        {"order_id": 1003, "email": "alice@example.com", "amount": 250.00, "currency": "EUR"},
+        {"order_id": 1004, "email": "carol@example.com", "amount": 45.00, "currency": "GBP"},
+    ],
+    "Stripe": [
+        {"payment_id": "PAY001", "order_id": 1001, "amount": 125.50, "status": "paid", "fee": 3.56},
+        {"payment_id": "PAY002", "order_id": 1002, "amount": 89.99, "status": "paid", "fee": 2.55},
+        {"payment_id": "PAY003", "order_id": 1003, "amount": 250.00, "status": "paid", "fee": 7.10},
+    ],
+}
+
+print("=== EXTRACT ===")
+total_rows = sum(len(rows) for rows in sources.values())
+for source, rows in sources.items():
+    print("  " + source + ": " + str(len(rows)) + " rows extracted")
+print("  Total: " + str(total_rows) + " rows from " + str(len(sources)) + " sources")
+print()
+
+print("=== TRANSFORM ===")
+fx_rate = {"USD": 1.0, "EUR": 1.09, "GBP": 1.27}
+orders = sources["Shopify"]
+for o in orders:
+    o["amount_usd"] = round(o["amount"] * fx_rate.get(o["currency"], 1.0), 2)
+    print("  Normalize: order " + str(o["order_id"]) + " " + str(o["amount"]) + " " + o["currency"] + " -> $ " + str(o["amount_usd"]) + " USD")
+
+payments = sources["Stripe"]
+enriched = []
+for o in orders:
+    payment = next((p for p in payments if p["order_id"] == o["order_id"]), None)
+    if payment:
+        enriched.append({
+            "order_id": o["order_id"],
+            "email": o["email"],
+            "amount_usd": o["amount_usd"],
+            "payment_status": payment["status"],
+            "fee": payment["fee"],
+            "net_amount": round(o["amount_usd"] - payment["fee"], 2),
+        })
+print("  Join: " + str(len(enriched)) + "/" + str(len(orders)) + " orders matched with payments")
+
+customer_agg = defaultdict(lambda: {"orders": 0, "revenue": 0.0, "fees": 0.0})
+for e in enriched:
+    customer_agg[e["email"]]["orders"] += 1
+    customer_agg[e["email"]]["revenue"] += e["net_amount"]
+    customer_agg[e["email"]]["fees"] += e["fee"]
+
+print("  Aggregate: " + str(len(customer_agg)) + " unique customers")
+for email, agg in customer_agg.items():
+    print("    " + email + ": " + str(agg["orders"]) + " orders, $ " + str(round(agg["revenue"], 2)) + " net, $ " + str(round(agg["fees"], 2)) + " fees")
+
+print()
+print("=== DATA QUALITY CHECKS ===")
+checks = [
+    ("No null emails", all(e["email"] for e in enriched)),
+    ("All amounts positive", all(e["amount_usd"] > 0 for e in enriched)),
+    ("Payment status is paid", all(e["payment_status"] == "paid" for e in enriched)),
+    ("Net revenue > 0", all(e["net_amount"] > 0 for e in enriched)),
+    ("No duplicate order IDs", len(set(e["order_id"] for e in enriched)) == len(enriched)),
+]
+all_pass = True
+for check_name, passed in checks:
+    status = "PASS" if passed else "FAIL"
+    if not passed: all_pass = False
+    print("  [" + status + "] " + check_name)
+print("  Overall: " + ("ALL PASS" if all_pass else "SOME FAILED"))
+
+print()
+print("=== LOAD ===")
+print("  Target: Snowflake (data_warehouse.gold.customer_aggregations)")
+print("  Rows loaded: " + str(len(customer_agg)))
+print("  Load method: MERGE (upsert on email)")
+print()
+print("ETL complete: " + str(total_rows) + " source rows -> " + str(len(enriched)) + " enriched -> " + str(len(customer_agg)) + " aggregated -> warehouse")
+print()
+print("=== ETL vs ELT ===")
+print("  ETL (this card): Transform BEFORE load -> warehouse-ready data")
+print("  ELT (Fivetran):  Load RAW first -> transform IN the warehouse")
+print("  ELT advantage:   warehouse compute is cheaper than ETL server")
+print("  ETL advantage:   warehouse stays clean (no raw data)")
+print("  LHC pipeline:     ETL pattern (trigger+zero-suppress = transform, EOS = load)")
+print("  Same pattern, different domain, different scale")`;
+
 const CODE_CARDS: CodeCard[] = [
   {
     id: "python",
@@ -821,6 +912,20 @@ const CODE_CARDS: CodeCard[] = [
     mathExpr: "max_demand: 1000→500→100 (stages scale down) · backpressure automatic · 1 OTP process per stage",
     intent: "Build a concurrent event-processing pipeline with GenStage + Flow. Each stage (readout → filter → compress → store) runs as an OTP process with automatic backpressure — the pipeline never overflows.",
     insight: "Elixir/Erlang's GenStage is the only framework that handles backpressure natively (via demand signaling). CERN's DAQ team evaluated Erlang for DAQ control plane monitoring (not data path — that stays in C++) because of its fault tolerance and hot code-swapping. The pattern shown here mirrors how CMS DAQ handles rate fluctuations during beam intensity ramps.",
+  },
+  {
+    id: "etl",
+    step: "5",
+    title: "ETL (Data Warehouse) — Extract → Transform → Load",
+    subtitle: "Classic ETL: source APIs → normalize/join/validate → warehouse",
+    accent: "oklch(0.55 0.16 60)",
+    icon: <Database className="h-4 w-4" />,
+    language: "python",
+    code: ETL_CODE,
+    runnable: true,
+    mathExpr: "Extract (source APIs) → Transform (normalize, join, aggregate, validate) → Load (warehouse MERGE)",
+    intent: "Classic ETL pipeline: extract from Shopify + Stripe, transform (currency normalization, referential join, customer aggregation, Great Expectations validation), load to Snowflake warehouse. This is the Fivetran pattern at business scale — same skeleton as the LHC pipeline but business domain.",
+    insight: "ETL vs ELT: ETL transforms BEFORE loading (warehouse era — 2000s). ELT loads FIRST then transforms in the warehouse (modern — Snowflake/BigQuery). The LHC pipeline IS ETL (trigger+zero-suppress = transform, EOS = load). Same pattern, different domain (business vs physics), different scale (3.1B rows/month vs 40 TB/s).",
   },
 ];
 
