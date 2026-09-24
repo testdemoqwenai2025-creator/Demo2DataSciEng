@@ -84,8 +84,8 @@ bun run build:static     # static export with GITHUB_PAGES=true for Pages-style 
 ```
 
 **Demo login** (on the Sign in button in the header):
-- Email: `demo@moderndatascieng.io`
-- Password: `demo-password`
+- Username: `admin`
+- Password: `admin`
 - Or click "Auto-fill & sign in" — the form pre-fills and submits in one click.
 
 ## Project PDF

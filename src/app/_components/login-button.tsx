@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   Dialog,
   DialogContent,
@@ -26,16 +26,16 @@ import { LogIn, LogOut, Sparkles, User } from "lucide-react";
  */
 
 const DEMO_USER = {
-  email: "demo@moderndatascieng.io",
-  password: "demo-password",
-  name: "Demo Analyst",
-  role: "Analytics Consumer",
+  username: "admin",
+  password: "admin",
+  name: "Admin Analyst",
+  role: "Platform Administrator",
 };
 
 const STORAGE_KEY = "mdse_demo_auth";
 
 interface AuthState {
-  email: string;
+  username: string;
   name: string;
   role: string;
   signedInAt: string;
@@ -63,7 +63,7 @@ export function LoginButton() {
   // Read once on client mount, falls back to null on server
   const initialAuth = useSyncExternalStore(noopSubscribe, getStoredAuth, getServerAuth);
   const [authState, setAuthState] = useState<AuthState | null>(initialAuth);
-  const [email, setEmail] = useState(DEMO_USER.email);
+  const [username, setUsername] = useState(DEMO_USER.username);
   const [password, setPassword] = useState(DEMO_USER.password);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,9 +71,9 @@ export function LoginButton() {
     e?.preventDefault();
     setError(null);
     // Demo auth — accept the demo credentials only
-    if (email === DEMO_USER.email && password === DEMO_USER.password) {
+    if (username === DEMO_USER.username && password === DEMO_USER.password) {
       const state: AuthState = {
-        email,
+        username,
         name: DEMO_USER.name,
         role: DEMO_USER.role,
         signedInAt: new Date().toISOString(),
@@ -91,12 +91,12 @@ export function LoginButton() {
   };
 
   const autoSignIn = () => {
-    setEmail(DEMO_USER.email);
+    setUsername(DEMO_USER.username);
     setPassword(DEMO_USER.password);
     // Defer sign-in so the state updates visually first
     setTimeout(() => {
       const state: AuthState = {
-        email: DEMO_USER.email,
+        username: DEMO_USER.username,
         name: DEMO_USER.name,
         role: DEMO_USER.role,
         signedInAt: new Date().toISOString(),
@@ -152,14 +152,14 @@ export function LoginButton() {
 
         <form onSubmit={signIn} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="login-email">Email</Label>
+            <Label htmlFor="login-username">Username</Label>
             <Input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@moderndatascieng.io"
-              autoComplete="email"
+              id="login-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              autoComplete="username"
               required
             />
           </div>
@@ -195,7 +195,7 @@ export function LoginButton() {
           <p className="text-[11px] text-muted-foreground">
             <strong className="text-foreground/80">Demo credentials (pre-filled):</strong>
             <br />
-            Email: <code className="font-mono">{DEMO_USER.email}</code>
+            Username: <code className="font-mono">{DEMO_USER.username}</code>
             <br />
             Password: <code className="font-mono">{DEMO_USER.password}</code>
             <br />
