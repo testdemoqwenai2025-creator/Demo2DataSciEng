@@ -1108,6 +1108,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["spatial-multi-omics", "dbit-seq", "spatial-cut-tag", "chromatin", "spatial-atac-rna", "cross-attention", "multi-modal-graph", "patterns", "genai"],
   },
+  {
+    id: "ADR-048",
+    title: "Adopt Direct Coupling Analysis (DCA) for co-evolution-based contact prediction — the mathematical bridge to AlphaFold2",
+    status: "accepted",
+    date: "FY32-Q4",
+    deciders: "Data Platform, Bioinformatics, ML Engineering, Architecture",
+    context:
+      "ADR-034 adopted ESM-2 for protein sequence embeddings. ADR-038 adopted AlphaFold DB for structure prediction. The mathematical bridge between these — the method that made AlphaFold2 POSSIBLE — is Direct Coupling Analysis (DCA, Morcos et al. 2011). DCA computes the mutual information I(i,j) = Σ_{a,b} f_{ij}(a,b) log[f_{ij}(a,b) / (f_i(a)·f_j(b))] between columns of a Multiple Sequence Alignment (MSA). Residues with high co-evolution are spatially close in 3D. The statistical physics model behind DCA is the Potts model: P(seq) ∝ exp(Σ_i h_i(x_i) + Σ_{i<j} J_{ij}(x_i, x_j)) where J_{ij} is the coupling matrix (co-evolution strength) and h_i is the local field (sequence preference). Mean-field DCA (mfDCA) solves the inverse Potts problem in closed form: J_{ij} = -(C^{-1})_{ij} where C is the covariance matrix of the MSA — a single matrix inversion gives all couplings. The Average Product Correction (APC) removes phylogenetic bias. The deep insight: the attention mechanism QK^T in transformers IS a parameterised version of the DCA coupling matrix J — AlphaFold2's Evoformer learned what DCA computed explicitly. DCA → contact map → 3D structure was the pipeline before AlphaFold2 (RaptorX, trRosetta); AlphaFold2 added end-to-end learning but the mathematical structure is the same.",
+    decision:
+      "Adopt DCA as the educational + research bridge between sequence alignment and structure prediction. Three-layer implementation: (1) Mutual information computation from MSA (Pyodide: compute I(i,j) from synthetic alignment); (2) Mean-field DCA via covariance matrix inversion (Pyodide: build C → invert → J = -C^{-1} → APC → top-L/5 contacts); (3) Attention-as-DCA equivalence (Pyodide: compare QK^T weights to DCA J matrix on same MSA). Connects to ADR-034 (ESM-2 uses the same MSA), ADR-038 (AlphaFold2 Evoformer IS learned DCA), ADR-044 (RFdiffusion uses MSA features for design). The Potts model IS the statistical physics of protein evolution — the partition function Z = Σ_seqs exp(-E(seq)) IS the Boltzmann distribution over sequence space, and the couplings J_{ij} ARE the evolutionary constraints.",
+    consequences:
+      "+ Provides the mathematical foundation that makes AlphaFold2's Evoformer understandable — QK^T IS DCA. + Mean-field DCA is O(L³) for L residues — fast (seconds for 100-residue protein). + APC correction removes the dominant phylogenetic noise. + Contact prediction accuracy ~70% for top-L/5 (DCA alone, no deep learning). + Connects statistical physics (Potts model) to deep learning (attention) to structural biology (contact maps). − DCA requires deep MSAs (≥1000 sequences) — fails for orphan proteins with no homologs. − Mean-field approximation breaks down for highly correlated sites (need pseudo-likelihood instead). − DCA contacts are binary (contact / no contact) — AlphaFold2's attention gives continuous distance distributions, more informative. − The Potts model assumes independent sites (mean-field) — real evolution has hierarchical phylogenetic structure.",
+    alternatives: [
+      "Pseudo-likelihood DCA (plmDCA) — more accurate than mean-field but O(L²·q²) per iteration, needs gradient descent",
+      "EVfold (Hopf 2012) — DCA + distance geometry for 3D reconstruction (pre-AlphaFold pipeline)",
+      "trRosetta (Yang 2020) — deep learning on top of DCA features (bridge between DCA and AlphaFold)",
+      "Greedy mutational scanning — no co-evolution, just single-site conservation (much weaker)",
+    ],
+    tags: ["dca", "direct-coupling-analysis", "mutual-information", "potts-model", "mean-field", "apc", "co-evolution", "attention-equivalence", "contact-prediction", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

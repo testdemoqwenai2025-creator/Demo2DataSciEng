@@ -85,6 +85,7 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "boltz":                       { topic: "Boltz-1 Boltz-2 open AlphaFold3 multi-chain complex MIT license PoseBusters drug discovery Chai-1",      label: "Boltz",         codeRepo: "jwohlwend/boltz/main/README.md" },
   "ai-drug-discovery":           { topic: "AI drug discovery Insilico Medicine Recursion Chemistry42 generative chemistry phenomics ADMET clinical candidate ISM042 Atomwise",      label: "AI Drug",       codeRepo: "insilico/chemistry42/main/README.md" },
   "spatial-multiomics":         { topic: "spatial multi-omics DBiT-seq spatial-CUT&Tag chromatin histone marks H3K4me3 H3K27me3 Spatial ATAC-RNA cross-attention STAGATE",      label: "Spatial Multi",  codeRepo: "Frishberg-Lab/STAGATE/main/README.md" },
+  "coevolution-dca":           { topic: "Direct Coupling Analysis DCA co-evolution mutual information Potts model mean-field covariance inverse AlphaFold attention equivalence contact prediction",      label: "Co-evo & DCA",   codeRepo: "marcatcg/inversefold/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";

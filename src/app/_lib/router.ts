@@ -62,13 +62,14 @@ export type PageId =
   | "alphaproteo"
   | "boltz"
   | "ai-drug-discovery"
-  | "spatial-multiomics";
+  | "spatial-multiomics"
+  | "coevolution-dca";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA";
   icon: string;
   description: string;
 }
@@ -521,6 +522,14 @@ export const PAGES: PageMeta[] = [
     group: "Spatial Multi-omics",
     icon: "Grid",
     description: "AI-generated illustrations + multi-modal spatial short, DBiT-seq microfluidic barcoding + spatial-CUT&Tag histone marks + Spatial ATAC-RNA + MultiModalSTAGATE cross-attention + SpatialWNN, low-level PyTorch MultiModalGraphConvolution+MultiModalSTAGATE+SpatialWNN.",
+  },
+  {
+    id: "coevolution-dca",
+    label: "Co-evolution & DCA — From Mutual Information to AlphaFold",
+    shortLabel: "Co-evolution & DCA",
+    group: "Coevolution & DCA",
+    icon: "Network",
+    description: "AI-generated illustrations + co-evolution short, mutual information I(i,j) + Potts model + mean-field DCA J=-(C^-1) + APC correction + attention QK^T≈J equivalence, low-level PyTorch MSAParser+FrequencyLayer+MutualInformationLayer+MeanFieldDCA+ContactPredictor+AttentionAsDCA.",
   },
 ];
 
