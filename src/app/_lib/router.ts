@@ -58,13 +58,14 @@ export type PageId =
   | "cryo-em"
   | "spatial-transcriptomics"
   | "singlecell-multiomics"
-  | "alphamissense";
+  | "alphamissense"
+  | "alphaproteo";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo";
   icon: string;
   description: string;
 }
@@ -485,6 +486,14 @@ export const PAGES: PageMeta[] = [
     group: "AlphaMissense",
     icon: "Dna",
     description: "AI-generated illustrations + variant scoring short, AlphaFold2 backbone + variant-aware head, ACMG classification thresholds (≥0.564 likely pathogenic), ClinVar+gnomAD calibration, 94% accuracy, low-level PyTorch ProteinEncoder+VariantEmbedder+AlphaMissenseHead+AlphaMissense.",
+  },
+  {
+    id: "alphaproteo",
+    label: "AlphaProteo — De Novo Protein Design via RFdiffusion",
+    shortLabel: "AlphaProteo",
+    group: "AlphaProteo",
+    icon: "Sparkles",
+    description: "AI-generated illustrations + binder design short, RFdiffusion DDPM on 3D backbones + ProteinMPNN inverse folding + AlphaFold2 self-consistency, AlphaProteo 60-90% wet-lab success, low-level PyTorch SE3EquivariantDenoiseLayer+RFdiffusion+ProteinMPNN+AlphaFold2SelfConsistency.",
   },
 ];
 

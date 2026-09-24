@@ -62,6 +62,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Spatial Transcriptomics", ids: ["spatial-transcriptomics"] },
   { title: "Single-cell Multi-omics", ids: ["singlecell-multiomics"] },
   { title: "AlphaMissense", ids: ["alphamissense"] },
+  { title: "AlphaProteo", ids: ["alphaproteo"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

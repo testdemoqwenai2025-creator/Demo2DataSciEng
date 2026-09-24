@@ -1028,6 +1028,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["alphamissense", "variant-interpretation", "missense", "pathogenicity", "clinvar", "gnomad", "acmg", "precision-medicine", "patterns", "genai"],
   },
+  {
+    id: "ADR-044",
+    title: "Adopt RFdiffusion + ProteinMPNN for de novo protein design — generative biology",
+    status: "accepted",
+    date: "FY32-Q1",
+    deciders: "Data Platform, Protein Engineering, ML Engineering, Architecture",
+    context:
+      "ADR-034 covered protein structure PREDICTION (sequence → structure via AlphaFold2). ADR-036 covered molecular modelling (force fields + MD). The inverse problem is protein DESIGN (structure → sequence that folds to it) — generate novel proteins not seen in nature. Three core methods: (1) RFdiffusion (Watson 2023, Nature) — Denoise from random 3D coordinates to a folded structure conditioned on a target motif, like ADR-027 image diffusion but for protein backbones. Architecture: RoseTTAFold backbone (3-track network: MSA + pair + coordinates) + SE(3)-equivariant denoising layers. (2) ProteinMPNN (Dauparas 2022, Science) — Inverse folding: given a 3D backbone, predict the sequence most likely to fold to it. Architecture: Message Passing Neural Network with autoregressive decoding. (3) ESM-IF (Hsu 2022) — Alternative inverse folder using ESM-2 backbone + structure encoder. AlphaProteo (DeepMind 2024) extends RFdiffusion with stronger binder design: target protein as condition, generate binder protein that wraps around it. Success rate: 60-90% of designed binders actually bind in wet-lab (vs <1% for naive approaches). The math: structure diffusion (ADR-027 DDPM applied to 3D coords), inverse folding (sequence likelihood given backbone), evaluation via AlphaFold2 self-consistency (does the predicted sequence fold back to the designed structure?).",
+    decision:
+      "Adopt RFdiffusion for de novo protein backbone generation, ProteinMPNN for sequence design (backbone → sequence), AlphaFold2 for self-consistency evaluation (does the predicted sequence fold to the designed structure?), and wet-lab assay for final validation. Pipeline: (1) Define target motif (e.g. binding interface of cytokine X); (2) RFdiffusion generates 1000 backbone structures conditioned on motif; (3) ProteinMPNN designs 8 sequences per backbone (8000 sequences); (4) AlphaFold2 predicts structure for each sequence, compute pLDDT + design-specific metrics (mpTM, ipTM); (5) Filter top-100 by confidence; (6) Synthesise + express in E. coli; (7) Wet-lab binding assay (SPR, ITC) + affinity measurement. Connects to ADR-027 diffusion (same DDPM math, different modality), ADR-034 ESM-2 (sequence embedding for ProteinMPNN), ADR-038 AlphaFold DB (self-consistency check).",
+    consequences:
+      "+ 60-90% binder success rate (AlphaProteo paper) — first ML method with production-grade wet-lab validation. + RFdiffusion generates novel folds not seen in nature — protein space exploration. + ProteinMPNN inverse folding is fast (seconds per sequence). + Connects to existing diffusion stack (ADR-027) — same math. − Wet-lab validation is the bottleneck (weeks per design cycle). − Designed binders sometimes have low solubility / stability — need post-design optimisation. − Therapeutic-grade binders need additional engineering (Fc fusion, PEGylation, half-life extension). − IP/patent landscape is crowded for AI-designed therapeutics.",
+    alternatives: [
+      "Random mutagenesis + phage display (legacy, 1000× slower, no design)",
+      "Chroma (Ingraham 2023) — alternative diffusion model, similar architecture, smaller community",
+      "LigandMPNN — extension of ProteinMPNN with ligand context, better for enzyme design",
+      "Trastoo et al. 2023 trRosetta-based design — pre-RFdiffusion, lower success rate",
+    ],
+    tags: ["alphaproteo", "rfdiffusion", "proteinmpnn", "esm-if", "inverse-folding", "protein-design", "diffusion", "generative-biology", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
