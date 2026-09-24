@@ -6,6 +6,7 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { QuantumShortsCarousel } from "../_components/quantum-shorts";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network } from "lucide-react";
@@ -908,6 +909,136 @@ export function QuantumComputingPage() {
 
       <SectionCard title="Bell state short — quantum circuit → superposition → entanglement → Bell state → measurement (loop)" icon={<Atom className="h-5 w-5" />} badge="short">
         <QuantumCircuitShort />
+      </SectionCard>
+
+      <SectionCard
+        title="Quantum concept shorts — superposition, entanglement, Grover, decoherence (click to pop up)"
+        description="Inspired by https://www.youtube.com/shorts/TOPgZ-AbFwo (30-second vertical explainers). Four 9:16 vertical cards — each click opens a LAZY modal with an animated SVG, the governing math equations, Pyodide-runnable Python that prints concrete numerical outcomes, and a 2024-2025 research citation with extracted hardware numbers. Modal content is mounted only when the card is clicked — the heavy SVG + Pyodide bundle never loads for users who don't open the modal."
+        icon={<Zap className="h-5 w-5" />}
+        badge="4 shorts"
+      >
+        <QuantumShortsCarousel />
+      </SectionCard>
+
+      <SectionCard
+        title="Recent breakthroughs (2024-2025) — Willow, Heron R2, H2, Majorana 1"
+        description="The quantum-hardware landscape changed dramatically in late 2024 / early 2025. Below: a comparison table of the four most consequential processors of the era — each chip is paired with the specific breakthrough it demonstrated, and a Python snippet showing how to extract its headline number."
+        icon={<Atom className="h-5 w-5" />}
+        badge="2024-2025"
+      >
+        <div className="space-y-4">
+          {/* Hardware comparison table */}
+          <div className="overflow-x-auto rounded-md border border-border/60">
+            <table className="w-full text-xs">
+              <thead className="bg-muted/40">
+                <tr>
+                  <th className="text-left p-2 font-semibold">Chip</th>
+                  <th className="text-left p-2 font-semibold">Vendor</th>
+                  <th className="text-left p-2 font-semibold">Date</th>
+                  <th className="text-right p-2 font-semibold">Qubits</th>
+                  <th className="text-right p-2 font-semibold">2Q fidelity</th>
+                  <th className="text-left p-2 font-semibold">Headline breakthrough</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                <tr>
+                  <td className="p-2 font-semibold text-primary">Willow</td>
+                  <td className="p-2">Google Quantum AI</td>
+                  <td className="p-2">Dec 2024</td>
+                  <td className="p-2 text-right font-mono">105</td>
+                  <td className="p-2 text-right font-mono">99.7%</td>
+                  <td className="p-2">First QEC <em>below</em> surface-code threshold — Λ = 2.14 ± 0.02 (Nature 2025)</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-semibold text-primary">Heron R2</td>
+                  <td className="p-2">IBM Quantum</td>
+                  <td className="p-2">Nov 2024</td>
+                  <td className="p-2 text-right font-mono">156</td>
+                  <td className="p-2 text-right font-mono">99.7%</td>
+                  <td className="p-2">TLS mitigation + tensor-network error mitigation; utility-scale circuits at depth &gt;100</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-semibold text-primary">H2-1</td>
+                  <td className="p-2">Quantinuum</td>
+                  <td className="p-2">Jun 2024</td>
+                  <td className="p-2 text-right font-mono">56 (ion)</td>
+                  <td className="p-2 text-right font-mono">99.8%</td>
+                  <td className="p-2">12 logical qubits with Microsoft QEC; RCS infeasible classically below 56 qubits</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-semibold text-primary">Majorana 1</td>
+                  <td className="p-2">Microsoft</td>
+                  <td className="p-2">Feb 2025</td>
+                  <td className="p-2 text-right font-mono">8 (topo.)</td>
+                  <td className="p-2 text-right font-mono">—</td>
+                  <td className="p-2">First topological qubit — uses topoconductor + Majorana zero modes; inherent noise protection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <strong className="text-foreground/80">The arc:</strong> Willow proves quantum error correction works below threshold (the precondition for scaling).
+            Heron R2 pushes NISQ utility via software mitigation. H2 demonstrates logical qubits at scale on trapped ions.
+            Majorana 1 bets on a fundamentally different qubit modality (topological) that is theoretically immune to local noise —
+            the long-term path to fault tolerance without enormous physical-qubit overheads.
+          </p>
+          {/* Code that extracts headline numbers from each paper */}
+          <PyodideRunner
+            buttonLabel="Run hardware-comparison + scalability model (Pyodide)"
+            code={`import numpy as np
+
+# ====== HEADLINE NUMBERS FROM 2024-2025 PAPERS ======
+chips = [
+    {"name": "Willow",    "vendor": "Google",      "year": 2024, "qubits": 105, "p_2q": 1 - 0.997,  "note": "First QEC below threshold (Nature 2025)"},
+    {"name": "Heron R2",  "vendor": "IBM",         "year": 2024, "qubits": 156, "p_2q": 1 - 0.997,  "note": "TLS + tensor-network mitigation"},
+    {"name": "H2-1",      "vendor": "Quantinuum",  "year": 2024, "qubits":  56, "p_2q": 1 - 0.998,  "note": "12 logical qubits w/ MSFT QEC"},
+    {"name": "Majorana 1","vendor": "Microsoft",    "year": 2025, "qubits":   8, "p_2q": None,       "note": "Topological qubit — topoconductor"},
+]
+
+print("=" * 80)
+print(f"{'Chip':<12} {'Year':<6} {'Qubits':>8} {'2Q error':>10}  Breakthrough")
+print("-" * 80)
+for c in chips:
+    err = f"{c['p_2q']*100:.2f}%" if c['p_2q'] is not None else "n/a"
+    print(f"{c['name']:<12} {c['year']:<6} {c['qubits']:>8} {err:>10}  {c['note']}")
+print("=" * 80)
+
+# ====== WILLOW: Λ scaling — the breakthrough metric ======
+print("\\n=== Google Willow: Λ (logical error suppression) ===")
+p_phys = 1.5e-3      # 0.15% physical (Willow 2024)
+p_c    = 1.0e-2      # surface code threshold ~1%
+Lambda_empirical = 2.14  # measured in Nature 2025 paper
+
+Lambda_predicted = (p_c / p_phys) ** 2
+print(f"  p_phys = {p_phys*100:.2f}%,  p_c ≈ {p_c*100:.1f}%")
+print(f"  Predicted Λ = (p_c/p)² = {Lambda_predicted:.2f}")
+print(f"  Measured Λ = {Lambda_empirical:.2f} ± 0.02  (d=5 → d=7 transition)")
+print(f"  → Logical error DECREASES as code grows. Fault tolerance is now within reach.")
+
+# ====== SURFACE CODE: qubit cost for Shor's algorithm ======
+print("\\n=== Surface code qubit cost for Shor's algorithm (2048-bit RSA) ===")
+# Per Gidney & Ekerå 2019: ~20M physical qubits, depth ~8 hours
+# Per surface code d=17-21 with current Willow p_phys:
+def qubits_for_distance(d):
+    # rotated surface code: 2d^2 - 1 data + ancilla ~ 2d^2 - 1 + 4(d^2-1)/2
+    return 2 * d * d - 1 + 2 * (d * d - 1)
+
+for d in [5, 11, 17, 21]:
+    print(f"  d={d:2d}  ({qubits_for_distance(d):>7,d} physical qubits)")
+
+# ====== MICROSOFT MAJORANA 1: topological protection factor ======
+print("\\n=== Microsoft Majorana 1: topological protection ===")
+# Topological gap Δ protects against local noise with rate ~exp(-Δ/kT)
+Delta_meV = 0.05   # ~50 µeV gap measured
+kBT_meV   = 0.025  # T=300mK, kBT in meV
+protection = np.exp(-Delta_meV / kBT_meV)
+print(f"  Topological gap Δ ≈ {Delta_meV:.3f} meV")
+print(f"  Thermal energy kBT (T=300mK) ≈ {kBT_meV:.3f} meV")
+print(f"  Local-noise suppression factor exp(-Δ/kBT) = {protection:.2e}")
+print(f"  → Inherent error ~10^-1 — needs to drop to 10^-4 for fault-tolerant topological qubits")
+print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via surface code.")`}
+          />
+        </div>
       </SectionCard>
 
       <SectionCard
