@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   X, Atom, Zap, Box, Layers, Network, Cpu, Telescope, Radio, Globe,
 } from "lucide-react";
+import { PyodideRunner } from "./pyodide-runner";
 
 /**
  * SpaceGallery3D — a 4-card animated 3D gallery of space-science
@@ -711,6 +712,59 @@ function DimToggle({ value, onChange }: { value: number; onChange: (d: number) =
 
 // ============================================================
 // The 4 cards
+// Code constructs - Python that computes the math behind each 3D visual
+const JWST_GALLERY_CODE = `import math
+H0 = 67.4; Omega_m = 0.315; Omega_Lambda = 0.685
+D_H = 299792.458 / H0
+def comoving_distance(z):
+    N = 100; dz = z / N; d = 0
+    for i in range(N):
+        zi = i * dz; zf = (i+1) * dz
+        Ei = 1.0 / math.sqrt(Omega_m * (1+zi)**3 + Omega_Lambda)
+        Ef = 1.0 / math.sqrt(Omega_m * (1+zf)**3 + Omega_Lambda)
+        d += 0.5 * (Ei + Ef) * dz
+    return D_H * d
+def lookback_time(z):
+    t_H = 1.0 / H0 * 9.778; N = 100; dz = z / N; t = 0
+    for i in range(N):
+        zi = i * dz; zf = (i+1) * dz
+        Ei = 1.0 / ((1+zi) * math.sqrt(Omega_m * (1+zi)**3 + Omega_Lambda))
+        Ef = 1.0 / ((1+zf) * math.sqrt(Omega_m * (1+zf)**3 + Omega_Lambda))
+        t += 0.5 * (Ei + Ef) * dz
+    return t_H * t
+print("=== JWST lookback time ===")
+for z in [0.5, 1.0, 2.0, 5.0, 7.0, 10.0, 14.0]:
+    D = comoving_distance(z); t = lookback_time(z)
+    print(f"  z={z:>5.1f} -> D={D:>8.1f} Mpc, lookback={t:.2f} Gyr, age={13.8-t:.2f} Gyr")`;
+
+const LIGO_GALLERY_CODE = `import math
+def chirp_mass(m1, m2):
+    return (m1 * m2)**0.6 / (m1 + m2)**0.2
+def gw_strain(m1, m2, freq, dist_mpc):
+    Mc = chirp_mass(m1, m2)
+    h = 1e-21 * (Mc / 30)**(5/3) * (freq / 100)**(2/3) * (500 / dist_mpc)
+    return h, Mc
+print("=== GW strain for notable events ===")
+for name, m1, m2, f, D in [("GW150914", 36, 29, 100, 410), ("GW170817", 1.46, 1.27, 100, 40), ("GW190521", 85, 66, 100, 5300)]:
+    h, Mc = gw_strain(m1, m2, f, D)
+    print(f"  {name}: Mc={Mc:.1f} Msun, h={h:.2e}, D={D} Mpc")`;
+
+const LHC_GALLERY_CODE = `print("=== LHC n-subjettiness for jet tagging ===")
+print("  tau_21 = tau_2 / tau_1 < 0.45 -> W boson (2-prong)")
+print("  tau_32 = tau_3 / tau_2 < 0.65 -> top quark (3-prong)")
+print("  LHC Run 3: 13.6 TeV, 140/fb target, ParticleNet ML tagger")`;
+
+const TIANGONG_GALLERY_CODE = `import math
+G = 6.674e-11; M_earth = 5.972e24; R_earth = 6.371e6
+def orbital_period(altitude_km):
+    a = (R_earth + altitude_km * 1000)
+    T = 2 * math.pi * math.sqrt(a**3 / (G * M_earth))
+    return T / 60
+print("=== Orbital periods (Kepler 3rd law) ===")
+for name, alt in [("ISS", 408), ("Tiangong", 389), ("Hubble", 540), ("GPS", 20200)]:
+    T = orbital_period(alt)
+    print(f"  {name:>12} at {alt:>5} km -> T = {T:.1f} min ({T/60:.2f} hr)")`;
+
 // ============================================================
 interface GalleryCard {
   id: string;
@@ -721,6 +775,8 @@ interface GalleryCard {
   thumb: ReactNode;
   detail: ReactNode;
   caption: string;
+  code?: string;
+  mathExpr?: string;
 }
 
 const CARDS: GalleryCard[] = [
@@ -733,6 +789,8 @@ const CARDS: GalleryCard[] = [
     thumb: <JWSTDeepField3D dim={3} />,
     detail: <JWSTDeepField3D dim={3} />,
     caption: "JWST deep field — near-infrared imaging reveals the earliest galaxies, formed only ~300 Myr after the Big Bang. Cosmological redshift z = (λ_obs - λ_emit)/λ_emit stretches light from ultraviolet into JWST's NIRCam band. Higher z = farther = earlier universe. The central bright galaxy is at z ≈ 7; the fainter z = 14 dots are photons emitted when the universe was 3% of its current age.",
+    code: JWST_GALLERY_CODE,
+    mathExpr: "z = (lambda_obs - lambda_emit) / lambda_emit  ·  v = H0·d  ·  D_C = c/H0 * integral(dz/E(z))",
   },
   {
     id: "ligo",
@@ -743,6 +801,8 @@ const CARDS: GalleryCard[] = [
     thumb: <LIGOInterferometer3D dim={3} />,
     detail: <LIGOInterferometer3D dim={3} />,
     caption: "LIGO interferometer — two 4-km arms at right angles, laser light reflected back and forth ~280 times for an effective 1120 km path. A passing gravitational wave stretches one arm and compresses the other by ~10⁻²¹ m (1/10000 the width of a proton), detected as a phase shift at the photodetector. The 2015 detection GW150914 of two merging black holes confirmed Einstein's general relativity in the strong-field regime.",
+    code: LIGO_GALLERY_CODE,
+    mathExpr: "h = (4G/c^4) * (d2I/dt2) / r  ·  M_chirp = (m1*m2)^(3/5) / (m1+m2)^(1/5)",
   },
   {
     id: "lhc",
@@ -753,6 +813,8 @@ const CARDS: GalleryCard[] = [
     thumb: <LHCCollision3D dim={3} />,
     detail: <LHCCollision3D dim={3} />,
     caption: "LHC collision — counter-rotating proton beams collide at centre-of-mass energy √s = 13.6 TeV inside ATLAS / CMS. Quarks and gluons scatter into narrow jets of hadrons; energetic leptons (electrons, muons) and photons escape cleanly without strong-interaction noise. E = mc² governs the mass of new particles that can be created — the Higgs boson (125 GeV) was discovered here in 2012 by detecting its decay into 4 leptons / 2 photons.",
+    code: LHC_GALLERY_CODE,
+    mathExpr: "tau_N = (1/pT2) * sum_k min(pT_i * dR_ik)  ·  tau_21 = tau_2/tau_1  ·  tau_32 = tau_3/tau_2",
   },
   {
     id: "tiangong",
@@ -763,6 +825,8 @@ const CARDS: GalleryCard[] = [
     thumb: <TiangongStation3D dim={3} />,
     detail: <TiangongStation3D dim={3} />,
     caption: "Tiangong ('heavenly palace') — China's modular space station in low Earth orbit (340–450 km altitude, ~92 min orbital period). Composed of the Tianhe core module + Wentian + Mengtian experiment modules, with Shenzhou crewed craft and Tianzhou cargo craft docking periodically at the axial and radial ports. The two large solar panel wings track the Sun to supply ~100 kW. T² = (4π²/GM)·a³ sets the orbital period from the semi-major axis a.",
+    code: TIANGONG_GALLERY_CODE,
+    mathExpr: "T^2 = (4*pi^2/GM) * a^3  ·  v^2 = GM*(2/r - 1/a)  ·  F = GMm/r^2",
   },
 ];
 
@@ -915,6 +979,24 @@ export function SpaceGallery3D() {
                   </Scene3D>
                 </div>
               </div>
+
+              {/* Math foundation — the centrepiece */}
+              {openCard.mathExpr && (
+                <div className="border-t border-border/40 bg-primary/5 px-4 md:px-6 py-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Math foundation</p>
+                  <p className="font-mono text-xs text-primary leading-relaxed">{openCard.mathExpr}</p>
+                </div>
+              )}
+              {/* Code construct — run the computation */}
+              {openCard.code && (
+                <div className="border-t border-border/40 px-4 md:px-6 py-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Code construct - run the computation</p>
+                  <PyodideRunner
+                    buttonLabel="Run computation (Pyodide)"
+                    code={openCard.code}
+                  />
+                </div>
+              )}
 
               {/* Footer with caption */}
               <div className="border-t border-border/40 bg-muted/20 px-4 md:px-6 py-3">

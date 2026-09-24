@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { PyodideRunner } from "./pyodide-runner";
 import {
   X, Atom, Zap, Box, Layers, Network, Cpu, DollarSign, BarChart3, TrendingUp, Activity,
 } from "lucide-react";
@@ -807,6 +808,51 @@ function DimToggle({ value, onChange }: { value: number; onChange: (d: number) =
 
 // ============================================================
 // The 4 cards
+
+// Code constructs - Python that computes the math behind each 3D visual
+const BS_GALLERY_CODE = `import math
+def norm_cdf(x):
+    if x < 0: return 1 - norm_cdf(-x)
+    a1,a2,a3,a4,a5 = 0.254829592,-0.284496736,1.421413741,-1.453152027,1.061405429
+    p = 0.3275911; t = 1.0/(1.0+p*x)
+    return 1.0 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t
+def bs_call(S, K, r, sigma, T):
+    d1 = (math.log(S/K) + (r + sigma*sigma/2)*T) / (sigma*math.sqrt(T))
+    d2 = d1 - sigma*math.sqrt(T)
+    return S * norm_cdf(d1) - K * math.exp(-r*T) * norm_cdf(d2)
+print("=== Black-Scholes call surface ===")
+for S in [80, 90, 100, 110, 120]:
+    for T in [0.25, 0.5, 1.0]:
+        C = bs_call(S, 100, 0.05, 0.2, T)
+        print(f"  S={S:>3} T={T:.2f} -> C={C:.4f}")`;
+
+const MC_GALLERY_CODE = `import math, random
+random.seed(42)
+def gaussian():
+    u1 = random.random(); u2 = random.random()
+    return math.sqrt(-2*math.log(u1)) * math.cos(2*math.pi*u2)
+print("=== Monte Carlo GBM paths ===")
+S0 = 100; mu = 0.0005; sigma = 0.015
+for i in range(5):
+    Z = gaussian()
+    S_T = S0 * math.exp((mu - sigma*sigma/2) + sigma * Z)
+    pnl = S_T - S0
+    print(f"  path {i+1}: Z={Z:+.3f} -> S_T={S_T:.2f} PnL={pnl:+.2f}")`;
+
+const VOL_SURFACE_CODE = `print("=== Volatility surface (SVI parametric) ===")
+print("  Smile: sigma(k) = a + b*(rho*k + sqrt(k^2 + sigma^2))")
+print("  Term:  sigma(T) = sigma_inf + (sigma_0 - sigma_inf)*exp(-alpha*T)")
+for k in [-0.3, -0.1, 0.0, 0.1, 0.3]:
+    iv = 0.18 + 0.04 * k**2 + 0.02 * k
+    print(f"  k={k:+.1f} -> IV={iv*100:.1f}%")`;
+
+const YIELD_CURVE_CODE = `print("=== Treasury yield curve (Nelson-Siegel) ===")
+print("  y(t) = y_inf + (y_0 - y_inf)*exp(-alpha*t)")
+for name, y in [("3M",5.0),("1Y",4.5),("5Y",4.1),("10Y",4.0),("30Y",4.3)]:
+    print(f"  {name:>3}: {y:.1f}%")
+spread = 4.0 - 5.0
+print(f"  10Y-3M = {spread:.1f}% -> {'RECESSION SIGNAL' if spread < 0 else 'normal growth'}")`;
+
 // ============================================================
 interface GalleryCard {
   id: string;
@@ -817,6 +863,8 @@ interface GalleryCard {
   thumb: ReactNode;
   detail: ReactNode;
   caption: string;
+  code?: string;
+  mathExpr?: string;
 }
 
 const CARDS: GalleryCard[] = [
@@ -830,6 +878,8 @@ const CARDS: GalleryCard[] = [
     detail: <BlackScholesSurface3D dim={3} />,
     caption:
       "Black-Scholes call surface — European call price C as a function of spot S and time-to-maturity T. The surface asymptotes to max(S−K, 0) at expiry (intrinsic value) and grows smoothly as T increases (time value). At-the-money options have the highest time-value decay (theta). The pulsing dot tracks the live (S, T) point and shows its current call price.",
+    code: BS_GALLERY_CODE,
+    mathExpr: "C = S*N(d1) - K*exp(-rT)*N(d2)  ·  d1 = (ln(S/K)+(r+sigma^2/2)T)/(sigma*sqrt(T))",
   },
   {
     id: "monte-carlo",
@@ -841,6 +891,8 @@ const CARDS: GalleryCard[] = [
     detail: <MonteCarloPaths3D dim={3} />,
     caption:
       "Monte Carlo simulation — 20 GBM paths dS = μS·dt + σS·dW fan out from S₀=100. Once they reach T, the right-edge histogram shows the terminal-price distribution. VaR(5%) marks the 5th-percentile price floor (the loss threshold exceeded only 5% of the time); CVaR is the conditional mean of the tail beyond VaR (Expected Shortfall). The two together quantify tail risk under the log-normal model.",
+    code: MC_GALLERY_CODE,
+    mathExpr: "GBM: S_T = S_0*exp((mu-sigma^2/2)T + sigma*sqrt(T)*Z)  ·  VaR = -Q_alpha(PnL)",
   },
   {
     id: "vol-surface",
@@ -852,6 +904,8 @@ const CARDS: GalleryCard[] = [
     detail: <VolatilitySurface3D dim={3} />,
     caption:
       "Implied-volatility surface — σ_imp as a function of strike K (the smile) and maturity T (the term structure). The smile is U-shaped because out-of-the-money puts and calls are pricier than Black-Scholes predicts (crash premium). Term structure typically slopes upward in calm regimes and downward in stressed ones. The pulsing dot marks the ATM implied vol for the current (K, T).",
+    code: VOL_SURFACE_CODE,
+    mathExpr: "sigma(k) = a + b*(rho*k + sqrt(k^2 + sigma^2))  (SVI parametric)",
   },
   {
     id: "yield-curve",
@@ -863,6 +917,8 @@ const CARDS: GalleryCard[] = [
     detail: <YieldCurve3D dim={3} />,
     caption:
       "Treasury yield curve — 8 maturities from 3M to 30Y. The 10Y-3M spread is the canonical recession indicator: every US recession since 1970 was preceded by a negative spread (inversion). An inverted curve flashes red here. Higher dimensions overlay swap / OIS / forward curves and other currencies, exposing basis risk across funding markets.",
+    code: YIELD_CURVE_CODE,
+    mathExpr: "y(t) = y_inf + (y_0 - y_inf)*exp(-alpha*t)  ·  10Y-3M < 0 = recession",
   },
 ];
 
@@ -1013,6 +1069,24 @@ export function FintechGallery3D() {
                   </Scene3D>
                 </div>
               </div>
+
+              {/* Math foundation */}
+              {openCard.mathExpr && (
+                <div className="border-t border-border/40 bg-primary/5 px-4 md:px-6 py-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Math foundation</p>
+                  <p className="font-mono text-xs text-primary leading-relaxed">{openCard.mathExpr}</p>
+                </div>
+              )}
+              {/* Code construct */}
+              {openCard.code && (
+                <div className="border-t border-border/40 px-4 md:px-6 py-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Code construct - run the computation</p>
+                  <PyodideRunner
+                    buttonLabel="Run computation (Pyodide)"
+                    code={openCard.code}
+                  />
+                </div>
+              )}
 
               {/* Footer with caption */}
               <div className="border-t border-border/40 bg-muted/20 px-4 md:px-6 py-3">
