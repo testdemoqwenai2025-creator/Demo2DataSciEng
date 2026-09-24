@@ -75,7 +75,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Fintech", ids: ["fintech"] },
 ];
 
-const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
+const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
 const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/DemoAppDataSci";
 const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSci-Advanced";
 

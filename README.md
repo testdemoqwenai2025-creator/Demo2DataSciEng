@@ -101,7 +101,7 @@ A 6-page project PDF lives at [`download/ModernDataSciEng-Platform.pdf`](./downl
 
 ## Contact
 
-- Email: `testdemoqwenai2025-creator@users.noreply.github.com`
+- Email: `testdemoqwenai2025@gmail.com`
 - GitHub: [@testdemoqwenai2025-creator](https://github.com/testdemoqwenai2025-creator)
 - Live preview: <https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/>
 

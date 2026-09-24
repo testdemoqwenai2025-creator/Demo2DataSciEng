@@ -28,7 +28,7 @@ import {
 
 const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/DemoAppDataSci";
 const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSci-Advanced";
-const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";
+const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
 
 const GDPR_RIGHTS = [
   { right: "Right of access (Art. 15)", implementation: "Unity Catalogue audit log + access reviews" },
