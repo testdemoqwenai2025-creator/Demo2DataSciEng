@@ -2384,3 +2384,29 @@ Stage Summary:
   * /hudi: COW vs MOR benchmark with 10 upserts + 3 reads
   * /data-lakehouse: Bronze→Silver→Gold medallion ETL with 100 synthetic CDC events + validation + DLQ
   * /catalogs: 6-catalog latency comparison + feature matrix + Nessie branching scenario
+
+---
+Task ID: batch-5-pages-update
+Agent: Super Z (subagent)
+Task: Update the 5 remaining Data Lakehouse group pages (/glue, /delta-lake, /hudi, /data-lakehouse, /catalogs) by inserting 4 new sections (Why-evolved + Unique-features + DatasetCards + Computational-tooling) immediately before the existing "Research" SectionCard — mirroring the pattern already established in /iceberg.tsx (lines 793-889).
+
+Work Log:
+- Read /home/z/my-project/src/app/_pages/iceberg.tsx (lines 790-905) to extract the exact 4-section pattern: SectionCard w/ History icon + "Why X" badge → SectionCard w/ Sparkles icon + "Unique features" badge (2×2 grid) → SectionCard w/ Database icon + "3 examples × 5 langs" badge (DatasetCards) → SectionCard w/ Server icon + "ecosystem" badge (Cpu + Cloud sub-sections).
+- Confirmed _dataset_examples2.tsx exports GLUE_EXAMPLES / DELTA_EXAMPLES / HUDI_EXAMPLES and _dataset_examples3.tsx exports LAKEHOUSE_EXAMPLES / CATALOG_EXAMPLES (each = 3 examples × 5 langs).
+- Updated /glue: added DatasetCards + GLUE_EXAMPLES imports, added `Server, Cloud` to lucide-react. 3 shortfalls (Hive Metastore on EMR: operational burden, no serverless, no auto-discovery), 4 unique features (Crawler auto-discovery, Serverless Spark, Lake Formation RLS, Glue Studio). Compute engines (6+): Glue ETL/Ray/Streaming, Athena, Redshift Spectrum, EMR, Lambda. Catalogs+governance (5): Glue Catalog, Lake Formation, Schema Registry, Crawlers, Studio, Data Quality.
+- Updated /delta-lake: added DELTA_EXAMPLES import, `Server, Cloud`. 3 shortfalls (Hive-on-S3: no ACID, slow MERGE, schema drift), 4 unique features (Liquid Clustering 2023, CDF, Z-Order multidim, delta-rs pure-Rust). Compute engines (8+): delta-spark, delta-rs, Flink, Trino, Presto/Starrocks/Doris, Athena/Glue, Beam, DuckDB. Catalogs+integrations (5): Unity, HMS, Glue, Snowflake external, Polars/Daft/LanceDB, Kafka Delta Sink.
+- Updated /hudi: added HUDI_EXAMPLES import, `Server, Cloud`. 3 shortfalls (Hive append-only: full partition rewrite per CDC, no incremental query, no async compaction), 4 unique features (MOR LSM-tree on S3, FOR SYSTEM_TIME incremental, native deltaStreamer CDC, async compaction). Compute engines (6+): hudi-spark, hudi-flink, Hoodie FlinkStreamer, Trino, Presto, Hive, Impala, DuckDB. Ingest+catalogs (5): DeltaStreamer, HMS, Glue, Unity, Kafka Connect, Debezium.
+- Updated /data-lakehouse: added LAKEHOUSE_EXAMPLES import, `Server, Cloud`. 4-era narrative shortfalls (Hadoop+HDFS storage tied to compute, Hive-on-S3 no ACID, open formats no vendor-neutral catalog, warehouse+lake duplication), 4 unique features (lake+warehouse unification, medallion pattern, open-format vendor-neutrality, catalog-as-control-plane). Compute (8+): Spark, Trino, Flink, DuckDB, Iceberg engines, Photon, Snowflake external, Athena+Redshift. Catalogs+formats (5): Iceberg, Delta, Hudi, Unity, Polaris, Nessie.
+- Updated /catalogs: added CATALOG_EXAMPLES import, `Server, Cloud`. 4 shortfalls of Hive Metastore (legacy single-region, no branching, no governance/RBAC, no multi-vendor federation), 4 unique features (Polaris multi-cloud, Nessie Git-for-data branching, Unity column-level RBAC, REST catalog spec). Compute engines (6+): Spark, Trino, Flink, DuckDB, Athena+Redshift, Snowflake, Databricks Photon. Catalog backends (5): Polaris, Unity, Nessie, Glue, HMS, Tabular.
+- All escaped `>`/`<` in JSX text via `<code>` tags or plain Unicode (`→`, `×`, `~`).
+- Lint clean across all 5 files: `bunx eslint src/app/_pages/{glue,delta-lake,hudi,data-lakehouse,catalogs}.tsx --max-warnings=0` — zero warnings, zero errors.
+- Static export build (`GITHUB_PAGES=true bun run build:static`) succeeded after moving src/app/api out of the build path and restoring it post-build.
+- Verified `out/{iceberg,glue,delta-lake,hudi,data-lakehouse,catalogs}/index.html` all exist and contain the 4 new section markers (Why X evolved, Truly unique X features, Computational tooling — the X ecosystem, 3 examples × 5 langs).
+- Dev server confirms live render: GET /glue, /delta-lake, /hudi, /data-lakehouse, /catalogs all 200.
+- Committed (b4bf2ca) and pushed to private/main — triggers the sync workflow that mirrors to public/main and the deploy workflow that publishes to GitHub Pages.
+
+Stage Summary:
+- 5 pages × 4 new sections = 20 new SectionCards added; 494 lines inserted across 5 files.
+- Each page now mirrors the /iceberg page section order: ... → Why-evolved → Unique-features → DatasetCards (3×5 langs) → Computational-tooling → Research → Insight → RelatedTopics.
+- 5 pages × 3 examples × 5 languages = 75 code examples across the Data Lakehouse group (15 examples × 5 langs total when /iceberg is included).
+- Pushed SHA: c891818..b4bf2ca on private/main.
