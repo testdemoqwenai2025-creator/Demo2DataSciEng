@@ -2043,3 +2043,43 @@ Stage Summary:
 - Ingestion page has 6 code cards (all Pyodide-runnable, all show CodeBlock)
 - ETL vs ELT: two cards showing the contrast between classic (transform-before-load) and modern (load-raw-then-transform-in-warehouse)
 - Both patterns applied to the same LHC/CMS data domain
+
+---
+Task ID: next-phase-suggestions-1-2
+Agent: Super Z (main)
+Task: Suggestion 1 (case studies on Streaming + Orchestration pages) + Suggestion 2 (real-time trigger stream)
+
+Work Log:
+Suggestion 1: Real-world case studies
+  - Streaming page: Kafka at LinkedIn (7T msgs/day, 100+ clusters, 14K topics, 2.5 PB/day)
+    * streaming-case-study.tsx (~300 lines)
+    * Animated pipeline: Producers → Kafka Brokers → Consumers → Schema Registry → Monitoring
+    * Data toggle: real LinkedIn stats vs synthetic Kafka events
+    * Pyodide-runnable: Kafka producer/consumer simulation (topic distribution, consumer lag, scale extrapolation)
+    * Architecture notes: SAMOA, Brooklin, Espresso, Pinot
+    * Lazy modal deep-dive
+    * Live verified: "Kafka at LinkedIn", "7 trillion" both present
+
+  - Orchestration page: Airflow at Airbnb (3,000+ DAGs, 100M+ task instances/yr, 500+ workers, 99.7% SLA)
+    * orchestration-case-study.tsx (~300 lines)
+    * Animated pipeline: Scheduler → Executor → Workers → Metadata DB → Web UI → Alerts
+    * Data toggle: real Airbnb stats vs synthetic task instances
+    * Pyodide-runnable: DAG scheduler simulation (6 DAGs, 30 tasks, state machine, SLA check)
+    * Architecture notes: CeleryExecutor→K8sExecutor, Great Expectations, PagerDuty
+    * Lazy modal deep-dive
+    * Live verified: "Airflow at Airbnb", "3,000+" both present
+
+  - Databricks case study deferred per user request ("Databricks content will be added later")
+
+Suggestion 2: Real-time WebSocket-like data feed for trigger simulator
+  - TriggerSimulator upgraded with Start/Stop live stream button
+  - Streams simulated CMS events at 40 Hz (25ms intervals = CMS beam crossing rate)
+  - Live event dots scroll through the SVG grid as new events arrive (keeping last 200)
+  - Live counter: totalProcessed/totalPassed updates in real-time
+  - Pass rate recalculated live from streaming data
+  - 'LIVE — streaming at 40 Hz' indicator with pulsing animation
+  - When stopped: reverts to static 200-event display
+  - Live verified: Start button → LIVE indicator → "events passed trigger" counter → Stop button
+
+- Commit afe9058, deploy #119 succeeded
+- Both suggestions verified on live site

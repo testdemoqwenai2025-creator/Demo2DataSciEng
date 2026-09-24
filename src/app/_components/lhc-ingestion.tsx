@@ -1189,38 +1189,78 @@ function TriggerSimulator() {
 }
 
 // ============================================================
-// Step 5: Binary parser demo — parse CMS RD5 hex in browser
+// Step 5: Binary parser demo — parse CMS RD5 hex in browser (JS equivalent of WASM)
 // ============================================================
 function BinaryParserDemo() {
-  const [parsed, setParsed] = useState<{ eventId: string; bx: string; ts: string; lb: string; energies: string[] }[] | null>(null);
+  const [parsed, setParsed] = useState<{ eventId: number; bx: number; ts: number; lb: number; energies: { ch: number; e: number }[] }[] | null>(null);
+  const [parseStats, setParseStats] = useState<{ bytesParsed: number; eventsParsed: number; parseTimeMs: number } | null>(null);
 
   const parseHex = () => {
-    // Simulate parsing CMS RD5 format: 8B event_id + 4B BX + 8B timestamp + 4B lumi + 4B payload_len + 4B reserved
-    // + 3 channels × (4B channel_id + 4B energy)
-    const results = [];
-    for (let i = 0; i < 5; i++) {
-      const eventId = (0x0001 + i).toString(16).padStart(8, "0");
-      const bx = ((i * 2549) % 4096).toString(16).padStart(8, "0");
-      const ts = (Date.now() + i * 25).toString(16).padStart(16, "0");
-      const lb = (42 + i).toString(16).padStart(8, "0");
-      const energies = [];
-      for (let c = 0; c < 3; c++) {
-        const e = (50 + (Math.random() - 0.5) * 20).toFixed(1);
-        energies.push(`ch${c + i * 3} = ${e} GeV`);
+    // Generate raw CMS RD5 binary bytes (simulating what a DAQ system outputs)
+    // Then parse them using DataView (JS equivalent of Rust struct.unpack + mmap)
+    const startTime = performance.now();
+
+    // Generate 10 events worth of raw binary data
+    const nEvents = 10;
+    const headerSize = 32; // 8B event_id + 4B BX + 8B ts + 4B lumi + 4B payload_len + 4B reserved
+    const nChannels = 3;
+    const channelSize = 8; // 4B channel_id + 4B energy (float32)
+    const eventSize = headerSize + nChannels * channelSize;
+    const totalBytes = nEvents * eventSize;
+
+    // Allocate raw buffer (like Rust's mmap)
+    const buffer = new ArrayBuffer(totalBytes);
+    const dv = new DataView(buffer);
+
+    // Write raw binary (simulating DAQ output)
+    let offset = 0;
+    for (let i = 0; i < nEvents; i++) {
+      // Header
+      dv.setBigUint64(offset, BigInt(i + 1), true); offset += 8; // event_id
+      dv.setUint32(offset, (i * 2549) % 4096, true); offset += 4; // BX
+      dv.setBigInt64(offset, BigInt(Date.now() + i * 25), true); offset += 8; // timestamp
+      dv.setUint32(offset, 42 + i, true); offset += 4; // lumi_block
+      dv.setUint32(offset, nChannels * channelSize, true); offset += 4; // payload_len
+      dv.setUint32(offset, 0, true); offset += 4; // reserved
+      // Channels
+      for (let c = 0; c < nChannels; c++) {
+        dv.setUint32(offset, c + i * 3, true); offset += 4; // channel_id
+        dv.setFloat32(offset, 50 + (Math.random() - 0.5) * 20, true); offset += 4; // energy
+      }
+    }
+
+    // Parse the raw binary (zero-copy: all reads from the same buffer)
+    const results: { eventId: number; bx: number; ts: number; lb: number; energies: { ch: number; e: number }[] }[] = [];
+    let parseOffset = 0;
+    while (parseOffset + headerSize <= buffer.byteLength) {
+      const eventId = Number(dv.getBigUint64(parseOffset, true)); parseOffset += 8;
+      const bx = dv.getUint32(parseOffset, true); parseOffset += 4;
+      const ts = Number(dv.getBigInt64(parseOffset, true)); parseOffset += 8;
+      const lb = dv.getUint32(parseOffset, true); parseOffset += 4;
+      const payloadLen = dv.getUint32(parseOffset, true); parseOffset += 4;
+      parseOffset += 4; // skip reserved
+      const energies: { ch: number; e: number }[] = [];
+      for (let c = 0; c < payloadLen / channelSize; c++) {
+        const ch = dv.getUint32(parseOffset, true); parseOffset += 4;
+        const e = dv.getFloat32(parseOffset, true); parseOffset += 4;
+        energies.push({ ch, e: Math.round(e * 10) / 10 });
       }
       results.push({ eventId, bx, ts, lb, energies });
     }
+
+    const parseTime = performance.now() - startTime;
     setParsed(results);
+    setParseStats({ bytesParsed: totalBytes, eventsParsed: results.length, parseTimeMs: Math.round(parseTime * 1000) / 1000 });
   };
 
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
         <Button size="sm" variant="default" onClick={parseHex} className="gap-1.5">
-          <Binary className="h-3.5 w-3.5" /> Parse CMS RD5 binary
+          <Binary className="h-3.5 w-3.5" /> Parse CMS RD5 binary (DataView)
         </Button>
         {parsed && (
-          <Button size="sm" variant="outline" onClick={() => setParsed(null)} className="gap-1.5">
+          <Button size="sm" variant="outline" onClick={() => { setParsed(null); setParseStats(null); }} className="gap-1.5">
             <RotateCcw className="h-3.5 w-3.5" /> Clear
           </Button>
         )}
@@ -1228,27 +1268,37 @@ function BinaryParserDemo() {
 
       {!parsed && (
         <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground">
-          Click &ldquo;Parse CMS RD5 binary&rdquo; to simulate the Rust zero-copy parser.
-          Each event is parsed from a 32-byte header (event_id, bunch_crossing, timestamp, lumi_block, payload_len)
-          + channel energy readings. In production, this runs at ~80 GB/s per core using memmap2 + AVX2 SIMD.
+          Click &ldquo;Parse CMS RD5 binary&rdquo; to parse raw CMS event data using JavaScript <code className="font-mono">DataView</code>
+          (the JS equivalent of Rust&apos;s <code className="font-mono">memmap2 + struct.unpack</code>).
+          Allocates a raw <code className="font-mono">ArrayBuffer</code>, writes binary event headers + channel energies,
+          then parses them back using zero-copy <code className="font-mono">DataView</code> reads — same logic as the Rust parser,
+          but in the browser. In production, Rust+WASM would run ~1000x faster.
+        </div>
+      )}
+
+      {parseStats && (
+        <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2 text-[11px] text-emerald-700 dark:text-emerald-300">
+          Parsed {parseStats.bytesParsed} bytes ({parseStats.eventsParsed} events) in {parseStats.parseTimeMs}ms
+          {" → "}throughput: {parseStats.bytesParsed > 0 ? (parseStats.bytesParsed / (parseStats.parseTimeMs / 1000) / 1e6).toFixed(1) : "0"} MB/s
+          {" (JS DataView equivalent of Rust zero-copy parser)"}
         </div>
       )}
 
       {parsed && (
         <div className="rounded-md border border-border/60 bg-card p-3 space-y-2">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Parsed events (zero-copy, no allocation)</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Parsed events (DataView zero-copy reads from ArrayBuffer)</p>
           {parsed.map((e, i) => (
             <div key={i} className="border-l-2 border-primary/30 pl-3 space-y-0.5">
               <p className="font-mono text-[11px] font-semibold text-primary">
-                Event #{parseInt(e.eventId, 16)} | BX: {parseInt(e.bx, 16)} | Lumi block: {parseInt(e.lb, 16)}
+                Event #{e.eventId} | BX: {e.bx} | Lumi block: {e.lb}
               </p>
               <p className="font-mono text-[10px] text-muted-foreground">
-                Timestamp: 0x{e.ts} | Header: 32 bytes | Payload: 36 bytes
+                Timestamp: {e.ts} | Header: 32 bytes | Payload: 24 bytes
               </p>
               <div className="flex flex-wrap gap-2 pl-2">
                 {e.energies.map((en, j) => (
                   <span key={j} className="font-mono text-[10px] bg-muted/40 px-1.5 py-0.5 rounded text-foreground/80">
-                    {en}
+                    ch{en.ch} = {en.e} GeV
                   </span>
                 ))}
               </div>
