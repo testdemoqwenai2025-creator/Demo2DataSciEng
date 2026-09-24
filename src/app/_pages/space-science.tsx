@@ -6,9 +6,10 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { SpaceInteractives } from "../_components/space-interactives";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network } from "lucide-react";
+import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
 
 const KPIS = [
   { label: "Kepler's 3rd law", value: "T² = (4π²/GM)·a³", hint: "Period T scales with semi-major axis a³ — Kepler 1619", deltaTone: "flat" as const },
@@ -943,6 +944,15 @@ export function SpaceSciencePage() {
 
       <SectionCard title="Transit detection short — star → planet transit → light-curve dip → exoplanet confirmed → JWST follow-up (loop)" icon={<Atom className="h-5 w-5" />} badge="short">
         <TransitDetectionShort />
+      </SectionCard>
+
+      <SectionCard
+        title="Space interactives — 8 fully interactive visuals (drag, slide, click to explore)"
+        description="Eight interactive visuals in lazy popups spanning NASA + Chinese space sector + dark matter / dark energy / JWST / LIGO / LHC / FAST / Beidou / Chang'e / Tiangong. Topics in contention: dark matter particle vs MOND vs emergent gravity; Hubble tension (Planck H0=67.4 vs SH0ES H0=73.04); far-side Moon samples (Chang'e 6, 2024); Beidou vs GPS; TianQin vs LISA. Each card opens a lazy popup with: animated SVG visual, math equation, sliders/buttons to control parameters, and a 3-part InfoCallout (Design intent / Math foundation / Implementation insight)."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="8 interactives"
+      >
+        <SpaceInteractives />
       </SectionCard>
 
       <SectionCard

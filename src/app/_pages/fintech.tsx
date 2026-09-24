@@ -7,9 +7,10 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { FintechInteractives } from "../_components/fintech-interactives";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network } from "lucide-react";
+import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
 
 const KPIS = [
   { label: "Black-Scholes", value: "C = S·N(d₁) - K·e^(-rT)·N(d₂)", hint: "Closed-form European option pricing (Black 1973)", deltaTone: "flat" as const },
@@ -795,6 +796,15 @@ export function FintechPage() {
         badge="short"
       >
         <FintechShort />
+      </SectionCard>
+
+      <SectionCard
+        title="Fintech interactives — 8 fully interactive visuals (quant, derivatives, commodities, real-time data)"
+        description="Eight interactive visuals in lazy popups spanning the full quant stack: Black-Scholes option pricing (with 5 live Greeks), Monte Carlo VaR/CVaR (10k paths, Basel III→IV transition), real-time market data toggle (Yahoo Finance API + synthetic GBM fallback — switchable per user request), Markowitz efficient frontier, volatility surface (SVI parametric), Treasury yield curve (recession signal), GNN fraud detection (transaction network), HFT order book microstructure (maker-taker, PFOF debate). Each card opens a lazy popup with: animated SVG visual, math equation, sliders/buttons, 3-part InfoCallout."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="8 interactives"
+      >
+        <FintechInteractives />
       </SectionCard>
 
       {/* Black-Scholes math */}
