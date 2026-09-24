@@ -57,13 +57,14 @@ export type PageId =
   | "systems-biology"
   | "cryo-em"
   | "spatial-transcriptomics"
-  | "singlecell-multiomics";
+  | "singlecell-multiomics"
+  | "alphamissense";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense";
   icon: string;
   description: string;
 }
@@ -476,6 +477,14 @@ export const PAGES: PageMeta[] = [
     group: "Single-cell Multi-omics",
     icon: "Atom",
     description: "AI-generated illustrations + RNA velocity short, 10x GEM Poisson + UMI, scVI ZINB VAE, WNN multi-modal integration, RNA velocity kinetic ODE, Harmony batch correction, low-level PyTorch scVI+WNN+RNAVelocitySolver+Harmony.",
+  },
+  {
+    id: "alphamissense",
+    label: "AlphaMissense — 71M Variant Pathogenicity Prediction",
+    shortLabel: "AlphaMissense",
+    group: "AlphaMissense",
+    icon: "Dna",
+    description: "AI-generated illustrations + variant scoring short, AlphaFold2 backbone + variant-aware head, ACMG classification thresholds (≥0.564 likely pathogenic), ClinVar+gnomAD calibration, 94% accuracy, low-level PyTorch ProteinEncoder+VariantEmbedder+AlphaMissenseHead+AlphaMissense.",
   },
 ];
 

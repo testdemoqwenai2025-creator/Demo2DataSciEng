@@ -1008,6 +1008,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["single-cell", "multi-omics", "10x-genomics", "scvi", "wnn", "rna-velocity", "harmony", "scvelo", "patterns", "genai"],
   },
+  {
+    id: "ADR-043",
+    title: "Adopt AlphaMissense (71M missense variants) for clinical variant pathogenicity prediction",
+    status: "accepted",
+    date: "FY31-Q4",
+    deciders: "Data Platform, Clinical Genomics, ML Engineering, Architecture",
+    context:
+      "ADR-034 covered ESM-2 (protein embeddings) and ADR-037 covered GWAS (variant → trait). The remaining gap: clinical variant interpretation — given a patient's VCF with 4-5M variants, which are pathogenic? Three legacy methods compete: (1) PolyPhen-2 (Adzhubei 2010) — rule-based on sequence conservation + structure, ~75% accuracy. (2) CADD (Combined Annotation Dependent Depletion, Kirchner 2014) — ensemble of 63 annotations, ~80% accuracy. (3) REVEL (Ioannidis 2016) — ensemble of 13 predictors, ~85% accuracy. AlphaMissense (Cheng 2023, Science) — AlphaFold2-derived model trained on 71M missense variants (every possible amino acid substitution in human proteins) — predicts pathogenicity with 94% accuracy. The math: for each of 71M variants, the model takes (wild-type residue, position, mutant residue, sequence context) → predicts pathogenicity score 0-1. Architecture: AlphaFold2 backbone (MSA + Evoformer + structure module) + variant-aware head. Trained on ClinVar (validated variants, ~50K) + gnomAD (population allele frequencies, ~80M) — variants common in population are likely benign, rare are likely pathogenic. Calibration: orthogonal validation against ClinVar clinical classifications + 12 variant effect assays.",
+    decision:
+      "Adopt AlphaMissense as the default variant pathogenicity prediction for clinical genomics. Production: download the AlphaMissense predictions table (71M variants, 1.6 GB VCF) → load into Parquet via ADAM/Spark → query by patient VCF. For each patient variant: lookup the AlphaMissense score; threshold ≥0.564 = 'likely pathogenic', ≤0.340 = 'likely benign', between = 'uncertain significance'. Connects to ADR-037 genetic materials: patient WGS → variant calling (BWA-MEM2 + GATK4) → AlphaMissense lookup → clinical report. Connects to ADR-034 ESM-2: AlphaMissense uses ESM-2-style embeddings as features. Connects to ADR-038 AlphaFold DB: AlphaMissense integrates with protein structure for residue-level interpretation (variant at protein-protein interface = more likely pathogenic). Connects to ADR-022 pgvector: store variant embeddings (ESM-2 wild-type + mutant) for similarity search — 'find variants with similar mechanism'. Clinical integration: report ACMG classification (Pathogenic/Likely Pathogenic/VUS/Likely Benign/Benign) with AlphaMissense score as evidence.",
+    consequences:
+      "+ 94% accuracy (vs 85% REVEL, 80% CADD, 75% PolyPhen-2) — state of the art. + 71M variants pre-computed — instant lookup, no per-patient ML inference. + Calibrated against ClinVar + 12 orthogonal assays. + Integrates with AlphaFold DB structure for residue-level interpretation. + Connects to ADR-037 100K-genome pipeline — variants in patient WGS get instant annotation. − AlphaMissense only covers missense (amino acid change) — not nonsense (stop-gain), frameshift, splice-site. Need separate tools for those. − Calibrated on European-ancestry ClinVar — performance on non-European variants is lower. − ACMG classification needs ≥2 evidence sources — AlphaMissense is one source, need to combine with segregation + functional assays. − Thresholds (0.564 / 0.340) are population-derived — may need re-calibration per phenotype. − Variant interpretation is non-deterministic — same variant can be pathogenic in one phenotype, benign in another.",
+    alternatives: [
+      "PolyPhen-2 (Adzhubei 2010) — oldest, rule-based, 75% accuracy, still used for legacy reports",
+      "CADD (Kirchner 2014) — ensemble of 63 annotations, 80% accuracy, no ML training needed",
+      "REVEL (Ioannidis 2016) — ensemble of 13 predictors, 85% accuracy, weighted combination",
+      "ESM-1b (Brandes 2023) — alternative ML approach, 90% accuracy, slightly worse than AlphaMissense",
+    ],
+    tags: ["alphamissense", "variant-interpretation", "missense", "pathogenicity", "clinvar", "gnomad", "acmg", "precision-medicine", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
