@@ -1014,3 +1014,53 @@ THE SCIENCE TRILOGY ARC:
 - Systems Biology (#48): FBA is supply chain LP (Dantzig 1947 original use case), PPI networks are distributed systems topology (Netflix critical-path), whole-cell simulation is microservices architecture (Karr's 28 sub-models = 28 microservices), cell is largest distributed system known, evolution load-tested for 4B years
 
 The grand pattern across all 48 pages and 39 ADRs: every scientific domain — bioinformatics, cheminformatics, molecular modelling, genetics, macro structures, systems biology — is a different modality of the SAME contrastive-learning + DP + LP + graph-theory algorithmic stack. The platform's pgvector IS the shared embedding space for all of them. The cell IS the original distributed system; biology IS the original cloud.
+
+---
+Task ID: adr043-alphamissense-c4-FINAL
+Agent: Super Z (main)
+Task: Stage 4/4 (FINAL) of "advanced science: cryo-EM + spatial tx + single-cell + AlphaMissense" — ADR-043 (AlphaMissense) + AlphaMissense page (#52). User requested deeper low-level code + math on all four.
+
+Work Log:
+- ADR-043: AlphaMissense (94% accuracy on 71M missense variants) as default clinical variant pathogenicity predictor
+- AlphaMissense page (#52) — FINAL of the advanced-science series:
+  * 4 AI-generated illustrations (mutation site, variant positions, pathogenicity score distribution, genome-wide manhattan) via z-ai-web-dev-sdk
+  * Variant scoring 'short' — looping 6-phase animation (wild-type protein → variant S4P introduced → ESM-2+AlphaFold2 backbone features → pathogenicity score 0-1 with gauge + threshold markers → ACMG Likely Pathogenic → clinical action counselling+cascade testing)
+  * AlphaMissense math: score = σ(W·[wild_emb ⊕ mut_emb ⊕ Δ_emb ⊕ struct_features]+b), features = MSA conservation + structure (buried, helix, sheet, active_site_dist) + BLOSUM62 residue change
+  * ACMG thresholds: ≤0.340 Likely Benign (~80% of 71M), 0.34-0.56 VUS (~15%), ≥0.564 Likely Pathogenic (~5%) calibrated on ClinVar
+  * Pyodide: full AlphaMissense-style scoring with BLOSUM62 + MSA entropy + structure features for 6 BRCA1 variants (incl. known pathogenic R175P vs conservative R175K) + accuracy comparison across 5 methods
+  * Modern papers: AlphaMissense (Cheng 2023 Science — AlphaFold2 backbone + variant head, 71M predictions, 94% accuracy, 1.6GB lookup table), ClinVar (Landrum 2014 — 50K clinically-classified variants), gnomAD (Karczewski 2020 Nature — 80M variants from 76K WGS, allele frequency as orthogonal evidence), PolyPhen-2 (Adzhubei 2010 — first method 7-feature logistic regression 75% accuracy legacy baseline)
+  * HPC pipeline ASCII: patient WGS (30x) → BWA-MEM2+GATK4 → VEP → AlphaMissense lookup (1.6GB pre-computed) → gnomAD allele freq filter → ACMG 5-tier classification → LLM RAG clinical report; 4-5M variants → 30 clinically actionable → ~10 min processing
+  * Low-level PyTorch: ProteinEncoder (ESM-2 6-layer transformer + RoPE), StructureAwareFeatures (per-residue 2-layer MLP), VariantEmbedder (encode wild+mutant by residue substitution, compute delta = mut-wild), AlphaMissenseHead (concat 3*hidden+struct_dim → 2-layer MLP → sigmoid → 0-1), full AlphaMissense with predict_all_variants() iterating L × 19 mutants for pre-computing 71M lookup
+  * 'AlphaMissense IS information theory applied to evolution' deeper-thought insight (71M possible missense variants all tested by evolution over 4B years — survivors in gnomAD = benign, absent = pathogenic, AlphaMissense IS evolution's experimental log queried via ML; 94% accuracy = upper bound from sequence+structure alone, remaining 6% needs functional assay; unifies platform's clinical genomics with research — ADR-037 100K-genome → ADR-043 AlphaMissense → ADR-038 AlphaFold DB → ADR-034 ESM-2 → ADR-036 drug design; clinical variant report IS multi-modal RAG ADR-033 — VCF + ClinVar + AlphaFold structure + ESM-2 + LLM; precision medicine IS multi-modal RAG on the human genome)
+
+Stage Summary — ALL 4 ADVANCED-SCIENCE STAGES COMPLETE:
+- HEAD = 9c4cd54 on both repos (private + public)
+- 52 pages, 43 ADRs, 49 pages with Pyodide, 3 with WasmRunner
+- /alphamissense → HTTP 200 (375KB), AlphaMissense: True, ClinVar: True, gnomAD: True, ACMG: True, pathogenicity: True, Pyodide: True, ADR-043: True, AI images: 4
+- Production build succeeded (53 routes total, 1 new)
+
+FINAL TOTALS — full platform state after advanced-science series:
+- 52 pages (started this conversation at 48)
+- 43 ADRs (started at 39)
+- 49 pages with Pyodide demos (started at 45)
+- 3 pages with WasmRunner (unchanged)
+- 53 routes (started at 50)
+- 4 new pages in this advanced-science series:
+  #49 /cryo-em (RELION, CryoSPARC, cryoDRGN — Fourier projection-slice, CTF correction, FSC resolution)
+  #50 /spatial-transcriptomics (Visium, MERFISH 4¹⁶, STAGATE, NicheNet — combinatorial barcoding, U-Net segmentation)
+  #51 /singlecell-multiomics (scVI ZINB VAE, WNN, RNA velocity kinetic ODE, Harmony)
+  #52 /alphamissense (71M missense variants, AlphaFold2 backbone, ACMG classification, ClinVar+gnomAD) — FINAL
+
+NEW INFRASTRUCTURE in this advanced-science series:
+- 16 new AI-generated scientific PNGs (4 per page × 4 pages, ~2MB total in /public/images/{cryoem,spatialtx,singlecell,alphamissense}/)
+- 4 new looping 'shorts' (projection-slice theorem, combinatorial barcoding, RNA velocity, variant scoring)
+- Reuses ImageModal component (click-to-popup with inline modal + open-in-new-tab)
+- Total AI-generated images across all science pages: 28 (4 per page × 7 pages: genetics, macro, systemsbio, cryoem, spatialtx, singlecell, alphamissense)
+
+THE ADVANCED-SCIENCE ARC:
+- Cryo-EM (#49): projection-slice theorem = same math as medical CT, MERFISH decoding = nearest-neighbour in Hamming space = same as ADR-032 RAG, cryoDRGN = VAE same architecture as ADR-034
+- Spatial Transcriptomics (#50): MERFISH decoding IS nearest-neighbour search (RAG), STAGATE IS graph neural network (PPI), U-Net is universal image segmentation (cryo-EM, medical, generation)
+- Single-cell Multi-omics (#51): scVI IS non-negative matrix factorisation with VAE (Netflix Prize), WNN IS multi-matrix factorisation with shared latent (MOFA+), RNA velocity IS ODE-constrained matrix factorisation (Verlet)
+- AlphaMissense (#52): IS evolution's experimental log queried via ML, precision medicine IS multi-modal RAG on the human genome
+
+The grand pattern across all 52 pages and 43 ADRs: every scientific domain — bioinformatics, cheminformatics, molecular modelling, genetics, macro structures, systems biology, cryo-EM, spatial transcriptomics, single-cell multi-omics, AlphaMissense — is a different modality of the SAME contrastive-learning + DP + LP + graph-theory + matrix-factorisation + ODE algorithmic stack. The platform's pgvector IS the shared embedding space for all of them. Biology IS the original cloud; the cell IS the original distributed system; evolution IS the original contrastive-learning experiment.
