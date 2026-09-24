@@ -91,15 +91,26 @@ export function PyodideRunner({
       setLoadTimeMs(loadMs);
 
       // Capture stdout/stderr
+      // Pyodide 0.26+ API: setStdout takes { batched: (msg: string) => void }
+      // (older versions took a plain function — wrap to support both)
       const lines: string[] = [];
       const writer = (s: string) => {
         lines.push(s);
       };
       try {
-        py.setStdout(writer);
-        py.setStderr(writer);
+        // Try the new Pyodide 0.26+ API first
+        // @ts-expect-error — Pyodide's setStdout signature varies across versions
+        py.setStdout({ batched: writer });
+        // @ts-expect-error — same for stderr
+        py.setStderr({ batched: writer });
       } catch {
-        // Older Pyodide versions don't have setStdout — fall back to runPythonAsync options
+        // Fall back to older Pyodide API (plain function)
+        try {
+          py.setStdout(writer);
+          py.setStderr(writer);
+        } catch {
+          // Older Pyodide versions don't have setStdout — fall back to runPythonAsync options
+        }
       }
 
       // Auto-load numpy if the code looks like it needs it (saves users
