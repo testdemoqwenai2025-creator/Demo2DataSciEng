@@ -85,6 +85,7 @@ export function PyodideRunner({
         runPythonAsync: (code: string, options?: { stdout?: (s: string) => void; stderr?: (s: string) => void }) => Promise<unknown>;
         setStdout: (fn: (s: string) => void) => void;
         setStderr: (fn: (s: string) => void) => void;
+        loadPackage: (names: string | string[]) => Promise<void>;
       };
       const loadMs = Math.round(performance.now() - start);
       setLoadTimeMs(loadMs);
@@ -99,6 +100,18 @@ export function PyodideRunner({
         py.setStderr(writer);
       } catch {
         // Older Pyodide versions don't have setStdout — fall back to runPythonAsync options
+      }
+
+      // Auto-load numpy if the code looks like it needs it (saves users
+      // from the "ModuleNotFoundError: No module named 'numpy'" traceback).
+      // Pyodide ships numpy in its standard distribution — we just have to
+      // ask for it explicitly. Cost: ~3-5s on first run, instant after.
+      if (/\bnumpy\b|\bnp\./.test(code) || (preamble && /\bnumpy\b/.test(preamble))) {
+        try {
+          await py.loadPackage("numpy");
+        } catch {
+          // Best-effort — if numpy fails to load, let the code error out naturally
+        }
       }
 
       setStatus("running");

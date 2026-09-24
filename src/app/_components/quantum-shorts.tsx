@@ -11,6 +11,7 @@ import {
   TrendingUp, BookOpen, Sparkles,
 } from "lucide-react";
 
+
 /**
  * QuantumShortsCarousel — 4 vertical-video-style cards (9:16) inspired by
  * https://www.youtube.com/shorts/TOPgZ-AbFwo (Quantum Superposition Explained
