@@ -1111,3 +1111,33 @@ THE ADVANCED-DESIGN ARC:
 - Spatial Multi-omics (#56): spatial multi-omics IS the regulatory layer biology was missing (RNA shows what, chromatin shows why, protein shows what — complete causal chain)
 
 The grand pattern across all 56 pages and 47 ADRs: the platform is a complete bidirectional map of biological space — forward (predict: variant → protein → structure → function → disease) and inverse (design: target → binder → drug → clinical candidate). Every modality (DNA, RNA, protein, chromatin, small molecule, cell, tissue) has both a forward predictor and an inverse designer. The platform's pgvector IS the shared embedding space for all of them. Precision medicine IS multi-modal RAG on the patient's biology.
+
+---
+Task ID: hash-redirect-basepath-fix
+Agent: Super Z (main)
+Task: Diagnose and fix the "page disappears after first render" bug on the GitHub Pages preview (https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/).
+
+Work Log:
+- Loaded agent-browser skill, opened the live site with an old hash URL (#/databricks)
+- Reproduced the bug deterministically: visiting /DemoAppDataSci/#/databricks caused the browser to navigate to https://testdemoqwenai2025-creator.github.io/databricks (no basePath) — GitHub Pages returned a 404 "File not found" and the visible page "disappeared"
+- Inspected src/app/_components/app-shell.tsx and src/app/_components/home-search.tsx
+- Root cause: both files called window.location.assign(hrefFor(id)) and window.history.replaceState(null, "", hrefFor(id)) — hrefFor() returns "/databricks" with no basePath prefix, so the manual navigation stripped the /DemoAppDataSci basePath that GitHub Pages serves from
+- Fix: replaced window.location.assign with useRouter().push / useRouter().replace (next/navigation). Next.js' router automatically prepends basePath on client-side navigation, so the redirect now lands on /DemoAppDataSci/databricks/ instead of /databricks
+- File 1: src/app/_components/app-shell.tsx (hash redirect useEffect)
+- File 2: src/app/_components/home-search.tsx (Enter-to-select + click handlers in the home hero search box)
+- Verified no other components bypass basePath (all other navigation uses Next.js <Link>)
+- Local static build succeeded (bun run build:static with GITHUB_PAGES=true after moving src/app/api/ out per the deploy workflow)
+- Committed as 4bea052, pushed to private repo (AppDataSci-Advanced)
+- Sync workflow #97 mirrored to public (DemoAppDataSci)
+- Deploy workflow #91 on public repo succeeded
+- Verified live site with 4 representative hash URLs:
+    /#/databricks → /DemoAppDataSci/databricks/  (body 22864 chars)
+    /#/snowflake  → /DemoAppDataSci/snowflake/   (body 21811 chars)
+    /#/dbt        → /DemoAppDataSci/dbt/          (body 24153 chars)
+    /#/           → /DemoAppDataSci/              (body 20430 chars, home)
+  All four now correctly preserve the basePath and render the target page instead of 404'ing
+
+Stage Summary:
+- HEAD = 4bea052 on both private (AppDataSci-Advanced) and public (DemoAppDataSci) repos
+- Live site confirmed: hash URLs (#/<page>) now redirect correctly to real routes while preserving the /DemoAppDataSci basePath — no more "page disappears after first render" bug
+- Browser console error that the user was referring to: a 404 Not Found on the document request triggered by the redirect to the wrong (basePath-less) URL
