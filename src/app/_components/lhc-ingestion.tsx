@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   X, Atom, Zap, Sparkles, Cpu, Activity, Database, ArrowRight,
-  Play, RotateCcw, Binary, FileText,
+  Play, RotateCcw, Binary, FileText, ExternalLink, Gauge, Layers, TrendingUp,
 } from "lucide-react";
 import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
+import { hrefFor } from "../_lib/router";
 
 /**
  * LHCIngestion — extreme-scale data ingestion scenario for the
@@ -627,6 +629,176 @@ const CODE_CARDS: CodeCard[] = [
 ];
 
 // ============================================================
+// Step 4: L1 Trigger simulator — interactive trigger cuts
+// ============================================================
+function TriggerSimulator() {
+  const [energyThresh, setEnergyThresh] = useState(30);  // GeV
+  const [metThresh, setMetThresh] = useState(20);          // GeV
+  const [jetCount, setJetCount] = useState(2);
+
+  // Generate 200 events with random energies and MET
+  const [events] = useState(() => {
+    const evts = [];
+    for (let i = 0; i < 200; i++) {
+      const nJets = Math.floor(Math.random() * 8) + 1;
+      const leadingPt = 20 + Math.random() * 80;
+      const met = Math.random() * 60;
+      evts.push({ id: i, nJets, leadingPt, met, pass: false });
+    }
+    return evts;
+  });
+
+  // Apply trigger cuts
+  const passed = events.filter(e =>
+    e.nJets >= jetCount &&
+    e.leadingPt > energyThresh &&
+    e.met > metThresh
+  );
+  const passRate = (passed.length / events.length) * 100;
+  const outputRate = (passRate / 100) * 40000; // 40 MHz × pass rate
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-3">
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Leading jet pT threshold</span>
+            <span className="font-mono font-semibold text-primary">{energyThresh} GeV</span>
+          </div>
+          <input type="range" min={10} max={100} step={1} value={energyThresh}
+            onChange={(e) => setEnergyThresh(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Missing ET threshold</span>
+            <span className="font-mono font-semibold text-primary">{metThresh} GeV</span>
+          </div>
+          <input type="range" min={0} max={60} step={1} value={metThresh}
+            onChange={(e) => setMetThresh(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-[11px]">
+            <span className="text-muted-foreground">Min jet count</span>
+            <span className="font-mono font-semibold text-primary">{jetCount} jets</span>
+          </div>
+          <input type="range" min={1} max={6} step={1} value={jetCount}
+            onChange={(e) => setJetCount(+e.target.value)}
+            className="w-full h-1.5 cursor-pointer appearance-none rounded-full bg-muted"
+            style={{ accentColor: "oklch(0.55 0.16 250)" }}
+          />
+        </div>
+
+        <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-center">
+          <p className="font-mono text-sm text-primary">40 MHz &times; {passRate.toFixed(1)}% = {outputRate.toFixed(0)} Hz output</p>
+          <p className="text-[11px] text-muted-foreground mt-1">{passed.length}/{events.length} events pass trigger cuts</p>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border/60 bg-card p-3">
+        <svg viewBox="0 0 280 280" className="w-full h-auto">
+          {/* Grid of event dots */}
+          {events.map((e, i) => {
+            const col = i % 20;
+            const row = Math.floor(i / 20);
+            const x = 20 + col * 12;
+            const y = 20 + row * 12;
+            const isPassed = e.nJets >= jetCount && e.leadingPt > energyThresh && e.met > metThresh;
+            return (
+              <motion.circle key={i} cx={x} cy={y} r="3"
+                fill={isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)"}
+                animate={{ fill: isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)" }}
+                transition={{ duration: 0.2 }}
+              />
+            );
+          })}
+          <text x="140" y="270" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.05 250)">
+            green = pass trigger, gray = fail
+          </text>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Step 5: Binary parser demo — parse CMS RD5 hex in browser
+// ============================================================
+function BinaryParserDemo() {
+  const [parsed, setParsed] = useState<{ eventId: string; bx: string; ts: string; lb: string; energies: string[] }[] | null>(null);
+
+  const parseHex = () => {
+    // Simulate parsing CMS RD5 format: 8B event_id + 4B BX + 8B timestamp + 4B lumi + 4B payload_len + 4B reserved
+    // + 3 channels × (4B channel_id + 4B energy)
+    const results = [];
+    for (let i = 0; i < 5; i++) {
+      const eventId = (0x0001 + i).toString(16).padStart(8, "0");
+      const bx = ((i * 2549) % 4096).toString(16).padStart(8, "0");
+      const ts = (Date.now() + i * 25).toString(16).padStart(16, "0");
+      const lb = (42 + i).toString(16).padStart(8, "0");
+      const energies = [];
+      for (let c = 0; c < 3; c++) {
+        const e = (50 + (Math.random() - 0.5) * 20).toFixed(1);
+        energies.push(`ch${c + i * 3} = ${e} GeV`);
+      }
+      results.push({ eventId, bx, ts, lb, energies });
+    }
+    setParsed(results);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <Button size="sm" variant="default" onClick={parseHex} className="gap-1.5">
+          <Binary className="h-3.5 w-3.5" /> Parse CMS RD5 binary
+        </Button>
+        {parsed && (
+          <Button size="sm" variant="outline" onClick={() => setParsed(null)} className="gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" /> Clear
+          </Button>
+        )}
+      </div>
+
+      {!parsed && (
+        <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground">
+          Click &ldquo;Parse CMS RD5 binary&rdquo; to simulate the Rust zero-copy parser.
+          Each event is parsed from a 32-byte header (event_id, bunch_crossing, timestamp, lumi_block, payload_len)
+          + channel energy readings. In production, this runs at ~80 GB/s per core using memmap2 + AVX2 SIMD.
+        </div>
+      )}
+
+      {parsed && (
+        <div className="rounded-md border border-border/60 bg-card p-3 space-y-2">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Parsed events (zero-copy, no allocation)</p>
+          {parsed.map((e, i) => (
+            <div key={i} className="border-l-2 border-primary/30 pl-3 space-y-0.5">
+              <p className="font-mono text-[11px] font-semibold text-primary">
+                Event #{parseInt(e.eventId, 16)} | BX: {parseInt(e.bx, 16)} | Lumi block: {parseInt(e.lb, 16)}
+              </p>
+              <p className="font-mono text-[10px] text-muted-foreground">
+                Timestamp: 0x{e.ts} | Header: 32 bytes | Payload: 36 bytes
+              </p>
+              <div className="flex flex-wrap gap-2 pl-2">
+                {e.energies.map((en, j) => (
+                  <span key={j} className="font-mono text-[10px] bg-muted/40 px-1.5 py-0.5 rounded text-foreground/80">
+                    {en}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // Main component
 // ============================================================
 
@@ -713,6 +885,202 @@ export function LHCIngestion() {
             </div>
           </motion.button>
         ))}
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 1: CMS Open Data integration                            */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <ExternalLink className="h-4 w-4 text-amber-600" />
+          <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">CMS Open Data — 4 PB of real collision data at opendata.cern.ch</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-xs">
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Years</p>
+            <p className="font-mono font-bold">2010-2012</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Total size</p>
+            <p className="font-mono font-bold">~4 PB</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Format</p>
+            <p className="font-mono font-bold">ROOT/AOD</p>
+          </div>
+          <div className="rounded-md border border-border/60 bg-card p-2">
+            <p className="text-[10px] text-muted-foreground">Events</p>
+            <p className="font-mono font-bold">~10 billion</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <a href="https://opendata.cern.ch" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" className="gap-1.5">
+              <ExternalLink className="h-3 w-3" /> Open opendata.cern.ch
+            </Button>
+          </a>
+          <a href="https://opendata.cern.ch/record/8000" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="ghost" className="gap-1.5">
+              <FileText className="h-3 w-3" /> MiniAOD sample
+            </Button>
+          </a>
+        </div>
+        <PyodideRunner
+          buttonLabel="Run CMS Open Data analysis (Pyodide)"
+          code={`import numpy as np
+
+# CMS Open Data analysis simulation
+# In production: use uproot to read ROOT files from opendata.cern.ch
+# Here: simulate the AOD -> MiniAOD -> skim -> histogram pipeline
+
+print("=== CMS Open Data Analysis Pipeline ===")
+print()
+print("Real pipeline (at CERN):")
+print("  1. AOD (Analysis Object Data) — ~1 MB/event, full detector info")
+print("  2. MiniAOD — ~50 kB/event, physics objects only (jets, muons, electrons)")
+print("  3. NanoAOD — ~2 kB/event, flat ntuple for analysis")
+print("  4. Skim — selected events only (e.g. H->bb candidates)")
+print()
+
+# Simulate event selection (Higgs -> bb analysis)
+n_total = 100000  # 100k MiniAOD events
+np.random.seed(42)
+
+# Each event has: n_jets, jet_pt[], jet_eta[], missing_et
+n_jets = np.random.poisson(5, n_total)  # ~5 jets per event on average
+jet_pts = [np.random.exponential(40, n) for n in n_jets]  # pT ~ Exp(40 GeV)
+missing_ets = np.random.exponential(20, n_total)  # MET ~ Exp(20 GeV)
+
+# Selection: >= 2 jets with pT > 30 GeV, MET > 20 GeV
+selected = 0
+for i in range(n_total):
+    if n_jets[i] >= 2:
+        pts = sorted(jet_pts[i], reverse=True)
+        if pts[0] > 30 and pts[1] > 30 and missing_ets[i] > 20:
+            selected += 1
+
+print(f"MiniAOD events: {n_total:,}")
+print(f"After selection (>= 2 jets pT>30, MET>20): {selected:,} ({selected/n_total*100:.1f}%)")
+print(f"Reduction: {n_total/selected:.1f}x")
+print()
+print("At full CMS scale:")
+print(f"  10 billion MiniAOD events -> {int(10e9 * selected/n_total):,} selected")
+print(f"  = {10e9 * selected/n_total * 50e3 / 1e15:.2f} PB of skimmed data")
+print(f"  (from {10e9 * 50e3 / 1e15:.1f} PB MiniAOD)")
+print()
+print("=== Cross-references ===")
+print("  NanoAOD format = Apache Arrow-compatible flat ntuples")
+print("  uproot library = reads ROOT files without CERN ROOT framework")
+print("  Dask-awkward = parallel NanoAOD analysis on WLCG grid")
+print("  Same patterns as the platform's Bronze->Silver->Gold medallion!")
+
+
+print()
+print("=== Data reduction at each stage ===")
+stages = [("AOD", 1000), ("MiniAOD", 50), ("NanoAOD", 2), ("Skim", 0.2)]
+for i in range(len(stages)-1):
+    name1, size1 = stages[i]
+    name2, size2 = stages[i+1]
+    ratio = size1 / size2
+    print(f"  {name1} -> {name2}: {size1} kB -> {size2} kB ({ratio:.0f}x reduction)")`}
+        />
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 2: HL-LHC (2029+) upgrade scenario                     */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">HL-LHC (2029+) — 10x more data, new challenges</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40">
+              <tr>
+                <th className="text-left p-2 font-semibold">Parameter</th>
+                <th className="text-right p-2 font-semibold">Run 2 (2015-18)</th>
+                <th className="text-right p-2 font-semibold">Run 3 (2022-26)</th>
+                <th className="text-right p-2 font-semibold">HL-LHC (2029+)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              <tr><td className="p-2 font-medium">Luminosity</td><td className="p-2 text-right font-mono">150 fb⁻¹</td><td className="p-2 text-right font-mono">300 fb⁻¹</td><td className="p-2 text-right font-mono text-primary font-bold">3000 fb⁻¹</td></tr>
+              <tr><td className="p-2 font-medium">Data stored</td><td className="p-2 text-right font-mono">50 PB</td><td className="p-2 text-right font-mono">100 PB</td><td className="p-2 text-right font-mono text-primary font-bold">1000 PB (1 EB)</td></tr>
+              <tr><td className="p-2 font-medium">Pileup (interactions/BX)</td><td className="p-2 text-right font-mono">~40</td><td className="p-2 text-right font-mono">~55</td><td className="p-2 text-right font-mono text-primary font-bold">~200</td></tr>
+              <tr><td className="p-2 font-medium">HLT technology</td><td className="p-2 text-right">CPU farm</td><td className="p-2 text-right">CPU + GPU</td><td className="p-2 text-right text-primary font-bold">GPU + AI trigger</td></tr>
+              <tr><td className="p-2 font-medium">L1 Trigger</td><td className="p-2 text-right">FPGA, 3 us</td><td className="p-2 text-right">FPGA, 3 us</td><td className="p-2 text-right text-primary font-bold">FPGA + ML, 1 us</td></tr>
+              <tr><td className="p-2 font-medium">WLCG sites</td><td className="p-2 text-right font-mono">~250</td><td className="p-2 text-right font-mono">~250</td><td className="p-2 text-right font-mono text-primary font-bold">~300 (cloud)</td></tr>
+              <tr><td className="p-2 font-medium">Raw rate</td><td className="p-2 text-right font-mono">40 TB/s</td><td className="p-2 text-right font-mono">40 TB/s</td><td className="p-2 text-right font-mono text-primary font-bold">~80 TB/s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          HL-LHC will produce <strong>10x more data</strong> with <strong>5x more pileup</strong> (overlapping collisions per bunch crossing).
+          The HLT will use <strong>GPU acceleration</strong> and <strong>AI-assisted trigger</strong> (Graph Neural Networks for pileup mitigation).
+          This is why CERN is evaluating Rust for the new DAQ readout and investing in heterogeneous computing (CPU+GPU+FPGA).
+        </p>
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 3: Cross-links to related pages                         */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-muted/20 p-4">
+        <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+          <Layers className="h-3.5 w-3.5 text-primary" /> Cross-references — LHC ingestion connects to the entire platform
+        </p>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <Link href={hrefFor("streaming")} className="text-primary hover:underline">
+            &rarr; Streaming (Kafka + Flink for real-time event streams)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("databricks")} className="text-primary hover:underline">
+            &rarr; Databricks (Spark for physics analysis &amp; skim production)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("quantum-computing")} className="text-primary hover:underline">
+            &rarr; Quantum Computing (LHC jet substructure &tau;<sub>N</sub>)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("space-science")} className="text-primary hover:underline">
+            &rarr; Space Science (JWST/LIGO raw data ingestion at smaller scale)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("orchestration")} className="text-primary hover:underline">
+            &rarr; Orchestration (Airflow DAGs for skim production)
+          </Link>
+          <span className="text-muted-foreground">&middot;</span>
+          <Link href={hrefFor("arrow")} className="text-primary hover:underline">
+            &rarr; Arrow (NanoAOD = flat ntuples, Arrow-compatible)
+          </Link>
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-2">
+          The LHC ingestion pipeline uses the SAME patterns as the platform&apos;s commercial ELT (Fivetran):
+          source &rarr; trigger/filter &rarr; zero-suppress &rarr; compress &rarr; store &rarr; distribute.
+          The only difference is scale (40 TB/s vs 3.1 B rows/month) and domain (physics vs business).
+        </p>
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 4: Real-time trigger simulator                          */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Gauge className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">L1 Trigger simulator &mdash; 40 MHz &rarr; ~1 kHz</p>
+        </div>
+        <TriggerSimulator />
+      </div>
+
+      {/* ============================================================ */}
+      {/* STEP 5: Binary data parser demo                               */}
+      {/* ============================================================ */}
+      <div className="rounded-md border border-border/60 bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Binary className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold text-primary">Binary parser demo &mdash; parse CMS RD5 format in browser</p>
+        </div>
+        <BinaryParserDemo />
       </div>
 
       {/* LAZY modal */}
