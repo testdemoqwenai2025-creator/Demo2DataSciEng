@@ -41,14 +41,55 @@ interface AuthState {
   signedInAt: string;
 }
 
-// Lazy initialiser that reads localStorage only on the client (no SSR hydration mismatch)
+/**
+ * useSyncExternalStore snapshot cache.
+ *
+ * React requires that the getSnapshot function returns a STABLE reference
+ * if the underlying data has not changed. JSON.parse() always produces a
+ * new object, so naively returning it from getSnapshot causes React to
+ * think the store has changed on every render —> infinite re-render loop
+ * —> Next.js error boundary catches it as "Application error: a
+ * client-side exception has occurred".
+ *
+ * We cache the parsed object keyed on the raw localStorage string so the
+ * same stored value returns the same object reference across renders.
+ */
+let cachedRaw: string | null | undefined = undefined; // undefined = not yet read
+let cachedSnapshot: AuthState | null = null;
+
 function readStoredAuth(): AuthState | null {
   if (typeof window === "undefined") return null;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as AuthState) : null;
+    // Same raw string → return cached object reference (stability for useSyncExternalStore)
+    if (stored === cachedRaw) return cachedSnapshot;
+    cachedRaw = stored;
+    cachedSnapshot = stored ? (JSON.parse(stored) as AuthState) : null;
+    return cachedSnapshot;
   } catch {
+    cachedRaw = null;
+    cachedSnapshot = null;
     return null;
+  }
+}
+
+/**
+ * Mutating the store — call after writing to localStorage so the cached
+ * snapshot is invalidated and useSyncExternalStore picks up the change.
+ */
+function writeStoredAuth(state: AuthState | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (state === null) {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    // Invalidate cache — next getSnapshot will re-read and return a new ref
+    cachedRaw = undefined;
+    cachedSnapshot = null;
+  } catch {
+    // ignore
   }
 }
 
@@ -79,11 +120,7 @@ export function LoginButton() {
         signedInAt: new Date().toISOString(),
       };
       setAuthState(state);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // ignore
-      }
+      writeStoredAuth(state);
       setOpen(false);
     } else {
       setError("Invalid credentials. Use the demo account below, or click 'Auto-fill & sign in'.");
@@ -102,22 +139,14 @@ export function LoginButton() {
         signedInAt: new Date().toISOString(),
       };
       setAuthState(state);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // ignore
-      }
+      writeStoredAuth(state);
       setOpen(false);
     }, 200);
   };
 
   const signOut = () => {
     setAuthState(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    writeStoredAuth(null);
   };
 
   if (authState) {
