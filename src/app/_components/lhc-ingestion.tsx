@@ -1045,18 +1045,48 @@ function TriggerSimulator() {
   const [energyThresh, setEnergyThresh] = useState(30);  // GeV
   const [metThresh, setMetThresh] = useState(20);          // GeV
   const [jetCount, setJetCount] = useState(2);
+  const [streaming, setStreaming] = useState(false);
+  const [liveEvents, setLiveEvents] = useState<{ id: number; nJets: number; leadingPt: number; met: number }[]>([]);
+  const [totalProcessed, setTotalProcessed] = useState(0);
+  const [totalPassed, setTotalPassed] = useState(0);
+  const eventIdRef = useRef(0);
 
-  // Generate 200 events with random energies and MET
-  const [events] = useState(() => {
+  // Real-time WebSocket-like feed at 40 Hz (25ms = simulated CMS crossing rate)
+  useEffect(() => {
+    if (!streaming) return;
+    const id = setInterval(() => {
+      // Generate 1 new event per tick (simulating 40 Hz CMS beam crossing)
+      const ev = {
+        id: eventIdRef.current++,
+        nJets: Math.floor(Math.random() * 8) + 1,
+        leadingPt: 20 + Math.random() * 80,
+        met: Math.random() * 60,
+      };
+      setLiveEvents(prev => {
+        const next = [...prev, ev];
+        return next.length > 200 ? next.slice(-200) : next; // keep last 200
+      });
+      setTotalProcessed(prev => prev + 1);
+      if (ev.nJets >= jetCount && ev.leadingPt > energyThresh && ev.met > metThresh) {
+        setTotalPassed(prev => prev + 1);
+      }
+    }, 25); // 40 Hz
+    return () => clearInterval(id);
+  }, [streaming, jetCount, energyThresh, metThresh]);
+
+  // Seed initial 200 events when not streaming
+  const events = streaming ? liveEvents : (() => {
     const evts = [];
     for (let i = 0; i < 200; i++) {
-      const nJets = Math.floor(Math.random() * 8) + 1;
-      const leadingPt = 20 + Math.random() * 80;
-      const met = Math.random() * 60;
-      evts.push({ id: i, nJets, leadingPt, met, pass: false });
+      evts.push({
+        id: i,
+        nJets: Math.floor(Math.random() * 8) + 1,
+        leadingPt: 20 + Math.random() * 80,
+        met: Math.random() * 60,
+      });
     }
     return evts;
-  });
+  })();
 
   // Apply trigger cuts
   const passed = events.filter(e =>
@@ -1064,12 +1094,28 @@ function TriggerSimulator() {
     e.leadingPt > energyThresh &&
     e.met > metThresh
   );
-  const passRate = (passed.length / events.length) * 100;
-  const outputRate = (passRate / 100) * 40000; // 40 MHz × pass rate
+  const passRate = streaming
+    ? (totalProcessed > 0 ? (totalPassed / totalProcessed) * 100 : 0)
+    : (passed.length / events.length) * 100;
+  const outputRate = (passRate / 100) * 40000;
+
+  const toggleStream = () => {
+    if (!streaming) {
+      setLiveEvents([]);
+      setTotalProcessed(0);
+      setTotalPassed(0);
+      eventIdRef.current = 0;
+    }
+    setStreaming(!streaming);
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <div className="space-y-3">
+        <Button size="sm" variant={streaming ? "destructive" : "default"} onClick={toggleStream} className="w-full gap-1.5">
+          {streaming ? <><Activity className="h-3.5 w-3.5 animate-pulse" /> Stop live stream (40 Hz)</> : <><Play className="h-3.5 w-3.5" /> Start live stream (40 Hz)</>}
+        </Button>
+
         <div className="flex flex-col gap-1">
           <div className="flex justify-between text-[11px]">
             <span className="text-muted-foreground">Leading jet pT threshold</span>
@@ -1106,21 +1152,27 @@ function TriggerSimulator() {
 
         <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-center">
           <p className="font-mono text-sm text-primary">40 MHz &times; {passRate.toFixed(1)}% = {outputRate.toFixed(0)} Hz output</p>
-          <p className="text-[11px] text-muted-foreground mt-1">{passed.length}/{events.length} events pass trigger cuts</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {streaming
+              ? `${totalPassed}/${totalProcessed} events passed trigger (live)`
+              : `${passed.length}/${events.length} events pass trigger cuts`}
+          </p>
+          {streaming && (
+            <p className="text-[10px] text-emerald-600 mt-1">● LIVE — streaming at 40 Hz (simulated CMS beam crossing rate)</p>
+          )}
         </div>
       </div>
 
       <div className="rounded-md border border-border/60 bg-card p-3">
         <svg viewBox="0 0 280 280" className="w-full h-auto">
-          {/* Grid of event dots */}
-          {events.map((e, i) => {
+          {events.slice(-200).map((e, i) => {
             const col = i % 20;
             const row = Math.floor(i / 20);
             const x = 20 + col * 12;
             const y = 20 + row * 12;
             const isPassed = e.nJets >= jetCount && e.leadingPt > energyThresh && e.met > metThresh;
             return (
-              <motion.circle key={i} cx={x} cy={y} r="3"
+              <motion.circle key={e.id} cx={x} cy={y} r="3"
                 fill={isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)"}
                 animate={{ fill: isPassed ? "oklch(0.65 0.16 165)" : "oklch(0.55 0.05 250 / 0.2)" }}
                 transition={{ duration: 0.2 }}
@@ -1128,7 +1180,7 @@ function TriggerSimulator() {
             );
           })}
           <text x="140" y="270" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.05 250)">
-            green = pass trigger, gray = fail
+            {streaming ? "live event stream (40 Hz)" : "static events — click Start to stream"}
           </text>
         </svg>
       </div>
