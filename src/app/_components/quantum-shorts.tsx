@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,22 +58,59 @@ interface ShortMeta {
 }
 
 // --- Thumbnail 1: Bloch sphere rotating vector ---
-function BlochSphereThumbnail({ accent }: { accent: string }) {
+function BlochSphereThumbnail({ accent, draggable = false }: { accent: string; draggable?: boolean }) {
   const [phi, setPhi] = useState(0);
+  const [theta, setTheta] = useState(Math.PI / 2);
+  const [dragging, setDragging] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null);
+  // Auto-rotate only when not dragging
   useEffect(() => {
+    if (dragging) return;
     const id = setInterval(() => setPhi(p => (p + 0.05) % (2 * Math.PI)), 50);
     return () => clearInterval(id);
-  }, []);
-  // Project 3D Bloch-sphere vector (theta=π/2, phi) to 2D isometric
-  const theta = Math.PI / 2;
+  }, [dragging]);
+  // Pointer handlers — convert screen (x, y) -> Bloch (theta, phi)
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!draggable) return;
+    setDragging(true);
+    handlePointerMove(e);
+  };
+  const handlePointerUp = () => setDragging(false);
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggable || !dragging || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const sx = ((e.clientX - rect.left) / rect.width) * 100;
+    const sy = ((e.clientY - rect.top) / rect.height) * 140;
+    const dx = sx - 50;
+    const dy = sy - 70;
+    const r = Math.min(Math.sqrt(dx * dx + dy * dy) / 38, 1);
+    const newTheta = r >= 1 ? Math.PI / 2 : Math.acos(1 - r * r);
+    const newPhi = Math.atan2(dy, dx);
+    setTheta(newTheta);
+    setPhi(newPhi);
+  };
+  // Live state |psi> components (for overlay)
+  const alpha = Math.cos(theta / 2);
+  const betaRe = Math.sin(theta / 2) * Math.cos(phi);
+  const betaIm = Math.sin(theta / 2) * Math.sin(phi);
+  const p0 = alpha * alpha;
+  // Project 3D Bloch-sphere vector (theta, phi) to 2D isometric
   const x = Math.sin(theta) * Math.cos(phi);
   const y = Math.sin(theta) * Math.sin(phi);
   const z = Math.cos(theta);
-  // isometric projection
   const px = 50 + 30 * (x - y * 0.5);
   const py = 70 - 30 * (z + (x + y) * 0.3);
   return (
-    <svg viewBox="0 0 100 140" className="w-full h-full">
+    <svg
+      ref={svgRef}
+      viewBox="0 0 100 140"
+      className={draggable ? (dragging ? "w-full h-full cursor-grabbing select-none" : "w-full h-full cursor-grab select-none") : "w-full h-full"}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onPointerMove={handlePointerMove}
+      style={{ touchAction: draggable ? "none" : undefined }}
+    >
       <defs>
         <radialGradient id="bs-grad" cx="40%" cy="35%" r="65%">
           <stop offset="0%" stopColor="oklch(0.96 0.02 250)" />
@@ -94,27 +131,53 @@ function BlochSphereThumbnail({ accent }: { accent: string }) {
       />
       <circle cx={px} cy={py} r="2.5" fill={accent} />
       <text x="50" y="132" textAnchor="middle" fontSize="6" fill={accent} fontWeight="bold">|+⟩</text>
+      {dragging && (
+        <g>
+          <rect x="2" y="120" width="96" height="18" fill="oklch(0.15 0.05 250 / 0.9)" rx="2" />
+          <text x="50" y="129" textAnchor="middle" fontSize="5" fill="oklch(0.85 0.18 25)" fontWeight="bold" fontFamily="monospace">
+            |psi⟩ = {alpha.toFixed(2)}|0⟩ + ({betaRe.toFixed(2)}{betaIm >= 0 ? "+" : ""}{betaIm.toFixed(2)}i)|1⟩
+          </text>
+          <text x="50" y="136" textAnchor="middle" fontSize="4" fill="oklch(0.75 0.10 250)" fontFamily="monospace">
+            P(0)={p0.toFixed(3)} · drag to set θ/φ
+          </text>
+        </g>
+      )}
     </svg>
   );
 }
 
 // --- Thumbnail 2: Bell pair (two linked qubits) ---
-function BellPairThumbnail({ accent }: { accent: string }) {
+function BellPairThumbnail({ accent, clickable = false }: { accent: string; clickable?: boolean }) {
   const [phase, setPhase] = useState(0);
+  const [flipped, setFlipped] = useState(false);
   useEffect(() => {
     const id = setInterval(() => setPhase(p => (p + 0.08) % (2 * Math.PI)), 60);
     return () => clearInterval(id);
   }, []);
   const wave1 = Math.sin(phase);
-  const wave2 = Math.sin(phase + Math.PI); // always opposite
+  const wave2 = Math.sin(phase + Math.PI); // always opposite — entanglement signature
+  // When clickable, the user can flip q0; q1 follows instantly (entanglement!)
+  const handleClick = () => {
+    if (!clickable) return;
+    setFlipped(f => !f);
+  };
+  const q0Color = (clickable && flipped) ? (wave1 > 0 ? accent : "oklch(0.95 0.02 250)") : (wave1 > 0 ? accent : "oklch(0.95 0.02 250)");
+  // For clickable mode: q0 inverts based on `flipped`; q1 follows instantly (entangled)
+  const q1Color = clickable
+    ? (flipped ? (wave1 > 0 ? accent : "oklch(0.95 0.02 250)") : (wave2 > 0 ? accent : "oklch(0.95 0.02 250)"))
+    : (wave2 > 0 ? accent : "oklch(0.95 0.02 250)");
   return (
-    <svg viewBox="0 0 100 140" className="w-full h-full">
+    <svg
+      viewBox="0 0 100 140"
+      className={clickable ? "w-full h-full cursor-pointer select-none" : "w-full h-full"}
+      onClick={handleClick}
+    >
       <circle cx="28" cy="50" r="18" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.85" />
-      <circle cx="28" cy="50" r="6" fill={wave1 > 0 ? accent : "oklch(0.95 0.02 250)"} />
-      <text x="28" y="78" textAnchor="middle" fontSize="6" fill="oklch(0.45 0.05 250)">q0</text>
+      <circle cx="28" cy="50" r="6" fill={q0Color} />
+      <text x="28" y="78" textAnchor="middle" fontSize="6" fill="oklch(0.45 0.05 250)">q0{clickable && (flipped ? " (flipped)" : "")}</text>
       <circle cx="72" cy="90" r="18" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.85" />
-      <circle cx="72" cy="90" r="6" fill={wave2 > 0 ? accent : "oklch(0.95 0.02 250)"} />
-      <text x="72" y="118" textAnchor="middle" fontSize="6" fill="oklch(0.45 0.05 250)">q1</text>
+      <circle cx="72" cy="90" r="6" fill={q1Color} />
+      <text x="72" y="118" textAnchor="middle" fontSize="6" fill="oklch(0.45 0.05 250)">q1{clickable && " (follows)"}</text>
       {/* Entanglement link — wavy line */}
       <motion.path
         d={`M 40 60 Q ${(40 + 72) / 2 + Math.sin(phase * 2) * 8} 75, 60 80`}
@@ -123,7 +186,9 @@ function BellPairThumbnail({ accent }: { accent: string }) {
         transition={{ duration: 0.06 }}
       />
       <text x="50" y="135" textAnchor="middle" fontSize="5" fill={accent} fontWeight="bold">|Φ+⟩</text>
-      <text x="50" y="14" textAnchor="middle" fontSize="5" fill="oklch(0.45 0.05 250)">opposite correlation</text>
+      <text x="50" y="14" textAnchor="middle" fontSize="5" fill="oklch(0.45 0.05 250)">
+        {clickable ? "click q0 → q1 follows (entangled!)" : "opposite correlation"}
+      </text>
     </svg>
   );
 }
@@ -209,12 +274,12 @@ function SuperpositionDetail() {
       <div className="rounded-md border border-border/60 bg-card p-4">
         <div className="flex justify-center">
           <div className="w-48 h-64">
-            <BlochSphereThumbnail accent="oklch(0.55 0.16 250)" />
+            <BlochSphereThumbnail accent="oklch(0.55 0.16 250)" draggable />
           </div>
         </div>
         <p className="text-[11px] text-muted-foreground text-center mt-2">
           A single qubit lives on the Bloch sphere — every pure state is a point (θ, φ).
-          The vector above rotates around the equator at θ=π/2 — that&apos;s the |+⟩ state, the simplest superposition.
+          Drag the sphere to set (θ, φ) — the state |ψ⟩ updates live. Release to resume auto-rotation. The default equatorial position is the |+⟩ state (equal superposition).
         </p>
       </div>
       {/* Math */}
@@ -276,7 +341,7 @@ function EntanglementDetail() {
       <div className="rounded-md border border-border/60 bg-card p-4">
         <div className="flex justify-center">
           <div className="w-48 h-64">
-            <BellPairThumbnail accent="oklch(0.55 0.16 165)" />
+            <BellPairThumbnail accent="oklch(0.55 0.16 165)" clickable />
           </div>
         </div>
         <p className="text-[11px] text-muted-foreground text-center mt-2">
@@ -516,7 +581,7 @@ const SHORTS: ShortMeta[] = [
     hookTitle: "A qubit that's BOTH 0 and 1",
     subtitle: "|ψ⟩ = α|0⟩ + β|1⟩ — until you look",
     accent: "oklch(0.55 0.16 250)",
-    thumbnail: <BlochSphereThumbnail accent="oklch(0.55 0.16 250)" />,
+    thumbnail: <BlochSphereThumbnail accent="oklch(0.55 0.16 250)" draggable />,
     detail: <SuperpositionDetail />,
   },
   {
@@ -525,7 +590,7 @@ const SHORTS: ShortMeta[] = [
     hookTitle: "Two qubits. ONE fate — instantly",
     subtitle: "|Φ+⟩ = (|00⟩ + |11⟩) / √2",
     accent: "oklch(0.55 0.16 165)",
-    thumbnail: <BellPairThumbnail accent="oklch(0.55 0.16 165)" />,
+    thumbnail: <BellPairThumbnail accent="oklch(0.55 0.16 165)" clickable />,
     detail: <EntanglementDetail />,
   },
   {

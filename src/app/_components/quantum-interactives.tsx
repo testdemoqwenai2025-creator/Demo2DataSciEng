@@ -17,6 +17,7 @@ import {
   HeliosConnectivity,
   ShorResources,
   ShorAlgorithmN15,
+  QuantumTeleportation,
 } from "./quantum-interactives-part2";
 
 /**
@@ -132,6 +133,16 @@ const CARDS: InteractiveCard[] = [
     icon: <Cpu className="h-4 w-4" />,
     thumb: <ShorN15Thumb />,
     content: <ShorAlgorithmN15 />,
+  },
+  {
+    id: "teleport",
+    step: "10",
+    title: "Quantum teleportation",
+    subtitle: "Alice |ψ⟩ + Bell pair → measure → 2 classical bits → Bob |ψ⟩",
+    accent: "oklch(0.55 0.16 165)",
+    icon: <Network className="h-4 w-4" />,
+    thumb: <TeleportThumb />,
+    content: <QuantumTeleportation />,
   },
 ];
 
@@ -384,6 +395,59 @@ function ShorN15Thumb() {
       <motion.text x="50" y="115" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.20 25)" fontWeight="bold"
         animate={{ opacity: [0, 1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}>3 × 5</motion.text>
       <text x="50" y="135" textAnchor="middle" fontSize="6" fill="oklch(0.55 0.10 250)">Shor factoring</text>
+    </svg>
+  );
+}
+
+function TeleportThumb() {
+  // Three qubit rails + entangled pair + classical channel to Bob + |ψ⟩ on Bob at end
+  return (
+    <svg viewBox="0 0 100 140" className="w-full h-full">
+      {/* Alice's q1 (input |ψ⟩) */}
+      <line x1="10" y1="25" x2="90" y2="25" stroke="oklch(0.55 0.10 250)" strokeWidth="0.5" />
+      <text x="6" y="27" fontSize="5" fill="oklch(0.55 0.10 250)">q1</text>
+      <text x="13" y="20" fontSize="5" fill="oklch(0.65 0.10 30)" fontWeight="bold">|ψ⟩</text>
+      {/* q2 (Alice's half of Bell pair) */}
+      <line x1="10" y1="60" x2="90" y2="60" stroke="oklch(0.55 0.10 250)" strokeWidth="0.5" />
+      <text x="6" y="62" fontSize="5" fill="oklch(0.55 0.10 250)">q2</text>
+      {/* q3 (Bob's half of Bell pair) */}
+      <line x1="10" y1="95" x2="90" y2="95" stroke="oklch(0.55 0.10 250)" strokeWidth="0.5" />
+      <text x="6" y="97" fontSize="5" fill="oklch(0.55 0.10 250)">q3</text>
+      {/* Initial entanglement between q2 and q3 */}
+      <circle cx="15" cy="60" r="2" fill="oklch(0.65 0.16 165)" />
+      <circle cx="15" cy="95" r="2" fill="oklch(0.65 0.16 165)" />
+      <line x1="15" y1="62" x2="15" y2="93" stroke="oklch(0.65 0.16 165)" strokeWidth="0.4" strokeDasharray="1 1" />
+      {/* CNOT gate (q1 controls q2) */}
+      <motion.g animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}>
+        <circle cx="40" cy="25" r="3" fill="oklch(0.65 0.16 30)" />
+        <line x1="40" y1="28" x2="40" y2="55" stroke="oklch(0.65 0.16 30)" strokeWidth="0.8" />
+        <circle cx="40" cy="60" r="5" fill="none" stroke="oklch(0.65 0.16 30)" strokeWidth="0.8" />
+        <line x1="35" y1="60" x2="45" y2="60" stroke="oklch(0.65 0.16 30)" strokeWidth="0.8" />
+        <line x1="40" y1="55" x2="40" y2="65" stroke="oklch(0.65 0.16 30)" strokeWidth="0.8" />
+      </motion.g>
+      {/* H gate on q1 */}
+      <motion.g animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity, delay: 1 }}>
+        <rect x="55" y="20" width="10" height="10" fill="oklch(0.65 0.16 250)" rx="1" />
+        <text x="60" y="27" textAnchor="middle" fontSize="6" fill="white" fontWeight="bold">H</text>
+      </motion.g>
+      {/* Measurement M on q1, q2 */}
+      <motion.g animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}>
+        <rect x="72" y="20" width="8" height="10" fill="oklch(0.65 0.16 0)" rx="1" />
+        <text x="76" y="27" textAnchor="middle" fontSize="5" fill="white" fontWeight="bold">M</text>
+        <rect x="72" y="55" width="8" height="10" fill="oklch(0.65 0.16 0)" rx="1" />
+        <text x="76" y="62" textAnchor="middle" fontSize="5" fill="white" fontWeight="bold">M</text>
+      </motion.g>
+      {/* Classical channel — double line from M to Bob (q3) */}
+      <motion.line x1="80" y1="30" x2="80" y2="95" stroke="oklch(0.65 0.10 250)" strokeWidth="0.5"
+        animate={{ opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity, delay: 2 }} />
+      {/* Bob's correction on q3 */}
+      <motion.rect x="80" y="90" width="10" height="10" fill="oklch(0.65 0.16 165)" rx="1"
+        animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity, delay: 2.5 }} />
+      <text x="85" y="97" textAnchor="middle" fontSize="5" fill="white" fontWeight="bold">?</text>
+      {/* Output: |ψ⟩ on Bob */}
+      <motion.text x="50" y="120" textAnchor="middle" fontSize="8" fill="oklch(0.75 0.20 25)" fontWeight="bold"
+        animate={{ opacity: [0, 1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 3 }}>|ψ⟩ teleported</motion.text>
+      <text x="50" y="135" textAnchor="middle" fontSize="6" fill="oklch(0.55 0.10 250)">Alice → Bob</text>
     </svg>
   );
 }

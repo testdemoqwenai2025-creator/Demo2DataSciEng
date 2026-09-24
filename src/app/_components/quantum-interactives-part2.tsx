@@ -780,6 +780,199 @@ function ShorAlgorithmN15() {
 }
 
 
+function QuantumTeleportation() {
+  // Alice's input state — pick from 4 presets or drag the Bloch sphere
+  const [preset, setPreset] = useState<"0" | "1" | "+" | "i+">("+");
+  // Phase: 0=idle, 1=CNOT done, 2=H done, 3=measured, 4=corrected
+  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [classicalBits, setClassicalBits] = useState<"00" | "01" | "10" | "11">("00");
+
+  // State vector for Alice's q1 input |ψ⟩
+  // |0⟩ = (1, 0), |1⟩ = (0, 1), |+⟩ = (1/√2, 1/√2), |i+⟩ = (1/√2, i/√2)
+  const inputStates: Record<typeof preset, { alpha: number; betaRe: number; betaIm: number; label: string; latex: string }> = {
+    "0":  { alpha: 1,                   betaRe: 0,                  betaIm: 0,                  label: "|0⟩",       latex: "|0⟩" },
+    "1":  { alpha: 0,                   betaRe: 1,                  betaIm: 0,                  label: "|1⟩",       latex: "|1⟩" },
+    "+":  { alpha: 1 / Math.SQRT2,      betaRe: 1 / Math.SQRT2,     betaIm: 0,                  label: "|+⟩",       latex: "(|0⟩+|1⟩)/√2" },
+    "i+": { alpha: 1 / Math.SQRT2,      betaRe: 0,                  betaIm: 1 / Math.SQRT2,      label: "|i+⟩",      latex: "(|0⟩+i|1⟩)/√2" },
+  };
+  const input = inputStates[preset];
+
+  // For demo, simulate Bob's correction outcome — measurement is random
+  // (each outcome equally likely with prob 1/4) but Bob's correction ALWAYS
+  // recovers |ψ⟩. So we pick a random (a, b) and show the correction.
+  const runTeleport = () => {
+    setPhase(0);
+    setTimeout(() => setPhase(1), 600);
+    setTimeout(() => setPhase(2), 1200);
+    setTimeout(() => {
+      // Pick random 2-bit measurement outcome (each with prob 1/4)
+      const outcomes: ("00" | "01" | "10" | "11")[] = ["00", "01", "10", "11"];
+      const outcome = outcomes[Math.floor(Math.random() * 4)];
+      setClassicalBits(outcome);
+      setPhase(3);
+    }, 1800);
+    setTimeout(() => setPhase(4), 2400);
+  };
+
+  const reset = () => {
+    setPhase(0);
+    setClassicalBits("00");
+  };
+
+  // Bob's correction map
+  const corrections: Record<string, { gate: string; matrix: string }> = {
+    "00": { gate: "I (no correction)", matrix: "[[1,0],[0,1]]" },
+    "01": { gate: "Z",                  matrix: "[[1,0],[0,-1]]" },
+    "10": { gate: "X (bit flip)",       matrix: "[[0,1],[1,0]]" },
+    "11": { gate: "X·Z",                matrix: "[[0,1],[-1,0]]" },
+  };
+  const correction = corrections[classicalBits];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Quantum circuit visualisation */}
+        <div className="rounded-md border border-border/60 bg-card p-3">
+          <svg viewBox="0 0 360 280" className="w-full h-auto">
+            {/* 3 qubit rails: q1 (Alice input), q2 (Alice half of Bell pair), q3 (Bob half) */}
+            <text x="6" y="40"  fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">q1:</text>
+            <text x="6" y="48"  fontSize="7"  fill="oklch(0.55 0.10 250)">Alice</text>
+            <line x1="50" y1="38" x2="340" y2="38" stroke="oklch(0.55 0.10 250)" strokeWidth="1" />
+            <text x="40" y="34" fontSize="8" fill="oklch(0.65 0.10 30)" fontWeight="bold">|ψ⟩</text>
+
+            <text x="6" y="100" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">q2:</text>
+            <text x="6" y="108" fontSize="7"  fill="oklch(0.55 0.10 250)">Bell ½</text>
+            <line x1="50" y1="98" x2="340" y2="98" stroke="oklch(0.55 0.10 250)" strokeWidth="1" />
+
+            <text x="6" y="160" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">q3:</text>
+            <text x="6" y="168" fontSize="7"  fill="oklch(0.55 0.10 250)">Bob</text>
+            <line x1="50" y1="158" x2="340" y2="158" stroke="oklch(0.55 0.10 250)" strokeWidth="1" />
+
+            {/* Initial Bell pair shared between q2 and q3 (entanglement symbol) */}
+            <motion.g animate={{ opacity: phase >= 0 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <circle cx="65" cy="98" r="3" fill="oklch(0.65 0.16 165)" />
+              <circle cx="65" cy="158" r="3" fill="oklch(0.65 0.16 165)" />
+              <line x1="65" y1="101" x2="65" y2="155" stroke="oklch(0.65 0.16 165)" strokeWidth="0.5" strokeDasharray="2 1" />
+              <text x="75" y="132" fontSize="7" fill="oklch(0.65 0.16 165)" fontWeight="bold">|Φ+⟩ shared</text>
+            </motion.g>
+
+            {/* Phase 1: CNOT(q1, q2) */}
+            <motion.g animate={{ opacity: phase >= 1 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <circle cx="130" cy="38" r="6" fill={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.65 0.16 30 / 0.5)"} />
+              <line x1="130" y1="44" x2="130" y2="92" stroke={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.65 0.16 30 / 0.5)"} strokeWidth="2" />
+              <circle cx="130" cy="98" r="10" fill="none" stroke={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.65 0.16 30 / 0.5)"} strokeWidth="2" />
+              <line x1="120" y1="98" x2="140" y2="98" stroke={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.65 0.16 30 / 0.5)"} strokeWidth="2" />
+              <line x1="130" y1="88" x2="130" y2="108" stroke={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.65 0.16 30 / 0.5)"} strokeWidth="2" />
+              <text x="130" y="22" textAnchor="middle" fontSize="8" fill="oklch(0.65 0.10 250)" fontWeight="bold">CNOT</text>
+              <text x="130" y="14" textAnchor="middle" fontSize="7" fill="oklch(0.55 0.10 250)">entangle</text>
+            </motion.g>
+
+            {/* Phase 2: H(q1) */}
+            <motion.g animate={{ opacity: phase >= 2 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="170" y="28" width="24" height="20" fill={phase === 2 ? "oklch(0.75 0.20 250)" : "oklch(0.65 0.16 250 / 0.5)"} rx="2" />
+              <text x="182" y="42" textAnchor="middle" fontSize="11" fill="white" fontWeight="bold">H</text>
+              <text x="182" y="22" textAnchor="middle" fontSize="8" fill="oklch(0.65 0.10 250)" fontWeight="bold">Bell basis</text>
+              <text x="182" y="14" textAnchor="middle" fontSize="7" fill="oklch(0.55 0.10 250)">rotate</text>
+            </motion.g>
+
+            {/* Phase 3: Measurement on q1, q2 */}
+            <motion.g animate={{ opacity: phase >= 3 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="220" y="28" width="30" height="20" fill={phase === 3 ? "oklch(0.75 0.20 0)" : "oklch(0.65 0.16 0 / 0.5)"} rx="2" />
+              <text x="235" y="42" textAnchor="middle" fontSize="11" fill="white" fontWeight="bold">M</text>
+              <rect x="220" y="88" width="30" height="20" fill={phase === 3 ? "oklch(0.75 0.20 0)" : "oklch(0.65 0.16 0 / 0.5)"} rx="2" />
+              <text x="235" y="102" textAnchor="middle" fontSize="11" fill="white" fontWeight="bold">M</text>
+              <text x="235" y="22" textAnchor="middle" fontSize="8" fill="oklch(0.65 0.10 250)" fontWeight="bold">measure</text>
+              <text x="235" y="14" textAnchor="middle" fontSize="7" fill="oklch(0.55 0.10 250)">→ 2 classical bits</text>
+              {/* Classical channel — double line to Bob */}
+              <line x1="265" y1="38"  x2="290" y2="38"  stroke="oklch(0.65 0.10 250)" strokeWidth="1" />
+              <line x1="265" y1="42"  x2="290" y2="42"  stroke="oklch(0.65 0.10 250)" strokeWidth="1" />
+              <line x1="290" y1="42"  x2="290" y2="158" stroke="oklch(0.65 0.10 250)" strokeWidth="1" />
+              <text x="300" y="100" fontSize="8" fill="oklch(0.65 0.10 250)">classical</text>
+              <text x="300" y="110" fontSize="8" fill="oklch(0.65 0.10 250)">ch: ({classicalBits})</text>
+            </motion.g>
+
+            {/* Phase 4: Bob's correction on q3 */}
+            <motion.g animate={{ opacity: phase >= 4 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="295" y="148" width="40" height="20" fill={phase === 4 ? "oklch(0.75 0.20 165)" : "oklch(0.65 0.16 165 / 0.5)"} rx="2" />
+              <text x="315" y="162" textAnchor="middle" fontSize="9" fill="white" fontWeight="bold">{phase >= 4 ? correction.gate.split(" ")[0] : "?"}</text>
+              <text x="315" y="142" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)">correct</text>
+            </motion.g>
+
+            {/* Phase indicator */}
+            <text x="180" y="220" textAnchor="middle" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">
+              Phase {phase}: {phase === 0 ? "idle (ready)" : phase === 1 ? "CNOT(q1,q2) — entangle" : phase === 2 ? "H(q1) — Bell basis" : phase === 3 ? "measure → ({classicalBits})" : "Bob corrects → |ψ⟩ teleported"}
+            </text>
+            <text x="180" y="240" textAnchor="middle" fontSize="9" fill="oklch(0.55 0.10 250)" fontFamily="monospace">
+              input: |ψ⟩ = {input.label} · outcome: ({classicalBits}) · Bob applies: {correction.gate}
+            </text>
+            <text x="180" y="260" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.20 25)" fontWeight="bold" fontFamily="monospace">
+              Bob's q3 = |ψ⟩ ✓ (teleported from Alice)
+            </text>
+          </svg>
+        </div>
+
+        {/* Controls + verification */}
+        <div className="space-y-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Alice&apos;s input state |ψ⟩</p>
+            <div className="grid grid-cols-4 gap-2">
+              {(["0", "1", "+", "i+"] as const).map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => { setPreset(p); reset(); }}
+                  className={`h-10 rounded-md border font-mono font-bold text-sm transition-all ${
+                    preset === p ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:border-primary hover:bg-accent"
+                  }`}
+                >|{p}⟩</button>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1.5 font-mono">|ψ⟩ = {input.latex}</p>
+          </div>
+
+          <Button size="sm" variant="default" onClick={runTeleport} disabled={phase > 0 && phase < 4} className="w-full gap-1.5">
+            <Play className="h-3.5 w-3.5" /> Run teleportation
+          </Button>
+          <Button size="sm" variant="outline" onClick={reset} className="w-full gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" /> Reset
+          </Button>
+
+          {phase >= 3 && (
+            <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Measurement outcome (Alice → Bob)</p>
+              <p className="font-mono text-lg font-bold text-primary">{classicalBits}</p>
+              <p className="text-muted-foreground mt-1.5">
+                Alice measured q1, q2 and got bits <code className="font-mono">{classicalBits[0]}</code> and <code className="font-mono">{classicalBits[1]}</code>.
+                Each outcome has probability 1/4 regardless of |ψ⟩ — the measurement is **uninformative about |ψ⟩** (no-cloning theorem protected).
+              </p>
+            </div>
+          )}
+
+          {phase === 4 && (
+            <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-3 text-xs">
+              <p className="text-emerald-700 dark:text-emerald-300 font-semibold mb-1.5">✓ Teleportation complete!</p>
+              <p className="font-mono text-sm">Bob&apos;s q3 = |ψ⟩ = {input.label}</p>
+              <p className="text-muted-foreground mt-1.5">
+                Bob applied <code className="font-mono">{correction.gate}</code> based on bits ({classicalBits}).
+                His correction matrix: <code className="font-mono">{correction.matrix}</code>
+              </p>
+              <p className="text-emerald-700 dark:text-emerald-300 mt-2">
+                ✓ Alice&apos;s original |ψ⟩ was destroyed by measurement (no-cloning theorem). Bob now holds the only copy. Teleportation ≠ copying.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+      <InfoCallout
+        intent="Pick Alice's input state |ψ⟩ (|0⟩, |1⟩, |+⟩, |i+⟩) → click 'Run teleportation' to watch the 4-step protocol: CNOT(q1,q2) entangles, H(q1) rotates to Bell basis, measurement gives 2 classical bits, Bob applies a correction (I/Z/X/X·Z) → Bob's q3 ends up in state |ψ⟩. The classical bits are random (1/4 each) but Bob's correction always recovers |ψ⟩."
+        math="Setup: |ψ⟩_q1 ⊗ |Φ+⟩_q2q3  ·  Step1: CNOT(q1,q2)  ·  Step2: H(q1)  ·  Step3: measure q1,q2 → (a,b) ∈ {00,01,10,11}  ·  Step4: Bob applies X^b · Z^a  ·  Result: |ψ⟩_q3"
+        insight="Quantum teleportation does NOT transmit information faster than light — Bob must WAIT for the 2 classical bits (transmitted at light speed) before his correction works. The 'spooky' part is that the quantum state is recoverable from a 2-bit classical message + shared entanglement. This is the foundation of quantum networking and the quantum internet."
+      />
+    </div>
+  );
+}
+
+
 
 export {
   DecoherenceTimeline,
@@ -787,4 +980,5 @@ export {
   HeliosConnectivity,
   ShorResources,
   ShorAlgorithmN15,
+  QuantumTeleportation,
 };

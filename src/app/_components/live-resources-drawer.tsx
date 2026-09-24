@@ -97,10 +97,56 @@ async function fetchJson(url: string, timeoutMs = 15000): Promise<unknown> {
   }
 }
 
+/**
+ * fetchJsonWithCorsFallback — try direct fetch first; on failure (CORS,
+ * 403, network error), retry through a public CORS proxy.
+ *
+ * Why: the static GitHub Pages preview can't reach APIs that don't set
+ * `Access-Control-Allow-Origin: *`. Verified failures (Oct 2026):
+ *   - export.arxiv.org          — no CORS headers, blocked
+ *   - api.github.com/search      — works for unauthenticated requests
+ *                                  but rate-limited (60/hr/IP)
+ *   - huggingface.co/api/datasets — CORS-friendly (works direct)
+ *   - paperswithcode.com/api/v1   — sometimes flaky from GH Pages
+ *
+ * Public CORS proxies used as fallback (in order):
+ *   1. https://corsproxy.io/?url=<encoded>   — fast, reliable
+ *   2. https://api.allorigins.win/raw?url=<encoded>  — slower, more permissive
+ *
+ * Both are read-only GET proxies. They DON'T forward POST/cookies/headers.
+ */
+async function fetchJsonWithCorsFallback(url: string, timeoutMs = 15000): Promise<unknown> {
+  // Try direct first
+  try {
+    return await fetchJson(url, timeoutMs);
+  } catch (directErr) {
+    const msg = directErr instanceof Error ? directErr.message : String(directErr);
+    // If it's a CORS / network error, retry through proxies
+    if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("CORS") || msg.includes("HTTP 403") || msg.includes("HTTP 0")) {
+      const encoded = encodeURIComponent(url);
+      const proxies = [
+        `https://corsproxy.io/?url=${encoded}`,
+        `https://api.allorigins.win/raw?url=${encoded}`,
+      ];
+      for (const proxyUrl of proxies) {
+        try {
+          return await fetchJson(proxyUrl, timeoutMs);
+        } catch {
+          // try next proxy
+        }
+      }
+      // All proxies failed — rethrow the original error
+      throw directErr;
+    }
+    // Non-CORS error (e.g. HTTP 404, 500) — don't retry
+    throw directErr;
+  }
+}
+
 async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arxiv"]>> {
   try {
     const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(topic)}&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending`;
-    const text = (await fetchJson(url, 20000)) as string;
+    const text = (await fetchJsonWithCorsFallback(url, 20000)) as string;
     const papers: ArxivPaper[] = [];
     const entries = text.match(/<entry>([\s\S]*?)<\/entry>/g) || [];
     for (const entry of entries) {
@@ -129,7 +175,7 @@ async function fetchGitHub(topic: string, language = ""): Promise<NonNullable<Re
   try {
     const langQ = language ? `+language:${language}` : "";
     const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(topic)}${langQ}+stars:>10&sort=stars&order=desc&per_page=5`;
-    const data = (await fetchJson(url, 15000)) as { items?: Array<Record<string, unknown>> };
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as { items?: Array<Record<string, unknown>> };
     const repos: GitHubRepo[] = (data.items || []).map((repo) => ({
       name: String(repo.full_name ?? repo.name ?? "?"),
       url: String(repo.html_url ?? ""),
@@ -149,7 +195,7 @@ async function fetchHuggingFace(topic: string): Promise<NonNullable<ResourcesDat
   try {
     // Hugging Face datasets search API — public, no auth needed
     const url = `https://huggingface.co/api/datasets?search=${encodeURIComponent(topic)}&limit=5&full=false`;
-    const data = (await fetchJson(url, 15000)) as Array<Record<string, unknown>>;
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as Array<Record<string, unknown>>;
     const datasets: HFDataset[] = (Array.isArray(data) ? data : []).map((d) => ({
       id: String(d.id ?? d.name ?? "?"),
       url: `https://huggingface.co/datasets/${d.id ?? d.name ?? ""}`,
@@ -167,7 +213,7 @@ async function fetchPwCDatasets(topic: string): Promise<NonNullable<ResourcesDat
   try {
     // Papers with Code datasets API
     const url = `https://paperswithcode.com/api/v1/datasets/?search=${encodeURIComponent(topic)}&page=1&page_size=5`;
-    const data = (await fetchJson(url, 15000)) as { results?: Array<Record<string, unknown>> };
+    const data = (await fetchJsonWithCorsFallback(url, 15000)) as { results?: Array<Record<string, unknown>> };
     const datasets: PwCDataset[] = (data.results || []).map((d) => ({
       name: String(d.name ?? ""),
       url: `https://paperswithcode.com/dataset/${d.slug ?? d.name ?? ""}`,
@@ -185,7 +231,7 @@ async function fetchCodeSnippets(topic: string, sampleRepo?: string): Promise<No
       // Fetch a specific file from a known repo via raw.githubusercontent
       // e.g. "owner/repo/main/path/to/file.py"
       const url = `https://raw.githubusercontent.com/${sampleRepo}`;
-      const text = (await fetchJson(url, 15000)) as string;
+      const text = (await fetchJsonWithCorsFallback(url, 15000)) as string;
       return {
         count: 1,
         snippets: [{
