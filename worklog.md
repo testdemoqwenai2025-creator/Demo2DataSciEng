@@ -1907,3 +1907,63 @@ Stage Summary:
 - 4 languages covered: Python (runnable), Rust (zero-copy SIMD), Scala (Spark Streaming), Elixir (GenStage)
 - Binary vs synthetic data toggle works in browser (lazy evaluation)
 - All in browser popups (click to expand)
+
+---
+Task ID: lhc-ingestion-5-steps
+Agent: Super Z (main)
+Task: Add 5 features to the LHC ingestion scenario step by step: CMS Open Data, HL-LHC upgrade, cross-links, trigger simulator, binary parser.
+
+Work Log:
+- Step 1: CMS Open Data integration
+  - Links to opendata.cern.ch (4 PB real collision data 2010-2012)
+  - Buttons: "Open opendata.cern.ch" + "MiniAOD sample"
+  - Pyodide-runnable: AOD → MiniAOD → NanoAOD → skim pipeline with actual selection efficiency
+  - Shows: 100k MiniAOD events → ~5% pass trigger cuts → 10B events → ~500M selected
+  - Data reduction: AOD 1MB → MiniAOD 50KB (20x) → NanoAOD 2KB (25x) → skim 0.2KB (10x)
+  - Live verified: "CMS Open Data Analysis Pipeline" output present, AOD + MiniAOD + Reduction shown
+
+- Step 2: HL-LHC (2029+) upgrade scenario
+  - Comparison table: Run 2 (2015-18) vs Run 3 (2022-26) vs HL-LHC (2029+)
+  - Key metrics: Luminosity 150→300→3000 fb⁻¹, Data 50→100→1000 PB, Pileup ~40→55→200
+  - New tech: GPU HLT, AI-assisted trigger (GNN), L1 FPGA+ML (1µs latency)
+  - Raw rate: 40→40→80 TB/s; WLCG 250→250→300 (cloud)
+  - Live verified: "HL-LHC", "3000 fb", "GPU + AI trigger" all present
+
+- Step 3: Cross-links to related pages
+  - 6 navigation links: Streaming, Databricks, Quantum Computing, Space Science, Orchestration, Arrow
+  - Each with topic-relevant annotation (e.g. "Kafka + Flink for real-time event streams")
+  - Summary note: "LHC pipeline = same patterns as commercial ELT (Fivetran)"
+  - Live verified: "Cross-references", Streaming + Databricks links present
+
+- Step 4: L1 Trigger simulator (interactive)
+  - 3 sliders: leading jet pT (10-100 GeV), missing ET (0-60 GeV), min jet count (1-6)
+  - 200 events as colored dots (green=pass, gray=fail) in a 20×10 grid
+  - Live calculation: 40 MHz × pass rate = output rate (~1 kHz typical)
+  - Slider moved to 80 GeV → fewer events pass → rate updates
+  - Live verified: "L1 Trigger simulator", "Leading jet pT threshold", "Hz output" all present
+
+- Step 5: Binary parser demo (in-browser)
+  - "Parse CMS RD5 binary" button
+  - Parses simulated CMS event headers: event_id, bunch_crossing, timestamp, lumi_block
+  + channel energies (3 channels × ~50 GeV each)
+  - Shows parsed structure per event: Event #1, BX: 2549, Lumi block: 42
+  - Timestamp in hex, header/payload sizes, channel energies
+  - Equivalent to Rust zero-copy parser but in JavaScript
+  - Live verified: "Binary parser demo", "Parse CMS RD5 binary", Event # + Lumi block + GeV shown
+
+- Commit 786176d, deploy #113 succeeded
+- All 5 features verified live on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fivetran-hightouch/
+
+Stage Summary:
+- HEAD = 786176d on both repos
+- Ingestion page now has:
+    * Existing Fivetran/Hightouch (ELT + rETL) content (retained)
+    * LHC extreme-scale ingestion scenario:
+      - 4 KPIs + animated pipeline viz
+      - Data toggle (binary vs synthetic)
+      - 4 code cards (Python/Rust/Scala/Elixir) in lazy popups
+      - CMS Open Data section (Pyodide-runnable analysis)
+      - HL-LHC comparison table (Run 2/3/HL-LHC)
+      - 6 cross-links to related pages
+      - Interactive L1 trigger simulator (sliders + event dots)
+      - Binary parser demo (click to parse CMS RD5)
