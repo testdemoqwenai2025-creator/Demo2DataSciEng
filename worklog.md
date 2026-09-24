@@ -1783,3 +1783,36 @@ Stage Summary:
 - All Chinese space sector content integrated (Beidou, Chang'e 6, FAST, Tiangong, TianQin)
 - All real-time data toggle working (Yahoo Finance + synthetic)
 - All contention topics in InfoCallouts (ΛCDM vs MOND, Hubble tension, BS vs rough vol, VaR vs CVaR, HFT PFOF debate)
+
+---
+Task ID: galleries-code-math-centrepiece
+Agent: Super Z (main)
+Task: Add Pyodide code constructs + prominent math equations to both 3D gallery modals. User request: "always the code, mathematics and computational tools are the centrepiece of the theme, where possible these needs to be expressed"
+
+Work Log:
+- Space gallery (space-gallery-3d.tsx): added 4 Python code constants + mathExpr field to each GalleryCard + PyodideRunner + math block in modal
+  - JWST: lookback time computation (Planck cosmology, comoving distance, z=14)
+  - LIGO: GW strain (chirp mass, h ~ 10^-21, GW150914)
+  - LHC: n-subjettiness (tau_21 tags W, tau_32 tags top)
+  - Tiangong: Kepler 3rd law orbital periods (ISS, Tiangong, GPS)
+- Fintech gallery (fintech-gallery-3d.tsx): same pattern
+  - Black-Scholes: BS call pricing + surface grid
+  - Monte Carlo: GBM simulation + 5 paths
+  - Vol surface: SVI parametric smile + IV by log-moneyness
+  - Yield curve: Nelson-Siegel + 10Y-3M recession signal
+- Each gallery modal now has 5 layers:
+  1. Header with n-D dimension toggle
+  2. Animated 3D SVG scene with floating math/code background
+  3. MATH FOUNDATION block (equations in primary color)
+  4. CODE CONSTRUCT block (PyodideRunner — runnable Python)
+  5. Caption footer
+- Commit c00a497, deploy #108 succeeded
+- Live verified:
+  Space JWST gallery modal: "MATH FOUNDATION" + "CODE CONSTRUCT - RUN THE COMPUTATION" + "Run computation (Pyodide)" + Pyodide v0.26.2 loaded ✓
+  Fintech BS gallery modal: "MATH FOUNDATION" + "CODE CONSTRUCT - RUN THE COMPUTATION" + "Run computation (Pyodide)" + Pyodide v0.26.2 loaded ✓ + math eq "C = S*N(d1) - K*exp(-rT)*N(d2) · d1 = (ln(S/K)+(r+sigma^2/2)T)/(sigma*sqrt(T))"
+
+Stage Summary:
+- HEAD = c00a497 on both repos
+- Both 3D galleries now have code constructs + math equations as the centrepiece
+- All 8 gallery cards (4 space + 4 fintech) have runnable Pyodide code + prominent math
+- The code IS the centrepiece — users can run the computation that generates the math shown in the 3D visualization
