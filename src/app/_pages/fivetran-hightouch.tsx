@@ -4,9 +4,10 @@ import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { SOURCE_SYSTEMS, REVERSE_ETL_AUDIENCES } from "../_data/synthetic";
+import { LHCIngestion } from "../_components/lhc-ingestion";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeftRight, Activity, Boxes, Workflow, ShieldCheck, Zap, Database, RefreshCw } from "lucide-react";
+import { ArrowLeftRight, Activity, Boxes, Workflow, ShieldCheck, Zap, Database, RefreshCw, Atom } from "lucide-react";
 
 const FIVETRAN_API = `# ============================================================
 # Programmatic source onboarding via Fivetran REST API
@@ -278,6 +279,15 @@ export function FivetranHightouchPage() {
           </ul>
         </SectionCard>
       </div>
+
+      <SectionCard
+        title="LHC extreme-scale ingestion — CMS/ATLAS at CERN"
+        description="Second example: the world's most extreme data ingestion pipeline. CMS and ATLAS at CERN's Large Hadron Collider generate 40 TB/s of raw data from 100M+ detector channels at 40 MHz crossing rate. A multi-stage trigger pipeline (L1 FPGA → HLT software farm → readout → EOS storage → WLCG grid) reduces this to 1 PB/year stored. Code examples in Python (Pyodide-runnable), Rust (zero-copy binary parser with SIMD), Scala (Spark Structured Streaming + Kafka), and Elixir (GenStage backpressure pipeline). Toggle between real binary data (hex dump of CMS RD5 format) and synthetic data (Python-generated event data). All in browser popups — lazy evaluation concept."
+        icon={<Atom className="h-5 w-5" />}
+        badge="LHC scenario"
+      >
+        <LHCIngestion />
+      </SectionCard>
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("orchestration")} className="text-sm text-primary hover:underline">
