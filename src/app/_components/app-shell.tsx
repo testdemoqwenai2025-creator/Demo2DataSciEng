@@ -64,6 +64,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "AlphaMissense", ids: ["alphamissense"] },
   { title: "AlphaProteo", ids: ["alphaproteo"] },
   { title: "Boltz", ids: ["boltz"] },
+  { title: "AI Drug Discovery", ids: ["ai-drug-discovery"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

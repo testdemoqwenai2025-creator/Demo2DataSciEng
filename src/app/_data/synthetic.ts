@@ -1068,6 +1068,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["boltz-1", "boltz-2", "alphafold3", "open-source", "biomolecular-complex", "protein-ligand", "multi-chain", "diffusion", "chai-1", "patterns", "genai"],
   },
+  {
+    id: "ADR-046",
+    title: "Adopt Insilico Medicine + Recursion paradigm for AI-driven drug discovery at scale",
+    status: "accepted",
+    date: "FY32-Q3",
+    deciders: "Data Platform, Drug Discovery, ML Engineering, Architecture",
+    context:
+      "ADR-035 covered cheminformatics (small molecules via ECFP + ChemBERTa). ADR-044 covered protein design (RFdiffusion + ProteinMPNN). ADR-045 covered multi-chain complex prediction (Boltz-1). The remaining gap is the END-TO-END drug discovery workflow — from target identification to clinical candidate. Two reference paradigms: (1) Insilico Medicine (Chemistry42 generative chemistry + Pharma.AI + Medicine42) — generative chemistry (VAE/diffusion for novel scaffolds) + target ID via gene expression + clinical candidate ISM042-2-048 (first AI-discovered drug in Phase II for idiopathic pulmonary fibrosis). (2) Recursion Pharmaceuticals — phenomics-based: image cells under 1000s of perturbations, derive morphological phenotypes via ML, find phenotypic matches between known drugs and disease models. Math: generative chemistry (molecule VAE — encode SMILES → latent → decode SMILES, trained on ZINC 250M), phenomics (CellProfiler features → ML embedding → nearest-neighbour search for phenotypic similarity), ADMET prediction (multi-task regression on Tox21). The Atomwise AtomNet (CNN on 3D binding pose) was an early (2015) ML binding predictor. Modern: Insilico Chemistry42 (Wallach 2015), Recursion phenomics (Carpenter 2006 CellProfiler), AlphaFold3 + drug design integration.",
+    decision:
+      "Adopt a hybrid drug discovery stack: (1) Target identification via ADR-037 genetic materials (GWAS hits → druggable target list) + ADR-039 systems biology (PPI network → essential targets). (2) Generative chemistry via Chemistry42-style VAE + diffusion (trained on ZINC 250M, conditioned on target binding site). (3) Phenotypic screening via Recursion-style phenomics (cell images → CellProfiler features → ML embedding → pgvector similarity search). (4) ADMET prediction (multi-task regression on Tox21 7K compounds). (5) Boltz-1 (ADR-045) for binding pose prediction + MM-PBSA (ADR-036) for binding free energy. End-to-end: GWAS target → generative 10K candidates → Boltz-1 dock top-1K → MM-PBSA top-100 → wet-lab top-10 → clinical candidate. Connects to ADR-035 ChemBERTa (small-molecule embedding for pgvector), ADR-044 AlphaProteo (alternative: protein binder vs small molecule), ADR-031 vLLM (clinical candidate summary).",
+    consequences:
+      "+ End-to-end AI drug discovery reduces discovery time from 4-5 years to 1-2 years (Insilico IPF case). + Generative chemistry explores 10^60 possible molecules — far beyond enumeratable chemical space. + Phenomics finds phenotypic matches without mechanistic knowledge. + Boltz-1 + MM-PBSA gives binding free energy estimates without wet-lab. − Generative chemistry candidates often have low synthesizability (need SA score filter). − ADMET prediction accuracy ~70-80% — not reliable enough for go/no-go decisions alone. − Wet-lab validation is still the bottleneck (months per cycle). − Clinical trial failure rate still 90% (AI doesn't fix biology unknowns).",
+    alternatives: [
+      "Pure pharma (manual target ID + high-throughput screen) — 4-5 years per drug, $2.6B per approval",
+      "Atomwise (early AI binding predictor) — single-target, limited chemistry diversity",
+      "Schrödinger (physics-based docking) — accurate but slow, no generative chemistry",
+      "BenevolentAI (knowledge graph + NLP for target ID) — strong on target ID, weak on chemistry",
+    ],
+    tags: ["ai-drug-discovery", "insilico-medicine", "recursion", "chemistry42", "phenomics", "generative-chemistry", "vae", "admet", "clinical-candidate", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
