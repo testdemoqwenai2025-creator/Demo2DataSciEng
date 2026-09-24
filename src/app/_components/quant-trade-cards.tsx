@@ -520,7 +520,377 @@ function FraudRingDiagram() {
   );
 }
 
-export { LazyModal, InfoCallout, MultiLangCode, DeltaHedgeMatrix, AsianPayoffDiagram, LSTMArchitecture, FraudRingDiagram };
+// ============================================================
+// SVI volatility smile diagram
+// ============================================================
+
+function SVISmileDiagram() {
+  // SVI: w(k) = a + b·[ρ·(k-m) + √((k-m)² + σ²)]
+  // Parameters: a=0.04, b=0.30, rho=-0.20, m=0.0, sigma=0.10
+  const a = 0.04, b = 0.30, rho = -0.20, m = 0.0, sigma = 0.10, T = 0.25;
+  const points = Array.from({ length: 80 }, (_, i) => {
+    const k = -0.3 + (i / 79) * 0.6;
+    const inner = (k - m) ** 2 + sigma ** 2;
+    const w = a + b * (rho * (k - m) + Math.sqrt(inner));
+    const vol = Math.sqrt(Math.max(w / T, 0));
+    return { k, vol };
+  });
+  const vols = points.map(p => p.vol);
+  const minV = Math.min(...vols), maxV = Math.max(...vols);
+  const range = maxV - minV || 1;
+  // ATM point (k=0)
+  const atmVol = Math.sqrt((a + b * sigma) / T);
+
+  // Market noise around the curve
+  const noise = points.map((_, i) => (i % 7 === 0 ? (Math.sin(i) * 0.002) : 0));
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          SVI volatility smile — 3-month European calls on a single underlying
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Axes */}
+          <line x1="40" y1="170" x2="380" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          <line x1="40" y1="20" x2="40" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          {/* ATM line */}
+          <line x1={40 + 0.5 * 340} y1="20" x2={40 + 0.5 * 340} y2="170"
+            stroke="var(--chart-3)" strokeWidth="1" strokeDasharray="4,3" />
+          <text x={40 + 0.5 * 340 + 4} y="30" fontSize="9" fill="var(--chart-3)">ATM</text>
+          {/* SVI curve */}
+          <polyline
+            points={points.map((p, i) =>
+              `${40 + (i / 79) * 340},${170 - ((p.vol - minV) / range) * 130 - 20}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="2"
+          />
+          {/* Market quotes (noisy dots) */}
+          {points.filter((_, i) => i % 5 === 0).map((p, i) => {
+            const noisy = p.vol + noise[i * 5];
+            return (
+              <circle key={i}
+                cx={40 + ((i * 5) / 79) * 340}
+                cy={170 - ((noisy - minV) / range) * 130 - 20}
+                r="3" fill="var(--chart-1)" opacity="0.7" />
+            );
+          })}
+          {/* ATM marker */}
+          <circle cx={40 + 0.5 * 340}
+            cy={170 - ((atmVol - minV) / range) * 130 - 20}
+            r="5" fill="var(--chart-3)" stroke="var(--background)" strokeWidth="1.5" />
+          {/* Labels */}
+          <text x="20" y="100" textAnchor="middle" fontSize="9" fill="var(--foreground)"
+            transform="rotate(-90 20 100)">implied vol</text>
+          <text x="210" y="190" textAnchor="middle" fontSize="9" fill="var(--foreground)">
+            log-moneyness k = ln(K/F)
+          </text>
+          <text x="50" y="14" fontSize="9" fill="var(--foreground)" fontWeight="bold">
+            SVI: w(k) = a + b·[ρ(k-m) + √((k-m)² + σ²)]
+          </text>
+          {/* Parameter labels */}
+          <text x="270" y="40" fontSize="9" fill="var(--chart-2)">
+            a=0.04, b=0.30, ρ=-0.20, m=0, σ=0.10
+          </text>
+          <text x="270" y="55" fontSize="9" fill="var(--chart-3)">
+            ATM vol = {(atmVol * 100).toFixed(2)}%
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          The 5 SVI parameters (a, b, ρ, m, σ) describe the level, slope, skew, ATM,
+          and curvature of the smile. Calibration fits market quotes to the curve
+          via Levenberg-Marquardt. No-arbitrage constraint: b·(1+|ρ|) &lt; 4/T.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Markowitz efficient frontier diagram
+// ============================================================
+
+function EfficientFrontierDiagram() {
+  // 3-asset universe: Stocks, Bonds, Gold
+  // mu = [0.10, 0.04, 0.06]
+  // Σ = [[0.04, 0.005, 0.002], [0.005, 0.01, -0.001], [0.002, -0.001, 0.02]]
+  // rf = 0.02
+  const rf = 0.02;
+  // MVP point (closed-form): w = Σ^-1·1 / (1'·Σ^-1·1)
+  // → roughly stocks 12%, bonds 76%, gold 12%
+  const mvp = { vol: 0.094, ret: 0.051 };
+  // Tangency point: w = Σ^-1·(μ-rf·1) / (1'·Σ^-1·(μ-rf·1))
+  const tan = { vol: 0.152, ret: 0.087 };
+  // Frontier curve (parametric from MVP going up)
+  const frontier: { vol: number; ret: number }[] = [
+    { vol: 0.094, ret: 0.051 },
+    { vol: 0.097, ret: 0.055 },
+    { vol: 0.105, ret: 0.060 },
+    { vol: 0.118, ret: 0.067 },
+    { vol: 0.135, ret: 0.075 },
+    { vol: 0.152, ret: 0.087 },
+    { vol: 0.175, ret: 0.092 },
+    { vol: 0.200, ret: 0.100 },
+  ];
+  // Random feasible portfolios (scatter cloud)
+  const cloud = Array.from({ length: 50 }, () => {
+    const r1 = Math.random(), r2 = Math.random(), r3 = Math.random();
+    const sum = r1 + r2 + r3;
+    const w = [r1 / sum, r2 / sum, r3 / sum];
+    const mu = [0.10, 0.04, 0.06];
+    const cov = [
+      [0.040, 0.005, 0.002],
+      [0.005, 0.010, -0.001],
+      [0.002, -0.001, 0.020],
+    ];
+    const ret = w.reduce((s, wi, i) => s + wi * mu[i], 0);
+    let var_ = 0;
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) var_ += w[i] * w[j] * cov[i][j];
+    return { vol: Math.sqrt(var_), ret };
+  });
+  const maxV = 0.22;
+  const minX = 40, maxX = 380, minY = 170, maxY = 20;
+  const xScale = (v: number) => minX + (v / maxV) * (maxX - minX);
+  const yScale = (r: number) => minY - (r / 0.12) * (minY - maxY);
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <TrendingUp className="h-3.5 w-3.5 text-primary" />
+          Markowitz efficient frontier — 3-asset universe (Stocks, Bonds, Gold)
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Axes */}
+          <line x1={minX} y1={minY} x2={maxX} y2={minY} stroke="var(--border)" strokeWidth="0.8" />
+          <line x1={minX} y1={minY} x2={minX} y2={maxY} stroke="var(--border)" strokeWidth="0.8" />
+          {/* Cloud of feasible portfolios */}
+          {cloud.map((p, i) => (
+            <circle key={i} cx={xScale(p.vol)} cy={yScale(p.ret)} r="2"
+              fill="var(--muted-foreground)" opacity="0.4" />
+          ))}
+          {/* Efficient frontier */}
+          <polyline
+            points={frontier.map(p => `${xScale(p.vol)},${yScale(p.ret)}`).join(" ")}
+            fill="none" stroke="var(--chart-2)" strokeWidth="2"
+          />
+          {/* MVP */}
+          <circle cx={xScale(mvp.vol)} cy={yScale(mvp.ret)} r="5"
+            fill="var(--chart-3)" stroke="var(--background)" strokeWidth="1.5" />
+          <text x={xScale(mvp.vol) + 8} y={yScale(mvp.ret) - 4} fontSize="9" fill="var(--chart-3)">
+            MVP
+          </text>
+          {/* Tangency portfolio */}
+          <circle cx={xScale(tan.vol)} cy={yScale(tan.ret)} r="6"
+            fill="var(--chart-1)" stroke="var(--background)" strokeWidth="1.5" />
+          <text x={xScale(tan.vol) + 8} y={yScale(tan.ret) - 4} fontSize="9" fill="var(--chart-1)">
+            Tangency (max-Sharpe)
+          </text>
+          {/* Capital Market Line from (0, rf) tangent to frontier */}
+          <line x1={xScale(0)} y1={yScale(rf)} x2={maxX}
+            y2={yScale(rf) + (maxX - xScale(0)) * ((tan.ret - rf) / tan.vol) * (maxV / 0.12) * -1}
+            stroke="var(--chart-4)" strokeWidth="1.5" strokeDasharray="4,3" />
+          <text x={maxX - 80} y={yScale(rf) - 6} fontSize="9" fill="var(--chart-4)">
+            CML (rf→tangency)
+          </text>
+          {/* Labels */}
+          <text x="20" y="100" textAnchor="middle" fontSize="9" fill="var(--foreground)"
+            transform="rotate(-90 20 100)">expected return</text>
+          <text x="210" y="190" textAnchor="middle" fontSize="9" fill="var(--foreground)">
+            volatility (σ)
+          </text>
+          <text x="60" y="14" fontSize="9" fill="var(--foreground)" fontWeight="bold">
+            min w&apos;Σw  s.t.  w&apos;μ = r_target,  1&apos;w = 1
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          Frontier = upper envelope of (vol, return) feasible set. MVP minimises
+          variance; tangency point maximises Sharpe = (μ_p − rf)/σ_p. Capital
+          Market Line (CML) from rf through tangency dominates all portfolios
+          on the frontier for a risk-free-asset-inclusive investor.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Deep hedging P&L distribution diagram
+// ============================================================
+
+function DeepHedgingPnLDiagram() {
+  // Two distributions: BS hedge (wider) vs Deep hedge (tighter tail)
+  // Generate via Gaussian mixtures
+  const bins = 30;
+  const bsHist: number[] = Array.from({ length: bins }, (_, i) => {
+    const x = (i - bins / 2) / 5;
+    return Math.exp(-(x * x) / 8) * 60;  // wider
+  });
+  const deepHist: number[] = Array.from({ length: bins }, (_, i) => {
+    const x = (i - bins / 2) / 5;
+    return Math.exp(-(x * x) / 4) * 80;  // tighter
+  });
+  const maxH = Math.max(...bsHist, ...deepHist);
+
+  // VaR markers (95%)
+  const bsVaR = bins - 1;  // tail right
+  const deepVaR = Math.round(bins * 0.85);
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Brain className="h-3.5 w-3.5 text-primary" />
+          Deep hedging P&amp;L distribution — tighter tail vs Black-Scholes
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Axes */}
+          <line x1="30" y1="170" x2="380" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          <line x1="30" y1="20" x2="30" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          {/* BS hedge histogram (red) */}
+          {bsHist.map((h, i) => {
+            const x = 30 + i * 11.5;
+            return (
+              <rect key={`bs-${i}`} x={x} y={170 - (h / maxH) * 130}
+                width="10" height={(h / maxH) * 130}
+                fill="var(--chart-1)" opacity="0.45" />
+            );
+          })}
+          {/* Deep hedge histogram (green) */}
+          {deepHist.map((h, i) => {
+            const x = 30 + i * 11.5;
+            return (
+              <motion.rect key={`deep-${i}`}
+                initial={{ height: 0, y: 170 }}
+                animate={{ height: (h / maxH) * 130, y: 170 - (h / maxH) * 130 }}
+                transition={{ duration: 0.3, delay: i * 0.01 }}
+                x={x + 1} width="8"
+                fill="var(--chart-4)" opacity="0.65" />
+            );
+          })}
+          {/* CVaR markers */}
+          <line x1={30 + bsVaR * 11.5} y1="20" x2={30 + bsVaR * 11.5} y2="170"
+            stroke="var(--chart-1)" strokeWidth="1.5" strokeDasharray="3,2" />
+          <text x={30 + bsVaR * 11.5 - 4} y="14" fontSize="9" fill="var(--chart-1)" textAnchor="end">
+            BS CVaR_95
+          </text>
+          <line x1={30 + deepVaR * 11.5} y1="20" x2={30 + deepVaR * 11.5} y2="170"
+            stroke="var(--chart-4)" strokeWidth="1.5" strokeDasharray="3,2" />
+          <text x={30 + deepVaR * 11.5 + 4} y="14" fontSize="9" fill="var(--chart-4)">
+            Deep CVaR_95
+          </text>
+          {/* Legend */}
+          <rect x="270" y="180" width="10" height="6" fill="var(--chart-1)" opacity="0.6" />
+          <text x="285" y="187" fontSize="8" fill="var(--foreground)">BS Delta hedge</text>
+          <rect x="160" y="180" width="10" height="6" fill="var(--chart-4)" opacity="0.7" />
+          <text x="175" y="187" fontSize="8" fill="var(--foreground)">Deep hedge (Buehler 2019)</text>
+          {/* Axis labels */}
+          <text x="200" y="195" textAnchor="middle" fontSize="9" fill="var(--foreground)">
+            hedged P&amp;L
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          BS Delta over-trades under transaction costs (assumes zero). Deep
+          hedging NN learns to skip small rebalances when cost exceeds the
+          gamma benefit → tighter left-tail (lower CVaR) for same mean P&amp;L.
+          Buehler 2019 reports 20-40% CVaR reduction on realistic cost levels.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CVA expected exposure profile diagram
+// ============================================================
+
+function CVAExposureDiagram() {
+  // EE profile over 5 years (50 time steps)
+  // Typical EE rises then falls as time-to-maturity shrinks
+  const n = 51;
+  const ee = Array.from({ length: n }, (_, i) => {
+    const t = i / 50;
+    // EE(t) = call value at time t, with random walk
+    return 8.5 * Math.exp(-t * 0.1) * (1 + 0.3 * Math.sin(t * 4)) * (1 - t * 0.6);
+  });
+  const maxEE = Math.max(...ee);
+  // EPE = mean of EE profile
+  const epe = ee.reduce((a, b) => a + b, 0) / ee.length;
+
+  return (
+    <div className="rounded-md border border-border/60 bg-card overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60">
+        <p className="text-xs font-semibold flex items-center gap-1.5">
+          <Shield className="h-3.5 w-3.5 text-primary" />
+          CVA expected exposure profile — EE(t) over 5 years
+        </p>
+      </div>
+      <div className="p-3">
+        <svg viewBox="0 0 400 200" className="w-full h-auto">
+          {/* Axes */}
+          <line x1="30" y1="170" x2="380" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          <line x1="30" y1="20" x2="30" y2="170" stroke="var(--border)" strokeWidth="0.8" />
+          {/* EPE line */}
+          <line x1="30" y1={170 - (epe / maxEE) * 130} x2="380"
+            y2={170 - (epe / maxEE) * 130}
+            stroke="var(--chart-3)" strokeWidth="1.5" strokeDasharray="6,3" />
+          <text x="280" y={170 - (epe / maxEE) * 130 - 4} fontSize="9" fill="var(--chart-3)">
+            EPE = {epe.toFixed(2)}
+          </text>
+          {/* EE curve */}
+          <polyline
+            points={ee.map((v, i) => `${30 + (i / 50) * 350},${170 - (v / maxEE) * 130}`).join(" ")}
+            fill="none" stroke="var(--chart-1)" strokeWidth="2" />
+          {/* Shaded area under EE */}
+          <polyline
+            points={`30,170 ` + ee.map((v, i) =>
+              `${30 + (i / 50) * 350},${170 - (v / maxEE) * 130}`).join(" ") + ` 380,170`}
+            fill="var(--chart-1)" opacity="0.15" />
+          {/* Year markers */}
+          {[0, 1, 2, 3, 4, 5].map(y => (
+            <g key={y}>
+              <line x1={30 + (y / 5) * 350} y1="170" x2={30 + (y / 5) * 350} y2="174"
+                stroke="var(--border)" strokeWidth="0.8" />
+              <text x={30 + (y / 5) * 350} y="184" textAnchor="middle" fontSize="8"
+                fill="var(--muted-foreground)">{y}y</text>
+            </g>
+          ))}
+          {/* Labels */}
+          <text x="20" y="100" textAnchor="middle" fontSize="9" fill="var(--foreground)"
+            transform="rotate(-90 20 100)">EE(t)</text>
+          <text x="60" y="14" fontSize="9" fill="var(--foreground)" fontWeight="bold">
+            CVA = Σ_t  LGD · EE(t) · PD(t) · DF(t)
+          </text>
+          <text x="60" y="28" fontSize="9" fill="var(--chart-2)">
+            LGD=0.60, hazard=0.02 → CVA ≈ 0.42 USD (rf price 21.07 → 20.65)
+          </text>
+        </svg>
+      </div>
+      <div className="px-3 py-2 bg-muted/30 border-t border-border/60">
+        <p className="text-[10px] text-muted-foreground">
+          EE(t) = mean positive exposure at time t (simulated via GBM).
+          EPE = time-averaged EE. CVA = LGD · EPE · PD integrated with
+          discounting — the credit risk component of XVA. Other XVA
+          components: DVA (own credit), FVA (funding), MVA (margin), KVA (capital).
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export { LazyModal, InfoCallout, MultiLangCode, DeltaHedgeMatrix, AsianPayoffDiagram, LSTMArchitecture, FraudRingDiagram, SVISmileDiagram, EfficientFrontierDiagram, DeepHedgingPnLDiagram, CVAExposureDiagram };
 
 // ============================================================
 // Main component — QuantTradeCards
@@ -534,6 +904,14 @@ import {
   LSTM_PYTHON, LSTM_RUST, LSTM_SCALA, LSTM_ELIXIR,
   GNN_PYTHON, GNN_RUST, GNN_SCALA, GNN_ELIXIR,
 } from "./_quant_trade_code2";
+import {
+  SVI_PYTHON, SVI_RUST, SVI_SCALA, SVI_ELIXIR,
+  MARKOWITZ_PYTHON, MARKOWITZ_RUST, MARKOWITZ_SCALA, MARKOWITZ_ELIXIR,
+} from "./_quant_trade_code3";
+import {
+  DEEP_HEDGE_PYTHON, DEEP_HEDGE_RUST, DEEP_HEDGE_SCALA, DEEP_HEDGE_ELIXIR,
+  CVA_PYTHON, CVA_RUST, CVA_SCALA, CVA_ELIXIR,
+} from "./_quant_trade_code4";
 
 const SCENARIOS: ScenarioCard[] = [
   {
@@ -636,6 +1014,106 @@ const SCENARIOS: ScenarioCard[] = [
     intent: "Implement the GraphSAGE architecture (Hamilton 2017) for the Weber 2019 'Scale' fraud-detection benchmark. Multi-hop message passing is the key — single-hop rules cannot see cycles. The same architecture powers Visa, Mastercard, PayPal, and JPMorgan production fraud systems.",
     insight: "GNN-based fraud detection achieves 5-10x higher fraud recall than rule-based systems at the same false-positive rate. The graph structure carries information that no per-transaction feature can — a single fraud ring member is flagged because its 2-hop neighbourhood is unusually dense and reciprocal.",
   },
+  {
+    id: "svi-vol-surface",
+    step: "5",
+    title: "SVI Volatility Surface Calibration",
+    subtitle: "5-parameter vol smile (Gatheral 2004) — Levenberg-Marquardt fit",
+    accent: "oklch(0.65 0.16 200)",
+    icon: <Activity className="h-4 w-4" />,
+    badge: "Gatheral 2004",
+    brief: {
+      derivative: "Volatility surface σ(K, T) for an option book — implied vols differ across strikes/maturities (volatility smile/smirk). Must be arbitrage-free.",
+      problem: "Direct interpolation of market implied vols often produces arbitrage-violating surfaces (calendar-spread or butterfly arbitrage). Need a parametric form that guarantees no-arbitrage and fits market quotes.",
+      solution: "Fit the 5-parameter SVI model: w(k) = a + b·[ρ·(k-m) + √((k-m)² + σ²)] where w is total implied variance, k is log-moneyness. The SVI form guarantees no calendar-spread arbitrage when b·(1+|ρ|) < 4/T. Calibrate via Levenberg-Marquardt.",
+    },
+    matrix: <SVISmileDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "svi_calibration.py", code: SVI_PYTHON },
+      { lang: "rust", filename: "svi_calibration.rs", code: SVI_RUST },
+      { lang: "scala", filename: "SVICalibrator.scala", code: SVI_SCALA },
+      { lang: "elixir", filename: "svi_calibrator.ex", code: SVI_ELIXIR },
+    ],
+    runnablePython: SVI_PYTHON,
+    mathExpr: "w(k) = a + b·[ρ·(k-m) + √((k-m)² + σ²)]  ·  no-arb: b·(1+|ρ|) < 4/T",
+    intent: "Calibrate the 5-parameter SVI volatility surface (Gatheral 2004) to market implied volatilities. SVI's parametric form guarantees no calendar-spread arbitrage and is the industry standard for listed-option desks (CBOE, CME option market-makers).",
+    insight: "SVI is preferred over spline interpolation because it has only 5 parameters (vs 20+ for cubic splines), is smooth, and obeys the Lee-Wingpertinger no-arbitrage bounds. Production calibration uses Levenberg-Marquardt with parameter scaling; the linear part (a, b) for fixed (ρ, m, σ) is solved via OLS as a warm-start, then refined via nonlinear optimisation.",
+  },
+  {
+    id: "markowitz-frontier",
+    step: "6",
+    title: "Markowitz Efficient Frontier",
+    subtitle: "min w'Σw s.t. w'μ = r_target, 1'w = 1 (Markowitz 1952, Nobel 1990)",
+    accent: "oklch(0.65 0.16 60)",
+    icon: <TrendingUp className="h-4 w-4" />,
+    badge: "Markowitz 1952",
+    brief: {
+      derivative: "A portfolio of 3 assets: Stocks (μ=10%, σ=20%), Bonds (μ=4%, σ=10%), Gold (μ=6%, σ=14%) with given covariance matrix.",
+      problem: "Choose weights w to minimise risk (variance) for a target return — or equivalently, maximise return for a given risk budget. The 'efficient frontier' is the upper envelope of feasible (risk, return) points.",
+      solution: "Solve the closed-form quadratic program: w(r) = Σ^-1·[μ | 1]·A^-1·[r ; 1] where A is a 2×2 matrix of risk-free-covariance scalars. The frontier traces out the optimal trade-off; the tangency point maximises Sharpe = (μ_p − rf)/σ_p.",
+    },
+    matrix: <EfficientFrontierDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "markowitz_frontier.py", code: MARKOWITZ_PYTHON },
+      { lang: "rust", filename: "markowitz_frontier.rs", code: MARKOWITZ_RUST },
+      { lang: "scala", filename: "MarkowitzOptimizer.scala", code: MARKOWITZ_SCALA },
+      { lang: "elixir", filename: "markowitz.ex", code: MARKOWITZ_ELIXIR },
+    ],
+    runnablePython: MARKOWITZ_PYTHON,
+    mathExpr: "min w'Σw  s.t.  w'μ = r_target,  1'w = 1  ·  tangency: w_tan ∝ Σ^-1·(μ − rf·1)",
+    intent: "Implement Markowitz's mean-variance optimisation (1952, Nobel 1990) in closed form — the foundation of modern portfolio theory. Compute the efficient frontier, minimum-variance portfolio, and tangency (max-Sharpe) point.",
+    insight: "Markowitz IS the same convex optimisation (QP) as regularised least-squares ML training — Σ plays the role of the Gram matrix X'X, the Sharpe ratio is signal-to-noise. The whole of mean-variance finance IS regularised ML, understood fifty years before 'machine learning' was named.",
+  },
+  {
+    id: "deep-hedging",
+    step: "7",
+    title: "Deep Hedging (Buehler 2019)",
+    subtitle: "NN learns hedge action via CVaR minimisation under transaction costs",
+    accent: "oklch(0.65 0.16 320)",
+    icon: <Brain className="h-4 w-4" />,
+    badge: "Buehler 2019",
+    brief: {
+      derivative: "Hedging a short option position with realistic transaction costs (5 bps per share). Black-Scholes assumes zero costs — real markets have costs that eat P&L.",
+      problem: "BS Delta continuously rebalances, which is optimal when costs are zero. With costs, the optimal hedge deviates from BS Delta — small rebalances should be skipped when cost exceeds the gamma P&L benefit.",
+      solution: "Train a neural network h(state_t) → hedge action. Loss = CVaR_α of hedged P&L across 10⁷-10⁹ simulated paths. The NN learns to trade less when costs outweigh the gamma benefit, producing tighter P&L tails than BS Delta under realistic frictions.",
+    },
+    matrix: <DeepHedgingPnLDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "deep_hedging.py", code: DEEP_HEDGE_PYTHON },
+      { lang: "rust", filename: "deep_hedging.rs", code: DEEP_HEDGE_RUST },
+      { lang: "scala", filename: "DeepHedger.scala", code: DEEP_HEDGE_SCALA },
+      { lang: "elixir", filename: "deep_hedger.ex", code: DEEP_HEDGE_ELIXIR },
+    ],
+    runnablePython: DEEP_HEDGE_PYTHON,
+    mathExpr: "min_θ  CVaR_α( Σ_t h_θ(state_t)·ΔS_t − premium − costs − payoff )  ·  α = 0.95",
+    intent: "Implement Buehler 2019's deep-hedging recipe: replace the BS Delta hedge rule with a neural network trained to minimise CVaR of hedged P&L. The NN learns to optimise hedge actions under transaction costs and market impact — things BS Delta ignores.",
+    insight: "Deep hedging outperforms BS Delta by 20-40% in after-cost P&L variance under realistic cost levels (Buehler 2019). Production deployed at JP Morgan, HSBC, and Allianz. This is the strongest case for ML in derivatives: not prediction of prices, but optimisation of actions — the same RL-as-stochastic-control framing as Atari agents.",
+  },
+  {
+    id: "cva-xva",
+    step: "8",
+    title: "CVA / XVA (Counterparty Credit Risk)",
+    subtitle: "CVA = E[LGD · EE(t) · PD(t)] — Basel III FRTB regulatory capital",
+    accent: "oklch(0.65 0.16 165)",
+    icon: <Shield className="h-4 w-4" />,
+    badge: "Basel III FRTB",
+    brief: {
+      derivative: "Counterparty credit risk on a 5-year European call. If the counterparty defaults before expiry, lose the positive replacement value of the trade.",
+      problem: "Risk-free option pricing (Black-Scholes) assumes the counterparty never defaults. Real counterparties (corporates, hedge funds) have non-zero default probability — must adjust the price for credit risk.",
+      solution: "CVA = E[LGD · EE · PD] integrated over time. LGD = Loss Given Default (1 - recovery rate); EE(t) = Expected Exposure at time t (positive replacement value, simulated via Monte Carlo); PD(t) = Probability of Default between t and t+dt (intensity model from credit spread). CVA + DVA + FVA + MVA + KVA = full XVA framework.",
+    },
+    matrix: <CVAExposureDiagram />,
+    codeTabs: [
+      { lang: "python", filename: "cva_xva.py", code: CVA_PYTHON },
+      { lang: "rust", filename: "cva_xva.rs", code: CVA_RUST },
+      { lang: "scala", filename: "CVAEngine.scala", code: CVA_SCALA },
+      { lang: "elixir", filename: "cva_engine.ex", code: CVA_ELIXIR },
+    ],
+    runnablePython: CVA_PYTHON,
+    mathExpr: "CVA = Σ_t  LGD · EE(t) · PD(t) · DF(t)  ·  XVA = CVA + DVA + FVA + MVA + KVA",
+    intent: "Compute CVA — the credit valuation adjustment — via Monte Carlo exposure simulation. This is the regulatory capital metric under Basel III FRTB and the foundation of the broader XVA framework (DVA, FVA, MVA, KVA) used by every bank's counterparty risk desk.",
+    insight: "CVA is computed daily on the full OTC derivatives portfolio (10⁵-10⁶ trades × 10⁴ paths each = 10⁹-10¹⁰ simulation steps). The XVA desk is now a profit centre at every major bank — AFRM (JP Morgan), EQD (Goldman), etc. pre-trade price XVA, post-trade hedge it. The same exposure profile feeds CVA, DVA, FVA, MVA, and KVA — one simulation, five adjustments.",
+  },
 ];
 
 export function QuantTradeCards() {
@@ -647,14 +1125,14 @@ export function QuantTradeCards() {
       {/* Intro */}
       <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
         <p className="text-sm font-semibold text-primary mb-1 flex items-center gap-1.5">
-          <Sparkles className="h-4 w-4" /> 4 quant scenarios · 4 languages each · click any card
+          <Sparkles className="h-4 w-4" /> 8 quant scenarios · 4 languages each · click any card
         </p>
         <p className="text-xs text-muted-foreground leading-relaxed">
           Each card opens a lazy popup with the scenario brief (Derivative, Problem, Quant Solution),
-          a rebalancing matrix or architecture diagram, multi-language code (Python / Rust / Scala / Elixir),
-          an in-browser Pyodide runner, and the math foundation + implementation insight callouts.
-          The pattern mirrors the LHC ingestion cards on the ELT+ETL page — same lazy-modal architecture,
-          different domain (quant finance vs physics data).
+          a visualisation matrix (rebalancing table / vol smile / efficient frontier / fraud-ring graph / etc.),
+          multi-language code (Python / Rust / Scala / Elixir), an in-browser Pyodide runner, and the
+          math-foundation + implementation-insight callouts. The pattern mirrors the LHC ingestion cards
+          on the ELT+ETL page — same lazy-modal architecture, different domain (quant finance vs physics data).
         </p>
       </div>
 
@@ -687,7 +1165,7 @@ export function QuantTradeCards() {
 
               {/* Mini preview: scenario card step indicator */}
               <div className="mt-3 flex items-center gap-2 text-[10px] text-muted-foreground">
-                <span className="font-mono">step {s.step}/4</span>
+                <span className="font-mono">step {s.step}/8</span>
                 <span>·</span>
                 <span className="font-mono">Python · Rust · Scala · Elixir</span>
               </div>

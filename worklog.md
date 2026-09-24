@@ -2196,3 +2196,34 @@ Stage Summary:
 - Dynamic Delta Hedging example follows user-provided spec: K=$100, T=10 days, σ=20%, r=5%, 10-day rebalancing matrix table showing Day / Spot / T(yrs) / Delta / Action.
 - All 4 scenarios reference foundational papers: Black 1973 (Black-Scholes), Boyle 1977 (Monte Carlo), Kemna-Vorst 1990 (Asian closed form), Fischer 2018 (LSTM trading), Weber 2019 (GNN fraud), Buehler 2019 (deep hedging).
 - Pattern matches LHC ingestion on the ELT+ETL page — same LazyModal architecture, different domain (quant finance vs physics data).
+
+---
+Task ID: fintech-quant-trade-cards-extended
+Agent: Super Z (main)
+Task: Extend the QuantTradeCards section on the Fintech page with 4 more scenarios (SVI vol-surface, Markowitz frontier, Deep Hedging, CVA/XVA), bringing the total to 8 scenarios × 4 languages = 32 code examples.
+
+Work Log:
+- Created 2 new code-constant files (matching the existing pattern):
+  1. src/app/_components/_quant_trade_code3.ts (~665 lines): SVI + Markowitz, 4 languages each.
+  2. src/app/_components/_quant_trade_code4.ts (~800 lines): Deep Hedging + CVA/XVA, 4 languages each.
+- Extended quant-trade-cards.tsx with:
+  - 4 new visualisation components: SVISmileDiagram, EfficientFrontierDiagram, DeepHedgingPnLDiagram, CVAExposureDiagram — each with custom SVG animation.
+  - 4 new SCENARIOS array entries (steps 5/6/7/8) with full brief, matrix, code tabs, math foundation, implementation insight.
+  - Updated intro to "8 quant scenarios · 4 languages each".
+  - Updated step indicator from /4 to /8.
+- Updated Fintech page SectionCard description to enumerate all 8 scenarios and their cited papers (Black 1973, Boyle 1977, Kemna-Vorst 1990, Fischer 2018, Weber 2019, Gatheral 2004, Markowitz 1952 Nobel 1990, Buehler 2019, Basel III FRTB).
+- Fixed two template-literal issues:
+  - SVI_PYTHON missing closing backtick (caused SVI_RUST to be parsed as continuation of SVI_PYTHON).
+  - CVA_PYTHON missing closing backtick (same root cause).
+  - SVI_SCALA had `\\${fitted.intercept}` (double-backslash + interpolation) which JS evaluated; changed to `\${fitted.intercept}` (single backslash escape → literal `${fitted.intercept}` in output, correct Scala syntax).
+- Lint clean across all 6 files (quant-trade-cards.tsx, _quant_trade_code.ts, _quant_trade_code2.ts, _quant_trade_code3.ts, _quant_trade_code4.ts, _pages/fintech.tsx).
+- Dev server smoke test: HTTP 200, all 8 scenario titles + all 8 badges render in HTML output.
+
+Stage Summary:
+- QuantTradeCards section on Fintech page now has 8 clickable cards opening lazy popups.
+- Scenarios 1-4 (existing): Delta Hedging, Monte Carlo Asian, LSTM, GNN Fraud.
+- Scenarios 5-8 (new this round): SVI Vol Surface, Markowitz Frontier, Deep Hedging, CVA/XVA.
+- Total: 8 scenarios × 4 languages = 32 code examples, each with Pyodide-runnable Python version.
+- Each popup has: scenario brief (Derivative/Problem/Solution), visualisation matrix, 4-tab multi-language code, Pyodide runner, math foundation callout, implementation insight callout.
+- The new scenarios round out the quant stack: pricing (Black-Scholes, MC Asian), ML (LSTM, GNN), market microstructure (SVI), portfolio theory (Markowitz), ML control (Deep Hedging), counterparty risk (CVA/XVA).
+- Pattern matches LHC ingestion on ELT+ETL page — same LazyModal architecture.
