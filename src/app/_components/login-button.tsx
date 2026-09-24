@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import {
   Dialog,
   DialogContent,
@@ -101,12 +101,24 @@ const getServerAuth = () => null;
 
 export function LoginButton() {
   const [open, setOpen] = useState(false);
-  // Read once on client mount, falls back to null on server
-  const initialAuth = useSyncExternalStore(noopSubscribe, getStoredAuth, getServerAuth);
-  const [authState, setAuthState] = useState<AuthState | null>(initialAuth);
+  // useSyncExternalStore reads localStorage after hydration. We need to sync
+  // its value into local state so user actions (sign in / sign out) can also
+  // update the UI immediately without waiting for the next getSnapshot call.
+  // The useEffect bridges the gap: on mount and whenever the snapshot changes,
+  // copy it into authState.
+  const storedAuth = useSyncExternalStore(noopSubscribe, getStoredAuth, getServerAuth);
+  const [authState, setAuthState] = useState<AuthState | null>(storedAuth);
   const [username, setUsername] = useState(DEMO_USER.username);
   const [password, setPassword] = useState(DEMO_USER.password);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync the external store snapshot into local state. On the initial mount
+  // (after hydration), this picks up any persisted auth state from a previous
+  // session. The dependency array tracks storedAuth so the local state mirrors
+  // the snapshot whenever it changes (e.g. another tab signed in/out).
+  useEffect(() => {
+    setAuthState(storedAuth);
+  }, [storedAuth]);
 
   const signIn = (e?: React.FormEvent) => {
     e?.preventDefault();
