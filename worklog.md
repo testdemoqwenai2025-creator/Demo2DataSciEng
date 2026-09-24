@@ -2304,3 +2304,44 @@ Stage Summary:
 - All changes are now LIVE on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/
 - Page order: PyTorch section → 8 Quant scenario cards → Low-level systems languages (Rust/Scala/Elixir/C).
 - Push SHA: 65cbc03..0f2e37e (4 commits) on private/main.
+
+---
+Task ID: fintech-14-scenarios-extension
+Agent: Super Z (main)
+Task: Extend the QuantTradeCards section with 6 more scenarios (Heston stochastic vol, Hull-White rates, SABR vol-surface, LOB replay, Black-76 commodity, Bond duration/convexity), each with synthetic data + hypothetical scenario + 4-language code (Python/Rust/Scala/Elixir). Bring the total to 14 scenarios × 4 languages = 56 code examples.
+
+Work Log:
+- Created 2 new code-constant files (matching the existing pattern):
+  - src/app/_components/_quant_trade_code5.ts (~620 lines): Heston, Hull-White, SABR
+  - src/app/_components/_quant_trade_code6.ts (~640 lines): LOB replay, Black-76, Bond duration/convexity
+- All 18 Python examples include synthetic market data + hypothetical scenarios:
+  - Heston: Bloomberg-style implied-vol smile on 7 strikes
+  - Hull-White: USD 10M 5y IRS, upward-sloping yield curve
+  - SABR: 5y10y swaption book, 7 strikes across ATM
+  - LOB: E-mini S&P 500 futures, 1000 synthetic ITCH events
+  - Black-76: WTI futures curve (8 contracts, backwardation)
+  - Bond Duration: USD 100M in 10y Treasury, +100bp shift, duration hedge
+- Added 6 new visualisation components to quant-trade-cards.tsx:
+  - HestonVolPathDiagram (spot + variance paths, ρ=-0.7)
+  - HullWhiteRatePathDiagram (5 rate paths + discount curve)
+  - SABRSmileDiagram (smile + market quotes)
+  - LOBDepthDiagram (heatmap-style L2 book)
+  - Black76FuturesDiagram (futures curve + ATM call prices)
+  - BondDurationConvexityDiagram (price-yield curve + tangent + convexity)
+- Added 6 new SCENARIOS array entries (steps 9-14) with full brief, matrix, code tabs, math foundation, implementation insight.
+- Updated intro to "14 quant scenarios · 4 languages each".
+- Updated step indicator from /8 to /14.
+- Updated SectionCard description in fintech.tsx to enumerate all 14 scenarios + their cited papers (Black 1973, Boyle 1977, Kemna-Vorst 1990, Fischer 2018, Weber 2019, Gatheral 2004, Markowitz 1952, Buehler 2019, Basel III FRTB, Heston 1993, Hull-White 1990, Hagan 2002, Cont 2010, Black 1976, Macaulay 1938, Hicks 1939).
+- Removed duplicate export statement (was causing Turbopack build error).
+- Lint clean across all touched files.
+- Static export built successfully (GITHUB_PAGES=true).
+- Verified out/fintech/index.html contains all 14 scenario titles + all 14 badges.
+- Committed and pushed: 0f2e37e..2ed5345 on private/main.
+- Sync workflow mirrored to public/main, deploy workflow built and published to GitHub Pages.
+- Verified live at https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/ — all 14 titles + 14 badges render in deployed HTML.
+
+Stage Summary:
+- 14 quant scenarios × 4 languages = 56 code examples, all LIVE on the Fintech page right below the PyTorch code section.
+- Scenarios span pricing (Black-Scholes, MC Asian, Heston, Black-76, SABR), portfolio theory (Markowitz), ML (LSTM, GNN, Deep Hedging), risk (CVA/XVA, Bond Duration), market microstructure (LOB replay), and rates (Hull-White).
+- All 6 new scenarios include synthetic market data + hypothetical scenario context (Bloomberg quotes, WTI futures curve, E-mini S&P 500 LOB, USD 100M 10y Treasury, USD 10M 5y IRS, 5y10y swaption book).
+- Each popup has the InfoCallout (math foundation + implementation insight) placed BEFORE the code block, so users see the qualitative context without scrolling past the long code blocks.
