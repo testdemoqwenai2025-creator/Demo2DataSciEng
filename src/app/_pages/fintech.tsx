@@ -13,6 +13,7 @@ import { FintechGallery3D } from "../_components/fintech-gallery-3d";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
+import { RelatedTopics } from "../_components/related-topics";
 
 const KPIS = [
   { label: "Black-Scholes", value: "C = S·N(d₁) - K·e^(-rT)·N(d₂)", hint: "Closed-form European option pricing (Black 1973)", deltaTone: "flat" as const },
@@ -1021,6 +1022,13 @@ export function FintechPage() {
           </p>
         </div>
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "databricks" as const, reason: "Spark for Monte Carlo pricing" },
+        { id: "streaming" as const, reason: "Kafka for market data feeds" },
+        { id: "neural-networks" as const, reason: "LSTM for price prediction" },
+        { id: "quantum-computing" as const, reason: "QEC for Shor on RSA" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("rag-deep-dive")} className="text-sm text-primary hover:underline">

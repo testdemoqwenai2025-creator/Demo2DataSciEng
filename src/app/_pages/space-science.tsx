@@ -12,6 +12,7 @@ import { SpaceGallery3D } from "../_components/space-gallery-3d";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
+import { RelatedTopics } from "../_components/related-topics";
 
 const KPIS = [
   { label: "Kepler's 3rd law", value: "T² = (4π²/GM)·a³", hint: "Period T scales with semi-major axis a³ — Kepler 1619", deltaTone: "flat" as const },
@@ -1115,6 +1116,13 @@ export function SpaceSciencePage() {
           </p>
         </div>
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "databricks" as const, reason: "Spark for JWST/LIGO analysis" },
+        { id: "streaming" as const, reason: "Kafka for real-time event streams" },
+        { id: "quantum-computing" as const, reason: "LHC jet substructure + QEC" },
+        { id: "arrow" as const, reason: "Columnar format for telescope data" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("neural-network-potentials")} className="text-sm text-primary hover:underline">→ Neural Network Potentials (SO(3) irreps — same symmetry as orbital mechanics)</Link>

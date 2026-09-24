@@ -15,6 +15,7 @@ import {
   Terminal, Activity, Database, ShieldCheck, Gauge,
 } from "lucide-react";
 import { StreamingCaseStudy } from "../_components/streaming-case-study";
+import { RelatedTopics } from "../_components/related-topics";
 
 const KPIS = [
   { label: "Streaming engines", value: "4", hint: "Spark · Flink · Kafka · Pulsar", deltaTone: "flat" as const },
@@ -390,6 +391,13 @@ client.close()`,
       >
         <StreamingCaseStudy />
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "fivetran-hightouch" as const, reason: "ELT + reverse-ETL ingestion" },
+        { id: "databricks" as const, reason: "Spark Structured Streaming" },
+        { id: "modern-big-data" as const, reason: "Kafka + Flink + Pulsar stack" },
+        { id: "orchestration" as const, reason: "Airflow triggers for streams" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("modern-big-data")} className="text-sm text-primary hover:underline">

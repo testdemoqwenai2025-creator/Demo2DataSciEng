@@ -5,9 +5,11 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { SOURCE_SYSTEMS, REVERSE_ETL_AUDIENCES } from "../_data/synthetic";
 import { LHCIngestion } from "../_components/lhc-ingestion";
+import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeftRight, Activity, Boxes, Workflow, ShieldCheck, Zap, Database, RefreshCw, Atom } from "lucide-react";
+import { IngestionGallery } from "../_components/ingestion-gallery";
 
 const FIVETRAN_API = `# ============================================================
 # Programmatic source onboarding via Fivetran REST API
@@ -281,6 +283,15 @@ export function FivetranHightouchPage() {
       </div>
 
       <SectionCard
+        title="Ingestion concept gallery — 3-layer interactive architecture"
+        description="Layer 1: 3D animated concept gallery (medallion, Kafka, Airflow DAG, Snowflake external tables) with n-D scope toggle + floating math/code background. Layer 2: Concept shorts with Pyodide-runnable Python (SCD2, schema drift, reverse-ETL, ELT vs ETL). Layer 3: Interactive calculators (throughput, latency). All in browser popups — lazy evaluation."
+        icon={<Atom className="h-5 w-5" />}
+        badge="3-layer gallery"
+      >
+        <IngestionGallery />
+      </SectionCard>
+
+      <SectionCard
         title="LHC extreme-scale ingestion — CMS/ATLAS at CERN"
         description="Second example: the world's most extreme data ingestion pipeline. CMS and ATLAS at CERN's Large Hadron Collider generate 40 TB/s of raw data from 100M+ detector channels at 40 MHz crossing rate. A multi-stage trigger pipeline (L1 FPGA → HLT software farm → readout → EOS storage → WLCG grid) reduces this to 1 PB/year stored. Code examples in Python (Pyodide-runnable), Rust (zero-copy binary parser with SIMD), Scala (Spark Structured Streaming + Kafka), and Elixir (GenStage backpressure pipeline). Toggle between real binary data (hex dump of CMS RD5 format) and synthetic data (Python-generated event data). All in browser popups — lazy evaluation concept."
         icon={<Atom className="h-5 w-5" />}
@@ -288,6 +299,15 @@ export function FivetranHightouchPage() {
       >
         <LHCIngestion />
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "streaming" as const, reason: "Kafka for real-time CDC" },
+        { id: "databricks" as const, reason: "Spark for transforms" },
+        { id: "orchestration" as const, reason: "Airflow DAGs for pipeline" },
+        { id: "snowflake" as const, reason: "Warehouse for ELT load" },
+        { id: "arrow" as const, reason: "Columnar format for zero-copy" },
+        { id: "patterns" as const, reason: "Medallion + SCD2 patterns" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("orchestration")} className="text-sm text-primary hover:underline">

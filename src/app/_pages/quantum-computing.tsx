@@ -12,6 +12,7 @@ import { QuantumInteractives } from "../_components/quantum-interactives";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
+import { RelatedTopics } from "../_components/related-topics";
 
 const KPIS = [
   { label: "Qubit superposition", value: "|ψ⟩ = α|0⟩ + β|1⟩", hint: "|α|² + |β|² = 1, Bloch sphere", deltaTone: "flat" as const },
@@ -1714,6 +1715,13 @@ print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via s
           </p>
         </div>
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "neural-network-potentials" as const, reason: "MACE — variational energy on SO(3)" },
+        { id: "molecular-modelling" as const, reason: "AMBER — the hand-crafted precursor" },
+        { id: "diffusion-models" as const, reason: "Variational lower bound — same family" },
+        { id: "knowledge" as const, reason: "ADR-052: VQE adoption" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("neural-network-potentials")} className="text-sm text-primary hover:underline">→ Neural Network Potentials (MACE — variational energy on SO(3) irreps)</Link>

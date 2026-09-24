@@ -8,6 +8,7 @@ import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Workflow, Activity, Clock, RefreshCw, ShieldCheck, AlertTriangle, Gauge } from "lucide-react";
 import { OrchestrationCaseStudy } from "../_components/orchestration-case-study";
+import { RelatedTopics } from "../_components/related-topics";
 
 const AIRFLOW_DAG = `# ============================================================
 # dags/gold_sales_mart_dag.py
@@ -322,6 +323,13 @@ export function OrchestrationPage() {
       >
         <OrchestrationCaseStudy />
       </SectionCard>
+
+      <RelatedTopics topics={[
+        { id: "fivetran-hightouch" as const, reason: "Pipeline for ELT ingestion" },
+        { id: "cicd" as const, reason: "CI/CD for DAG deployment" },
+        { id: "governance" as const, reason: "DQ checks + lineage" },
+        { id: "databricks" as const, reason: "Spark job orchestration" },
+      ]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("governance")} className="text-sm text-primary hover:underline">
