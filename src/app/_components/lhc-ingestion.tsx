@@ -853,6 +853,101 @@ print("  ETL advantage:   warehouse stays clean (no raw data)")
 print("  LHC pipeline:     ETL pattern (trigger+zero-suppress = transform, EOS = load)")
 print("  Same pattern, different domain, different scale")`;
 
+// ELT (Modern Lakehouse) — Extract -> Load RAW -> Transform in warehouse
+const ELT_CODE = `print("=== ELT Approach (Modern Lakehouse Architecture) ===")
+print()
+print("Pattern: Extract -> Load RAW -> Transform IN warehouse")
+print("vs ETL:  Extract -> Transform -> Load (transform BEFORE load)")
+print()
+print("=== Step 1: EXTRACT + LOAD raw binary to object storage ===")
+print("# DAQ captures raw binary (zero preprocessing)")
+print("# Stream directly to S3/GCS/Ceph as immutable binary blobs")
+print()
+raw_blobs = [
+    {"key": "s3://cms-daq/2024/run3/bucket_0001.bin", "size_bytes": 1048576, "events": 12500},
+    {"key": "s3://cms-daq/2024/run3/bucket_0002.bin", "size_bytes": 1048576, "events": 12480},
+    {"key": "s3://cms-daq/2024/run3/bucket_0003.bin", "size_bytes": 1048576, "events": 12510},
+]
+total_bytes = sum(b["size_bytes"] for b in raw_blobs)
+total_events = sum(b["events"] for b in raw_blobs)
+print("Loaded " + str(len(raw_blobs)) + " binary blobs to S3:")
+for b in raw_blobs:
+    print("  " + b["key"] + " (" + str(b["size_bytes"]) + " bytes, " + str(b["events"]) + " events)")
+print("  Total: " + str(total_bytes) + " bytes (" + str(round(total_bytes / 1048576, 1)) + " MB), " + str(total_events) + " events")
+print("  Zero preprocessing - raw binary stored as-is (immutable)")
+print()
+print("=== Step 2: Register external table in Snowflake ===")
+print("-- Snowflake reads S3 directly via external stage (zero-copy)")
+print("CREATE OR REPLACE STAGE cms_daq_stage")
+print("  URL = 's3://cms-daq/2024/run3/'")
+print("  STORAGE_INTEGRATION = s3_read_integration;")
+print()
+print("CREATE OR REPLACE EXTERNAL TABLE cms_raw_events (")
+print("  event_id VARCHAR AS (value:event_id::VARCHAR),")
+print("  bunch_crossing INT AS (value:bx::INT),")
+print("  timestamp TIMESTAMP AS (value:ts::TIMESTAMP),")
+print("  energy FLOAT AS (value:energy::FLOAT),")
+print("  met FLOAT AS (value:met::FLOAT)")
+print(")")
+print("  WITH LOCATION = @cms_daq_stage")
+print("  FILE_FORMAT = (TYPE = PARQUET)")
+print("  AUTO_REFRESH = TRUE;")
+print()
+print("-- External table: zero-copy, no data duplication")
+print("-- Snowflake reads S3 files on every query")
+print()
+print("=== Step 3: Transform IN the warehouse (SQL UDFs) ===")
+print("-- Create a SQL UDF to parse raw binary fields")
+print("CREATE OR REPLACE FUNCTION parse_cms_event(raw_bytes BINARY)")
+print("  RETURNS TABLE (event_id BIGINT, bx INT, energy FLOAT)")
+print("  LANGUAGE PYTHON RUNTIME_VERSION = '3.8'")
+print("  HANDLER = 'parse_event'")
+print("  AS $$")
+print("import struct")
+print("def parse_event(raw_bytes):")
+print("    events = []")
+print("    offset = 0")
+print("    while offset + 32 <= len(raw_bytes):")
+print("        eid, bx, ts, lb, plen, _ = struct.unpack_from(raw_bytes, offset)")
+print("        energy = struct.unpack_from(raw_bytes, offset + 32)[0]")
+print("        events.append((eid, bx, energy))")
+print("        offset += 32 + plen")
+print("    return events")
+print("$$;")
+print()
+print("-- Query external table + UDF (in-warehouse transform)")
+print("SELECT event_id, bunch_crossing, energy, met,")
+print("  CASE WHEN energy > 50 AND met > 20 THEN 'physics' ELSE 'noise' END AS class")
+print("FROM cms_raw_events")
+print("WHERE energy > 50 AND met > 20")
+print("LIMIT 100;")
+print()
+print("=== Step 4: Populate production analytics table ===")
+print("CREATE OR REPLACE TABLE gold.physics_events AS")
+print("SELECT event_id, bunch_crossing, timestamp, energy, met,")
+print("  energy + met AS total_energy,")
+print("  DATE_TRUNC('hour', timestamp) AS hour_bucket")
+print("FROM cms_raw_events")
+print("WHERE energy > 50 AND met > 20;")
+print()
+import random
+random.seed(42)
+selected = sum(1 for _ in range(total_events) if random.random() > 0.95)
+print("=== Results ===")
+print("  Raw blobs in S3: " + str(len(raw_blobs)) + " files, " + str(total_events) + " events")
+print("  External table: zero-copy read from S3")
+print("  After SQL transform: " + str(selected) + " events pass selection")
+print("  Reduction: " + str(round(total_events / max(selected, 1), 1)) + "x")
+print()
+print("=== ELT vs ETL ===")
+print("  ELT: Extract -> Load RAW to S3 -> Transform IN Snowflake")
+print("  ETL: Extract -> Transform on ETL server -> Load to warehouse")
+print("  ELT advantage: raw data preserved, warehouse compute elastic")
+print("  ELT advantage: external tables = no data duplication")
+print("  ELT advantage: SQL UDFs run distributed across warehouse nodes")
+print("  ELT advantage: replayable (re-process raw data anytime)")
+print("  Modern pattern: ELT + materialized views for hot tables")`;
+
 const CODE_CARDS: CodeCard[] = [
   {
     id: "python",
@@ -926,6 +1021,20 @@ const CODE_CARDS: CodeCard[] = [
     mathExpr: "Extract (source APIs) → Transform (normalize, join, aggregate, validate) → Load (warehouse MERGE)",
     intent: "Classic ETL pipeline: extract from Shopify + Stripe, transform (currency normalization, referential join, customer aggregation, Great Expectations validation), load to Snowflake warehouse. This is the Fivetran pattern at business scale — same skeleton as the LHC pipeline but business domain.",
     insight: "ETL vs ELT: ETL transforms BEFORE loading (warehouse era — 2000s). ELT loads FIRST then transforms in the warehouse (modern — Snowflake/BigQuery). The LHC pipeline IS ETL (trigger+zero-suppress = transform, EOS = load). Same pattern, different domain (business vs physics), different scale (3.1B rows/month vs 40 TB/s).",
+  },
+  {
+    id: "elt-lakehouse",
+    step: "6",
+    title: "ELT (Modern Lakehouse) — Extract → Load RAW → Transform IN warehouse",
+    subtitle: "S3/GCS external tables → Snowflake SQL UDFs → analytics",
+    accent: "oklch(0.55 0.16 200)",
+    icon: <Database className="h-4 w-4" />,
+    language: "python",
+    code: ELT_CODE,
+    runnable: true,
+    mathExpr: "Extract (DAQ) → Load (S3 immutable blobs) → Transform (warehouse SQL UDFs) → Materialized views",
+    intent: "Modern ELT pattern: load raw binary directly to S3 (zero preprocessing), register as Snowflake external table (zero-copy, no data moved), transform via SQL UDFs running distributed across warehouse nodes. Same LHC data, different architecture than ETL.",
+    insight: "ELT vs ETL: ELT loads RAW first, transforms IN the warehouse (Snowflake/BigQuery/Delta Lake). ETL transforms BEFORE loading. The LHC pipeline can be EITHER — current CMS is ETL (trigger+zero-suppress before storage), but HL-LHC is moving toward ELT (raw to S3 + in-warehouse transforms). Same physics data, different compute architecture.",
   },
 ];
 
@@ -1401,26 +1510,32 @@ for i in range(len(stages)-1):
               <p className="font-mono text-xs text-primary leading-relaxed">{openCard.mathExpr}</p>
             </div>
 
-            {/* Code */}
-            {openCard.runnable ? (
-              <PyodideRunner
-                buttonLabel={`Run ${openCard.language} code (Pyodide)`}
-                code={openCard.code}
-              />
-            ) : (
-              <div className="space-y-3">
-                <CodeBlock language={openCard.language} filename={`lhc_${openCard.id}.${openCard.language === "rust" ? "rs" : openCard.language === "scala" ? "scala" : "ex"}`} code={openCard.code} />
-                {openCard.pythonCode && (
-                  <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
-                    <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" /> Python equivalent — run in browser (Pyodide)
-                    </p>
-                    <PyodideRunner
-                      buttonLabel={`Run Python equivalent (Pyodide)`}
-                      code={openCard.pythonCode}
-                    />
-                  </div>
-                )}
+            {/* Code preview — always show CodeBlock (like Rust/Scala/Elixir) */}
+            <CodeBlock language={openCard.language} filename={`lhc_${openCard.id}.${openCard.language === "rust" ? "rs" : openCard.language === "scala" ? "scala" : openCard.language === "elixir" ? "ex" : "py"}`} code={openCard.code} />
+
+            {/* Run button — for runnable cards (Python, ETL, ELT) */}
+            {openCard.runnable && (
+              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> Python code — run in browser (Pyodide)
+                </p>
+                <PyodideRunner
+                  buttonLabel={`Run ${openCard.language} code (Pyodide)`}
+                  code={openCard.code}
+                />
+              </div>
+            )}
+
+            {/* Python equivalent — for non-runnable cards (Rust/Scala/Elixir) */}
+            {!openCard.runnable && openCard.pythonCode && (
+              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> Python equivalent — run in browser (Pyodide)
+                </p>
+                <PyodideRunner
+                  buttonLabel={`Run Python equivalent (Pyodide)`}
+                  code={openCard.pythonCode}
+                />
               </div>
             )}
 
