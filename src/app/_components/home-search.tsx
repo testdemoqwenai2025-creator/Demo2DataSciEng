@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PAGES, hrefFor } from "../_lib/router";
 import { Search, X, ArrowRight, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ export function HomeSearch() {
   const [activeIdx, setActiveIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter(); // use router.push — respects basePath on GitHub Pages
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
@@ -53,8 +55,9 @@ export function HomeSearch() {
       setActiveIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && results[activeIdx]) {
       const target = results[activeIdx];
-      // Use assign() to satisfy immutability lint rule
-      window.location.assign(hrefFor(target.id));
+      // router.push applies basePath automatically (window.location.assign would
+      // strip it on GitHub Pages, causing a 404)
+      router.push(hrefFor(target.id));
       setQuery("");
       setOpen(false);
     } else if (e.key === "Escape") {
@@ -64,8 +67,9 @@ export function HomeSearch() {
   };
 
   const handleSelect = (pageId: typeof PAGES[number]["id"]) => {
-    // Use assign() instead of direct hash assignment to satisfy immutability lint
-    window.location.assign(hrefFor(pageId));
+    // router.push applies basePath automatically (window.location.assign would
+    // strip it on GitHub Pages, causing a 404)
+    router.push(hrefFor(pageId));
     setQuery("");
     setOpen(false);
   };

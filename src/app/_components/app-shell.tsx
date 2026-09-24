@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
@@ -219,29 +219,34 @@ function FooterContent({ compact = false }: { compact?: boolean }) {
 export function AppShell({ children }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const active = pathnameToPageId(pathname);
 
   // Backward-compat: redirect old hash URLs (e.g. /#/databricks → /databricks)
   // Runs once on mount, client-side only.
+  // Uses next/router (router.replace) instead of window.location.assign so the
+  // basePath (e.g. /DemoAppDataSci on GitHub Pages) is automatically applied.
+  // The previous version called window.location.assign("/databricks") which
+  // stripped the basePath and 404'd on GitHub Pages — making the page
+  // "disappear" after the first render.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const hash = window.location.hash;
-    if (hash.startsWith("#/")) {
-      const targetId = hash.slice(2).trim();
-      const target = PAGES.find((p) => p.id === targetId);
-      if (target && target.id !== "home") {
-        // Replace history so the back button doesn't bounce to the hash
-        window.history.replaceState(null, "", hrefFor(target.id));
-        // Force a navigation via hash change to trigger router update
-        window.location.hash = "";
-        // Navigate using assign to the real route
-        window.location.assign(hrefFor(target.id));
-      } else if (hash === "#/" || hash === "#") {
-        // Home — just clear the hash
-        window.history.replaceState(null, "", "/");
-        window.location.hash = "";
-      }
+    if (!hash.startsWith("#/")) return;
+
+    const targetId = hash.slice(2).trim();
+    const target = PAGES.find((p) => p.id === targetId);
+
+    if (target && target.id !== "home") {
+      // Clear the hash first so back-button doesn't bounce to it
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      // Client-side navigation to the real route — respects basePath
+      router.replace(hrefFor(target.id));
+    } else if (hash === "#/" || hash === "#") {
+      // Home — just clear the hash
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
