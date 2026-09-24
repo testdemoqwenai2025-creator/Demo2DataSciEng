@@ -1,0 +1,96 @@
+# ============================================================
+# Guardrail Audit — runs on every push to main
+# Checks: worklog.md not deleted, CODEOWNERS intact, no protected file removed
+# This is a SOFTWARE guardrail (not GitHub API branch protection, which
+# requires GitHub Pro for private repos). It alerts but doesn't block.
+# ============================================================
+name: Guardrail Audit
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need full history for diff
+
+      - name: Verify protected files exist
+        run: |
+          echo "🔍 Checking protected files..."
+          for file in \
+            "worklog.md" \
+            ".github/CODEOWNERS" \
+            ".github/CONTRIBUTING.md" \
+            ".github/workflows/deploy-pages.yml" \
+            ".github/workflows/sync-to-public.yml" \
+            "next.config.ts" \
+            "package.json" \
+            "src/app/_lib/router.ts" \
+            "src/app/_components/app-shell.tsx"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ MISSING: $file"
+              exit 1
+            else
+              echo "✅ Present: $file"
+            fi
+          done
+
+      - name: Check worklog.md is append-only
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check if worklog.md has lines removed (not just appended)
+          BASE="origin/${{ github.event.pull_request.base.ref }}"
+          git fetch origin "$BASE"
+          LINES_REMOVED=$(git diff "$BASE" --numstat -- worklog.md | awk '{print $2}')
+          if [ -n "$LINES_REMOVED" ] && [ "$LINES_REMOVED" -gt 0 ]; then
+            echo "⚠️  WARNING: worklog.md has $LINES_REMOVED lines being REMOVED."
+            echo "   The worklog is append-only (multi-agent shared log)."
+            echo "   Review the diff carefully before merging."
+            # Don't fail — just warn. The pre-push hook is the hard block.
+          fi
+
+      - name: Verify backup branch exists
+        run: |
+          echo "🔍 Checking backup branch..."
+          if git ls-remote --heads origin backup/stable-pre-break | grep -q "backup/stable-pre-break"; then
+            echo "✅ Backup branch 'backup/stable-pre-break' exists"
+          else
+            echo "⚠️  WARNING: Backup branch 'backup/stable-pre-break' not found!"
+            echo "   This is the recovery snapshot. Recreate from tag 'stable-2024-09-25'."
+          fi
+
+      - name: Verify stable tag exists
+        run: |
+          echo "🔍 Checking stable tag..."
+          if git ls-remote --tags origin stable-2024-09-25 | grep -q "stable-2024-09-25"; then
+            echo "✅ Stable tag 'stable-2024-09-25' exists"
+          else
+            echo "⚠️  WARNING: Stable tag 'stable-2024-09-25' not found!"
+          fi
+
+      - name: Summary
+        run: |
+          echo "============================================"
+          echo "Guardrail audit complete."
+          echo ""
+          echo "Recovery resources:"
+          echo "  - Backup branch: backup/stable-pre-break"
+          echo "  - Stable tag:    stable-2024-09-25"
+          echo "  - CODEOWNERS:    .github/CODEOWNERS"
+          echo "  - Pre-push hook: scripts/pre-push-guardrail.sh"
+          echo ""
+          echo "Recovery: git reset --hard backup/stable-pre-break"
+          echo "============================================"

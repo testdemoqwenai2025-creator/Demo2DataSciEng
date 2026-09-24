@@ -1,0 +1,32 @@
+# ============================================================
+# CODEOWNERS — protect critical files from unreviewed changes
+# Format: <path pattern> <owner>
+# ============================================================
+
+# Default: all files require review from the repository owner
+*                           @testdemoqwenai2025-creator
+
+# Critical infrastructure — never modify without explicit review
+/.github/                   @testdemoqwenai2025-creator
+/.github/workflows/         @testdemoqwenai2025-creator
+/next.config.ts             @testdemoqwenai2025-creator
+/package.json               @testdemoqwenai2025-creator
+/bun.lock                   @testdemoqwenai2025-creator
+/tsconfig.json              @testdemoqwenai2025-creator
+/eslint.config.mjs          @testdemoqwenai2025-creator
+
+# Router + navigation — protect the page registry
+/src/app/_lib/router.ts     @testdemoqwenai2025-creator
+/src/app/_components/app-shell.tsx  @testdemoqwenai2025-creator
+
+# Worklog — the shared multi-agent work log, never delete
+/worklog.md                 @testdemoqwenai2025-creator
+
+# Deploy scripts — protect CI/CD pipeline
+/scripts/                   @testdemoqwenai2025-creator
+
+# Architecture decisions
+/AGENTIC_WORKFLOW.md        @testdemoqwenai2025-creator
+/ARCHITECTURE.md            @testdemoqwenai2025-creator
+/SKILLS.md                  @testdemoqwenai2025-creator
+/FUTURE_TECH.md             @testdemoqwenai2025-creator
