@@ -173,8 +173,13 @@ async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arx
 
 async function fetchGitHub(topic: string, language = ""): Promise<NonNullable<ResourcesData["github"]>> {
   try {
+    // GitHub search doesn't return good results for long multi-word queries
+    // like "quantum computing VQE QAOA Grover QFT Qiskit superposition...".
+    // Take just the first 2-3 keywords of the topic for the search query,
+    // and lower the stars filter to >50 (so we still get popular repos).
+    const shortTopic = topic.split(" ").slice(0, 3).join(" ");
     const langQ = language ? `+language:${language}` : "";
-    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(topic)}${langQ}+stars:>10&sort=stars&order=desc&per_page=5`;
+    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(shortTopic)}${langQ}+stars:>50&sort=stars&order=desc&per_page=5`;
     const data = (await fetchJsonWithCorsFallback(url, 15000)) as { items?: Array<Record<string, unknown>> };
     const repos: GitHubRepo[] = (data.items || []).map((repo) => ({
       name: String(repo.full_name ?? repo.name ?? "?"),
