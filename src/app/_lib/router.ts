@@ -61,13 +61,14 @@ export type PageId =
   | "alphamissense"
   | "alphaproteo"
   | "boltz"
-  | "ai-drug-discovery";
+  | "ai-drug-discovery"
+  | "spatial-multiomics";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics";
   icon: string;
   description: string;
 }
@@ -512,6 +513,14 @@ export const PAGES: PageMeta[] = [
     group: "AI Drug Discovery",
     icon: "FlaskConical",
     description: "AI-generated illustrations + generative chemistry short, Insilico Chemistry42 VAE + Recursion phenomics + ADMET multi-task regression + clinical pipeline (ISM042-2-048 Phase II), low-level PyTorch MoleculeVAE+PhenomicsEncoder+ADMETPredictor+AIDrugDiscoveryPipeline.",
+  },
+  {
+    id: "spatial-multiomics",
+    label: "Spatial Multi-omics — DBiT-seq, spatial-CUT&Tag, Cross-attention STAGATE",
+    shortLabel: "Spatial Multi-omics",
+    group: "Spatial Multi-omics",
+    icon: "Grid",
+    description: "AI-generated illustrations + multi-modal spatial short, DBiT-seq microfluidic barcoding + spatial-CUT&Tag histone marks + Spatial ATAC-RNA + MultiModalSTAGATE cross-attention + SpatialWNN, low-level PyTorch MultiModalGraphConvolution+MultiModalSTAGATE+SpatialWNN.",
   },
 ];
 

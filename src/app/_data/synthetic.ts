@@ -1088,6 +1088,26 @@ export const ADRS: ADR[] = [
     ],
     tags: ["ai-drug-discovery", "insilico-medicine", "recursion", "chemistry42", "phenomics", "generative-chemistry", "vae", "admet", "clinical-candidate", "patterns", "genai"],
   },
+  {
+    id: "ADR-047",
+    title: "Adopt DBiT-seq + spatial-CUT&Tag for spatial multi-omics — chromatin + RNA + protein co-profiling",
+    status: "accepted",
+    date: "FY32-Q4",
+    deciders: "Data Platform, Epigenomics, Bioinformatics, Architecture",
+    context:
+      "ADR-041 covered spatial transcriptomics (Visium/MERFISH — RNA only with spatial coords). ADR-042 covered single-cell multi-omics (RNA + ATAC + protein, dissociated). Spatial multi-omics is the integration: measure RNA + chromatin + protein in the same tissue section, preserving spatial context. Three platforms: (1) DBiT-seq (Liu 2020, Nature Biotechnology) — microfluidic chip deposits barcodes in two perpendicular passes, captures RNA + protein per 50μm pixel. (2) spatial-CUT&Tag (Tian 2023, Nature Methods) — antibody-based CUT&Tag on tissue sections, spatial resolution of histone marks (H3K4me3 active promoters, H3K27me3 repressed chromatin). (3) Spatial ATAC-RNA-seq (Zhang 2023, Nature Biotechnology) — Tn5 transposase + RNA capture on same tissue. The math: multi-modal spatial integration extends STAGATE (ADR-041) to joint embedding of RNA + chromatin + protein — same graph attention, but with modality-specific encoders + cross-attention. The spatial chromatin marks reveal which genes are 'primed' (H3K4me3) vs 'silenced' (H3K27me3) at each position — regulatory layer invisible to RNA-only methods.",
+    decision:
+      "Adopt a three-modality spatial multi-omics stack: (1) DBiT-seq for RNA + protein co-profiling (microfluidic barcoding, 50μm pixels). (2) spatial-CUT&Tag for chromatin marks (H3K4me3, H3K27me3, H3K27ac — antibody-based, sub-cellular). (3) Spatial ATAC-RNA-seq for open chromatin + RNA on same tissue. Integration: extend STAGATE (ADR-041) to multi-modal graph attention autoencoder with cross-attention between modalities. Connects to ADR-041 spatial transcriptomics (RNA modality is shared), ADR-042 single-cell multi-omics (WNN integration pattern extends to spatial), ADR-039 systems biology (spatial chromatin adds regulatory layer to FBA + PPI). Production: process on Spark — spatial multi-omics produces 3 matrices (RNA + chromatin + protein) per tissue, each N_pixels × N_features = 10^9 entries per tissue.",
+    consequences:
+      "+ Measures RNA + chromatin + protein in same tissue — regulatory + expression + functional layers simultaneously. + spatial-CUT&Tag reveals gene regulatory state (primed vs repressed) at each spatial position. + Extends STAGATE multi-modal — cross-attention captures inter-modality dependencies. + Connects to ADR-042 single-cell multi-omics (WNN pattern). − DBiT-seq spatial resolution (50μm) is coarse vs MERFISH (200nm). − spatial-CUT&Tag antibody panel is limited (~10 marks per tissue). − Spatial ATAC-RNA-seq is technically challenging — 30% lower quality than dissociated. − Multi-modal integration is harder than single-modality — cross-attention adds O(N²) per layer.",
+    alternatives: [
+      "10x Visium HD spatial (2024) — 2μm RNA only, no chromatin",
+      "MERFISH + antibody imaging (sequential) — multi-modal but no true co-profiling",
+      "Stereo-seq + CUT&Tag (parallel sections) — loses spatial co-registration",
+      "Slide-tags (Russell 2023) — single-cell spatial ATAC, no RNA",
+    ],
+    tags: ["spatial-multi-omics", "dbit-seq", "spatial-cut-tag", "chromatin", "spatial-atac-rna", "cross-attention", "multi-modal-graph", "patterns", "genai"],
+  },
 ];
 
 // ============================================================
