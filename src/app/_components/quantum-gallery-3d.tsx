@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -242,27 +242,72 @@ function QuantumCircuit3D({ dim = 3 }: { dim?: number }) {
 function BlochSphere3D({ dim = 3 }: { dim?: number }) {
   const [phi, setPhi] = useState(0);
   const [theta, setTheta] = useState(Math.PI / 2);
+  const [dragging, setDragging] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  // Auto-rotate ONLY when not dragging (keeps the gallery thumbnail alive)
   useEffect(() => {
+    if (dragging) return;
     const id = setInterval(() => {
-      setPhi(p => (p + 0.04) % (2 * Math.PI));
-      setTheta(t => Math.PI / 2 + 0.3 * Math.sin(Date.now() / 1500));
-    }, 50);
+      setPhi(p => (p + 0.025) % (2 * Math.PI));
+      setTheta(t => Math.PI / 2 + 0.25 * Math.sin(Date.now() / 1800));
+    }, 60);
     return () => clearInterval(id);
-  }, []);
-  // For n-D toggle: dim=3 → 1 qubit Bloch (S²), dim=4 → 2 qubits (Bloch + pair), dim=5 → 3 qubits (chain), dim=N → N qubits (cluster)
+  }, [dragging]);
+
+  // Pointer handlers — mouse-down on the sphere starts drag mode, pointer-move
+  // updates (theta, phi) via inverse orthographic projection of the unit sphere.
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setDragging(true);
+    handlePointerMove(e);
+  };
+  const handlePointerUp = () => setDragging(false);
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragging || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const sx = ((e.clientX - rect.left) / rect.width) * 360;
+    const sy = ((e.clientY - rect.top) / rect.height) * 320;
+    const R = 90, cx = 180, cy = 160;
+    const dx = sx - cx;
+    const dy = sy - cy;
+    const rho = Math.sqrt(dx * dx + dy * dy) / R;
+    const r = Math.min(rho, 1);
+    const newTheta = r >= 1 ? Math.PI / 2 : Math.acos(1 - r * r);
+    const safeTheta = rho > 1.05 ? Math.PI / 2 : newTheta;
+    const newPhi = Math.atan2(dy, dx);
+    setTheta(safeTheta);
+    setPhi(newPhi);
+  };
+
+  // n-D toggle: dim=3 -> 1 qubit Bloch (S^2), dim=4 -> 2 qubits, dim=5 -> 3, dim=N -> 6
   const extraSpheres = dim === 3 ? 0 : dim === 4 ? 1 : dim === 5 ? 2 : 4;
-  // Bloch sphere isometric projection
   const R = 90;
   const cx = 180, cy = 160;
-  // vector endpoint (theta, phi) → (x, y, z)
+  // Live state vector components for the equation overlay
+  const alpha = Math.cos(theta / 2);
+  const betaRe = Math.sin(theta / 2) * Math.cos(phi);
+  const betaIm = Math.sin(theta / 2) * Math.sin(phi);
+  const p0 = alpha * alpha;
+  const p1 = 1 - p0;
+  // vector endpoint -> 3D -> isometric 2D
   const x = R * Math.sin(theta) * Math.cos(phi);
   const y = R * Math.sin(theta) * Math.sin(phi);
   const z = R * Math.cos(theta);
-  // isometric projection (rotate -X then Y)
   const px = cx + 0.9 * x - 0.4 * y;
   const py = cy - z + 0.2 * (x + y);
   return (
-    <svg viewBox="0 0 360 320" width="100%" height="100%">
+    <svg
+      ref={svgRef}
+      viewBox="0 0 360 320"
+      width="100%"
+      height="100%"
+      className={dragging ? "cursor-grabbing select-none" : "cursor-grab select-none"}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onPointerMove={handlePointerMove}
+      style={{ touchAction: "none" }}
+    >
       <defs>
         <radialGradient id="sphere-grad" cx="35%" cy="35%" r="65%">
           <stop offset="0%" stopColor="oklch(0.90 0.10 250 / 0.35)" />
@@ -274,26 +319,22 @@ function BlochSphere3D({ dim = 3 }: { dim?: number }) {
           <stop offset="100%" stopColor="oklch(0.50 0.18 25 / 0.0)" />
         </radialGradient>
       </defs>
-      {/* main Bloch sphere */}
       <ellipse cx={cx} cy={cy} rx={R} ry={R * 0.3} fill="none" stroke="oklch(0.55 0.10 250 / 0.5)" strokeDasharray="2 2" strokeWidth="0.6" />
       <ellipse cx={cx} cy={cy} rx={R * 0.3} ry={R} fill="none" stroke="oklch(0.55 0.10 250 / 0.5)" strokeDasharray="2 2" strokeWidth="0.6" />
       <circle cx={cx} cy={cy} r={R} fill="url(#sphere-grad)" stroke="oklch(0.65 0.15 250 / 0.7)" strokeWidth="1" />
-      {/* axes */}
       <line x1={cx} y1={cy - R} x2={cx} y2={cy + R} stroke="oklch(0.55 0.10 250)" strokeWidth="0.8" />
       <text x={cx} y={cy - R - 4} textAnchor="middle" fontSize="9" fill="oklch(0.65 0.10 250)">|0⟩</text>
       <text x={cx} y={cy + R + 12} textAnchor="middle" fontSize="9" fill="oklch(0.65 0.10 250)">|1⟩</text>
       <line x1={cx - R} y1={cy} x2={cx + R} y2={cy} stroke="oklch(0.55 0.10 250 / 0.5)" strokeWidth="0.6" strokeDasharray="2 2" />
-      {/* state vector */}
       <motion.line
         x1={cx} y1={cy} x2={px} y2={py}
-        stroke="oklch(0.75 0.20 25)" strokeWidth="2"
+        stroke="oklch(0.75 0.20 25)" strokeWidth="2.5"
         animate={{ x2: px, y2: py }}
         transition={{ duration: 0.05, ease: "linear" }}
       />
       <motion.circle cx={px} cy={py} r="4" fill="url(#vec-grad)"
         animate={{ cx: px, cy: py }} transition={{ duration: 0.05, ease: "linear" }} />
-      <text x={px + 8} y={py - 4} fontSize="9" fill="oklch(0.75 0.20 25)" fontWeight="bold">|ψ⟩</text>
-      {/* extra spheres for n-D toggle (smaller, positioned around main) */}
+      <text x={px + 8} y={py - 4} fontSize="9" fill="oklch(0.85 0.20 25)" fontWeight="bold">|ψ⟩</text>
       {Array.from({ length: extraSpheres }).map((_, i) => {
         const angle = (i / extraSpheres) * 2 * Math.PI;
         const ex = cx + 130 * Math.cos(angle);
@@ -318,13 +359,24 @@ function BlochSphere3D({ dim = 3 }: { dim?: number }) {
           </g>
         );
       })}
-      <text x="180" y="305" textAnchor="middle" fontSize="9" fill="oklch(0.65 0.10 250)">
-        {1 + extraSpheres}-qubit state · θ={Math.round(theta * 180 / Math.PI)}°, φ={Math.round(phi * 180 / Math.PI)}°
+      {/* Live equation overlay - only visible while dragging */}
+      {dragging && (
+        <g>
+          <rect x="10" y="280" width="340" height="35" fill="oklch(0.15 0.05 250 / 0.85)" rx="4" />
+          <text x="180" y="295" textAnchor="middle" fontSize="10" fill="oklch(0.85 0.18 25)" fontWeight="bold" fontFamily="monospace">
+            |ψ⟩ = {alpha.toFixed(3)}|0⟩ + ({betaRe.toFixed(3)}{betaIm >= 0 ? "+" : ""}{betaIm.toFixed(3)}i)|1⟩
+          </text>
+          <text x="180" y="308" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.10 250)" fontFamily="monospace">
+            |α|²={p0.toFixed(3)}  |β|²={p1.toFixed(3)}  ·  θ={Math.round(theta * 180 / Math.PI)}° φ={Math.round(phi * 180 / Math.PI)}°
+          </text>
+        </g>
+      )}
+      <text x="180" y="318" textAnchor="middle" fontSize="8" fill="oklch(0.65 0.10 250)">
+        {dragging ? "← drag the sphere to set |ψ⟩ →" : "click + drag the sphere (auto-rotating when idle)"}
       </text>
     </svg>
   );
 }
-
 // ============================================================
 // Concept 3: Entanglement (Bell pair with linked rotation)
 // ============================================================

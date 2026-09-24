@@ -186,6 +186,39 @@ function DraggableBlochSphere() {
     return () => clearInterval(id);
   }, []);
 
+  // Keyboard shortcuts — rotate the Bloch vector with arrow keys.
+  // Active only when the modal is open AND the user is not currently
+  // dragging with the mouse. The listener is attached to window so it
+  // works regardless of where focus is inside the modal.
+  // Deps [theta, phi, alpha, betaRe, betaIm] so the handler always
+  // sees the LATEST state (no stale-closure bug when applying gates).
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+      const step = 0.08;  // ~5° per key press
+      let handled = true;
+      switch (e.key) {
+        case "ArrowUp":    setTheta(t => Math.max(0.05, t - step)); break;
+        case "ArrowDown":  setTheta(t => Math.min(Math.PI - 0.05, t + step)); break;
+        case "ArrowLeft":  setPhi(p => (p - step + 2 * Math.PI) % (2 * Math.PI)); break;
+        case "ArrowRight": setPhi(p => (p + step) % (2 * Math.PI)); break;
+        case "h": case "H": applyGate("H"); break;
+        case "x": case "X": applyGate("X"); break;
+        case "y": case "Y": applyGate("Y"); break;
+        case "z": case "Z": applyGate("Z"); break;
+        case "m": case "M": measure(); break;
+        case "r": case "R": reset(); break;
+        default: handled = false;
+      }
+      if (handled) e.preventDefault();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theta, phi, alpha, betaRe, betaIm]);
+
   const handleMouseDown = (e: React.MouseEvent) => {
     dragging.current = true;
     handleMouseMove(e);
@@ -292,6 +325,9 @@ function DraggableBlochSphere() {
             <text x={px + 8} y={py - 4} fontSize="11" fill="oklch(0.85 0.20 25)" fontWeight="bold">|ψ⟩</text>
             <text x="180" y="305" textAnchor="middle" fontSize="9" fill="oklch(0.65 0.10 250)">
               drag the sphere to rotate |ψ⟩  ·  θ={formatAngle(theta)}, φ={formatAngle(phi)}
+            </text>
+            <text x="180" y="316" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.10 250 / 0.7)">
+              or use arrow keys (←↑↓→) · H/X/Y/Z apply gates · M = measure · R = reset
             </text>
           </svg>
         </div>

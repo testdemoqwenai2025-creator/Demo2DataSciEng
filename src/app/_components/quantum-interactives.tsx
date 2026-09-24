@@ -16,6 +16,7 @@ import {
   QiskitCircuit,
   HeliosConnectivity,
   ShorResources,
+  ShorAlgorithmN15,
 } from "./quantum-interactives-part2";
 
 /**
@@ -121,6 +122,16 @@ const CARDS: InteractiveCard[] = [
     icon: <Atom className="h-4 w-4" />,
     thumb: <ShorThumb />,
     content: <ShorResources />,
+  },
+  {
+    id: "shor-n15",
+    step: "9",
+    title: "Shor's algorithm (N=15)",
+    subtitle: "actual simulator — Hadamard → a^x mod N → QFT → factors",
+    accent: "oklch(0.55 0.16 30)",
+    icon: <Cpu className="h-4 w-4" />,
+    thumb: <ShorN15Thumb />,
+    content: <ShorAlgorithmN15 />,
   },
 ];
 
@@ -338,6 +349,41 @@ function ShorThumb() {
       <motion.rect x="78" y="25" width="10" height="90" fill="oklch(0.65 0.16 250)" rx="1" />
       <line x1="10" y1="108" x2="90" y2="108" stroke="oklch(0.75 0.20 0)" strokeWidth="0.5" strokeDasharray="2 1" />
       <text x="50" y="135" textAnchor="middle" fontSize="6" fill="oklch(0.65 0.10 250)">RSA key size (log scale)</text>
+    </svg>
+  );
+}
+
+function ShorN15Thumb() {
+  // Two-qubit rails + Hadamard + modular-exp box + QFT + measure
+  return (
+    <svg viewBox="0 0 100 140" className="w-full h-full">
+      {/* Register 1 rail */}
+      <line x1="10" y1="40" x2="90" y2="40" stroke="oklch(0.55 0.10 250)" strokeWidth="0.5" />
+      <text x="6" y="42" fontSize="5" fill="oklch(0.55 0.10 250)">reg1</text>
+      {/* Register 2 rail */}
+      <line x1="10" y1="80" x2="90" y2="80" stroke="oklch(0.55 0.10 250)" strokeWidth="0.5" />
+      <text x="6" y="82" fontSize="5" fill="oklch(0.55 0.10 250)">reg2</text>
+      {/* H gate */}
+      <motion.rect x="18" y="35" width="10" height="10" fill="oklch(0.65 0.16 30)" rx="1"
+        animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }} />
+      <text x="23" y="42" textAnchor="middle" fontSize="6" fill="white" fontWeight="bold">H</text>
+      {/* Modular exp box */}
+      <motion.rect x="38" y="35" width="20" height="50" fill="oklch(0.65 0.16 165 / 0.4)" stroke="oklch(0.65 0.16 165)" strokeWidth="0.5" rx="1"
+        animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity, delay: 0.5 }} />
+      <text x="48" y="62" textAnchor="middle" fontSize="6" fill="oklch(0.95 0.10 165)" fontWeight="bold">a^x</text>
+      <text x="48" y="68" textAnchor="middle" fontSize="5" fill="oklch(0.95 0.10 165)">mod N</text>
+      {/* QFT */}
+      <motion.rect x="68" y="35" width="14" height="10" fill="oklch(0.65 0.16 250)" rx="1"
+        animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+      <text x="75" y="42" textAnchor="middle" fontSize="6" fill="white" fontWeight="bold">QFT</text>
+      {/* Measure */}
+      <rect x="84" y="35" width="8" height="10" fill="oklch(0.65 0.16 0)" rx="1" />
+      <text x="88" y="42" textAnchor="middle" fontSize="5" fill="white" fontWeight="bold">M</text>
+      {/* Output: factors */}
+      <text x="50" y="100" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)" fontWeight="bold">N=15</text>
+      <motion.text x="50" y="115" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.20 25)" fontWeight="bold"
+        animate={{ opacity: [0, 1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}>3 × 5</motion.text>
+      <text x="50" y="135" textAnchor="middle" fontSize="6" fill="oklch(0.55 0.10 250)">Shor factoring</text>
     </svg>
   );
 }

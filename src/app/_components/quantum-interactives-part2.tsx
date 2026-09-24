@@ -556,10 +556,235 @@ function ShorResources() {
     </div>
   );
 }
+function ShorAlgorithmN15() {
+  // Demo parameters: N=15, try several a values
+  const N = 15;
+  const candidates = [2, 7, 11, 13]; // all coprime to 15
+  const [a, setA] = useState(7);
+  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4>(0);
+  // Phase 0: classical pre-processing
+  // Phase 1: Hadamard on register 1 (superposition of all x)
+  // Phase 2: a^x mod N (entanglement between registers)
+  // Phase 3: QFT (interference → peaks at multiples of 2^k/r)
+  // Phase 4: measurement + classical post-processing (extract r, find factors)
+  const [measurements, setMeasurements] = useState<{ x: number; count: number }[]>([]);
+
+  function gcd(a: number, b: number): number {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b > 0) { [a, b] = [b, a % b]; }
+    return a;
+  }
+
+  // Period of a mod N (the value Shor's algorithm extracts via QFT)
+  // For a=7, N=15: 7^1=7, 7^2=49≡4, 7^3=28≡13, 7^4=91≡1 → r=4
+  // For a=2, N=15: 2,4,8,1 → r=4
+  // For a=11, N=15: 11,1 → r=2 (a^2 = 121 ≡ 1 mod 15)
+  // For a=13, N=15: 13,4,7,1 → r=4
+  const findPeriod = (a: number, N: number) => {
+    let r = 1;
+    let cur = a % N;
+    while (cur !== 1 && r < 100) {
+      cur = (cur * a) % N;
+      r++;
+    }
+    return r;
+  };
+  const r = findPeriod(a, N);
+
+  // Factor extraction (only works if r is even and a^(r/2) ≠ -1 mod N)
+  const factor1 = r % 2 === 0 ? gcd(Math.pow(a, r / 2) - 1, N) : null;
+  const factor2 = r % 2 === 0 ? gcd(Math.pow(a, r / 2) + 1, N) : null;
+
+  // For demo, generate 1000 simulated QFT measurements
+  // After QFT, register 1 measurements cluster at multiples of 2^n/r = 256/4 = 64
+  // So peaks at 0, 64, 128, 192 (for r=4)
+  const runQuantum = () => {
+    setPhase(0);
+    setMeasurements([]);
+    setTimeout(() => setPhase(1), 500);
+    setTimeout(() => setPhase(2), 1000);
+    setTimeout(() => setPhase(3), 1500);
+    setTimeout(() => {
+      setPhase(4);
+      // Simulated QFT measurements — peaks at multiples of 256/r
+      const Q = 256; // 2^8 — 8 qubits in register 1
+      const peakSpacing = Q / r;
+      const counts: { [k: number]: number } = {};
+      for (let i = 0; i < 1000; i++) {
+        // Sample from one of the peaks with Gaussian noise
+        const peakIdx = Math.floor(Math.random() * r);
+        const noise = Math.round((Math.random() - 0.5) * 4);
+        const k = (peakIdx * peakSpacing + noise + Q) % Q;
+        counts[k] = (counts[k] || 0) + 1;
+      }
+      const sorted = Object.entries(counts)
+        .map(([k, c]) => ({ x: parseInt(k), count: c }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+      setMeasurements(sorted);
+    }, 2000);
+  };
+
+  const reset = () => {
+    setPhase(0);
+    setMeasurements([]);
+  };
+
+  // Classical demonstration: a^x mod N for x = 0..7
+  const powers = Array.from({ length: 8 }, (_, x) => ({
+    x,
+    val: Math.pow(a, x) % N,
+  }));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Quantum circuit visualisation */}
+        <div className="rounded-md border border-border/60 bg-card p-3">
+          <svg viewBox="0 0 360 280" className="w-full h-auto">
+            {/* Register 1 (8 qubits, but show as 2 grouped for clarity) */}
+            <text x="10" y="40" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">reg 1:</text>
+            <text x="10" y="50" fontSize="7" fill="oklch(0.55 0.10 250)">8 qubits (x)</text>
+            <line x1="50" y1="38" x2="340" y2="38" stroke="oklch(0.55 0.10 250)" strokeWidth="1" />
+            {/* Register 2 (4 qubits for N=15) */}
+            <text x="10" y="140" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">reg 2:</text>
+            <text x="10" y="150" fontSize="7" fill="oklch(0.55 0.10 250)">4 qubits (a^x mod N)</text>
+            <line x1="50" y1="138" x2="340" y2="138" stroke="oklch(0.55 0.10 250)" strokeWidth="1" />
+
+            {/* Phase 1: Hadamards on reg 1 */}
+            <motion.g animate={{ opacity: phase >= 1 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="80" y="28" width="30" height="20" fill={phase === 1 ? "oklch(0.75 0.20 30)" : "oklch(0.55 0.16 30 / 0.5)"} rx="2" />
+              <text x="95" y="42" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">H⊗8</text>
+              <text x="95" y="22" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)">superposition</text>
+            </motion.g>
+
+            {/* Phase 2: a^x mod N (controlled modular exponentiation) */}
+            <motion.g animate={{ opacity: phase >= 2 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="140" y="28" width="50" height="120" fill={phase === 2 ? "oklch(0.75 0.20 165 / 0.4)" : "oklch(0.55 0.16 165 / 0.2)"} stroke={phase === 2 ? "oklch(0.85 0.20 165)" : "oklch(0.65 0.16 165 / 0.5)"} strokeWidth="1.5" rx="3" />
+              <text x="165" y="80" textAnchor="middle" fontSize="9" fill="oklch(0.95 0.10 165)" fontWeight="bold">a^x</text>
+              <text x="165" y="92" textAnchor="middle" fontSize="9" fill="oklch(0.95 0.10 165)" fontWeight="bold">mod N</text>
+              <text x="165" y="22" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)">modular exp</text>
+            </motion.g>
+
+            {/* Phase 3: QFT on reg 1 */}
+            <motion.g animate={{ opacity: phase >= 3 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="220" y="28" width="50" height="20" fill={phase === 3 ? "oklch(0.75 0.20 250)" : "oklch(0.55 0.16 250 / 0.5)"} rx="2" />
+              <text x="245" y="42" textAnchor="middle" fontSize="9" fill="white" fontWeight="bold">QFT</text>
+              <text x="245" y="22" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)">interference</text>
+            </motion.g>
+
+            {/* Phase 4: Measurement on reg 1 */}
+            <motion.g animate={{ opacity: phase >= 4 ? 1 : 0.3 }} transition={{ duration: 0.3 }}>
+              <rect x="290" y="28" width="30" height="20" fill={phase === 4 ? "oklch(0.75 0.20 0)" : "oklch(0.55 0.16 0 / 0.5)"} rx="2" />
+              <text x="305" y="42" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">M</text>
+              <text x="305" y="22" textAnchor="middle" fontSize="7" fill="oklch(0.65 0.10 250)">measure</text>
+            </motion.g>
+
+            {/* Phase indicator */}
+            <text x="180" y="200" textAnchor="middle" fontSize="10" fill="oklch(0.65 0.10 250)" fontWeight="bold">
+              Phase {phase}: {phase === 0 ? "idle" : phase === 1 ? "Hadamard → superposition" : phase === 2 ? "a^x mod N (entanglement)" : phase === 3 ? "QFT (interference)" : "measure → extract r"}
+            </text>
+            <text x="180" y="215" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.10 250)">
+              N = {N} · a = {a} · period r = {r}
+            </text>
+            <text x="180" y="228" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.10 250)">
+              a^(x) mod {N} for x=0..7: {powers.map(p => p.val).join(", ")}
+            </text>
+            <text x="180" y="245" textAnchor="middle" fontSize="8" fill="oklch(0.55 0.10 250)">
+              QFT peaks at: x = 0, {Math.floor(256 / r)}, {Math.floor(2 * 256 / r)}, {Math.floor(3 * 256 / r)} (= 256/r × k)
+            </text>
+            <text x="180" y="265" textAnchor="middle" fontSize="9" fill="oklch(0.75 0.20 25)" fontWeight="bold">
+              factors = gcd({a}^{r / 2} - 1, {N}) × gcd({a}^{r / 2} + 1, {N}) = {factor1} × {factor2}
+            </text>
+          </svg>
+        </div>
+
+        {/* Controls + measurement histogram */}
+        <div className="space-y-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Choose base a (coprime to N={N})</p>
+            <div className="grid grid-cols-4 gap-2">
+              {candidates.map(c => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => { setA(c); reset(); }}
+                  className={`h-10 rounded-md border font-mono font-bold text-sm transition-all ${
+                    a === c ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:border-primary hover:bg-accent"
+                  }`}
+                >{c}</button>
+              ))}
+            </div>
+          </div>
+          <Button size="sm" variant="default" onClick={runQuantum} disabled={phase > 0 && phase < 4} className="w-full gap-1.5">
+            <Play className="h-3.5 w-3.5" /> Run Shor&apos;s algorithm
+          </Button>
+          <Button size="sm" variant="outline" onClick={reset} className="w-full gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" /> Reset
+          </Button>
+
+          {measurements.length > 0 && (
+            <div className="rounded-md border border-border/60 bg-card p-3">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Top 8 QFT measurement outcomes (1000 shots)</p>
+              <div className="space-y-1.5">
+                {measurements.map(m => {
+                  const peakSpacing = 256 / r;
+                  const modVal = m.x % peakSpacing;
+                  const nearPeak = modVal < 3 || modVal > peakSpacing - 3;
+                  return (
+                    <div key={m.x} className="flex items-center gap-2">
+                      <span className="font-mono text-[11px] w-12">{m.x}</span>
+                      <div className="flex-1 h-4 rounded bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(100, (m.count / 1000) * 100 * 4)}%` }}
+                          transition={{ duration: 0.3 }}
+                          className="h-full"
+                          style={{ backgroundColor: nearPeak ? "oklch(0.75 0.20 165)" : "oklch(0.55 0.16 250)" }}
+                        />
+                      </div>
+                      <span className="font-mono text-[10px] w-10 text-right">{m.count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2">
+                Peaks cluster at multiples of 256/r = {Math.floor(256/r)} — these encode r = {r} via continued fractions on s/256.
+              </p>
+            </div>
+          )}
+
+          {phase === 4 && factor1 && factor2 && (
+            <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-3 text-xs">
+              <p className="text-emerald-700 dark:text-emerald-300 font-semibold mb-1.5">✓ Factors extracted!</p>
+              <p className="font-mono text-sm">N = {N} = {factor1} × {factor2}</p>
+              <p className="text-muted-foreground mt-1.5">
+                gcd({a}^{r / 2} - 1, {N}) = {factor1}  ·  gcd({a}^{r / 2} + 1, {N}) = {factor2}
+              </p>
+              {factor1 * factor2 === N ? (
+                <p className="text-emerald-700 dark:text-emerald-300 mt-1">✓ Verification: {factor1} × {factor2} = {factor1 * factor2} = N ✓</p>
+              ) : (
+                <p className="text-amber-700 dark:text-amber-300 mt-1">Note: r = {r} {r % 2 !== 0 ? "is ODD" : "doesn't yield factors for this a"} — try a different a</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <InfoCallout
+        intent="Pick a base a coprime to N=15 (try 2, 7, 11, or 13) → click 'Run Shor's algorithm' to see the 4-phase quantum circuit animate: Hadamards create superposition, modular exponentiation entangles registers, QFT creates interference peaks at multiples of 2^n/r, measurement extracts the period r → classical gcd gives factors."
+        math="Shor(N, a): (1) H^⊗n on reg 1 → |x⟩/√(2^n)  (2) U_f|x⟩|0⟩ = |x⟩|a^x mod N⟩  (3) QFT|x⟩ → peaks at k·2^n/r  (4) measure → continued fractions → r  (5) gcd(a^(r/2)±1, N) → factors"
+        insight="This is the algorithm that breaks RSA. For N=15 (4 bits), it requires ~12 qubits (8 in reg 1 + 4 in reg 2). The same algorithm on RSA-2048 needs ~4000 logical qubits + ~394M physical qubits (see interactive #8). N=15 was the first number factored on a real quantum device (IBM, 2001 — using NMR)."
+      />
+    </div>
+  );
+}
+
+
 
 export {
   DecoherenceTimeline,
   QiskitCircuit,
   HeliosConnectivity,
   ShorResources,
+  ShorAlgorithmN15,
 };

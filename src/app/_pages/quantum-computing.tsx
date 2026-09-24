@@ -1692,10 +1692,10 @@ print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via s
       </SectionCard>
 
       <SectionCard
-        title="Quantum interactives — 8 fully interactive visuals (drag, slide, click to explore)"
-        description="Replaces the previous 'Improvement designs — 8 code previews' section. Each card opens a lazy popup with a fully interactive visualisation: drag the Bloch sphere, click qubits to inject errors, slide μ across the topological phase boundary, run 8192-shot sampling, etc. The math is computed live in the browser (no Pyodide round-trip) — instant feedback. Modal content only mounts when the card is clicked."
+        title="Quantum interactives — 9 fully interactive visuals (drag, slide, click to explore)"
+        description="Replaces the previous 'Improvement designs — 8 code previews' section. Each card opens a lazy popup with a fully interactive visualisation: drag the Bloch sphere (or use arrow keys H/X/Y/Z/M/R), click qubits to inject errors, slide μ across the topological phase boundary, run 8192-shot sampling, or run an actual Shor's algorithm simulator on N=15 → 3 × 5. The math is computed live in the browser (no Pyodide round-trip) — instant feedback. Modal content only mounts when the card is clicked."
         icon={<Sparkles className="h-5 w-5" />}
-        badge="8 interactives"
+        badge="9 interactives"
       >
         <QuantumInteractives />
       </SectionCard>
