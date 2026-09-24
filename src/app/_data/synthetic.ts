@@ -1188,6 +1188,66 @@ export const ADRS: ADR[] = [
     ],
     tags: ["generative-chemistry-2", "edm", "diffdock", "gflownet", "optimal-transport", "sinkhorn", "wasserstein", "3d-molecule-generation", "diffusion", "patterns", "genai"],
   },
+  {
+    id: "ADR-052",
+    title: "Adopt Qiskit + PyTorch quantum for hybrid quantum-classical ML — VQE, QAOA, quantum kernel methods",
+    status: "accepted",
+    date: "FY33-Q4",
+    deciders: "Data Platform, Quantum Computing, ML Engineering, Architecture",
+    context:
+      "ADR-049 covers SO(3) representation theory for classical ML. Quantum computing adds a fundamentally different computational paradigm: qubits exist in superposition |ψ⟩ = α|0⟩ + β|1⟩, entanglement creates correlations impossible classically (Bell states), and quantum gates are unitary matrices U ∈ U(2^n). The math: Schrödinger equation iℏ d|ψ⟩/dt = H|ψ⟩ governs quantum dynamics. VQE (Variational Quantum Eigensolver, Peruzzo 2014) finds molecular ground states via hybrid quantum-classical optimization: quantum circuit prepares trial state |ψ(θ)⟩, classical optimizer (COBYLA/SPSA) minimises ⟨ψ|H|ψ⟩. QAOA (Quantum Approximate Optimization Algorithm, Farhi 2014) solves combinatorial optimisation via p-layer quantum+classical alternation. Grover's algorithm gives quadratic speedup for unstructured search: O(√N) vs O(N). Quantum Fourier Transform (QFT) is exponentially faster than FFT: O(n log n) vs O(N log N) where N=2^n. Datasets: IBM Quantum (real quantum hardware, 127-qubit Eagle), Google Sycamore (53-qubit, quantum supremacy 2019), CERN Open Data (particle collision events for quantum ML).",
+    decision:
+      "Adopt Qiskit as the quantum computing SDK with PyTorch integration for hybrid quantum-classical ML. Three-layer stack: (1) Quantum simulation: Qiskit Aer (statevector + noise simulators) on GPU; (2) Hybrid algorithms: VQE for molecular ground states (connects to ADR-049 neural network potentials), QAOA for combinatorial optimisation (portfolio optimisation, graph problems); (3) Quantum ML: quantum kernel methods (quantum-enhanced SVM), quantum neural networks (parameterised quantum circuits as ML models). Datasets: IBM Quantum Experience for real hardware runs, CERN Open Data for particle physics quantum ML benchmarks. Connects to ADR-049 (VQE replaces DFT for ground state — same variational principle), ADR-036 (quantum MD simulation), ADR-027 (diffusion on quantum states).",
+    consequences:
+      "+ Quantum speedup for specific problems (Grover √N, QFT n log n). + VQE gives molecular ground states without full diagonalisation. + Quantum kernels capture correlations invisible to classical kernels. + Same variational principle as ADR-049 (minimise ⟨ψ|H|ψ⟩ = minimise loss). − Current hardware: 127 qubits (IBM Eagle), decoherence limits depth to ~100 gates. − Noise: NISQ (Noisy Intermediate-Scale Quantum) era — error correction not yet practical. − Quantum advantage demonstrated only for contrived problems (random circuit sampling). − Hybrid algorithms still need classical optimisation loop.",
+    alternatives: [
+      "PennyLane (Xanadu) — alternative quantum ML framework, similar capabilities",
+      "Cirq (Google) — quantum circuit framework, focused on Google hardware",
+      "Classical simulation only — no real quantum hardware, exponentially expensive O(2^n)",
+      "Annealing (D-Wave) — different paradigm, optimisation-focused, no universal gates",
+    ],
+    tags: ["quantum-computing", "vqe", "qaoa", "grover", "qft", "qiskit", "superposition", "entanglement", "bell-states", "quantum-ml", "patterns", "genai"],
+  },
+  {
+    id: "ADR-053",
+    title: "Adoint ML pipeline for space science — exoplanets, gravitational waves, LHC/CERN particle physics, JWST",
+    status: "accepted",
+    date: "FY34-Q1",
+    deciders: "Data Platform, Space Science, ML Engineering, Architecture",
+    context:
+      "ADR-049 covers SO(3) representation theory (spherical harmonics, Clebsch-Gordan). Space science is the ultimate application: orbital mechanics (Kepler's laws, N-body problem, Gauss's method for orbit determination), exoplanet detection (transit method — TESS/Kepler light curves, radial velocity — Doppler spectroscopy), gravitational waves (LIGO/Virgo — matched filtering, Bayesian parameter estimation), JWST imaging (infrared astronomy, spectroscopy), and LHC/CERN particle physics (jet classification, Higgs discovery, dark matter search). The math: Kepler's third law T² = (4π²/GM)a³, transit depth ΔF/F = (R_p/R_s)², radial velocity K = (2πG/P)^(1/3) · M_p sin(i) / (M_s+M_p)^(2/3) · 1/√(1-e²), gravitational wave strain h(t) = (4G/c⁴) · (d²I_ij/dt²) / r (quadrupole formula). LHC data: particle collision events (jets, leptons, MET), jet substructure (n-subjettiness, energy correlation functions), ML for jet classification (top vs QCD, signal vs background). Datasets: Kepler/K2 (300K light curves), TESS (200M+ light curves), Gaia (1.8 billion stars), LIGO/Virgo (90 gravitational wave events), CERN Open Data (1 PB collision data), JWST (Early Release Science).",
+    decision:
+      "Adopt a multi-domain space science ML stack: (1) Exoplanet detection: 1D CNN on transit light curves (TESS/Kepler) + Gaussian process detrending; (2) Gravitational wave detection: matched filtering (template bank) + deep learning (CNN on spectrograms); (3) LHC particle physics: Graph Neural Networks for jet classification ( jets as graphs of particles), transformer for event reconstruction; (4) JWST spectral analysis: autoencoder for galaxy classification. Datasets: NASA MAST Archive (Kepler/TESS), Gaia Archive, LIGO Open Data, CERN Open Data Portal. Connects to ADR-049 (SO(3) for orbital mechanics + particle scattering), ADR-029 (OpenTelemetry for pipeline tracing), ADR-022 (pgvector for similar-event search).",
+    consequences:
+      "+ Kepler/TESS: 5000+ confirmed exoplanets, ML finds candidates missed by classical methods. + LIGO: 90 GW events, ML reduces false alarm rate by 10×. + LHC: Higgs discovery (2012), ML improves signal/background by 30%. + JWST: earliest galaxies (z>13), ML for automated redshift. + Same math as ADR-049 (SO(3) for orbital mechanics, spherical harmonics for CMB). − Exoplanet ML has high false positive rate (10-20%) — needs human validation. − LIGO data volume: ~1 TB/day — needs real-time processing. − LHC data: 1 PB/year — needs distributed processing (Spark). − JWST: only ~100 targets in early release — limited training data.",
+    alternatives: [
+      "Classical methods only (transit fitting, template matching) — proven but misses complex signals",
+      "Commercial space data (Planet Labs, Maxar) — Earth observation, not astrophysics",
+      "Classical statistical methods (Bayesian inference) — principled but slow for large N",
+      "AstroML (VanderPlas 2014) — Python library for astro ML, good starting point",
+    ],
+    tags: ["space-science", "exoplanets", "gravitational-waves", "lhc", "cern", "jwst", "transit-method", "matched-filtering", "jet-classification", "kepler", "tess", "patterns", "genai"],
+  },
+  {
+    id: "ADR-054",
+    title: "Adopt Black-Scholes + Monte Carlo + GNN for quantitative finance — derivatives pricing, risk, fraud detection",
+    status: "accepted",
+    date: "FY34-Q2",
+    deciders: "Data Platform, Fintech, ML Engineering, Architecture",
+    context:
+      "ADR-019 covers the contextual bandit for recommendations. Fintech is the other major ML application domain for the platform. Three core problems: (1) Derivatives pricing — Black-Scholes formula C = S·N(d₁) - K·e^(-rT)·N(d₂) where d₁ = (ln(S/K)+(r+σ²/2)T)/(σ√T), d₂ = d₁ - σ√T. Monte Carlo simulation: simulate S_T = S₀·exp((r-σ²/2)T + σ√T·Z) for N paths, price = e^(-rT)·E[payoff]. Itô's lemma: df = (∂f/∂t + μ∂f/∂x + ½σ²∂²f/∂x²)dt + σ∂f/∂x·dW. (2) Risk metrics — Value at Risk (VaR): the quantile q_α such that P(L > VaR) = 1-α. Conditional VaR (CVaR/ES): E[L | L > VaR]. (3) Algorithmic trading + fraud detection — LSTM time series prediction, GNN for blockchain transaction graphs. Datasets: market data (OHLCV), Level 2 order book, blockchain transactions (Ethereum).",
+    decision:
+      "Adopt a three-pillar fintech stack: (1) Derivatives: Black-Scholes closed-form + Monte Carlo for path-dependent (Asian, barrier, lookback), GPU-accelerated (100M paths/sec on A100). (2) Risk: VaR via historical simulation + Monte Carlo, CVaR via Rockafellar-Uryasev formula. (3) ML: LSTM for price prediction, GNN for fraud detection on transaction graphs. Datasets: Yahoo Finance API (OHLCV), Binance API (crypto order book), Ethereum blockchain (on-chain analytics). Connects to ADR-019 (bandit for dynamic pricing), ADR-029 (OpenTelemetry for trade audit trail — MiFID II compliance), ADR-039 (PPI graph = transaction graph, same GNN architecture).",
+    consequences:
+      "+ Black-Scholes is O(1) — instant pricing for vanilla options. + Monte Carlo on GPU: 100M paths/sec — real-time exotic pricing. + GNN fraud detection: 95%+ precision on Ethereum transaction graphs. + Connects to ADR-019 (bandit for adaptive pricing). − Black-Scholes assumes constant volatility — fails for smile/skew (need Heston/SABR). − VaR is not subadditive (portfolio VaR > sum of individual VaRs) — use CVaR instead. − LSTM for price prediction: 52% accuracy (barely better than random) — markets are near-efficient. − Regulatory: MiFID II requires audit trail for every trade — OpenTelemetry integration essential.",
+    alternatives: [
+      "Heston model (stochastic volatility) — more accurate than Black-Scholes but 10× slower",
+      "Deep hedging (Buehler 2019) — neural network for hedging, no closed-form needed",
+      "Reinforcement learning for trading — explores action space but unstable in non-stationary markets",
+      "Classical statistical arbitrage (cointegration) — proven but low alpha in modern markets",
+    ],
+    tags: ["fintech", "black-scholes", "monte-carlo", "ito-lemma", "var", "cvar", "algorithmic-trading", "fraud-detection", "gnn", "lstm", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

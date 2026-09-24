@@ -66,13 +66,16 @@ export type PageId =
   | "coevolution-dca"
   | "neural-network-potentials"
   | "enhanced-sampling"
-  | "generative-chemistry-2";
+  | "generative-chemistry-2"
+  | "quantum-computing"
+  | "space-science"
+  | "fintech";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech";
   icon: string;
   description: string;
 }
@@ -557,6 +560,30 @@ export const PAGES: PageMeta[] = [
     group: "Generative Chemistry 2.0",
     icon: "FlaskConical",
     description: "AI illustrations + Sinkhorn short, EDM SE(3)-equivariant DDPM on R^(N×3) + DiffDock diffusion on SE(3) + GFlowNet trajectory balance + Sinkhorn optimal transport W_ε=min⟨T,C⟩+εH(T), low-level PyTorch SinkhornDistance+EDMDenoiser+GFlowNet.",
+  },
+  {
+    id: "quantum-computing",
+    label: "Quantum Computing — VQE, QAOA, Grover, Quantum ML",
+    shortLabel: "Quantum",
+    group: "Quantum Computing",
+    icon: "Atom",
+    description: "AI illustrations + circuit short, qubit superposition + Hadamard/CNOT/Pauli gates + Bell states + VQE variational principle + Grover O(√N) + QFT, low-level PyTorch QuantumGate+QuantumCircuit+VQE+GroverCircuit.",
+  },
+  {
+    id: "space-science",
+    label: "Space Science — Exoplanets, Gravitational Waves, LHC/CERN, JWST",
+    shortLabel: "Space Science",
+    group: "Space Science",
+    icon: "Network",
+    description: "AI illustrations + transit short, Kepler laws + transit method + GW strain + LHC jet substructure + JWST, low-level PyTorch TransitCNN+GravitationalWaveClassifier+JetGNN.",
+  },
+  {
+    id: "fintech",
+    label: "Fintech — Black-Scholes, Monte Carlo, VaR, Algorithmic Trading",
+    shortLabel: "Fintech",
+    group: "Fintech",
+    icon: "Activity",
+    description: "AI illustrations + pricing short, Black-Scholes formula + Ito lemma + Monte Carlo + VaR/CVaR + LSTM trading + GNN fraud, low-level PyTorch BlackScholesModel+MonteCarloPricer+LSTMPredictor+FraudGNN.",
   },
 ];
 

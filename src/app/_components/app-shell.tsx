@@ -70,6 +70,9 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "NN Potentials", ids: ["neural-network-potentials"] },
   { title: "Enhanced Sampling", ids: ["enhanced-sampling"] },
   { title: "Gen Chem 2.0", ids: ["generative-chemistry-2"] },
+  { title: "Quantum Computing", ids: ["quantum-computing"] },
+  { title: "Space Science", ids: ["space-science"] },
+  { title: "Fintech", ids: ["fintech"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

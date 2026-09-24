@@ -89,6 +89,9 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "neural-network-potentials": { topic: "neural network potential SchNet DimeNet GemNet NequIP MACE SO(3) representation theory Clebsch-Gordan spherical harmonics body-order QM9",      label: "NN Potentials",   codeRepo: "mir-group/pytorch_run/README.md" },
   "enhanced-sampling":          { topic: "enhanced sampling metadynamics REMD replica exchange Markov state model MSM TICA neural ODE free energy rare events molecular dynamics",      label: "Enh. Sampling",   codeRepo: "openmm/openmm/main/README.md" },
   "generative-chemistry-2":     { topic: "generative chemistry EDM diffusion DiffDock GFlowNet Sinkhorn optimal transport Wasserstein 3D molecule generation",      label: "Gen Chem 2.0",    codeRepo: "hoogeboom/edM/main/README.md" },
+  "quantum-computing":            { topic: "quantum computing VQE QAOA Grover QFT Qiskit superposition entanglement Bell states quantum ML hybrid classical",      label: "Quantum",       codeRepo: "Qiskit/qiskit/main/README.md" },
+  "space-science":                { topic: "space science exoplanets transit method gravitational waves LIGO LHC CERN jet classification JWST Kepler TESS",      label: "Space Science", codeRepo: "astropy/astropy/main/README.md" },
+  "fintech":                       { topic: "fintech Black-Scholes Monte Carlo Ito lemma VaR CVaR algorithmic trading LSTM fraud detection GNN blockchain DeFi",      label: "Fintech",      codeRepo: "quantopian/pyfolio/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
