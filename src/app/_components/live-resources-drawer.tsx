@@ -144,27 +144,37 @@ async function fetchJsonWithCorsFallback(url: string, timeoutMs = 15000): Promis
 }
 
 async function fetchArxiv(topic: string): Promise<NonNullable<ResourcesData["arxiv"]>> {
+  // Crossref API — CORS-friendly, free, no auth needed (replaces arXiv which has no CORS headers)
+  // URL: https://api.crossref.org/works?query=<topic>&rows=5&select=title,author,published-print,abstract,DOI,URL
+  // Returns: { message: { items: [{ title: ["..."], author: [{given, family}], "published-print": {date-parts}, abstract, DOI, URL }] } }
   try {
-    const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(topic)}&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending`;
-    const text = (await fetchJsonWithCorsFallback(url, 20000)) as string;
-    const papers: ArxivPaper[] = [];
-    const entries = text.match(/<entry>([\s\S]*?)<\/entry>/g) || [];
-    for (const entry of entries) {
-      const title = entry.match(/<title>([\s\S]*?)<\/title>/);
-      const summary = entry.match(/<summary>([\s\S]*?)<\/summary>/);
-      const published = entry.match(/<published>([^<]+)<\/published>/);
-      const id = entry.match(/<id>([^<]+)<\/id>/);
-      const authors = (entry.match(/<name>([^<]+)<\/name>/g) || []).map((a) => a.replace(/<\/?name>/g, "")).slice(0, 5);
-      if (title) {
-        papers.push({
-          title: title[1].replace(/\s+/g, " ").trim(),
-          authors,
-          published: published ? published[1] : "",
-          url: id ? id[1].trim() : "",
-          summary: summary ? summary[1].replace(/\s+/g, " ").trim().slice(0, 280) + "..." : "",
-        });
-      }
-    }
+    // Take first 3 keywords for better search results (Crossref searches full text)
+    const shortTopic = topic.split(" ").slice(0, 3).join(" ");
+    const url = `https://api.crossref.org/works?query=${encodeURIComponent(shortTopic)}&rows=5&select=title,author,published-print,abstract,DOI,URL`;
+    const data = (await fetchJsonWithCorsFallback(url, 20000)) as {
+      message?: { items?: Array<Record<string, unknown>> };
+    };
+    const items = data?.message?.items || [];
+    const papers: ArxivPaper[] = items.map((item) => {
+      const titleArr = item.title as string[] | undefined;
+      const title = titleArr && titleArr.length > 0 ? titleArr[0] : "Untitled";
+      const authorArr = item.author as Array<{ given?: string; family?: string }> | undefined;
+      const authors = (authorArr || []).slice(0, 5).map((a) =>
+        [a.given, a.family].filter(Boolean).join(" ")
+      );
+      const pubPrint = item["published-print"] as { "date-parts"?: number[][] } | undefined;
+      const dateParts = pubPrint?.["date-parts"]?.[0];
+      const published = dateParts
+        ? `${dateParts[0]}-${String(dateParts[1] || 1).padStart(2, "0")}-${String(dateParts[2] || 1).padStart(2, "0")}`
+        : "";
+      const doi = item.DOI as string | undefined;
+      const url = (item.URL as string) || (doi ? `https://doi.org/${doi}` : "");
+      const abstract = item.abstract as string | undefined;
+      const summary = abstract
+        ? abstract.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 280) + "..."
+        : "";
+      return { title, authors, published, url, summary };
+    });
     return { count: papers.length, papers };
   } catch (err) {
     return { error: err instanceof Error ? err.message : String(err) };
