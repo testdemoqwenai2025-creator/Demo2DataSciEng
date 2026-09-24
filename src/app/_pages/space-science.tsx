@@ -7,6 +7,8 @@ import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
 import { SpaceInteractives } from "../_components/space-interactives";
+import { SpaceShortsCarousel } from "../_components/space-shorts";
+import { SpaceGallery3D } from "../_components/space-gallery-3d";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
@@ -905,42 +907,24 @@ export function SpaceSciencePage() {
         ))}
       </div>
 
-      <SectionCard title="AI-generated illustrations — click to expand" icon={<Atom className="h-5 w-5" />} badge="AI gallery">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <ImageModal
-              src="/images/space/exoplanet-transit.png"
-              alt="Exoplanet transit"
-              caption="Exoplanet transit — a planet crossing its host star creates a small (84 ppm for Earth-Sun) flux dip, repeated every orbital period T. Kepler's 3rd law T² = (4π²/GM)a³ gives the orbital semi-major axis a from the period alone. Three periodic dips = exoplanet confirmation."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Exoplanet transit — flux dip ΔF/F = (Rp/Rs)²</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/space/gravitational-waves.png"
-              alt="Gravitational waves"
-              caption="Gravitational waves — ripples in spacetime from accelerating massive bodies. LIGO detects merging black-hole binaries via the strain h = (4G/c⁴)(d²I/dt²)/r, where I is the mass quadrupole. GW150914 (Abbott et al. 2016) was the first direct detection — 36 + 29 solar-mass black holes merging 1.3 billion light-years away."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Gravitational waves — LIGO strain interferometer</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/space/lhc-collision.png"
-              alt="LHC collision"
-              caption="LHC collision — 40 MHz proton-proton collisions at 13 TeV centre-of-mass. ATLAS + CMS together produce ~1 PB/year of raw data after trigger zero-suppression. Jets (collimated sprays of hadrons) are clustered via the anti-kT algorithm; classified by n-subjettiness τ_N and modern GNNs (ParticleNet)."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">LHC collision — jet substructure</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/space/jwst-deep-field.png"
-              alt="JWST deep field"
-              caption="JWST deep field — the James Webb Space Telescope's NIRCam images reveal galaxies within 300 million years of the Big Bang (Naidu et al. 2022, CEERS survey). Photometric redshifts from dropout techniques; follow-up NIRSpec spectroscopy confirms Lyman-α emission. JWST generates ~10 TB/day of raw imaging data."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">JWST deep field — early galaxies</p>
-          </div>
-        </div>
+      <SectionCard
+        title="Space concept gallery — 3D animated, click to expand (lazy popup)"
+        description="Replaces the previous AI-generated static image gallery. Each card opens a lazy modal with an animated 3D SVG, an n-D dimension toggle (3D single galaxy → 4D galaxy cluster → 5D cosmic web → N-D multi-wavelength), and a floating math/code background with space-science equations and Python snippets drifting subtly."
+        icon={<Atom className="h-5 w-5" />}
+        badge="3D gallery"
+      >
+        <SpaceGallery3D />
       </SectionCard>
+
+      <SectionCard
+        title="Space concept shorts — 4 lazy popups with Pyodide code + 2024-2025 NASA/Chinese papers"
+        description="Four 9:16 vertical cards inspired by YouTube Shorts format: JWST deep field (z>14, JADES 2023-2024), Gravitational waves (LIGO O4 + TianQin + LISA), Dark matter (LZ/XENONnT/PandaX-4T null 2024, ΛCDM vs MOND), FAST radio telescope (1000+ FRBs 2024, China). Each card opens a lazy popup with animated SVG + math equations + Pyodide-runnable Python code + recent paper citation."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="4 shorts"
+      >
+        <SpaceShortsCarousel />
+      </SectionCard>
+
 
       <SectionCard title="Transit detection short — star → planet transit → light-curve dip → exoplanet confirmed → JWST follow-up (loop)" icon={<Atom className="h-5 w-5" />} badge="short">
         <TransitDetectionShort />

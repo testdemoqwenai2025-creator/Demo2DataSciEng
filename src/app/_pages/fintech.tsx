@@ -8,6 +8,8 @@ import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
 import { FintechInteractives } from "../_components/fintech-interactives";
+import { FintechShortsCarousel } from "../_components/fintech-shorts";
+import { FintechGallery3D } from "../_components/fintech-gallery-3d";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
@@ -746,47 +748,25 @@ export function FintechPage() {
       </div>
 
       {/* AI gallery */}
+
       <SectionCard
-        title="AI-generated fintech illustrations — click to expand"
-        description="Four original illustrations via AI image generation. Click any thumbnail for an inline modal; 'Open in new tab' opens the high-resolution PNG in a separate browser tab."
-        icon={<Brain className="h-5 w-5" />}
-        badge="AI gallery"
+        title="Fintech concept gallery — 3D animated, click to expand (lazy popup)"
+        description="Replaces the previous AI-generated static image gallery. Each card opens a lazy modal with an animated 3D SVG of the concept (Black-Scholes call surface, Monte Carlo paths, volatility surface, yield curve), an n-D dimension toggle (3D single stock → 4D portfolio → 5D derivatives portfolio → N-D full risk grid), and a floating math/code background with quant-finance equations and Python snippets drifting subtly."
+        icon={<Atom className="h-5 w-5" />}
+        badge="3D gallery"
       >
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <ImageModal
-              src="/images/fintech/trading-dashboard.png"
-              alt="Algorithmic trading dashboard"
-              caption="Algorithmic trading dashboard — multi-asset price charts with technical indicators (RSI, MACD, Bollinger Bands), live P&L attribution by strategy, order-book depth ladder, and an LSTM signal panel showing predicted next-period direction. The quant trader's primary surface — every pixel trades for a living. Rendered via AI image generation."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Trading dashboard — multi-asset + LSTM signals</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/fintech/black-scholes.png"
-              alt="Black-Scholes option pricing surface"
-              caption="Black-Scholes option pricing surface — call price as a function of spot S and time to expiry T, with strike K, rate r, and volatility σ fixed. The smooth surface shows the closed-form solution C = S·N(d₁) - K·e^(-rT)·N(d₂). As T → 0 the surface collapses to the hockey-stick payoff max(S - K, 0). Greeks (Delta, Gamma, Vega, Theta, Rho) are slopes and curvatures of this surface. Rendered via AI image generation."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Black-Scholes pricing surface — closed-form</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/fintech/monte-carlo.png"
-              alt="Monte Carlo simulation paths"
-              caption="Monte Carlo simulation — 10⁴ Geometric Brownian Motion paths fan out from spot S₀. Each path is one realisation of dS = μ·S·dt + σ·S·dW. The European call price = e^(-rT)·E[max(S(T) - K, 0)] averages the payoff across all paths. GPU implementations simulate 100M paths/sec, enabling pricing of path-dependent exotics (Asian, barrier, lookback) where no closed form exists. Rendered via AI image generation."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Monte Carlo paths — GBM fan for pricing</p>
-          </div>
-          <div>
-            <ImageModal
-              src="/images/fintech/fraud-detection.png"
-              alt="Transaction-graph fraud detection"
-              caption="Transaction-graph fraud detection — a graph neural network (GNN) propagates information across the transaction network. Each node is a transaction; edges connect shared accounts, IPs, devices, or merchants. Multi-hop message passing exposes coordinated fraud rings invisible to per-transaction rules. The Weber 2019 'Scale' paper established this paradigm; production systems flag 5-10× more fraud than rule-based systems at the same false-positive rate. Rendered via AI image generation."
-            />
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">Fraud GNN — transaction graph rings</p>
-          </div>
-        </div>
+        <FintechGallery3D />
       </SectionCard>
+
+      <SectionCard
+        title="Fintech concept shorts — 4 lazy popups with Pyodide code + 2024-2025 papers"
+        description="Four 9:16 vertical cards: Black-Scholes (50th anniversary 2023, deep hedging), Monte Carlo VaR/CVaR (Basel IV 2025+), GNN fraud detection (GraphSAGE, Visa/JPMorgan production 2024), HFT order book (SEC Reg NMS 2024, PFOF debate). Each card opens a lazy popup with animated SVG + math equations + Pyodide-runnable Python code + recent paper citation."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="4 shorts"
+      >
+        <FintechShortsCarousel />
+      </SectionCard>
+
 
       {/* Looping "short" */}
       <SectionCard
