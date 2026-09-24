@@ -1273,3 +1273,70 @@ Stage Summary:
   backtick bugs this time
 - The page is now substantially more "computational" — every visual concept is
   backed by an executable proof of the math, not just prose descriptions
+
+---
+Task ID: quantum-3d-gallery-replace-ai-images
+Agent: Super Z (main)
+Task: Replace the static AI-image gallery on the quantum-computing page with a 3D animated gallery that has n-D dimension toggle + floating math/code background. Address the Chinese-text issue on the AI images.
+
+Work Log:
+- Used VLM to inspect all 4 existing AI PNG images:
+    * bloch-sphere.png — clean (3D wireframe sphere with axes)
+    * entanglement.png — clean (2 glowing blue spheres)
+    * quantum-circuit.png — has random Chinese: '睿加意', '阿边娉门', '红缾核心' (AI-hallucinated gibberish)
+    * vqe-hybrid.png — has real Chinese: '已知' (given), '求解' (solve for) mixed with math
+- Built new src/app/_components/quantum-gallery-3d.tsx (~600 lines):
+    * 4 cards in 2x2 / 1x4 grid (circuit, Bloch sphere, entanglement, VQE hybrid)
+    * Each card has a 9:14 aspect-ratio thumbnail with a small animated 3D SVG preview
+    * CSS 3D transforms: perspective: 900px + rotateX/rotateY keyframes
+    * Click → lazy modal popup (AnimatePresence) — heavy SVG only mounts on demand
+    * Modal content:
+        - Large animated 3D SVG of the concept (rotating gates / Bloch vector / Bell pair pulsing / VQE loop nodes lighting up)
+        - n-D toggle (3D / 4D / 5D / N-D) showing how the concept scales across Hilbert dimensions:
+            3D = 1 qubit, single Bloch (Hilbert dim 2)
+            4D = 2 qubits, Bell pair (Hilbert dim 4)
+            5D = 3 qubits, GHZ state (Hilbert dim 8)
+            N-D = 6 qubits, cluster state (Hilbert dim 64)
+        - Floating math/code background — 24 quantum equations and Python snippets
+          (|ψ⟩=α|0⟩+β|1⟩, |α|²+|β|²=1, H|0⟩=(|0⟩+|1⟩)/√2, U_f=I-2|x*⟩⟨x*|,
+          D=2|s⟩⟨s|-I, iℏ d|ψ⟩/dt=H|ψ⟩, P(k)=|⟨k|ψ⟩|², |Φ+⟩=(|00⟩+|11⟩)/√2,
+          E(θ)=⟨ψ(θ)|H|ψ(θ)⟩, ∂E/∂θ_i=[E(θ+π/2·e_i)-E(θ-π/2·e_i)]/2,
+          Λ=(p_c/p)²  (Willow=2.14), p_logical=p×Λ^((d-1)/2),
+          import numpy as np, H=np.array([[1,1],[1,-1]])/√2, ...,
+          CHSH: |S|≤2 (classical), S=2√2 (quantum), T₁=100µs (Heron R2), ...)
+          drifting subtly with 14-20s animation, low opacity (0.18)
+- Replaced the SectionCard in quantum-computing.tsx:
+    Old: 'AI-generated illustrations — click to expand' with 4 ImageModal PNGs
+    New: 'Quantum concept gallery — 3D animated, click to expand (lazy popup)'
+         with <QuantumGallery3D /> component
+- Description on the new SectionCard explicitly explains WHY the gallery was
+  replaced — so future readers know about the Chinese-text issue and the
+  decision to use procedural SVG instead of AI images
+- Build succeeded (commit 6a8b8e8)
+- Sync workflow mirrored to public, deploy #100 succeeded
+- Live verification on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/quantum-computing/:
+    * Body length 61318 (vs 60090 before — slightly more content from the new gallery)
+    * 'NO old quantum PNG images on page' — confirms the AI images with Chinese text are gone
+    * 4 'Open 3D gallery: ...' buttons found in the snapshot
+    * Clicked Bloch sphere card → modal popped up with:
+        - 'Bloch sphere · 3D animated · lazy-loaded' header
+        - 'Hilbert dim: 3D / 4D / 5D / N-D' toggle in the top-right
+        - Floating math equations in background (verified via VLM)
+        - 3D animated Bloch sphere (verified via VLM screenshot analysis)
+    * Clicked '4D' on the dim toggle → modal stayed open, content updated for 4D mode
+    * VLM screenshot analysis confirmed all 3 requested features:
+        1. 'Yes, there is a 3D animated Bloch sphere visible in the center'
+        2. 'Yes, there is a toggle in the top right corner labeled Hilbert dim: with options 3D, 4D, 5D, N-D'
+        3. 'Yes, there are faint floating math equations and code snippets in the background'
+
+Stage Summary:
+- HEAD = 6a8b8e8 on both private (AppDataSci-Advanced) and public (DemoAppDataSci) repos
+- Live quantum-computing page now has:
+    * NO AI-generated PNGs (zero Chinese-text risk)
+    * NEW 3D animated gallery with 4 concepts
+    * NEW n-D dimension toggle (3D/4D/5D/N-D) — shows Hilbert-space scaling
+    * NEW floating math/code background with 24 equations + Python snippets
+    * Lazy modal popup pattern (matches the quantum-shorts carousel pattern)
+- Screenshots saved to:
+    * /home/z/my-project/download/screenshots/quantum-3d-gallery-modal.png (default 3D mode)
+    * /home/z/my-project/download/screenshots/quantum-3d-gallery-4d.png (4D mode after toggle)
