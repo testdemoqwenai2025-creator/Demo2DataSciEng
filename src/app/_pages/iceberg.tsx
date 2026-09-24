@@ -7,12 +7,15 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ICEBERG_EXAMPLES } from "../_components/_dataset_examples";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Layers, Boxes, Database, Workflow, Zap, GitBranch, History, ShieldCheck,
   Atom, Activity, FileText, ExternalLink, Network, Sparkles, Cpu, TrendingUp,
+  Server, Cloud, Code2,
 } from "lucide-react";
 
 // ============================================================
@@ -785,6 +788,104 @@ export function IcebergPage() {
         icon={<Boxes className="h-5 w-5" />}
       >
         <FormatComparisonTable />
+      </SectionCard>
+
+      {/* Why this evolved */}
+      <SectionCard
+        title="Why Iceberg evolved — shortfalls of Hive-on-S3 (Era 2)"
+        description="Modern data engineers prefer Iceberg because Hive-on-S3 (the prior generation) had four critical shortfalls that made PB-scale analytics painful. Iceberg was designed ground-up to fix all four simultaneously."
+        icon={<History className="h-5 w-5" />}
+        badge="Why Iceberg"
+      >
+        <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <p>
+            <strong className="text-foreground/80">Shortfall 1: Path-based partitions were fragile.</strong> Hive partition pruning required <code className="font-mono">WHERE date='2024-09-01'</code> to match exactly the partition spec — analysts who wrote <code className="font-mono">WHERE order_ts &gt;= current_date() - 7</code> hit ALL files (no pruning). Iceberg's hidden partitioning stores the transform (days(order_ts)) in metadata — users write natural WHERE clauses, Iceberg computes the partition predicate automatically. <strong className="text-foreground/80">Result:</strong> 10-100× faster queries on partitioned tables because pruning actually happens.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 2: Schema evolution broke downstream.</strong> Hive bound column names to file positions — adding a column required rewriting every Parquet file. Renaming a column broke every downstream query. Iceberg assigns each column a stable ID (1, 2, 3...) at create time; renames just update metadata.json (column 3 is now called ship_country instead of ship_ctry). Old Parquet files still have column 3 with its old name — Iceberg remaps on read. <strong className="text-foreground/80">Result:</strong> schema evolution without file rewrites, zero downtime for downstream consumers.
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 3: No time travel.</strong> Hive had no concept of "read the table as-of yesterday" — analysts wanting reproducibility had to manually snapshot tables. Iceberg's snapshot chain (every commit creates a new snapshot, old ones retained 90 days) makes VERSION AS OF N / TIMESTAMP AS OF a first-class query feature. <strong className="text-foreground/80">Result:</strong> reproducible ML training (read features as-of the training cutoff), audit-compliant queries (read as-of a past date), and bug-reproducibility (run today's query against yesterday's data).
+          </p>
+          <p>
+            <strong className="text-foreground/80">Shortfall 4: No atomic commits.</strong> Hive writes weren't atomic — concurrent writes could interleave, producing torn reads. Iceberg's manifest tree uses compare-and-swap on the metadata.json pointer — only one write commits at a time. <strong className="text-foreground/80">Result:</strong> multi-writer concurrency on the same table without coordination; perfect for streaming CDC + batch analytics writing simultaneously.
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* Unique features */}
+      <SectionCard
+        title="Truly unique Iceberg features (vs Delta + Hudi)"
+        description="Iceberg has four features that are genuinely unique — not marketing fluff, but structural differentiators that no other open table format has yet matched."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="Unique features"
+      >
+        <div className="grid md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">1. Hidden partitioning</p>
+            <p className="text-muted-foreground">Partition transforms (days, hours, bucket, truncate) stored in metadata — users never write WHERE on partition keys. <strong>Delta + Hudi still require path-based partitions.</strong> This is Iceberg's #1 killer feature.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">2. Vendor-neutral catalogs</p>
+            <p className="text-muted-foreground">5 catalog backends: REST, Glue, Hive, Nessie, Unity — all conform to the same Iceberg REST API. <strong>Delta is Unity-locked; Hudi is Hive-first.</strong> Iceberg wins on portability.</p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">3. Multi-engine read/write</p>
+            <p className="text-muted-foreground">8+ compute engines: Spark, Trino, Flink, DuckDB, Athena, Snowflake, Impala, BeeHyve — all read/write natively. <strong>No other format has 8+ engines.</strong></p>
+          </div>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="font-semibold text-primary mb-1">4. Manifest-tree partition pruning</p>
+            <p className="text-muted-foreground">Manifests store partition values in Avro — readers prune files without opening Parquet. <strong>Delta + Hudi prune via Parquet stats (slower — requires opening file footers).</strong></p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Dataset examples cards */}
+      <SectionCard
+        title="3 large-dataset examples — cards with 5-language code popups"
+        description="Three production-style dataset examples showing Iceberg in action. Each is a clickable card opening a lazy popup with: scenario brief (dataset/scale/why), dataset stats grid, computational tooling, multi-language code in Scala + Rust + Go + Elixir + Zig, and an implementation insight. All datasets are real public data or synthetic Uber-scale equivalents."
+        icon={<Database className="h-5 w-5" />}
+        badge="3 examples × 5 langs"
+      >
+        <DatasetCards
+          examples={ICEBERG_EXAMPLES}
+          intro="Real public datasets (Wikipedia Pageviews 1.5TB/mo, NYC TLC 50GB/yr, NOAA Climate 500GB) + synthetic Uber-scale equivalents. Each card has Scala/Rust/Go/Elixir/Zig code with the unique Iceberg differentiator."
+        />
+      </SectionCard>
+
+      {/* Computational tooling */}
+      <SectionCard
+        title="Computational tooling — the Iceberg ecosystem"
+        description="Iceberg's compute-engine ecosystem is the broadest of any open table format — 8+ engines read/write Iceberg natively. The catalog layer (5 implementations) provides vendor-neutral metadata management."
+        icon={<Server className="h-5 w-5" />}
+        badge="ecosystem"
+      >
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-primary" /> Compute engines (8+)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Apache Spark 3.5+</strong> — primary write engine (PySpark/Scala/SQL/R)</li>
+              <li>• <strong>Trino 425+</strong> — federated SQL (fastest Iceberg reads)</li>
+              <li>• <strong>Apache Flink 1.18+</strong> — streaming CDC ingestion (exactly-once)</li>
+              <li>• <strong>DuckDB 0.10+</strong> — laptop-scale analytics (no cluster)</li>
+              <li>• <strong>AWS Athena</strong> — serverless Trino on S3</li>
+              <li>• <strong>Snowflake Polar Federation</strong> — Snowflake reads external Iceberg</li>
+              <li>• <strong>Apache Impala 4.0+</strong> — Cloudera Hadoop clusters</li>
+              <li>• <strong>PyIceberg</strong> — pure-Python client (no JVM)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-2 flex items-center gap-1.5"><Cloud className="h-3.5 w-3.5 text-primary" /> Catalogs (5)</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>REST Catalog</strong> — Apache spec, any impl (Tabular, custom)</li>
+              <li>• <strong>AWS Glue Data Catalog</strong> — AWS-managed, multi-tenant</li>
+              <li>• <strong>Apache Hive Metastore</strong> — legacy, self-hosted</li>
+              <li>• <strong>Project Nessie</strong> — Git-for-data branching (Dremio)</li>
+              <li>• <strong>Databricks Unity Catalog</strong> — Databricks governance-first</li>
+              <li>• <strong>Snowflake Polaris</strong> — Apache-licensed REST catalog (2024)</li>
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* Research */}
