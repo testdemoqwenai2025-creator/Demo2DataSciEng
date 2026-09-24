@@ -1128,6 +1128,66 @@ export const ADRS: ADR[] = [
     ],
     tags: ["dca", "direct-coupling-analysis", "mutual-information", "potts-model", "mean-field", "apc", "co-evolution", "attention-equivalence", "contact-prediction", "patterns", "genai"],
   },
+  {
+    id: "ADR-049",
+    title: "Adopt MACE (higher-order equivariant GNN) as the default neural network potential for molecular property prediction",
+    status: "accepted",
+    date: "FY33-Q1",
+    deciders: "Data Platform, Molecular Modelling, ML Engineering, Architecture",
+    context:
+      "ADR-036 covered classical force fields (AMBER) and E(n)-equivariant NNs. The field has advanced dramatically: SchNet (Schütt 2017) introduced continuous-filter CNNs; DimeNet (Gasteiger 2020) added directional message passing; GemNet (Gasteiger 2021) extended to geometric; NequIP (Batzner 2022) introduced E(3)-equivariance via tensor products; MACE (Batatia 2022) added higher-order Clebsch-Gordan products (body order > 2), achieving <1 meV/atom on QM9. The math: SO(3) irreducible representations are labeled by angular momentum l=0,1,2,... with spherical harmonics Y_l^m as basis. Clebsch-Gordan coefficients C(l1 m1 l2 m2 | L M) give the coupling rules — same as quantum mechanics angular momentum coupling. Body-order expansion: k-body interactions decomposed via CG products of k representations. MACE uses O(3)-equivariant messages with higher-order tensor products — capturing 3-body and 4-body interactions that lower-order models miss.",
+    decision:
+      "Adopt MACE as the default neural network potential for molecular property prediction. Architecture: O(3)-equivariant message passing with higher-order Clebsch-Gordan tensor products. Trained on QM9 (130K molecules + DFT properties), extends to ANI-1x (5M conformers) for production. Connects to ADR-036 (replaces AMBER for ML-based force fields), ADR-035 (ChemBERTa for 2D, MACE for 3D), ADR-044 (RFdiffusion uses MACE-style layers), ADR-045 (Boltz-1 uses IPA which IS a special case of CG tensor product).",
+    consequences:
+      "+ <1 meV/atom on QM9 — state-of-the-art accuracy. + 1000× faster than DFT at inference. + Captures many-body interactions via higher-order CG products. + Same SE(3)-equivariance as AlphaFold (ADR-036). − Higher-order CG products are O(L^3) per message — expensive for large L. − Training requires DFT data (expensive). − Transferability across element types is limited (need per-element embeddings).",
+    alternatives: [
+      "NequIP (Batzner 2022) — lower body order, slightly less accurate but faster",
+      "SchNet (Schütt 2017) — simpler, no equivariance, lower accuracy",
+      "ANI-2x (Devereux 2020) — non-equivariant, trained on larger dataset but lower ceiling",
+      "Allegro (Musaelian 2023) — local equivariant, scales better but loses long-range",
+    ],
+    tags: ["neural-network-potential", "mace", "schNet", "dimenet", "gemnet", "nequip", "clebsch-gordan", "spherical-harmonics", "so3", "representation-theory", "body-order", "patterns", "genai"],
+  },
+  {
+    id: "ADR-050",
+    title: "Adopt metadynamics + REMD + MSMs for enhanced sampling beyond μs-timescale molecular dynamics",
+    status: "accepted",
+    date: "FY33-Q2",
+    deciders: "Data Platform, Molecular Modelling, ML Engineering, Architecture",
+    context:
+      "ADR-036 covered classical MD (AMBER + Verlet) and ADR-049 covers neural network potentials. The fundamental bottleneck of MD is the timescale problem: biological processes (protein folding, ligand binding, conformational transitions) occur on μs-ms timescales, but even with GPU acceleration, MD can only reach μs for large systems. Enhanced sampling methods solve this by biasing the simulation to explore rare events faster. Five methods: (1) Metadynamics (Laio & Parrinello 2003) — history-dependent bias potential V(s,t) = Σ W exp(-|s-s(t')|²/2σ²) fills free energy wells; (2) Replica Exchange MD (Sugita & Okamoto 1999) — N replicas at different temperatures, periodic swaps via Metropolis criterion P_swap = min(1, exp(Δβ·ΔE)); (3) Markov State Models (Pande et al. 2010) — discretise conformational space, compute transition matrix T_ij(τ), eigenvalues give timescales; (4) TICA — time-lagged independent component analysis, finds slowest collective variables; (5) Neural ODEs (Chen 2018) — continuous-depth models for learning dynamics from MD trajectories.",
+    decision:
+      "Adopt a multi-method enhanced sampling stack: (1) Metadynamics for free energy surface mapping (well-tempered variant, bias factor γ=10); (2) REMD for temperature-accelerated exploration (32 replicas, T=300-600K); (3) MSMs for trajectory analysis (Pande's MSMBuilder); (4) TICA for collective variable discovery; (5) Neural ODEs for learned dynamics. Connects to ADR-036 (AMBER force field + these methods), ADR-049 (MACE potential + enhanced sampling = fast + accurate), ADR-029 (OpenTelemetry traces each MD phase), ADR-045 (Boltz-1 provides starting structures for MD).",
+    consequences:
+      "+ Metadynamics gives free energy surfaces in hours (vs years for brute-force MD). + REMD explores rare events via temperature scaling. + MSMs extract kinetics (rates, pathways) from short trajectories. + TICA discovers optimal collective variables without manual selection. + Neural ODEs learn continuous dynamics from discrete MD data. − Metadynamics requires good CV selection (bad CVs = wasted compute). − REMD needs N replicas (N× compute). − MSMs need many short trajectories (1000s) for convergence. − Neural ODE training is unstable (vanishing gradients in long trajectories).",
+    alternatives: [
+      "Brute-force MD (no enhancement) — only reaches μs, misses rare events",
+      "Accelerated MD (Hamelberg 2004) — simpler than metadynamics, less accurate",
+      "Adaptive sampling (no MSM) — fewer trajectories, higher variance",
+      "Steered MD — pulling simulations, biased toward specific pathway",
+    ],
+    tags: ["enhanced-sampling", "metadynamics", "remd", "markov-state-models", "tica", "neural-ode", "free-energy", "rare-events", "patterns", "genai"],
+  },
+  {
+    id: "ADR-051",
+    title: "Adopt EDM + DiffDock + GFlowNet for generative chemistry 2.0 — diffusion and flow networks for 3D molecule design",
+    status: "accepted",
+    date: "FY33-Q3",
+    deciders: "Data Platform, Cheminformatics, ML Engineering, Architecture",
+    context:
+      "ADR-035 covered ECFP + ChemBERTa (2D fingerprints). ADR-046 covered Insilico VAE (1D SMILES generation). ADR-044 covered RFdiffusion (protein backbone design). The next frontier is 3D molecule generation: design small molecules directly in 3D space with equivariant diffusion. Three methods: (1) EDM (Hoogeboom 2022) — Equivariant Diffusion Model, DDPM on R^(N×3) atom coordinates with SE(3)-equivariance, same math as ADR-027 (image diffusion) + ADR-044 (RFdiffusion); (2) DiffDock (Corso 2023) — diffusion-based protein-ligand docking, replaces AutoDock Vina with learned diffusion over binding poses; (3) GFlowNet (Bengio 2023) — generative flow networks that match the reward distribution (not maximise), frames molecular design as sequential MDP. Plus optimal transport: Sinkhorn iteration (Cuturi 2013) for Wasserstein distance between molecular distributions — a geometry-aware metric on molecular space more informative than Tanimoto.",
+    decision:
+      "Adopt a three-method generative chemistry 2.0 stack: (1) EDM for de novo 3D molecule generation (SE(3)-equivariant DDPM on coordinates); (2) DiffDock for protein-ligand docking (replaces ADR-036 AutoDock Vina); (3) GFlowNet for reward-matched molecular design (alternative to VAE from ADR-046). Plus Sinkhorn optimal transport for molecular similarity (replaces Tanimoto from ADR-035 for 3D-aware comparison). Connects to ADR-027 (same DDPM math), ADR-035 (ECFP for 2D, EDM for 3D), ADR-044 (RFdiffusion for proteins, EDM for small molecules), ADR-046 (Insilico VAE for 1D SMILES, GFlowNet for graph-structured generation), ADR-045 (Boltz-1 docking replaced by DiffDock).",
+    consequences:
+      "+ EDM generates novel 3D molecules not seen in training — explores chemical space. + DiffDock outperforms AutoDock Vina by 20%+ on PoseBusters. + GFlowNet matches reward distribution (diverse candidates vs VAE's mode collapse). + Sinkhorn gives geometry-aware molecular similarity (respects 3D shape). + All use SE(3)-equivariance — same inductive bias as ADR-036/044/045. − EDM training is unstable (high variance in 3D coordinate diffusion). − DiffDock requires protein structure (from ADR-038 AlphaFold DB). − GFlowNet training requires careful reward shaping. − Sinkhorn is O(n²) per iteration — expensive for large molecules.",
+    alternatives: [
+      "GeoDiff (Xu 2022) — alternative 3D diffusion, similar architecture",
+      "GraphAF (Shi 2020) — autoregressive flow (no diffusion), less diverse",
+      "MolGAN (De Cao 2018) — GAN for molecules (mode collapse, no likelihood)",
+      "Tanimoto on ECFP (ADR-035) — 2D-only, ignores 3D shape",
+    ],
+    tags: ["generative-chemistry-2", "edm", "diffdock", "gflownet", "optimal-transport", "sinkhorn", "wasserstein", "3d-molecule-generation", "diffusion", "patterns", "genai"],
+  },
 ];
 
 // ============================================================

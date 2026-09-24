@@ -67,6 +67,9 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "AI Drug Discovery", ids: ["ai-drug-discovery"] },
   { title: "Spatial Multi-omics", ids: ["spatial-multiomics"] },
   { title: "Co-evolution & DCA", ids: ["coevolution-dca"] },
+  { title: "NN Potentials", ids: ["neural-network-potentials"] },
+  { title: "Enhanced Sampling", ids: ["enhanced-sampling"] },
+  { title: "Gen Chem 2.0", ids: ["generative-chemistry-2"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025-creator@users.noreply.github.com";

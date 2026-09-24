@@ -63,13 +63,16 @@ export type PageId =
   | "boltz"
   | "ai-drug-discovery"
   | "spatial-multiomics"
-  | "coevolution-dca";
+  | "coevolution-dca"
+  | "neural-network-potentials"
+  | "enhanced-sampling"
+  | "generative-chemistry-2";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0";
   icon: string;
   description: string;
 }
@@ -530,6 +533,30 @@ export const PAGES: PageMeta[] = [
     group: "Coevolution & DCA",
     icon: "Network",
     description: "AI-generated illustrations + co-evolution short, mutual information I(i,j) + Potts model + mean-field DCA J=-(C^-1) + APC correction + attention QK^T≈J equivalence, low-level PyTorch MSAParser+FrequencyLayer+MutualInformationLayer+MeanFieldDCA+ContactPredictor+AttentionAsDCA.",
+  },
+  {
+    id: "neural-network-potentials",
+    label: "Neural Network Potentials — SchNet to MACE via SO(3) Representation Theory",
+    shortLabel: "NN Potentials",
+    group: "Neural Network Potentials",
+    icon: "Atom",
+    description: "AI illustrations + CG tensor product short, SchNet→DimeNet→GemNet→NequIP→MACE, SO(3) irreps + spherical harmonics + Clebsch-Gordan coefficients, body-order expansion, low-level PyTorch real_spherical_harmonics+CGTensorProduct+SchNetInteraction+NequIPLayer+MACEModel.",
+  },
+  {
+    id: "enhanced-sampling",
+    label: "Enhanced Sampling & Free Energy — Metadynamics, REMD, MSMs, Neural ODEs",
+    shortLabel: "Enhanced Sampling",
+    group: "Enhanced Sampling",
+    icon: "Waves",
+    description: "AI illustrations + free energy short, metadynamics V(s,t)=Σ W exp(-|s-s'|²/2σ²) + REMD P=min(1,exp(ΔβΔE)) + MSMs T_ij(τ) τ_k=-τ/log(λ_k) + TICA C(τ) + Neural ODEs, low-level PyTorch NeuralODE+MetadynamicsSimulator+MSMEstimator+TICA.",
+  },
+  {
+    id: "generative-chemistry-2",
+    label: "Generative Chemistry 2.0 — EDM, DiffDock, GFlowNet, Optimal Transport",
+    shortLabel: "Gen Chem 2.0",
+    group: "Generative Chemistry 2.0",
+    icon: "FlaskConical",
+    description: "AI illustrations + Sinkhorn short, EDM SE(3)-equivariant DDPM on R^(N×3) + DiffDock diffusion on SE(3) + GFlowNet trajectory balance + Sinkhorn optimal transport W_ε=min⟨T,C⟩+εH(T), low-level PyTorch SinkhornDistance+EDMDenoiser+GFlowNet.",
   },
 ];
 

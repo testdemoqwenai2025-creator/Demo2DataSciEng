@@ -86,6 +86,9 @@ const PAGE_TOPICS: Record<PageId, PageTopic> = {
   "ai-drug-discovery":           { topic: "AI drug discovery Insilico Medicine Recursion Chemistry42 generative chemistry phenomics ADMET clinical candidate ISM042 Atomwise",      label: "AI Drug",       codeRepo: "insilico/chemistry42/main/README.md" },
   "spatial-multiomics":         { topic: "spatial multi-omics DBiT-seq spatial-CUT&Tag chromatin histone marks H3K4me3 H3K27me3 Spatial ATAC-RNA cross-attention STAGATE",      label: "Spatial Multi",  codeRepo: "Frishberg-Lab/STAGATE/main/README.md" },
   "coevolution-dca":           { topic: "Direct Coupling Analysis DCA co-evolution mutual information Potts model mean-field covariance inverse AlphaFold attention equivalence contact prediction",      label: "Co-evo & DCA",   codeRepo: "marcatcg/inversefold/main/README.md" },
+  "neural-network-potentials": { topic: "neural network potential SchNet DimeNet GemNet NequIP MACE SO(3) representation theory Clebsch-Gordan spherical harmonics body-order QM9",      label: "NN Potentials",   codeRepo: "mir-group/pytorch_run/README.md" },
+  "enhanced-sampling":          { topic: "enhanced sampling metadynamics REMD replica exchange Markov state model MSM TICA neural ODE free energy rare events molecular dynamics",      label: "Enh. Sampling",   codeRepo: "openmm/openmm/main/README.md" },
+  "generative-chemistry-2":     { topic: "generative chemistry EDM diffusion DiffDock GFlowNet Sinkhorn optimal transport Wasserstein 3D molecule generation",      label: "Gen Chem 2.0",    codeRepo: "hoogeboom/edM/main/README.md" },
 };
 
 const DISMISS_KEY = "mdse-floating-live-dismissed-v1";
