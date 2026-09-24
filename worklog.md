@@ -2006,3 +2006,40 @@ Stage Summary:
   (CMS Open Data, HL-LHC upgrade, cross-links, trigger simulator, binary parser)
 - Synthetic data toggle confirmed working
 - Next-phase suggestions 1-5 are the next work items
+
+---
+Task ID: elt-lakehouse-card-codeblock-fix
+Agent: Super Z (main)
+Task: Show Python CodeBlock for all cards (like Rust/Scala/Elixir) + add 6th ELT (Modern Lakehouse) card + push all files
+
+Work Log:
+- Fixed modal rendering: ALL 6 cards now show CodeBlock (syntax-highlighted code preview) BEFORE the PyodideRunner button. Previously, runnable cards (Python, ETL) only showed the PyodideRunner button without code preview. Now all cards show:
+  a. CodeBlock (syntax-highlighted Python code visible)
+  b. PyodideRunner (run the code in browser, amber callout)
+- Added 6th card: "ELT (Modern Lakehouse) — Extract → Load RAW → Transform IN warehouse"
+  - Pattern: Extract → Load RAW to S3 → Transform IN Snowflake (ELT vs ETL)
+  - Step 1: Load raw binary blobs to S3 (zero preprocessing, immutable)
+  - Step 2: Create external table in Snowflake (zero-copy, reads S3 directly)
+  - Step 3: SQL UDF to parse binary IN the warehouse (distributed Python handler)
+  - Step 4: Populate analytics table from external table + materialized views
+  - Technical stack: DAQ → S3/GCS/Ceph → Snowflake/BigQuery/Delta Lake
+  - ELT vs ETL comparison:
+    ELT = Load RAW first, transform IN warehouse (modern Snowflake/BigQuery)
+    ETL = Transform BEFORE load (warehouse era 2000s)
+    LHC = ETL pattern (trigger+zero-suppress=transform, EOS=load)
+    HL-LHC = Moving toward ELT (raw to S3 + in-warehouse transforms)
+- Commit b45b342, deploy #116 succeeded
+- All 6 code cards verified live:
+  1. Python (LHC data reduction) — CodeBlock + Pyodide
+  2. Rust (binary parser) — CodeBlock + Python equivalent (Pyodide)
+  3. Scala (Spark Streaming) — CodeBlock + Python equivalent (Pyodide)
+  4. Elixir (GenStage) — CodeBlock + Python equivalent (Pyodide)
+  5. ETL (Data Warehouse) — CodeBlock + Pyodide (code visible: EXTRACT)
+  6. ELT (Modern Lakehouse) — CodeBlock + Pyodide (code visible: S3, external table, SQL UDF)
+- All scripts, .txt files, and worklog pushed to private repo
+
+Stage Summary:
+- HEAD = b45b342 on both repos
+- Ingestion page has 6 code cards (all Pyodide-runnable, all show CodeBlock)
+- ETL vs ELT: two cards showing the contrast between classic (transform-before-load) and modern (load-raw-then-transform-in-warehouse)
+- Both patterns applied to the same LHC/CMS data domain
