@@ -2283,3 +2283,24 @@ Stage Summary:
 - Page order on /fintech: PyTorch section → 8 scenario cards (Quant scenarios) → Low-level systems languages (Rust/Scala/Elixir/C).
 - Deploy workflow (.github/workflows/deploy-pages.yml) will run on next push to main and publish to https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/.
 - User needs to commit and push these changes to trigger the deploy, OR manually copy out/ to the gh-pages branch.
+
+---
+Task ID: push-and-deploy-fintech
+Agent: Super Z (main)
+Task: Push the local commits to GitHub to trigger the sync + deploy workflows. The user reported that https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/ still did not show the cards.
+
+Work Log:
+- Diagnosed: 4 local commits ahead of remote — none of the new sections (Quant scenarios, low-level systems languages) had been pushed.
+- Pushed private/main → triggered the sync workflow which mirrors to public/main → triggered the deploy workflow which builds and publishes to GitHub Pages.
+- Waited 60 seconds for the deploy to complete.
+- Re-fetched https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/ — HTTP 200, size doubled from 538KB to 1037KB.
+- Verified in the deployed HTML:
+  - All 8 scenario card titles: Dynamic Delta Hedging, Monte Carlo Asian Option, LSTM Price-Direction Predictor, GNN Fraud Ring Detection, SVI Volatility Surface, Markowitz Efficient Frontier, Deep Hedging (Buehler 2019), CVA / XVA.
+  - All 8 scenario badges: Black-Scholes Δ, MC + antithetic, Fischer 2018, Weber 2019, Gatheral 2004, Markowitz 1952, Buehler 2019, Basel III FRTB.
+  - All 4 low-level code files: fintech_quant_lowlevel.rs, FintechQuantLowLevel.scala, fintech_quant_lowlevel.ex, fintech_quant_lowlevel.c.
+  - Correct section order: Low-level PyTorch → Quant scenarios in 4 languages → Low-level systems languages.
+
+Stage Summary:
+- All changes are now LIVE on https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/fintech/
+- Page order: PyTorch section → 8 Quant scenario cards → Low-level systems languages (Rust/Scala/Elixir/C).
+- Push SHA: 65cbc03..0f2e37e (4 commits) on private/main.
