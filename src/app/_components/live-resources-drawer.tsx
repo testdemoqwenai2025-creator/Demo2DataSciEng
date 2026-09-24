@@ -209,7 +209,7 @@ async function fetchGitHub(topic: string, language = ""): Promise<NonNullable<Re
 async function fetchHuggingFace(topic: string): Promise<NonNullable<ResourcesData["huggingface"]>> {
   try {
     // Hugging Face datasets search API — public, no auth needed
-    const shortTopic = topic.split(" ").slice(0, 3).join(" ");
+    const shortTopic = topic.split(" ").slice(0, 1).join(" ");
     const url = `https://huggingface.co/api/datasets?search=${encodeURIComponent(shortTopic)}&limit=5&full=false`;
     const data = (await fetchJsonWithCorsFallback(url, 15000)) as Array<Record<string, unknown>>;
     const datasets: HFDataset[] = (Array.isArray(data) ? data : []).map((d) => ({
@@ -228,7 +228,7 @@ async function fetchHuggingFace(topic: string): Promise<NonNullable<ResourcesDat
 async function fetchPwCDatasets(topic: string): Promise<NonNullable<ResourcesData["pwc_datasets"]>> {
   try {
     // Papers with Code datasets API
-    const shortTopic = topic.split(" ").slice(0, 3).join(" ");
+    const shortTopic = topic.split(" ").slice(0, 1).join(" ");
     const url = `https://paperswithcode.com/api/v1/datasets/?search=${encodeURIComponent(shortTopic)}&page=1&page_size=5`;
     const data = (await fetchJsonWithCorsFallback(url, 15000)) as { results?: Array<Record<string, unknown>> };
     const datasets: PwCDataset[] = (data.results || []).map((d) => ({
