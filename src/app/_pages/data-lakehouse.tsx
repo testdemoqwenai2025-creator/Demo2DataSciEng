@@ -9,6 +9,7 @@ import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { DatasetCards } from "../_components/dataset-cards";
 import { LAKEHOUSE_EXAMPLES } from "../_components/_dataset_examples3";
+import { LAKEHOUSE_SCIENCE_EXAMPLES } from "../_components/_dataset_examples8";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -544,6 +545,19 @@ export function DataLakehousePage() {
         <DatasetCards
           examples={LAKEHOUSE_EXAMPLES}
           intro="Production-style lakehouse scenarios showing the unification pattern: Bronze→Silver→Gold medallion ETL, multi-engine (Trino + Spark + Flink) cross-query, and Polaris/Nessie/Unity cross-cloud catalogs. Each card has Scala/Rust/Go/Elixir/Zig code with lakehouse-specific primitives."
+        />
+      </SectionCard>
+
+      {/* Scientific lakehouse examples — 6 more cards with science domain data */}
+      <SectionCard
+        title="Scientific lakehouse — the medallion pattern applied to science (6 examples)"
+        description="The lakehouse is the starting point of everything — the medallion Bronze→Silver→Gold pattern applies universally beyond business data. These 6 examples show the pattern in action across life sciences (genomics, clinical trials, single-cell), environmental sensors, particle physics (CERN LHC), and pure mathematics (OEIS). Each demonstrates how Iceberg's hidden partitioning + time travel + schema evolution solve domain-specific big-data problems at petabyte scale."
+        icon={<Atom className="h-5 w-5" />}
+        badge="6 science examples × 5 langs"
+      >
+        <DatasetCards
+          examples={LAKEHOUSE_SCIENCE_EXAMPLES}
+          intro="Life sciences (1000 Genomes 100TB, FDA FAERS 15M reports, Single-cell 50TB) + Sensors (EPA AirNow 10TB) + Physics (CERN LHC 1PB) + Mathematics (OEIS 370k sequences). Each card has Scala/Rust/Go/Elixir/Zig code showing the Bronze→Silver→Gold medallion pipeline for that scientific domain."
         />
       </SectionCard>
 
