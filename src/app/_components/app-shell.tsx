@@ -122,6 +122,9 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Fine-Tuning DD", ids: ["fine-tuning-deep-dive"] },
   { title: "Agent Frameworks", ids: ["agent-frameworks"] },
   { title: "Computational Biology", ids: ["computational-biology"] },
+  { title: "Comp Chemistry", ids: ["computational-chemistry"] },
+  { title: "Comp Physics", ids: ["computational-physics"] },
+  { title: "Bio Pipelines", ids: ["bioinformatics-pipelines"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
