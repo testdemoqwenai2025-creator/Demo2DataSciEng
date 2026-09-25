@@ -92,6 +92,10 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Databricks Lakehouse", ids: ["databricks-lakehouse"] },
   { title: "Snowflake Polaris", ids: ["snowflake-polaris"] },
   { title: "AWS Lake Formation", ids: ["aws-lake-formation"] },
+  { title: "Apache Flink", ids: ["flink"] },
+  { title: "Apache Kafka", ids: ["kafka"] },
+  { title: "Apache Pulsar", ids: ["pulsar"] },
+  { title: "Spark Streaming", ids: ["spark-streaming"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";

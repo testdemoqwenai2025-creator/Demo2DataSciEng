@@ -88,13 +88,17 @@ export type PageId =
   | "tabular"
   | "databricks-lakehouse"
   | "snowflake-polaris"
-  | "aws-lake-formation";
+  | "aws-lake-formation"
+  | "flink"
+  | "kafka"
+  | "pulsar"
+  | "spark-streaming";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming";
   icon: string;
   description: string;
 }
@@ -755,6 +759,38 @@ export const PAGES: PageMeta[] = [
     group: "AWS Lake Formation",
     icon: "ShieldCheck",
     description: "Cell-level RLS, LF-tags governance, cross-account data sharing. The most production-deployed lakehouse governance on AWS. IAM for data.",
+  },
+  {
+    id: "flink",
+    label: "Apache Flink — Stream Processing at Scale",
+    shortLabel: "Flink",
+    group: "Apache Flink",
+    icon: "Activity",
+    description: "Flink deep dive: watermark, state backends, exactly-once, CEP, CDC ingestion. The streaming engine for Iceberg/Delta/Hudi writes. Scientific examples: real-time genomics, LHC trigger, sensor monitoring.",
+  },
+  {
+    id: "kafka",
+    label: "Apache Kafka — Distributed Event Streaming",
+    shortLabel: "Kafka",
+    group: "Apache Kafka",
+    icon: "Radio",
+    description: "Kafka architecture: partitions, consumer groups, transactions, KRaft. 7T msgs/day at LinkedIn. Scientific examples: genomics event streams, LHC DAQ, environmental sensor feeds.",
+  },
+  {
+    id: "pulsar",
+    label: "Apache Pulsar — Segmented Streaming + Geo-replication",
+    shortLabel: "Pulsar",
+    group: "Apache Pulsar",
+    icon: "Radio",
+    description: "Pulsar: segmented storage, geo-replication, functions. Yahoo-origin alternative to Kafka. Scientific examples: multi-region sensor networks, distributed genomics.",
+  },
+  {
+    id: "spark-streaming",
+    label: "Spark Structured Streaming — Micro-batch + Continuous",
+    shortLabel: "Spark Streaming",
+    group: "Spark Streaming",
+    icon: "Activity",
+    description: "Spark Structured Streaming: micro-batch vs continuous, watermarks, stateful ops. Scientific examples: batch+streaming genomics, IoT sensor windows, LHC online monitoring.",
   },
 ];
 
