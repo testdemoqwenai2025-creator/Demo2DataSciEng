@@ -3250,3 +3250,26 @@ All phases complete:
 - Phase E: 4 ML platform deep-dive pages + 12 ML scientific examples
 - Phase G: 4 cross-cutting pages (Data Mesh + Streaming SQL + Data Contracts + Privacy) + 8 cross-cutting scientific examples
 - Total: 105 pages total, 60+ scientific dataset examples across the platform, each with 5-language code + Pyodide simulation.
+
+---
+Task ID: phaseG-complete
+Agent: Super Z (main) + subagent
+Task: Build Phase G cross-cutting concern deep-dive pages (Data Mesh DD, Streaming SQL, Data Contracts DD, Privacy Tech) with deep mathematical foundations + 8 scientific dataset examples.
+
+Work Log:
+- Registered 4 new page IDs in router + sidebar + route stubs.
+- Subagent built 4 pages (5,211 lines) + _dataset_examples14.tsx (1,542 lines, 8 examples × 5 langs = 40 code blocks).
+- Each page has DEDICATED Mathematical Foundations section with proper equations:
+  * Data Mesh: graph theory G=(V,E), information theory quality=1-H(X|Y), SLA probability bound
+  * Streaming SQL: event-time vs processing-time, Watermark W(t)=max_seen-allowed_lateness, TUMBLE/HOP/SESSION
+  * Data Contracts: formal tuple C=(Schema,SLA,Q,O), backward/forward/full compatibility, SLA formula
+  * Privacy Tech: ε-DP, Laplace/Gaussian mechanisms, Composition theorems, HE (Paillier+BFV/BGV+CKKS), FedAvg
+- 8 science examples: genomics data products, clinical trial mesh, real-time genomics Flink SQL, LHC Materialize, VCF contracts, clinical GDPR, genomics ε-DP, clinical FedAvg.
+- All lint clean, static export built (105 pages), commits pushed to private/main.
+- Verified live: all 4 pages HTTP 200, math content verified (Laplace, Federated, Homomorphic, TUMBLE, HOP, SESSION, Watermark, Materialize, RisingWave).
+
+Stage Summary:
+- Phase G COMPLETE — 4 cross-cutting concern deep-dive pages.
+- Platform now has 105 pages total.
+- Total science examples across platform: 60+ examples × 5 languages = 300+ code blocks.
+- Every deep-dive page has a dedicated Mathematical Foundations section with proper equations.
