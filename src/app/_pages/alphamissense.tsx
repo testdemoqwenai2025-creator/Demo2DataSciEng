@@ -7,11 +7,13 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Layers, Zap, TrendingUp, Terminal, Brain,
-  Activity, Atom, Dna, Microscope,
+  Activity, Atom, Dna, Microscope, Sparkles,
 } from "lucide-react";
 
 const KPIS = [
@@ -889,6 +891,19 @@ export function AlphaMissensePage() {
           <p><strong className="text-foreground/80">The 94% accuracy is the evolutionary signal.</strong> PolyPhen-2 (75%) used rule-based features (sequence conservation, structure) — captures half the signal. CADD (80%) ensembled 63 annotations — better but still rule-based. AlphaMissense's breakthrough: use a deep-learning model (AlphaFold2 backbone) that learns the embedding directly from 250M protein sequences. The model discovers the same patterns evolution used — residue substitution patterns, structural constraints, functional conservation — without explicit rules. The 94% accuracy is the upper bound of what's possible from sequence + structure alone — the remaining 6% requires functional assay data (does this variant actually disrupt protein function in a test tube?). The platform's existing ML infrastructure (ESM-2 ADR-034, AlphaFold2 ADR-036) is exactly what AlphaMissense builds on — the same transformer + structure architecture, applied to variant prediction.</p>
           <p><strong className="text-foreground/80">This unifies the platform's clinical genomics stack with its research infrastructure.</strong> ADR-037 genetic materials (100K-genome pipeline) → ADR-043 AlphaMissense (variant pathogenicity) → ADR-038 AlphaFold DB (protein structure) → ADR-034 ESM-2 (functional embedding) → ADR-036 molecular modelling (drug design for pathogenic variants). The clinical variant report IS multi-modal RAG (ADR-033) — patient's VCF (genetic modality) + ClinVar (clinical modality) + AlphaFold structure (3D modality) + ESM-2 embedding (protein modality) + LLM summary. The platform's pgvector (ADR-022) stores variant embeddings for similarity search — 'find patients with similar variant profiles'. The clinical genomics stack IS the platform's GenAI stack, applied to precision medicine. Every patient's genome is a query into the universe of evolutionary experiments; AlphaMissense is the lookup table; the LLM is the projection back to natural language for the clinician. Precision medicine IS multi-modal RAG on the human genome.</p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Bayes */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Bayes bridges genetics, spam filtering, and quantum mechanics"
+        description="Bayes (P(H|D) = P(D|H)P(H)/P(D)) IS the belief updater. AlphaMissense predicting pathogenicity from a variant IS a spam filter classifying a Variant of Uncertain Significance (VUS) — and BOTH are doing Bayesian inference on quantum-mechanically-determined sequences. Updating beliefs in light of evidence is universal — whether the evidence is a ClinVar label, an email header, or a Stern–Gerlach measurement."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 7)}
+          intro="Bayes (genetics ↔ spam ↔ quantum): the SAME belief-updating rule powers AlphaMissense variant pathogenicity, Gmail spam filtering, and quantum measurement — because all three update P(H) given D."
+        />
       </SectionCard>
 
       <div className="flex flex-wrap gap-2">

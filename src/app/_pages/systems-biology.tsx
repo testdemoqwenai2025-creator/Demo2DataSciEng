@@ -7,11 +7,13 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Layers, Zap, TrendingUp, Terminal, Brain,
-  Activity, Network, Boxes, FlaskConical,
+  Activity, Network, Boxes, FlaskConical, Sparkles,
 } from "lucide-react";
 
 const KPIS = [
@@ -969,6 +971,19 @@ export function SystemsBiologyPage() {
           <p><strong className="text-foreground/80">PPI networks ARE distributed systems topology.</strong> Hub proteins (high PageRank) are load balancers — many other proteins depend on them, like a database that many microservices call. Essentiality prediction via PageRank IS the same analysis that Netflix does for service dependency graphs: which services would cause a cascading failure if down? Knockout screens (knock out each gene, see which kill the cell) IS chaos engineering (kill each service, see which break the system). The biology insight: ~10% of genes are essential = ~10% of microservices are critical for any large distributed system. The same mathematical structure (sparse graph + centrality + failure analysis) applies to both.</p>
           <p><strong className="text-foreground/80">Whole-cell simulation IS microservices architecture.</strong> Karr 2012's 28 sub-models (metabolism, transcription, translation, replication, etc.) are 28 microservices, each with its own time scale and solver, integrated by message passing. The cell's chromosome is a configuration file. The cell cycle IS the deployment cycle (build → test → release → scale → divide). The reason whole-cell simulation is hard is the same reason microservices integration is hard: each service has its own contract (data types, time scales, error handling), and emergent behaviour from composition is unpredictable. The solution (Karr 2012): explicit message passing + careful contract specification + slow integration tests. This is the same playbook as site reliability engineering. Systems biology IS SRE for the cell — the cell is the largest distributed system we know of, evolution has been load-testing it for 4 billion years, and our job is to reverse-engineer the playbook. The platform's systems biology stack connects to its data engineering stack (Spark, Medallion, pgvector) — FBA is LP (same as data pipeline optimisation), PPI is graph analytics (same as fraud detection), MOFA+ is matrix factorisation (same as recommender systems), whole-cell is microservices (same as the platform itself). The cell IS the original distributed system; biology IS the original cloud.</p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Entropy */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Entropy bridges information, thermodynamics, and genetics"
+        description="Entropy (H = -Σ p log p) IS the universal currency of disorder. Shannon used it to measure the information in a message; Boltzmann used it to measure the disorder in a gas; Haldane used it (via allele-frequency heterozygosity) to measure the genetic diversity of a population. The cell, the gas, and the genome are all the SAME statistic — because all three are probability distributions being compressed."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 9)}
+          intro="Entropy (information ↔ thermodynamics ↔ genetics): the SAME formula measures message information, gas disorder, and population heterozygosity — because all three quantify surprise in a distribution."
+        />
       </SectionCard>
 
       <div className="flex flex-wrap gap-2">

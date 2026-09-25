@@ -13,6 +13,8 @@ import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 
 const KPIS = [
   { label: "Kepler's 3rd law", value: "T² = (4π²/GM)·a³", hint: "Period T scales with semi-major axis a³ — Kepler 1619", deltaTone: "flat" as const },
@@ -1115,6 +1117,19 @@ export function SpaceSciencePage() {
             <strong className="text-foreground/80">This unifies the entire platform under one analytical stack.</strong> ADR-049 (neural-network potentials — SO(3) irreps for equivariance) is the same mathematics that solves the orbital-mechanics angular-momentum conservation: SO(3) is the rotation group, and equivarient networks respect it for exactly the reason Kepler's 2nd law (equal areas in equal times) holds — angular momentum conservation is an SO(3) symmetry. ADR-053 (systems-biology — PPI networks + multi-omics graphs) uses the same graph analytics as JetGNN: nodes are entities (proteins or particles), edges are relationships (interactions or ΔR proximity), and the message-passing paradigm is identical. ADR-002 (Databricks Lakehouse — Spark + Parquet + Delta) is the same software stack that LIGO's Data Grid uses for matched-filter searches and that MAST uses for TESS archive queries. The progression — classical orbital mechanics (Kepler 1619) → relativistic gravity (Einstein 1916) → computational big-data astronomy (Borucki 2010, Abbott 2016) — is the same ladder of mathematical tools, scaling from analytic power laws to learned graph neural networks, applied to the same universe. The universe IS the largest dataset, and the platform's entire computational-science arc converges on its analysis: from SO(3) orbital symmetries (neural-network-potentials) to graph analytics (systems-biology) to petabyte-scale storage (databricks). Every data scientist working on this platform is, indirectly, doing space science.
           </p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Euler's Method */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Euler's Method bridges orbital mechanics, game physics, and financial modelling"
+        description="Euler's Method (y(t+Δt) = y(t) + f(t,y)×Δt) IS the seed of all simulation. The simplest ODE integrator powers satellite trajectory propagation (NASA GMAT), game-engine physics loops (Unity fixed step), and financial SDE simulation (Black-Scholes Monte Carlo) — because all three discretise a continuous-time equation into steps. Every numerical simulation you've ever seen is a fancier version of Euler."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 8)}
+          intro="Euler's Method (orbital mechanics ↔ games ↔ finance): the SAME first-order integrator powers satellite propagation, game physics, and option pricing — because all three discretise continuous dynamics."
+        />
       </SectionCard>
 
       <RelatedTopics topics={[

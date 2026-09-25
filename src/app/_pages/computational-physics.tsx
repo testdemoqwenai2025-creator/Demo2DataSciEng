@@ -8,6 +8,8 @@ import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { Foldable } from "../_components/foldable";
 import { ScienceShort } from "../_components/science-short";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -627,6 +629,19 @@ export function ComputationalPhysicsPage() {
           <p><strong className="text-foreground/80">The Reynolds number IS dimensional analysis made computational.</strong> Buckingham's Pi theorem says any physical law expressible in n dimensional quantities can be rewritten in n - k dimensionless groups (k = number of base dimensions). Navier-Stokes has 5 dimensional parameters (ρ, v, L, ν, p) → 1 dimensionless ratio Re = ρvL/ν. So the entire flow regime is determined by ONE number — not 5. This is why wind-tunnel tests on a 1/100-scale model at the same Re predict the full-scale aircraft's behavior. Computational physics depends on this insight: simulate at the right dimensionless parameters, not the right dimensional ones. Without it, every CFD simulation would be wrong by a factor of 100 in lengthscale.</p>
         </div>
       </Foldable>
+
+      {/* Cross-disciplinary elegant-code card — Navier-Stokes */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Navier-Stokes bridges weather, blood flow, and turbulence"
+        description="Navier-Stokes (∂u/∂t + u·∇u = -∇p/ρ + ν∇²u) IS the universe's flow equation. A meteorologist simulating a hurricane, a cardiologist simulating arterial blood flow, and an aerospace engineer simulating wing turbulence solve the SAME equation because all three are continuum fluids with viscosity."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 5)}
+          intro="Navier-Stokes (weather ↔ blood ↔ turbulence): the SAME PDE governs the atmosphere, the aorta, and a Boeing wing — because all three are viscous fluids."
+        />
+      </SectionCard>
 
       <RelatedTopics topics={[
         { id: "quantum-computing" as const, reason: "Quantum Computing (exact path integrals on quantum hardware)" },

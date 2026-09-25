@@ -8,6 +8,7 @@ import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { TABULAR_EXAMPLES } from "../_components/_dataset_examples7";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -960,6 +961,19 @@ export function TabularPage() {
             <strong className="text-foreground/80">The Tabular acquisition IS the 2010s database-vendor battle redux.</strong> In the 2010s, AWS won the managed database battle with RDS (managed Postgres/MySQL) — took 50%+ of new database deployments by removing ops overhead. Snowflake is trying to do the same for the lakehouse catalog with Tabular + Polaris — managed open catalog as the default. Databricks is fighting back with Unity (closed catalog + managed compute). The 2020s catalog battle is structurally the 2010s managed-database battle — open spec + managed service vs closed spec + managed service. History suggests the open + managed model wins (RDS won), but Databricks' incumbent advantage (all Delta customers) is significant.
           </p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Gradient Descent */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Gradient Descent bridges ML, evolution, and thermodynamics"
+        description="Gradient Descent (θ(t+1) = θ(t) - η∇L(θ)) IS the learning rule. A neural network learning to classify images, a population evolving under selection pressure, and a physical system relaxing to its minimum-energy state all follow the SAME rule: step downhill in the loss/fitness/energy landscape. ML IS evolution IS thermodynamics — three names for the same descent."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 6)}
+          intro="Gradient Descent (ML ↔ evolution ↔ thermodynamics): the SAME descent rule powers GPT-4 training, natural selection, and protein folding — because all three minimise a landscape."
+        />
       </SectionCard>
 
       <RelatedTopics topics={[
