@@ -13,7 +13,7 @@
 // ============================================================
 
 import type { DatasetExample } from "./dataset-cards";
-import { Atom, Brain, Activity, Database, Zap, Cpu, Network } from "lucide-react";
+import { Atom, Brain, Activity, Database, Zap, Cpu, Network, TrendingUp } from "lucide-react";
 
 export const ELEGANT_CODE_CARDS: DatasetExample[] = [
   // ============================================================
@@ -1585,5 +1585,1073 @@ print("  - MORE accuracy (2nd order vs 1st order Euler)")
 print("  - ENERGY CONSERVATION (symplectic)")
 print("Less code, better math. THAT is elegance.")`,
     insight: "Verlet IS the simplest symplectic integrator. Its elegance lies in its minimalism: no velocity variable, no accumulated state, just positions and forces. The formula r(t+Δt) = 2r(t) - r(t-Δt) + (F/m)×Δt² is time-reversal symmetric — swap t+Δt and t-Δt, and the equation is unchanged. This symmetry IS the symplectic property: the integrator preserves phase-space volume, which means energy is conserved. A biochemist simulating protein folding (AMBER), a game developer simulating ragdoll physics (Havok), and an aerospace engineer simulating spacecraft trajectories (NASA JPL) all benefit from the SAME conservation law. Three sciences, one formula, same energy preservation — because all three simulate Hamiltonian systems. The math dictates the code. The code preserves the math. A biochemist and a game developer are using the SAME algorithm and neither knows it — THAT is the multi-disciplinary elegance the platform should reveal.",
+  },
+
+  // ============================================================
+  // 6. Navier-Stokes: Weather ↔ Blood flow ↔ Turbulence
+  // ============================================================
+  {
+    id: "elegant-navier-stokes-cross-discipline",
+    step: "6",
+    title: "Navier-Stokes — the universe's flow equation (weather ↔ blood ↔ turbulence)",
+    subtitle: "∂u/∂t + u·∇u = -∇p/ρ + ν∇²u — one PDE, three flow sciences",
+    accent: "oklch(0.65 0.16 200)",
+    icon: <Activity className="h-4 w-4" />,
+    badge: "Fluid Dynamics",
+    brief: {
+      dataset: "Weather prediction: global atmosphere modeled as Navier-Stokes on a sphere. Blood flow: arteries modeled with patient-specific geometry. Turbulence: DNS at Re=10⁶.",
+      scale: "Weather: 10⁷ grid points × 10⁵ timesteps. Blood: 10⁶ mesh elements per artery. Turbulence: Re=10⁶, Kolmogorov scale η ~ Re^(-3/4).",
+      why: "Navier-Stokes IS the equation of flow. Air, blood, money, stars — everything that flows obeys it. The Clay Mathematics Institute offers USD 1M for proving existence/uniqueness. The SAME equation models weather (ECMWF), blood flow (patient-specific CFD), and turbulence (DNS). A meteorologist, a cardiologist, and a physicist are solving the same PDE.",
+    },
+    stats: [
+      { label: "Grid points", value: "10⁷ (weather)" },
+      { label: "Mesh elements", value: "10⁶ (blood)" },
+      { label: "Reynolds", value: "10⁶ (turbulence)" },
+      { label: "Prize", value: "USD 1M (Clay)" },
+    ],
+    tools: ["OpenFOAM", "COMSOL", "ANSYS Fluent", "Nektar++", "NumPy/SciPy", "GPU clusters"],
+    codeTabs: [
+      {
+        lang: "scala",
+        filename: "NavierStokes_Elegance.scala",
+        code: `// ============================================================
+// Navier-Stokes: ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+//
+// ONE PDE. THREE flow sciences. The universe's equation.
+//
+// Meteorology:  global atmosphere → weather prediction (ECMWF)
+//              → 10⁷ grid points, 10km resolution, 10-day forecast
+//
+// Hemodynamics: patient-specific arteries → blood flow (CFD)
+//              → 10⁶ mesh elements, mm resolution, aneurysm risk
+//
+// Turbulence:   direct numerical simulation (DNS) → Kolmogorov cascade
+//              → Re=10⁶, all scales resolved, η ~ Re^(-3/4)
+//
+// WHY the same equation?
+// Because EVERYTHING that flows (liquids, gases, plasmas) obeys
+// conservation of momentum + mass. Navier-Stokes IS Newton's F=ma
+// applied to a continuum with viscosity.
+//
+// The advection term u·∇u is the NONLINEAR term — it makes
+// Navier-Stokes hard (chaos, turbulence, the Clay Millennium Prize).
+// The viscous term ν∇²u is the DISSIPATIVE term — it smooths.
+// The balance between advection (nonlinear) and viscosity (dissipation)
+// is measured by the Reynolds number Re = ρvL/ν.
+//
+// Re << 1: viscous dominates → laminar (honey, bacteria)
+// Re >> 1: advection dominates → turbulent (air, blood in aorta)
+// Re ~ 1: balanced → interesting (sperm swimming, microfluidics)
+// ============================================================
+
+// Weather: global atmosphere simulation
+val u_next = u_t + dt * (-(u_t dot grad) * u_t - grad(p)/rho + nu * laplacian(u_t))
+// u_t = 3D velocity field (10⁷ grid points)
+// dt = minutes, nu = atmospheric viscosity, rho = air density
+// → 10-day weather forecast (ECMWF runs this every 6 hours)
+
+// Blood flow: patient-specific artery
+val u_next = u_t + dt * (-(u_t dot grad) * u_t - grad(p)/rho + nu * laplacian(u_t))
+// SAME equation, different parameters:
+// nu = blood viscosity (3.5e-6 m²/s), rho = blood density (1060 kg/m³)
+// Re = rho*v*D/nu ~ 2000 in aorta → transitional flow
+// → predict wall shear stress (aneurysm rupture risk)
+
+// Turbulence: direct numerical simulation
+val u_next = u_t + dt * (-(u_t dot grad) * u_t - grad(p)/rho + nu * laplacian(u_t))
+// SAME equation, extreme parameters:
+// Re = 10⁶, Kolmogorov scale η/L ~ Re^(-3/4) = 10^(-4.5)
+// → need 10⁹ grid points to resolve ALL scales
+// → only feasible on the world's largest supercomputers`,
+      },
+      {
+        lang: "rust",
+        filename: "navier_stokes_elegance.rs",
+        code: `// ============================================================
+// Navier-Stokes in Rust — the universe's flow equation
+//
+// ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+//
+// The elegance: the SAME code simulates weather, blood, and turbulence.
+// Only the PARAMETERS change (nu, rho, dt, grid resolution).
+// The EQUATION is universal. The PHYSICS is universal.
+// The DOMAIN changes the parameters; the math remains identical.
+//
+// The insight: the nonlinear term u·∇u IS what makes flow INTERESTING.
+// Without it (linearize: ∂u/∂t = ν∇²u), flow is boring (pure diffusion).
+// WITH it, flow is chaotic (turbulence), beautiful (vortices),
+// and unsolved (the Clay Millennium Prize — existence/uniqueness
+// of Navier-Stokes solutions is an OPEN mathematical problem).
+//
+// The SAME nonlinearity that makes weather unpredictable (butterfly
+// effect) makes blood flow complex (aneurysm prediction) and makes
+// turbulence beautiful (Kolmogorov cascade). The chaos IS the elegance.
+// ============================================================
+
+/// Navier-Stokes: ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+/// The universal flow equation. Weather, blood, turbulence — same PDE.
+fn navier_stokes_step(
+    u: &Field3D,       // velocity field
+    p: &Field3D,       // pressure field
+    rho: f64,          // density (air=1.2, blood=1060)
+    nu: f64,           // viscosity (air=1.5e-5, blood=3.5e-6)
+    dt: f64,           // timestep (weather=min, blood=ms)
+) -> Field3D {
+    // The advection term: u·∇u (NONLINEAR — this IS the chaos)
+    let advection = u.advect(u);  // u · ∇u
+    // The pressure gradient: -∇p/ρ
+    let pressure_grad = p.gradient().scale(-1.0 / rho);
+    // The viscous term: ν∇²u (DISSIPATIVE — this IS the smoothing)
+    let viscous = u.laplacian().scale(nu);
+    // Time update: ∂u/∂t = -advection + pressure_grad + viscous
+    // Euler step (production uses higher-order: RK4, Adams-Bashforth)
+    u + (pressure_grad + viscous - advection).scale(dt)
+    // The SAME function simulates:
+    //   Weather (ECMWF): nu=1.5e-5, rho=1.2, dt=60s, grid=10⁷
+    //   Blood (CFD): nu=3.5e-6, rho=1060, dt=0.001s, grid=10⁶
+    //   Turbulence (DNS): nu=1e-7, rho=1.0, dt=1e-5s, grid=10⁹
+    // The function doesn't know the domain. The domain doesn't change the function.
+}`,
+      },
+      {
+        lang: "go",
+        filename: "navier_stokes_elegance.go",
+        code: `// Navier-Stokes: the universal flow equation
+// ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+// Weather, blood, turbulence — same PDE, different parameters.
+func NavierStokes(u, p Field3D, rho, nu, dt float64) Field3D {
+    advection := u.Advect(u)              // u·∇u (the chaos)
+    pressure := p.Gradient().Scale(-1.0/rho) // -∇p/ρ
+    viscous := u.Laplacian().Scale(nu)   // ν∇²u (the smoothing)
+    return u.Add((pressure.Add(viscous).Sub(advection)).Scale(dt))
+}`,
+      },
+      {
+        lang: "elixir",
+        filename: "navier_stokes_elegance.ex",
+        code: `defmodule NavierStokes do
+  @moduledoc """
+  ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+
+  The universe's flow equation. ONE PDE, THREE sciences.
+
+  Weather:     atmosphere → prediction (ECMWF, 10⁷ grid)
+  Hemodynamics: arteries → aneurysm risk (CFD, 10⁶ mesh)
+  Turbulence:  DNS → Kolmogorov cascade (Re=10⁶, 10⁹ grid)
+
+  The nonlinear term u·∇u IS the chaos. The viscous term ν∇²u IS the smoothing.
+  The balance (Reynolds number) determines the regime.
+  """
+  def step(u, p, rho, nu, dt) do
+    advection = advect(u, u)            # u·∇u — THE chaos
+    pressure = scale(gradient(p), -1.0/rho) # -∇p/ρ
+    viscous = scale(laplacian(u), nu)   # ν∇²u — THE smoothing
+    add(u, scale(sub(add(pressure, viscous), advection), dt))
+    # The function doesn't know if u is wind, blood, or eddy.
+    # The math is universal. The physics is universal. The domain is irrelevant.
+  end
+end`,
+      },
+      {
+        lang: "zig",
+        filename: "navier_stokes_elegance.zig",
+        code: `const std = @import("std");
+// Navier-Stokes: ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u
+// The universal flow equation — weather, blood, turbulence, stars.
+pub fn navierStokesStep(u: Field3D, p: Field3D, rho: f64, nu: f64, dt: f64) Field3D {
+    const advection = u.advect(u);           // u·∇u — THE nonlinearity
+    const pressure = p.gradient().scale(-1.0/rho); // -∇p/ρ
+    const viscous = u.laplacian().scale(nu); // ν∇²u — THE dissipation
+    return u.add(pressure.add(viscous).sub(advection).scale(dt));
+    // The Clay Millennium Prize asks: does this equation ALWAYS have
+    // a unique smooth solution? We don't know. The universe runs it
+    // every second (weather, blood, stars) — but we can't prove it.
+    // The math is used before it's proven. THAT is elegance.
+}`,
+      },
+    ],
+    runnablePython: `# Navier-Stokes: the universe's flow equation
+import math, random
+
+print("=== Navier-Stokes: ∂u/∂t + u·∇u = -∇p/ρ + ν∇²u ===")
+print()
+print("ONE PDE. THREE flow sciences. The universe's equation.")
+print()
+print("  Weather:     atmosphere → prediction (ECMWF, 10⁷ grid)")
+print("  Blood:       arteries → aneurysm risk (CFD, 10⁶ mesh)")
+print("  Turbulence:  DNS → Kolmogorov cascade (Re=10⁶)")
+print()
+
+# Simulate 1D advection-diffusion (simplified Navier-Stokes)
+N = 100; dt = 0.001; nu = 0.01
+u = [math.sin(2*math.pi*i/N) for i in range(N)]  # initial wave
+print("1D advection-diffusion (simplified Navier-Stokes):")
+print(f"  N={N} grid, dt={dt}, nu={nu} (viscosity)")
+print()
+
+for step in range(500):
+    u_new = [0.0]*N
+    for i in range(N):
+        # Advection: -u * du/dx (nonlinear — THE chaos)
+        du_dx = (u[(i+1)%N] - u[(i-1)%N]) / 2
+        advection = -u[i] * du_dx
+        # Diffusion: nu * d²u/dx² (linear — THE smoothing)
+        d2u_dx2 = (u[(i+1)%N] - 2*u[i] + u[(i-1)%N])
+        diffusion = nu * d2u_dx2
+        # Update
+        u_new[i] = u[i] + dt * (advection + diffusion)
+    u = u_new
+    if step % 100 == 0:
+        max_u = max(abs(v) for v in u)
+        print(f"  Step {step:3d}: max|u| = {max_u:.4f} (wave amplitude decaying)")
+
+print()
+print("The insight: u·∇u (advection) IS the nonlinearity that makes flow")
+print("chaotic. Without it, flow is pure diffusion (boring). With it,")
+print("flow is weather, blood, and turbulence (beautiful + unsolved).")
+print()
+print("The Clay Millennium Prize: does Navier-Stokes ALWAYS have a unique")
+print("smooth solution? We don't know — but the universe runs it every second.")`,
+    insight: "Navier-Stokes IS the universe's equation for flow. Air flows (weather), blood flows (hemodynamics), money flows (finance), stars flow (plasma). The SAME PDE governs ALL of them because everything that flows obeys conservation of momentum + mass. The nonlinear term u·∇u is what makes flow INTERESTING — it creates chaos, turbulence, and the butterfly effect. Without it, flow is boring diffusion; with it, flow is beautiful, complex, and mathematically unsolved (the Clay Millennium Prize). A meteorologist predicting weather, a cardiologist predicting aneurysm risk, and a physicist studying turbulence are solving the SAME equation — and none of them knows it. The chaos IS the elegance: the SAME nonlinearity that makes weather unpredictable makes blood flow complex and makes turbulence beautiful. The universe runs this equation every second — but we still can't prove it always has a solution. The math is used before it's proven. THAT is elegance.",
+  },
+
+  // ============================================================
+  // 7. Gradient Descent: ML ↔ Evolution ↔ Thermodynamics
+  // ============================================================
+  {
+    id: "elegant-gradient-descent-cross-discipline",
+    step: "7",
+    title: "Gradient Descent — the learning rule (ML ↔ evolution ↔ thermodynamics)",
+    subtitle: "θ(t+1) = θ(t) - η∇L(θ) — one update rule, three optimization sciences",
+    accent: "oklch(0.65 0.16 165)",
+    icon: <TrendingUp className="h-4 w-4" />,
+    badge: "Optimization",
+    brief: {
+      dataset: "ML training: 175B parameters, loss landscape with 10¹¹ dimensions. Evolution: fitness landscape over genotype space. Thermodynamics: free energy minimization.",
+      scale: "175B parameters (GPT-3), 10⁹ years (evolution), Boltzmann distribution (statistical mechanics)",
+      why: "Gradient descent IS the learning rule. ML minimizes loss, evolution maximizes fitness, thermodynamics minimizes free energy. The SAME update rule (step in the direction of steepest descent) because ALL THREE are optimization on a landscape. The loss landscape IS the fitness landscape IS the energy landscape — different names, same geometry.",
+    },
+    stats: [
+      { label: "Parameters", value: "175B (GPT-3)" },
+      { label: "Evolution", value: "10⁹ years" },
+      { label: "Landscape", value: "10¹¹-dim" },
+      { label: "Sciences", value: "3" },
+    ],
+    tools: ["PyTorch SGD/Adam", "JAX optax", "NumPy autograd", "DeepSpeed", "evolutionary algorithms"],
+    codeTabs: [
+      {
+        lang: "scala",
+        filename: "GradientDescent_Elegance.scala",
+        code: `// ============================================================
+// Gradient Descent: θ(t+1) = θ(t) - η∇L(θ)
+//
+// The elegance: ONE update rule, THREE optimization sciences.
+//
+// ML:           minimize loss L(θ) → train neural network
+//               → 175B parameters, η=learning rate, SGD/Adam
+//               → loss landscape with 10¹¹ dimensions
+//
+// Evolution:    maximize fitness F(g) → natural selection
+//               → genotype space, η=mutation rate
+//               → fitness landscape (Wright 1932, Sewall Wright)
+//
+// Thermodynamics: minimize free energy G(s) → equilibrium
+//               → state space, η=temperature (β=1/kT)
+//               → free energy landscape (Boltzmann distribution)
+//
+// WHY the same rule?
+// Because ALL THREE optimize on a landscape:
+//   - ML: descend the loss landscape (find the minimum)
+//   - Evolution: climb the fitness landscape (find the maximum)
+//   - Thermodynamics: descend the free energy landscape (find equilibrium)
+//
+// The gradient ∇ points in the direction of steepest change.
+// For ML: -η∇L descends loss (improves the model)
+// For evolution: +η∇F climbs fitness (improves adaptation)
+// For thermodynamics: -η∇G descends free energy (reaches equilibrium)
+//
+// The SIGN is different (minimize loss vs maximize fitness) but the
+// GEOMETRY is the same: follow the gradient on a landscape.
+//
+// The insight: the loss landscape IS the fitness landscape IS the
+// energy landscape. The SAME geometry because optimization IS universal.
+// ML, evolution, and thermodynamics are all doing the SAME thing:
+// navigating a high-dimensional landscape via local gradient information.
+// ============================================================
+
+// ML: gradient descent on loss
+val theta_new = theta - lr * gradient(loss, theta)
+// theta = 175B parameters, lr = 0.001 (Adam)
+// loss = cross-entropy on 300B tokens
+// → train GPT-3 (175B params, 1024 A100 GPUs, 34 days)
+
+// Evolution: natural selection as gradient ascent on fitness
+val genotype_new = genotype + mutation_rate * gradient(fitness, genotype)
+// genotype = DNA sequence, mutation_rate = 10⁻⁸ per base per generation
+// fitness = reproductive success
+// → 10⁹ years of evolution = 10⁹ gradient steps on fitness landscape
+
+// Thermodynamics: free energy minimization
+val state_new = state - beta * gradient(free_energy, state)
+// state = configuration, beta = 1/kT (inverse temperature)
+// free_energy = E - TS (energy - temperature × entropy)
+// → system relaxes to equilibrium (minimum free energy)`,
+      },
+      {
+        lang: "rust",
+        filename: "gradient_descent_elegance.rs",
+        code: `// ============================================================
+// Gradient Descent in Rust — the universal learning rule
+//
+// θ(t+1) = θ(t) - η∇L(θ)
+//
+// The elegance: ONE function implements ML, evolution, and thermodynamics.
+// Only the SIGN of the gradient and the meaning of η change.
+//
+// ML:            θ -= η × ∇L  (descend loss → minimize prediction error)
+// Evolution:     g += η × ∇F  (ascend fitness → maximize reproduction)
+// Thermodynamics: s -= β × ∇G  (descend free energy → reach equilibrium)
+//
+// The SIGN is a CONVENTION (minimize vs maximize). The GEOMETRY is universal:
+// navigate a high-dimensional landscape via local gradient information.
+// The landscape doesn't know if it's loss, fitness, or energy.
+// The gradient doesn't know what it's optimizing. The step doesn't know
+// if it's SGD, mutation, or thermal relaxation. The math is domain-agnostic.
+// ============================================================
+
+/// Gradient descent: θ(t+1) = θ(t) - η∇L(θ)
+/// The universal optimization step. ML, evolution, thermodynamics.
+fn gradient_descent(
+    theta: &[f64],     // current parameters (ML), genotype (evolution), state (thermo)
+    grad: &[f64],      // gradient of landscape (∇L for ML, ∇F for evolution, ∇G for thermo)
+    lr: f64,           // learning rate (η for ML, mutation rate for evolution, β=1/kT for thermo)
+    maximize: bool,    // false=ML/thermo (minimize), true=evolution (maximize)
+) -> Vec<f64> {
+    let sign = if maximize { 1.0 } else { -1.0 };
+    theta.iter().zip(grad.iter())
+        .map(|(&t, &g)| t + sign * lr * g)
+        .collect()
+    // ONE function. THREE sciences. The sign is the only difference.
+    // The math is identical: step in the direction of steepest change.
+    // The domain is irrelevant. The gradient is universal.
+}`,
+      },
+      {
+        lang: "go",
+        filename: "gradient_descent_elegance.go",
+        code: `// Gradient Descent: θ(t+1) = θ(t) - η∇L(θ)
+// ML (minimize loss), evolution (maximize fitness), thermo (minimize energy).
+func GradientDescent(theta, grad []float64, lr float64, maximize bool) []float64 {
+    sign := -1.0 // minimize (ML, thermodynamics)
+    if maximize { sign = 1.0 } // maximize (evolution)
+    result := make([]float64, len(theta))
+    for i := range theta { result[i] = theta[i] + sign*lr*grad[i] }
+    return result
+}`,
+      },
+      {
+        lang: "elixir",
+        filename: "gradient_descent_elegance.ex",
+        code: `defmodule GradientDescent do
+  @moduledoc """
+  θ(t+1) = θ(t) - η∇L(θ)
+
+  The universal learning rule. ONE update, THREE sciences.
+
+  ML:            minimize loss → train neural networks (175B params)
+  Evolution:     maximize fitness → natural selection (10⁹ years)
+  Thermodynamics: minimize free energy → reach equilibrium (Boltzmann)
+
+  The landscape is universal: loss = fitness = energy (different names, same geometry).
+  The gradient is universal: steepest change in ANY landscape.
+  The step is universal: move in the direction of improvement.
+  """
+  def step(theta, grad, lr, maximize) do
+    sign = if maximize, do: 1.0, else: -1.0
+    Enum.zip(theta, grad)
+    |> Enum.map(fn {t, g} -> t + sign * lr * g end)
+    # ONE function. THREE sciences. The sign is the only difference.
+    # In ML: theta -= lr * grad_loss (descend the loss landscape)
+    # In evolution: genotype += mutation_rate * grad_fitness (climb fitness)
+    # In thermo: state -= beta * grad_energy (descend free energy)
+    # The math is identical. The domain is irrelevant.
+  end
+end`,
+      },
+      {
+        lang: "zig",
+        filename: "gradient_descent_elegance.zig",
+        code: `const std = @import("std");
+// ============================================================
+// Gradient Descent: θ(t+1) = θ(t) - η∇L(θ)
+//
+// The universal learning rule. ML, evolution, thermodynamics.
+//
+// The insight: the loss landscape IS the fitness landscape IS the
+// energy landscape. The SAME geometry because optimization IS universal.
+// ML descends loss (improves predictions). Evolution ascends fitness
+// (improves adaptation). Thermodynamics descends free energy (reaches
+// equilibrium). THREE sciences, SAME geometry, ONE update rule.
+//
+// The sign is a convention: minimize (ML, thermo) vs maximize (evolution).
+// The math is identical: step in the direction of steepest change.
+// ============================================================
+pub fn gradientDescent(theta: []f64, grad: []f64, lr: f64, maximize: bool) []f64 {
+    const sign: f64 = if (maximize) 1.0 else -1.0;
+    var result = theta.*;
+    for (result, grad) |*t, g| { t.* += sign * lr * g; }
+    return result;
+}`,
+      },
+    ],
+    runnablePython: `# Gradient Descent: the universal learning rule
+import math, random
+
+print("=== Gradient Descent: θ(t+1) = θ(t) - η∇L(θ) ===")
+print()
+print("ONE update rule. THREE optimization sciences.")
+print()
+print("  ML:            minimize loss → train neural networks (175B params)")
+print("  Evolution:     maximize fitness → natural selection (10⁹ years)")
+print("  Thermodynamics: minimize free energy → reach equilibrium (Boltzmann)")
+print()
+
+# Simulate gradient descent on a quadratic loss
+random.seed(42)
+theta = 5.0  # starting point (far from minimum at 0)
+lr = 0.1    # learning rate
+print(f"Gradient descent on L(θ) = θ² (minimum at θ=0):")
+print(f"  Start: θ={theta:.4f}, L={theta**2:.4f}")
+for step in range(20):
+    grad = 2 * theta  # ∇L = 2θ
+    theta = theta - lr * grad  # θ -= η∇L
+    if step % 5 == 0 or step == 19:
+        print(f"  Step {step:2d}: θ={theta:.4f}, L={theta**2:.6f}")
+print(f"  Converged to θ={theta:.6f} (minimum at 0)")
+print()
+print("The SAME process describes:")
+print("  ML: θ=weights, L=loss, η=learning rate → model improves")
+print("  Evolution: θ=genotype, L=-fitness, η=mutation rate → adaptation improves")
+print("  Thermo: θ=state, L=free_energy, η=1/kT → system relaxes to equilibrium")
+print()
+print("The insight: loss landscape = fitness landscape = energy landscape.")
+print("Different names, SAME geometry. Optimization IS universal.")`,
+    insight: "Gradient descent IS the learning rule. ML minimizes loss, evolution maximizes fitness, thermodynamics minimizes free energy — all three navigate a high-dimensional landscape via local gradient information. The loss landscape IS the fitness landscape IS the energy landscape: different names for the SAME geometry. The sign is a convention (minimize vs maximize); the math is identical: step in the direction of steepest change. A machine learning engineer training GPT-3 (175B parameters), an evolutionary biologist modeling 10⁹ years of natural selection, and a physicist computing Boltzmann equilibrium are all doing gradient descent on different landscapes. The loss function doesn't know it's loss; the fitness function doesn't know it's fitness; the free energy doesn't know it's energy. The gradient is universal — it points in the direction of steepest change regardless of what 'change' means in your science. THAT is multi-disciplinary elegance: when the SAME optimization rule governs learning, evolution, and equilibrium.",
+  },
+
+  // ============================================================
+  // 8. Bayes: Genetics ↔ Spam Filtering ↔ Quantum Mechanics
+  // ============================================================
+  {
+    id: "elegant-bayes-cross-discipline",
+    step: "8",
+    title: "Bayes — the learning rule for beliefs (genetics ↔ spam ↔ quantum)",
+    subtitle: "P(H|D) = P(D|H)P(H)/P(D) — one theorem, three belief-updating sciences",
+    accent: "oklch(0.65 0.16 250)",
+    icon: <Brain className="h-4 w-4" />,
+    badge: "Inference",
+    brief: {
+      dataset: "GWAS: 3M SNPs × 2504 individuals. Bayes updates disease probability given genotype. Spam: email features → P(spam|features). Quantum: Bayesian interpretation of measurement.",
+      scale: "3M SNPs (genetics), 10⁹ emails (spam), quantum state vectors (Hilbert space)",
+      why: "Bayes IS the learning rule for beliefs. Genetics (posterior disease risk from genotype), spam filtering (posterior spam probability from features), and quantum mechanics (Bayesian interpretation of measurement) all update beliefs the same way. The theorem doesn't know if H is a disease, a spam label, or a quantum state. Belief updating IS universal.",
+    },
+    stats: [
+      { label: "SNPs", value: "3M (GWAS)" },
+      { label: "Emails", value: "10⁹ (spam)" },
+      { label: "States", value: "|ψ⟩ (quantum)" },
+      { label: "Sciences", value: "3" },
+    ],
+    tools: ["PyMC", "Stan", "NumPy/SciPy", "scikit-learn (NaiveBayes)", "Bayesian optimization"],
+    codeTabs: [
+      {
+        lang: "scala",
+        filename: "Bayes_Elegance.scala",
+        code: `// ============================================================
+// Bayes: P(H|D) = P(D|H) × P(H) / P(D)
+//
+// The elegance: ONE theorem, THREE belief-updating sciences.
+//
+// Genetics:     P(disease|genotype) = P(genotype|disease) × P(disease) / P(genotype)
+//               → update disease risk based on DNA test
+//               → prior = population prevalence, likelihood = genotype frequency
+//
+// Spam:         P(spam|email) = P(email|spam) × P(spam) / P(email)
+//               → classify email as spam/not-spam
+//               → prior = base spam rate, likelihood = word frequencies
+//
+// Quantum:      P(state|measurement) = P(measurement|state) × P(state) / P(measurement)
+//               → update quantum state after measurement (Bayesian interpretation)
+//               → prior = pre-measurement state, likelihood = Born rule
+//
+// WHY the same theorem?
+// Because ALL THREE update BELIEFS given EVIDENCE:
+//   - Genetics: belief = disease risk, evidence = genotype
+//   - Spam: belief = spam classification, evidence = email features
+//   - Quantum: belief = quantum state, evidence = measurement outcome
+//
+// Bayes says: new belief = (evidence × old belief) / total evidence
+// This is the UNIVERSAL formula for updating ANY belief given ANY evidence.
+// The theorem doesn't know if H is a disease, a spam label, or a quantum state.
+// Belief updating IS universal — Bayes is the math of learning.
+// ============================================================
+
+// Genetics: P(disease|genotype)
+val p_disease_given_genotype = (p_genotype_given_disease * p_disease) / p_genotype
+// p_genotype_given_disease = frequency of this genotype among patients
+// p_disease = population prevalence (e.g., 1% for BRCA1)
+// p_genotype = frequency of this genotype in the general population
+// → update disease risk: was 1%, now 47% with BRCA1 mutation
+
+// Spam: P(spam|email_features)
+val p_spam_given_email = (p_email_given_spam * p_spam) / p_email
+// p_email_given_spam = word frequencies in spam emails
+// p_spam = base spam rate (e.g., 45%)
+// p_email = word frequencies in all emails
+// → classify: P(spam|"free money") = 0.97 → spam
+
+// Quantum: P(state|measurement)
+val p_state_given_meas = (p_meas_given_state * p_state) / p_meas
+// p_meas_given_state = Born rule: |<measurement|state>|²
+// p_state = pre-measurement quantum state
+// p_meas = total probability of this measurement
+// → collapse: measurement updates the quantum state (Bayesian interpretation)`,
+      },
+      {
+        lang: "rust",
+        filename: "bayes_elegance.rs",
+        code: `// ============================================================
+// Bayes in Rust — the universal belief updater
+//
+// P(H|D) = P(D|H) × P(H) / P(D)
+//
+// The elegance: the function signature IS the theorem.
+// Input: prior P(H), likelihood P(D|H), evidence P(D).
+// Output: posterior P(H|D).
+//
+// The function doesn't know if H is a disease, spam label, or quantum state.
+// It just updates: new belief proportional to evidence × old belief.
+//
+// The insight: Bayes IS the math of learning.
+// Every system that learns from evidence uses Bayes — explicitly (statistics)
+// or implicitly (neural networks approximate Bayesian inference at scale).
+// The posterior IS the updated belief. The prior IS the initial belief.
+// The likelihood IS the evidence. The evidence P(D) IS the normalizer.
+// Four quantities, one theorem, infinite applications.
+// ============================================================
+
+/// Bayes: P(H|D) = P(D|H) × P(H) / P(D)
+/// The universal belief updater. Genetics, spam, quantum mechanics.
+fn bayes(prior: f64, likelihood: f64, evidence: f64) -> f64 {
+    likelihood * prior / evidence
+    // P(H|D) = P(D|H) × P(H) / P(D)
+    //
+    // Genetics: prior=P(disease), likelihood=P(genotype|disease), evidence=P(genotype)
+    // Spam: prior=P(spam), likelihood=P(email|spam), evidence=P(email)
+    // Quantum: prior=P(state), likelihood=P(meas|state), evidence=P(meas)
+    //
+    // The function IS the theorem. The theorem IS the function.
+    // No abstraction. Just the equation, expressed in code.
+}`,
+      },
+      {
+        lang: "go",
+        filename: "bayes_elegance.go",
+        code: `// Bayes: P(H|D) = P(D|H) × P(H) / P(D)
+// The universal belief updater — genetics, spam, quantum mechanics.
+func Bayes(prior, likelihood, evidence float64) float64 {
+    return likelihood * prior / evidence
+}`,
+      },
+      {
+        lang: "elixir",
+        filename: "bayes_elegance.ex",
+        code: `defmodule Bayes do
+  @moduledoc """
+  P(H|D) = P(D|H) × P(H) / P(D)
+
+  The universal belief updater. ONE theorem, THREE sciences.
+
+  Genetics: P(disease|genotype) → update disease risk from DNA
+  Spam:     P(spam|features) → classify email
+  Quantum:  P(state|measurement) → update quantum state (Bayesian interpretation)
+
+  Bayes IS the math of learning. Every system that updates beliefs
+  from evidence uses Bayes — explicitly or implicitly.
+  """
+  def posterior(prior, likelihood, evidence) do
+    likelihood * prior / evidence
+    # P(H|D) = P(D|H) × P(H) / P(D)
+    # The function IS the theorem. The theorem IS the function.
+  end
+end`,
+      },
+      {
+        lang: "zig",
+        filename: "bayes_elegance.zig",
+        code: `const std = @import("std");
+// Bayes: P(H|D) = P(D|H) × P(H) / P(D)
+// The universal belief updater. Genetics, spam, quantum mechanics.
+pub fn bayes(prior: f64, likelihood: f64, evidence: f64) f64 {
+    return likelihood * prior / evidence;
+    // The function IS the theorem. The theorem IS the function.
+    // No abstraction. Just the equation, expressed in code.
+    // Genetics: P(disease|genotype) = P(genotype|disease) × P(disease) / P(genotype)
+    // Spam: P(spam|email) = P(email|spam) × P(spam) / P(email)
+    // Quantum: P(state|meas) = P(meas|state) × P(state) / P(meas)
+    // The theorem doesn't know if H is a disease, spam, or quantum state.
+}`,
+      },
+    ],
+    runnablePython: `# Bayes: the universal belief updater
+import math, random
+
+print("=== Bayes: P(H|D) = P(D|H) × P(H) / P(D) ===")
+print()
+print("ONE theorem. THREE belief-updating sciences.")
+print()
+print("  Genetics:  P(disease|genotype) → update disease risk from DNA")
+print("  Spam:      P(spam|features) → classify email")
+print("  Quantum:   P(state|measurement) → update quantum state")
+print()
+
+# Genetics: BRCA1 mutation → breast cancer risk
+p_disease = 0.01  # prior: 1% population prevalence
+p_genotype_given_disease = 0.05  # 5% of patients have this mutation
+p_genotype = 0.001  # 0.1% of general population has this mutation
+p_disease_given_genotype = (p_genotype_given_disease * p_disease) / p_genotype
+print(f"Genetics: P(cancer|BRCA1+) = {p_disease_given_genotype:.2f} ({p_disease_given_genotype*100:.0f}%)")
+print(f"  Prior: P(cancer) = {p_disease*100:.0f}% → Posterior: P(cancer|BRCA1+) = {p_disease_given_genotype*100:.0f}%")
+print()
+
+# Spam: "free money" → spam probability
+p_spam = 0.45  # 45% of emails are spam
+p_words_given_spam = 0.15  # 15% of spam emails have "free money"
+p_words = 0.07  # 7% of all emails have "free money"
+p_spam_given_words = (p_words_given_spam * p_spam) / p_words
+print(f"Spam: P(spam|'free money') = {p_spam_given_words:.4f} ({p_spam_given_words*100:.1f}%)")
+print(f"  Prior: P(spam) = {p_spam*100:.0f}% → Posterior: P(spam|'free money') = {p_spam_given_words*100:.1f}%")
+print()
+
+# Quantum: measurement updates state
+print("Quantum: P(state|measurement) = Born rule × prior / evidence")
+print("  Prior = pre-measurement state → Posterior = collapsed state")
+print("  The measurement 'updates the belief' about the quantum state.")
+print()
+print("The insight: Bayes IS the math of learning.")
+print("Every system that updates beliefs from evidence uses Bayes.")
+print("Genetics (risk), spam (classification), quantum (measurement) —")
+print("all update beliefs the SAME way. The theorem doesn't know the domain.")`,
+    insight: "Bayes IS the math of learning. P(H|D) = P(D|H)×P(H)/P(D) updates beliefs given evidence — universally. Genetics updates disease risk from genotype (prior=prevalence, likelihood=genotype frequency). Spam filtering updates spam probability from email features (prior=base rate, likelihood=word frequencies). Quantum mechanics updates state from measurement (prior=pre-measurement state, likelihood=Born rule). The theorem doesn't know if H is a disease, a spam label, or a quantum state — it just computes the posterior. Belief updating IS universal: every system that learns from evidence uses Bayes, explicitly (statistics) or implicitly (neural networks approximate Bayesian inference at scale). A geneticist computing cancer risk from a DNA test, an engineer classifying spam, and a physicist measuring a quantum state are all doing the SAME computation — updating beliefs given evidence. None of them knows it. THAT is the multi-disciplinary elegance.",
+  },
+
+  // ============================================================
+  // 9. Euler's Method: ODEs ↔ Games ↔ Finance
+  // ============================================================
+  {
+    id: "elegant-euler-cross-discipline",
+    step: "9",
+    title: "Euler's Method — the simplest integrator (ODEs ↔ games ↔ finance)",
+    subtitle: "y(t+Δt) = y(t) + f(t,y)×Δt — one step, three simulation domains",
+    accent: "oklch(0.65 0.16 30)",
+    icon: <Cpu className="h-4 w-4" />,
+    badge: "Numerical Methods",
+    brief: {
+      dataset: "ODE simulation: chemical kinetics (10⁶ reactions), game physics (60 FPS), Black-Scholes (10⁵ time steps). Euler is 1st order but universal.",
+      scale: "10⁶ reactions (chemistry), 60 FPS (games), 10⁵ steps (finance), Δt varies per domain",
+      why: "Euler IS the simplest integrator. Every numerical simulation starts here. Chemical kinetics, game physics, and financial modeling all use y(t+Δt) = y(t) + f(t,y)×Δt as the starting point — before upgrading to Verlet/RK4. The simplest method is the most universal because it works on ANY ODE.",
+    },
+    stats: [
+      { label: "Accuracy", value: "1st order (O(Δt))" },
+      { label: "Reactions", value: "10⁶ (chemistry)" },
+      { label: "FPS", value: "60 (games)" },
+      { label: "Steps", value: "10⁵ (finance)" },
+    ],
+    tools: ["scipy.integrate.odeint", "ODEPACK (LSODA)", "NumPy", "PhysX", "QuantLib"],
+    codeTabs: [
+      {
+        lang: "scala",
+        filename: "Euler_Elegance.scala",
+        code: `// ============================================================
+// Euler's Method: y(t+Δt) = y(t) + f(t,y) × Δt
+//
+// The elegance: the SIMPLEST integrator works on EVERY ODE.
+//
+// Chemistry:    dC/dt = -kC → simulate reaction kinetics
+//              → 10⁶ reactions, Δt = 1e-9 s, RK4 for accuracy
+//
+// Games:        dv/dt = F/m → simulate game physics (before Verlet)
+//              → 60 FPS, Δt = 16ms, semi-implicit Euler
+//
+// Finance:     dS/dt = μS + σS×dW → simulate Black-Scholes
+//              → 10⁵ steps, Δt = 1 day, Monte Carlo
+//
+// WHY does the simplest method work everywhere?
+// Because Euler IS the definition of a derivative:
+//   dy/dt = lim(Δt→0) [y(t+Δt) - y(t)] / Δt
+//   → y(t+Δt) = y(t) + dy/dt × Δt (when Δt is small)
+// Euler is the FIRST TERM of the Taylor expansion.
+// It's not the BEST integrator, but it's the UNIVERSAL one —
+// every simulation can START with Euler and UPGRADE later.
+//
+// The insight: Euler is to numerical simulation what Newton's F=ma
+// is to mechanics — the simplest equation that captures the ESSENCE.
+// Every other integrator (Verlet, RK4, Adams-Bashforth) is a
+// REFINEMENT of Euler — they add higher-order terms.
+// Euler IS the foundation; the refinements are the elegance.
+// ============================================================
+
+// Chemistry: reaction kinetics dC/dt = -kC
+val C_new = C + (-k * C) * dt
+// k = reaction rate constant, C = concentration
+// → 10⁶ reactions simulated (before upgrading to RK4)
+
+// Games: physics dv/dt = F/m
+val v_new = v + (force / mass) * dt
+val r_new = r + v_new * dt  // semi-implicit Euler (update v first)
+// → 60 FPS, stable for game physics (before upgrading to Verlet)
+
+// Finance: Black-Scholes dS/dt = μS + σS×dW
+val S_new = S + (mu * S + sigma * S * random.gauss(0, 1) * math.sqrt(dt)) * dt
+// μ = drift, σ = volatility, dW = Brownian motion
+// → 10⁵ Monte Carlo paths for option pricing`,
+      },
+      {
+        lang: "rust",
+        filename: "euler_elegance.rs",
+        code: `// ============================================================
+// Euler's Method in Rust — the simplest integrator
+//
+// y(t+Δt) = y(t) + f(t,y) × Δt
+//
+// The elegance: this is the FIRST LINE of every simulation.
+// Chemistry (kinetics), games (physics), finance (Black-Scholes).
+// All start here. All can upgrade to Verlet/RK4 later.
+//
+// The insight: Euler IS the Taylor expansion truncated to 1st order:
+//   y(t+Δt) = y(t) + y'(t)Δt + O(Δt²)
+// Drop the O(Δt²) term → Euler's method.
+// Keep it → 2nd order (Verlet).
+// Add more → RK4 (4th order).
+//
+// Every integrator is Euler + more terms. Euler is the SEED
+// from which all numerical integration grows.
+// ============================================================
+
+/// Euler's method: y(t+Δt) = y(t) + f(t,y)×Δt
+/// The simplest integrator. The seed of all numerical simulation.
+fn euler_step(y: f64, f: impl Fn(f64, f64) -> f64, t: f64, dt: f64) -> f64 {
+    y + f(t, y) * dt
+    // Chemistry: f = -kC (exponential decay)
+    // Games: f = F/m (Newton's 2nd law)
+    // Finance: f = μS + σS×dW (stochastic differential equation)
+    //
+    // The function accepts ANY f — any derivative function.
+    // This is why Euler is universal: it works on EVERY ODE.
+    // The simplification (1st order) is a FEATURE, not a bug —
+    // it makes Euler the STARTING POINT for every simulation.
+}`,
+      },
+      {
+        lang: "go",
+        filename: "euler_elegance.go",
+        code: `// Euler: y(t+Δt) = y(t) + f(t,y)×Δt
+// The simplest integrator. The seed of all numerical simulation.
+func Euler(y, t, dt float64, f func(float64, float64) float64) float64 {
+    return y + f(t, y) * dt
+}`,
+      },
+      {
+        lang: "elixir",
+        filename: "euler_elegance.ex",
+        code: `defmodule Euler do
+  @moduledoc """
+  y(t+Δt) = y(t) + f(t,y)×Δt
+
+  The simplest integrator. The seed of all numerical simulation.
+
+  Chemistry: dC/dt = -kC → reaction kinetics
+  Games:     dv/dt = F/m → game physics
+  Finance:   dS/dt = μS + σS×dW → Black-Scholes
+
+  Euler IS the Taylor expansion truncated to 1st order.
+  Every other integrator (Verlet, RK4) is Euler + more terms.
+  """
+  def step(y, t, dt, f) do
+    y + f.(t, y) * dt
+    # The function accepts ANY derivative f.
+    # This is why Euler is universal: works on EVERY ODE.
+    # The 1st-order simplification is a FEATURE — it's the STARTING POINT.
+  end
+end`,
+      },
+      {
+        lang: "zig",
+        filename: "euler_elegance.zig",
+        code: `const std = @import("std");
+// Euler: y(t+Δt) = y(t) + f(t,y)×Δt
+// The simplest integrator. The seed of all numerical simulation.
+pub fn euler(y: f64, f: f64, dt: f64) f64 {
+    return y + f * dt;
+    // Chemistry: f = -kC, Games: f = F/m, Finance: f = μS + σS×dW
+    // The function accepts ANY derivative. Works on EVERY ODE.
+    // Euler IS the 1st-order Taylor expansion. Every integrator is Euler + more.
+}`,
+      },
+    ],
+    runnablePython: `# Euler's Method: the simplest integrator
+import math, random
+
+print("=== Euler's Method: y(t+Δt) = y(t) + f(t,y)×Δt ===")
+print()
+print("ONE step. THREE simulation domains. The seed of all numerical methods.")
+print()
+print("  Chemistry: dC/dt = -kC → reaction kinetics")
+print("  Games:     dv/dt = F/m → game physics")
+print("  Finance:   dS/dt = μS + σS×dW → Black-Scholes")
+print()
+
+# Chemistry: radioactive decay dC/dt = -kC
+C = 100.0; k = 0.1; dt = 0.1
+print("Chemistry: dC/dt = -kC (exponential decay):")
+for step in range(50):
+    C = C + (-k * C) * dt  # Euler step
+    if step % 10 == 0:
+        exact = 100 * math.exp(-k * step * dt)
+        print(f"  Step {step:2d}: C_euler={C:.4f}, C_exact={exact:.4f}, error={abs(C-exact):.4f}")
+
+print()
+print("The insight: Euler IS the Taylor expansion truncated to 1st order:")
+print("  y(t+Δt) = y(t) + y'(t)×Δt + O(Δt²)")
+print("  Drop O(Δt²) → Euler (1st order, universal)")
+print("  Keep it → Verlet (2nd order, symplectic)")
+print("  Add more → RK4 (4th order, accurate)")
+print()
+print("EVERY integrator is Euler + more terms.")
+print("Euler is the SEED from which all numerical integration grows.")`,
+    insight: "Euler's method IS the seed of all numerical simulation. y(t+Δt) = y(t) + f(t,y)×Δt is the 1st-order Taylor expansion — the simplest possible integrator. Every other method (Verlet, RK4, Adams-Bashforth) is Euler + higher-order terms. Chemistry (reaction kinetics), games (physics), and finance (Black-Scholes) all START with Euler because it works on ANY ODE. The simplicity is a FEATURE — Euler is the universal starting point. A chemist simulating 10⁶ reactions, a game developer simulating 60 FPS physics, and a quant simulating 10⁵ price paths all begin with the SAME one-line formula. They UPGRADE to Verlet/RK4 for accuracy, but the starting point is always Euler — because the simplest method that captures the ESSENCE is the most universal. Euler IS to numerical simulation what Newton's F=ma is to mechanics — the first equation, the seed, the foundation.",
+  },
+
+  // ============================================================
+  // 10. Entropy: Information ↔ Thermodynamics ↔ Genetics
+  // ============================================================
+  {
+    id: "elegant-entropy-cross-discipline",
+    step: "10",
+    title: "Entropy — the universal currency (information ↔ thermodynamics ↔ genetics)",
+    subtitle: "H = -Σ p log p — one measure, three measures of disorder",
+    accent: "oklch(0.65 0.16 320)",
+    icon: <Network className="h-4 w-4" />,
+    badge: "Information Theory",
+    brief: {
+      dataset: "Shannon entropy: measure uncertainty in data. Boltzmann entropy: measure disorder in matter. Genetic entropy: measure diversity in populations. All measured by H = -Σ p log p.",
+      scale: "Bits (information), Joules/Kelvin (thermodynamics), alleles (genetics) — all measured by the same formula",
+      why: "Entropy IS the universal currency. Information (Shannon 1948), thermodynamics (Boltzmann 1877), and genetics (heterozygosity) all use H = -Σ p log p to measure disorder. The SAME formula measures bits, heat, and genetic diversity. Three sciences, one measure, infinite applications.",
+    },
+    stats: [
+      { label: "Information", value: "bits (Shannon)" },
+      { label: "Thermodynamics", value: "J/K (Boltzmann)" },
+      { label: "Genetics", value: "alleles (heterozygosity)" },
+      { label: "Formula", value: "H = -Σ p log p" },
+    ],
+    tools: ["scipy.stats.entropy", "NumPy", "scikit-learn (mutual_info)", "BLAST (sequence entropy)"],
+    codeTabs: [
+      {
+        lang: "scala",
+        filename: "Entropy_Elegance.scala",
+        code: `// ============================================================
+// Entropy: H = -Σ p(x) × log p(x)
+//
+// The elegance: ONE formula measures disorder in THREE sciences.
+//
+// Information:    H(X) = -Σ p(x) log₂ p(x) → bits
+//                → measure uncertainty in data (Shannon 1948)
+//                → compression limit: can't compress below H bits
+//
+// Thermodynamics: S = -k_B Σ p_i ln p_i → Joules/Kelvin
+//                 → measure disorder in matter (Boltzmann 1877)
+//                 → 2nd law: entropy always increases (arrow of time)
+//
+// Genetics:      H = -Σ p_i log p_i → heterozygosity
+//                → measure genetic diversity in a population
+//                → H=0: clonal population, H=max: all alleles equally frequent
+//
+// WHY the same formula?
+// Because ALL THREE measure the SAME thing: how SPREAD OUT
+// a distribution is. When everything is concentrated (p=1 for one
+// outcome), entropy is 0 (no disorder). When everything is uniform
+// (p=1/N for all outcomes), entropy is maximum (max disorder).
+//
+// The log makes entropy ADDITIVE: H(X,Y) = H(X) + H(Y|X).
+// This is why entropy is the UNIVERSAL measure — it decomposes.
+// Information, heat, and genetic diversity all ADD across independent
+// systems because they're all measured by the same additive functional.
+//
+// The insight: entropy IS the universal currency of disorder.
+// A compressed file (information), a hot cup of coffee (thermodynamics),
+// and a diverse population (genetics) all have HIGH entropy.
+// A redundant file, a cold crystal, and a clonal population all have LOW entropy.
+// The SAME measure because disorder IS disorder, regardless of domain.
+// ============================================================
+
+// Information: entropy of a probability distribution
+val H_info = -probs.map(p => p * math.log(p, 2)).sum  // bits
+// Used in: data compression (Huffman coding reaches H bits),
+//           ML (cross-entropy loss IS entropy),
+//           feature selection (mutual information = KL divergence)
+
+// Thermodynamics: Boltzmann entropy
+val S_thermo = -k_B * states.map(p => p * math.log(p)).sum  // J/K
+// k_B = 1.38e-23 J/K (Boltzmann constant)
+// 2nd law: S always increases in isolated systems (arrow of time)
+
+// Genetics: heterozygosity (genetic diversity)
+val H_genetic = -alleles.map(p => p * math.log(p)).sum  // diversity index
+// p_i = frequency of allele i in the population
+// H=0: everyone has the same allele (clonal, endangered)
+// H=max: all alleles equally frequent (healthy, diverse)`,
+      },
+      {
+        lang: "rust",
+        filename: "entropy_elegance.rs",
+        code: `// ============================================================
+// Entropy in Rust — the universal measure of disorder
+//
+// H = -Σ p(x) × log p(x)
+//
+// The elegance: ONE function measures disorder in THREE sciences.
+// Only the LOG BASE changes (log₂ for bits, ln for J/K, log for diversity).
+//
+// Information:    H = -Σ p log₂ p → bits (Shannon)
+// Thermodynamics: S = -k_B Σ p ln p → J/K (Boltzmann)
+// Genetics:       H = -Σ p log p → diversity index
+//
+// The insight: entropy IS the universal currency of disorder.
+// A compressed file, a hot gas, and a diverse population all have HIGH entropy.
+// A redundant file, a cold crystal, and a clonal population all have LOW entropy.
+// The SAME measure because disorder IS disorder — regardless of domain.
+//
+// The log makes entropy ADDITIVE: H(X,Y) = H(X) + H(Y|X) for independent X,Y.
+// This additivity is WHY entropy is universal — it decomposes across systems.
+// ============================================================
+
+/// Entropy: H = -Σ p(x) × log p(x)
+/// The universal measure of disorder. Information, thermodynamics, genetics.
+fn entropy(probs: &[f64], log_base: f64) -> f64 {
+    -probs.iter()
+        .filter(|&&p| p > 0.0)
+        .map(|&p| p * (p.log(log_base)))
+        .sum()
+    // Information: log_base=2 → bits (Shannon entropy)
+    // Thermo: log_base=std::f64::consts::E → J/K × k_B (Boltzmann)
+    // Genetics: log_base=std::f64::consts::E → diversity index
+    //
+    // The function doesn't know if probs is:
+    //   - word frequencies (information → compression limit)
+    //   - energy state probabilities (thermo → arrow of time)
+    //   - allele frequencies (genetics → population health)
+    // The disorder is measured the SAME way. The domain is irrelevant.
+}`,
+      },
+      {
+        lang: "go",
+        filename: "entropy_elegance.go",
+        code: `// Entropy: H = -Σ p(x) × log p(x)
+// The universal measure of disorder. Information, thermodynamics, genetics.
+func Entropy(probs []float64, logBase float64) float64 {
+    h := 0.0
+    for _, p := range probs {
+        if p > 0 { h -= p * math.Log(p) / math.Log(logBase) }
+    }
+    return h
+}`,
+      },
+      {
+        lang: "elixir",
+        filename: "entropy_elegance.ex",
+        code: `defmodule Entropy do
+  @moduledoc """
+  H = -Σ p(x) × log p(x)
+
+  The universal currency of disorder. ONE formula, THREE sciences.
+
+  Information:    H = -Σ p log₂ p → bits (compression limit, ML loss)
+  Thermodynamics: S = -k_B Σ p ln p → J/K (2nd law, arrow of time)
+  Genetics:       H = -Σ p log p → diversity (heterozygosity, population health)
+
+  A compressed file, a hot gas, and a diverse population all have HIGH entropy.
+  A redundant file, a cold crystal, and a clonal population all have LOW entropy.
+  The SAME measure because disorder IS disorder.
+  """
+  def compute(probs, log_base) do
+    -Enum.sum(for p <- probs, p > 0, do: p * :math.log(p) / :math.log(log_base))
+    # log_base=2 → bits (information), e → nats (thermodynamics), e → diversity (genetics)
+    # The function doesn't know the domain. The domain doesn't change the function.
+  end
+end`,
+      },
+      {
+        lang: "zig",
+        filename: "entropy_elegance.zig",
+        code: `const std = @import("std");
+const math = std.math;
+// Entropy: H = -Σ p(x) × log p(x)
+// The universal currency of disorder. Information, thermodynamics, genetics.
+pub fn entropy(probs: []const f64, log_base: f64) f64 {
+    var h: f64 = 0;
+    for (probs) |p| {
+        if (p > 0) h -= p * (math.log(f64, log_base, p));
+    }
+    return h;
+    // Information: log_base=2 → bits (Shannon, compression, ML loss)
+    // Thermo: log_base=e → J/K × k_B (Boltzmann, 2nd law)
+    // Genetics: log_base=e → diversity (heterozygosity, population health)
+    // The SAME function. Different log bases. Same measure of disorder.
+}`,
+      },
+    ],
+    runnablePython: `# Entropy: the universal currency of disorder
+import math, random
+
+print("=== Entropy: H = -Σ p(x) × log p(x) ===")
+print()
+print("ONE formula. THREE sciences. The universal measure of disorder.")
+print()
+print("  Information:    H = -Σ p log₂ p → bits (compression, ML)")
+print("  Thermodynamics: S = -k_B Σ p ln p → J/K (2nd law, time's arrow)")
+print("  Genetics:       H = -Σ p log p → diversity (population health)")
+print()
+
+def entropy(probs, base=2):
+    return -sum(p * math.log(p, base) for p in probs if p > 0)
+
+# Information: entropy of a text distribution
+word_freqs = [0.4, 0.2, 0.15, 0.1, 0.08, 0.04, 0.03]
+H_info = entropy(word_freqs, base=2)
+print(f"Information: H = {H_info:.4f} bits")
+print(f"  → Can compress to {H_info:.2f} bits/symbol (Shannon limit)")
+print()
+
+# Thermodynamics: entropy of energy states
+state_probs = [0.5, 0.25, 0.15, 0.07, 0.03]
+S_thermo = entropy(state_probs, base=math.e) * 1.38e-23  # × k_B
+print(f"Thermodynamics: S = {S_thermo:.4e} J/K (× k_B)")
+print(f"  → Measures disorder of energy distribution")
+print()
+
+# Genetics: heterozygosity of allele frequencies
+allele_freqs = [0.3, 0.25, 0.2, 0.15, 0.1]
+H_genetic = entropy(allele_freqs, base=math.e)
+print(f"Genetics: H = {H_genetic:.4f} (diversity index)")
+print(f"  → H=0: clonal (endangered) | H=max: diverse (healthy)")
+print()
+
+print("The insight: entropy IS the universal currency of disorder.")
+print("A compressed file, a hot gas, and a diverse population all have HIGH entropy.")
+print("A redundant file, a cold crystal, and a clonal population all have LOW entropy.")
+print("The SAME measure because disorder IS disorder — regardless of domain.")
+print()
+print("The log makes entropy ADDITIVE: H(X,Y) = H(X) + H(Y|X) for independent systems.")
+print("This additivity is WHY entropy is universal — it decomposes across systems.")`,
+    insight: "Entropy IS the universal currency of disorder. H = -Σ p log p measures uncertainty in information (Shannon 1948, bits), disorder in thermodynamics (Boltzmann 1877, J/K), and diversity in genetics (heterozygosity, allele frequencies). The SAME formula because all three measure how SPREAD OUT a distribution is. A compressed file has high entropy (unpredictable), a hot gas has high entropy (disordered), a diverse population has high entropy (many alleles). A redundant file, a cold crystal, and a clonal population all have low entropy. The log makes entropy ADDITIVE: H(X,Y) = H(X) + H(Y|X) for independent systems — this is WHY entropy is universal, because it decomposes across systems. An information theorist, a thermodynamicist, and a population geneticist are measuring the SAME thing — disorder — with the SAME formula, and none of them knows it. The 2nd law of thermodynamics (entropy always increases) IS the arrow of time — and it applies to information loss (compression limit) and genetic erosion (loss of diversity) equally. Disorder IS disorder, regardless of domain.",
   },
 ];
