@@ -2716,3 +2716,76 @@ Stage Summary:
 - The /data-lakehouse page now has 9 total dataset examples (3 production + 6 scientific), each with 5-language code (Scala/Rust/Go/Elixir/Zig) + Pyodide demo + insight.
 - Total: 9 examples × 5 languages = 45 code blocks on the data-lakehouse page alone.
 - The user's vision is confirmed: the lakehouse IS the starting point of everything — the medallion pattern applies universally from business to genomics to particle physics to pure mathematics.
+
+---
+Task ID: phaseA-streaming-pages
+Agent: Super Z (main)
+Task: Build 4 Phase A streaming pages (Flink, Kafka, Pulsar, Spark Structured Streaming) in src/app/_pages/ + src/app/_components/_dataset_examples9.tsx with 6 scientific examples (2 life sciences + 2 sensors + 1 physics + 1 math) × 5 languages (Scala/Rust/Go/Elixir/Zig). Each page mirrors the /iceberg.tsx reference implementation exactly. Shows how real-time streaming enables the Bronze→Silver→Gold medallion for science.
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md (latest commits: 2d31573 Phase A route stub registration, 6b82737 docs append, d13877d scientific-lakehouse-examples, 4db06ba phase4-pages).
+- Read /home/z/appdatasci2/src/app/_pages/iceberg.tsx (983 lines) — REFERENCE IMPLEMENTATION. Followed exact structure: PageHeader → 4 KPIs → architecture SVG → 5-6 code blocks → Pyodide demo → comparison table → Why-evolved → Unique-features (2×2) → DatasetCards → Computational-tooling → Research → Deeper-thought insight → RelatedTopics + cross-links.
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx — confirmed DatasetExample interface (id, step, title, subtitle, accent, icon, badge, brief, stats, codeTabs, runnablePython, insight, tools).
+- Read /home/z/appdatasci2/src/app/_components/_dataset_examples8.tsx (1,565 lines) as reference for scientific dataset examples (6 examples × 5 langs pattern + Pyodide simulation using only math/random/collections).
+- Read /home/z/appdatasci2/agent-ctx/phase4-pages-super-z.md — previous agent's notes on ${var} escaping + JSX text rewording for unescaped </>.
+- Verified route folders src/app/{flink,kafka,pulsar,spark-streaming}/page.tsx already existed (commit 2d31573 registered stubs importing FlinkPage/KafkaPage/PulsarPage/SparkStreamingPage from ../_pages/<name>).
+
+Built src/app/_components/_dataset_examples9.tsx (2,003 lines):
+  * FLINK_SCIENCE_EXAMPLES (2): real-time genomics variant calling (10k variants/sec from Illumina NovaSeq → Flink CDC → Bronze Iceberg), LHC trigger pipeline (40MHz collisions → Flink CEP → Bronze).
+  * KAFKA_SCIENCE_EXAMPLES (2): environmental sensor network (50k EPA AirNow sensors → Kafka partitioned by sensor_id → Bronze), genomics event streaming (GATK variant calls → Kafka partitioned by chromosome → Bronze).
+  * PULSAR_SCIENCE_EXAMPLES (1): multi-region sensor network (150k sensors across EU+US+Asia → Pulsar geo-replication → Bronze per region).
+  * SPARK_STREAMING_SCIENCE_EXAMPLES (1): OEIS sequence property computation (370k+ sequences → Spark micro-batch → Bronze).
+  * Each example has 5 code tabs (Scala/Rust/Go/Elixir/Zig) + runnable Python (Pyodide) using only math/random/collections + hashlib for Kafka partitioning.
+
+Built src/app/_pages/flink.tsx (907 lines): Flink architecture diagram (8 nodes — client + JobManager + TaskManager + source + operators + sink + state + checkpoint), 5 code blocks (watermark SQL, state backends, exactly-once 2PC, CEP Pattern API Scala, Dataset API Scala), Pyodide pipeline simulation (watermark tracker + state backend + Iceberg sink 2PC + late event detection + state TTL + checkpoint commit), Flink vs Spark Streaming vs Kafka Streams comparison (11 aspects), 4 unique features (true streaming sub-ms, native CEP, pluggable state backends HashMap+RocksDB, two-phase commit on checkpoint), 2 scientific examples (genomics + LHC).
+Built src/app/_pages/kafka.tsx (887 lines): Kafka architecture diagram (7 nodes — producer + broker KRaft + topic + partition + ISR + consumer_group + consumer→Bronze), 5 code blocks (Python producer idempotent+transactions, Scala consumer exactly-once via EOS read-process-write, KRaft server.properties YAML, partitions parallelism model, transactions across topics), Pyodide partition+consumer group simulation (Murmur2 hash by chromosome → 24 partitions → 24 parallel consumers → Bronze), Kafka vs Pulsar vs Kinesis comparison (11 aspects including 7T msgs/day LinkedIn scale), 4 unique features (7T scale production, idempotent producer + transactions, KRaft metadata quorum 2M partitions, ecosystem 100+ integrations), 2 scientific examples (sensors + genomics).
+Built src/app/_pages/pulsar.tsx (943 lines): Pulsar architecture diagram (7 nodes — producer + stateless broker + Bookie storage + topic segmented + geo-replication + consumer + function), 5 code blocks (Python producer with batching+compression+geo-replication, Scala Pulsar Functions (stateful, BookKeeper-backed), geo-replication admin commands, segmented storage config, Scala consumer with 4 subscription modes Exclusive/Shared/Failover/Key_Shared), Pyodide multi-region geo-replication simulation (EU producer → 3 Bronze Iceberg copies, per-region latency, replication counts), Pulsar vs Kafka vs Kinesis comparison (11 aspects including segmented storage + native geo-replication), 4 unique features (native geo-replication, compute-storage split stateless brokers, in-broker Pulsar Functions, native multi-tenancy), 1 scientific example (multi-region sensors).
+Built src/app/_pages/spark-streaming.tsx (999 lines): Spark Streaming architecture diagram (8 nodes — Driver + executor + source + micro-batch + stateful_op + watermark + sink + checkpoint), 5 code blocks (PySpark Kafka→Iceberg pipeline with watermark + UDF, Continuous mode SQL, stateful ops mapGroupsWithState Scala, 3 output modes Append/Update/Complete, watermarks + tumbling/sliding/session windows), Pyodide micro-batch simulation (5 1-minute batches, watermark tolerance, Append mode commit closed windows, micro-batch vs continuous comparison table), Spark Streaming vs Flink vs Kafka Streams comparison (11 aspects including unified batch+streaming), 4 unique features (unified batch+streaming, continuous mode ~1ms, session windows Spark 3.4+, 3 output modes), 1 scientific example (OEIS math sequences).
+
+Lint: bunx eslint src/app/_pages/{flink,kafka,pulsar,spark-streaming}.tsx src/app/_components/_dataset_examples9.tsx --max-warnings=0 → all pass (0 errors, 0 warnings).
+
+Fixed 1 issue during build:
+  1. Unescaped ${var} in Scala s-strings inside JS template literals — used \\${var} (double backslash) instead of \${var} (single backslash) in 5 places: 4 in _dataset_examples9.tsx (lines 682, 698, 1014, 1327) and 2 in pulsar.tsx (lines 117, 152). \\${var} in JS template literal parses as `\\` (one backslash output) + `${var}` (JS interpolation), throwing ReferenceError at runtime because `var` is a Scala variable not a JS variable. Build failed on /pulsar prerender with "ReferenceError: region is not defined". Fixed by Python script: replace `\\\\\${` (regex for 2 backslashes + dollar + brace) with `\\\${` (1 backslash + dollar + brace). All 6 instances fixed.
+
+Build: GITHUB_PAGES=true bun run build:static — succeeded after fix. 88/88 pages prerendered (Turbopack, 28.7s compile). All 4 Phase A pages built:
+  * out/flink/index.html ✅
+  * out/kafka/index.html ✅
+  * out/pulsar/index.html ✅
+  * out/spark-streaming/index.html ✅
+- src/app/api directory moved aside to .api-routes-backup/ during build (z-ai-web-dev-sdk doesn't work in static export), restored after build. src/app/api/agent-triage/route.ts present post-build. .nojekyll touched in out/.
+- Commit: ad09239 "feat: add Phase A streaming pages (Flink, Kafka, Pulsar, Spark Streaming) + _dataset_examples9.tsx with 6 scientific examples..."
+- Push: 2d31573..ad09239 on private/main (AppDataSciEng2-Advance). Pre-push guardrail checks passed.
+- Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+
+Stage Summary:
+- HEAD = ad09239 on private/main (AppDataSciEng2-Advance). Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+- 5 new files added: src/app/_components/_dataset_examples9.tsx (2,003 lines), src/app/_pages/flink.tsx (907 lines), src/app/_pages/kafka.tsx (887 lines), src/app/_pages/pulsar.tsx (943 lines), src/app/_pages/spark-streaming.tsx (999 lines) — total 5,739 lines.
+- Phase A (4 streaming pages) complete. Each page follows the /iceberg.tsx pattern exactly with all 13 sections (PageHeader + 4 KPIs + architecture SVG + 5 code blocks + Pyodide demo + comparison table + Why-evolved + Unique-features 2×2 + DatasetCards + Computational tooling + Research + Deeper-thought insight + RelatedTopics + cross-links).
+- 6 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 30 code examples in _dataset_examples9.tsx + 6 Pyodide simulations.
+- The 6 scientific examples show how real-time streaming enables the Bronze→Silver→Gold medallion for science: genomics variant calling (Flink CDC), LHC triggers (Flink CEP), environmental sensors (Kafka partitions), GATK genomics events (Kafka by chromosome), multi-region sensors (Pulsar geo-replication), OEIS sequences (Spark micro-batch).
+
+---
+Task ID: phaseA-streaming-pages
+Agent: Super Z (main) + full-stack-developer subagent
+Task: Build Phase A streaming pages (Flink, Kafka, Pulsar, Spark Streaming) with 6 scientific-angle dataset examples showing how real-time streaming enables the Bronze→Silver→Gold medallion for life sciences, sensors, physics, and mathematics.
+
+Work Log:
+- Registered 4 new page IDs (flink, kafka, pulsar, spark-streaming) in router.ts + sidebar + route stubs.
+- Subagent built 4 pages (5,739 lines total) + _dataset_examples9.tsx (2,003 lines, 6 examples × 5 languages = 30 code blocks + 6 Pyodide demos).
+- Lint clean, static export built (88/88 pages), all 4 pages verified in out/.
+- Commit ad09239 pushed to private/main. Sync→deploy completed.
+- Verified live on preview: all 4 pages HTTP 200, science examples verified (genomics, LHC, trigger, variant, AirNow, GATK, sensor).
+
+The 6 science examples:
+1. Real-time genomics variant calling (Flink, Life Sciences) — Illumina 10k vars/sec → Flink CDC → Bronze Iceberg
+2. LHC trigger pipeline (Flink, Physics) — 40MHz collisions → Flink CEP → Bronze
+3. Environmental sensor network (Kafka, Sensors) — 50k EPA sensors → Kafka → Bronze
+4. Genomics event streaming (Kafka, Life Sciences) — GATK VCF → Kafka → Bronze Iceberg
+5. Multi-region sensor network (Pulsar, Sensors) — 150k sensors EU+US+Asia → Pulsar geo-replication → Bronze
+6. OEIS sequence computation (Spark Streaming, Mathematics) — 370k sequences → Spark micro-batch → Bronze
+
+Stage Summary:
+- Platform now has 88 pages total (82 + 4 new streaming pages + 2 additional from earlier phases).
+- Each streaming page has the full 13-section structure + DatasetCards with science examples.
+- The science examples show streaming as the Bronze-tier enabler: Kafka/Flink/Pulsar/Spark Streaming → Iceberg Bronze → Silver (cleansed) → Gold (analytics).
+- The medallion pattern is now demonstrated end-to-end from raw sensor/sequencer/LHC data through streaming ingest to analytics.
