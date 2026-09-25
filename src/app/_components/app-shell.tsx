@@ -125,6 +125,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Comp Chemistry", ids: ["computational-chemistry"] },
   { title: "Comp Physics", ids: ["computational-physics"] },
   { title: "Bio Pipelines", ids: ["bioinformatics-pipelines"] },
+  { title: "Elegant Code", ids: ["elegant-code"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
