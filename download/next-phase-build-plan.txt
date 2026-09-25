@@ -1,0 +1,474 @@
+# ============================================================
+# Next-Phase Build Plan — ModernDataSciEng Platform v2
+# Created: 2024-09-25
+# Sandbox: /home/z/appdatasci2/ (private: AppDataSciEng2-Advance)
+# Preview: https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
+# ============================================================
+
+## Architecture
+
+Private repo (AppDataSciEng2-Advance) = source-of-truth — all code + worklog pushed here.
+Public repo (Demo2DataSciEng) = observer/preview — mirrored via sync workflow, deployed to GitHub Pages.
+Deploy flow: push private/main → sync mirrors to public/main → deploy builds static export → publishes to Pages.
+Public endpoint provides 24/7/365 live preview for interested clients without legal complications.
+
+## Existing pages (verified live on preview)
+
+### Data Lakehouse group (6 pages — already built + deployed)
+- /iceberg — Apache Iceberg open table format (Netflix origin)
+  * Manifest tree diagram, Spark/PyIceberg/Trino/Flink/DuckDB code, Pyodide manifest simulation
+  * Why-evolved: 4 Hive-on-S3 shortfalls (path-based partitions, schema drift, no time travel, no atomic commits)
+  * Unique features: hidden partitioning, vendor-neutral catalogs, 8+ engines, manifest-tree pruning
+  * 3 dataset examples: Wikipedia Pageviews (1.5TB/mo), NYC TLC (50GB/yr), NOAA Climate (500GB)
+  * Each example has Scala/Rust/Go/Elixir/Zig code
+- /glue — AWS Glue (serverless ETL, Data Catalog, Crawlers, Glue Studio)
+  * Architecture diagram (S3→Crawler→Catalog→Athena/Redshift/Iceberg), PySpark+Crawler+Bookmarks code
+  * 3 dataset examples: Multi-source ETL (50M orders), Streaming CDC (100M/hr), Cross-account sharing (10TB)
+- /delta-lake — Databricks Delta (ACID, time travel, CDF, Z-Order, Liquid Clustering)
+  * Transaction-log diagram, Delta SQL + delta-rs + Flink code, Pyodide log-replay demo
+  * 3 dataset examples: Clickstream+CDF (100M/day), ML Feature Store (Liquid Clustering), Ride-sharing (1B, Z-Order)
+- /hudi — Apache Hudi (COW vs MOR, UPSERT specialist, Uber origin)
+  * Interactive COW vs MOR toggle diagram, PySpark streaming CDC + Flink code, Pyodide COW/MOR benchmark
+  * 3 dataset examples: Uber Trip CDC (10M/day, MOR), IoT Sensor Stream (100M/hr, COW), Customer Master CDC (1M/min)
+- /data-lakehouse — concept anchor (4-era evolution Hadoop→S3→Iceberg/Delta)
+  * 4-era evolution timeline, medallion diagram, SQL-evolution code, Pyodide Bronze→Silver→Gold simulation
+  * 3 dataset examples: Netflix-scale streaming (1B/day), ML Feature Platform (Feast on Iceberg), Real-time Supply Chain
+- /catalogs — comparison: Glue/Hive/Nessie/Unity/Polaris/REST Catalog
+  * Interactive 6-catalog diagram, Polaris YAML config, Spark multi-catalog SQL, Nessie branching CLI
+  * 3 dataset examples: Polaris Multi-cloud (3 clouds), Nessie Branch (Stripe-style), Unity Column RBAC (10M PII)
+
+### Fintech group (1 page — already built + deployed)
+- /fintech — Quantitative Finance
+  * 14 quant scenarios × 4 languages (Python/Rust/Scala/Elixir) = 56 code examples
+  * Scenarios: Delta Hedging, MC Asian, LSTM, GNN Fraud, SVI, Markowitz, Deep Hedging, CVA/XVA,
+    Heston, Hull-White, SABR, LOB Replay, Black-76, Bond Duration
+  * Low-level PyTorch (BlackScholesModel + MonteCarloPricer + LSTMPredictor + FraudGNN)
+  * Low-level systems languages (Rust/Scala/Elixir/C implementations of same 4 models)
+
+## Next-Phase Build Plan (13 new pages)
+
+### Phase 1: Open table formats + compute engines (5 pages)
+Priority: HIGH — completes the open-source lakehouse stack
+
+#### 1. /pinot — Apache Pinot (real-time OLAP, LinkedIn origin)
+- Why it matters: The only format that does real-time ingestion + OLAP in one system.
+  Sub-second analytics on streaming data. LinkedIn serves 50+ billion events/day on Pinot.
+- Origin: LinkedIn 2013 (open-sourced 2015, Apache top-level 2018)
+- Unique features:
+  1. Real-time + batch ingestion in one system (segment-based architecture)
+  2. Star-tree index — pre-aggregated multi-dimensional rollups (unique to Pinot)
+  3. Sub-second queries on billions of rows (via segment + star-tree)
+  4. Multi-tenant query routing (per-tenant resource isolation)
+- Why it evolved (shortfalls of prior):
+  1. Hive queries were too slow (>10s for real-time dashboards)
+  2. HBase required custom code for analytics
+  3. No system combined real-time ingestion + OLAP querying
+  4. Druid existed but lacked SQL interface
+- Datasets (3 examples × 5 languages Scala/Rust/Go/Elixir/Zig):
+  1. LinkedIn ad impressions (synthetic 1B/day) — real-time funnel analytics
+  2. Uber real-time dashboards (synthetic 100M trips/day) — trip analytics <1s
+  3. Real-time fraud detection (synthetic 10M txns/day) — sub-second GNN + Pinot lookup
+- Computational tooling:
+  * Pinot Controller + Broker + Server (3-component architecture)
+  * Kafka real-time ingestion (low-level consumer + segment builder)
+  * Batch ingestion from HDFS/S3/Parquet
+  * Star-tree index builder
+  * PQL (Pinot Query Language) + SQL interface
+  * Multi-tenant query scheduler
+- Research:
+  * LinkedIn Eng 2013: "Pinot: Realtime Distributed OLAP Data Store"
+  * Star-tree paper (LinkedIn 2015): sub-second analytics via pre-aggregation
+  * LinkedIn 2020: "Pinot at LinkedIn — 50B events/day"
+- Insight: "Pinot's star-tree IS the materialised view pattern applied to columnar segments."
+
+#### 2. /paimon — Apache Paimon (streaming-native, Flink-first)
+- Why it matters: The newest open table format (2023), designed for streaming-first lakehouse.
+  Flink-native writes, changelog support, partial-update support.
+- Origin: Apache Flink community 2022 (forked from Flink Table Store, renamed to Paimon 2023)
+- Unique features:
+  1. Streaming-first design (Flink-native, no Spark required)
+  2. Changelog mode (table emits row-level changes like a Kafka topic)
+  3. Partial-update merge engine (merge on read for partial column updates)
+  4. First-class Flink integration (Flink SQL DDL/DML directly)
+- Why it evolved (shortfalls of prior):
+  1. Iceberg/Delta streaming writes required Spark (Flink support was bolted-on)
+  2. Hudi MOR was close but Uber-designed (not Flink-native)
+  3. No format supported changelog mode (table as a stream)
+  4. No format supported partial updates (merge specific columns)
+- Datasets (3 examples × 5 languages):
+  1. Flink CDC pipelines (synthetic 100M events/day) — MySQL CDC → Paimon changelog
+  2. Streaming changelogs (synthetic 10M updates/day) — Paimon as a Kafka replacement
+  3. Real-time feature stores (synthetic 50M features) — partial-update merge for ML
+- Computational tooling:
+  * Apache Flink 1.18+ (primary engine)
+  * Flink SQL Gateway (DDL/DML via REST)
+  * Paimon catalog (Hive/Glue/REST)
+  * Spark read support (via Paimon Spark connector)
+  * Trino/Presto read support
+- Research:
+  * Apache Paimon spec (2023): streaming-native table format
+  * Flink Table Store origin (2022): the predecessor project
+  * Paimon 0.8 (2024): changelog mode + partial-update merge engine
+- Insight: "Paimon IS the streaming-first lakehouse format — it treats tables as streams."
+
+#### 3. /druid — Apache Druid (time-series OLAP, 2011)
+- Why it matters: Sub-second queries on event/time-series data at scale.
+  Powers real-time analytics at Netflix, Airbnb, Alibaba, Salesforce.
+- Origin: Metamarkets 2011 (open-sourced 2012, Apache top-level 2015)
+- Unique features:
+  1. Column-oriented segment format (immutable, time-chunked)
+  2. In-memory + mmap hybrid storage (hot data in RAM, cold on disk)
+  3. Approximate aggregation (HyperLogLog, quantile sketches) for sub-second counts
+  4. Real-time ingestion from Kafka (direct, no Spark/Flink needed)
+- Why it evolved (shortfalls of prior):
+  1. Hadoop/Hive couldn't do sub-second queries
+  2. No system handled time-series event data at scale (10B+ events/day)
+  3. SQL warehouses were too expensive for event analytics
+  4. No approximate aggregation (exact counts on 10B events = slow)
+- Datasets (3 examples × 5 languages):
+  1. Netflix metrics (synthetic 1B events/day) — real-time streaming analytics
+  2. Airbnb guest analytics (synthetic 100M events/day) — dashboard sub-second queries
+  3. IoT telemetry (synthetic 500M sensors) — time-series aggregation at scale
+- Computational tooling:
+  * Druid Coordinator + Overlord + Historical + MiddleManager (4-component)
+  * Kafka real-time ingestion (supervisor API)
+  * Segment builder + deep storage (S3/HDFS)
+  * SQL + native query interface
+  * Approximate aggregation (HLL, quantile sketches)
+- Research:
+  * Metamarkets 2011: "Druid: A Real-time Analytical Data Store"
+  * Netflix 2017: "Druid at Netflix — Real-time Analytics at Scale"
+  * Airbnb 2018: "Druid at Airbnb — Sub-second Analytics"
+- Insight: "Druid's segment format IS the time-chunked columnar store — time is always the primary axis."
+
+#### 4. /impala — Apache Impala (Cloudera Hadoop-era MPP SQL)
+- Why it matters: The original Hadoop MPP SQL engine (2012).
+  Still relevant for on-prem Hadoop + Kudu stacks. Cloudera CDW ships Impala.
+- Origin: Cloudera 2012 (open-sourced 2013, Apache top-level 2017)
+- Unique features:
+  1. MPP (massively parallel processing) on HDFS — no MapReduce
+  2. Shared-nothing architecture (each node has local storage)
+  3. Code generation (LLVM JIT) for query performance
+  4. Kudu integration (fast columnar storage on HDFS)
+- Why it evolved (shortfalls of prior):
+  1. Hive-on-MapReduce was too slow (minutes per query)
+  2. Hive-on-Tez was better but still not sub-second
+  3. No Hadoop-native MPP SQL engine existed
+  4. Commercial warehouses (Teradata, Exadata) were too expensive for Hadoop data
+- Datasets (3 examples × 5 languages):
+  1. Cloudera CDW deployments (synthetic 100TB) — on-prem Hadoop analytics
+  2. Kudu+Impala fast analytics (synthetic 1B rows) — sub-second scan on Kudu
+  3. On-prem log analytics (synthetic 10TB) — HDFS + Impala for log search
+- Computational tooling:
+  * Impala daemons (co-located with DataNodes)
+  * Cloudera CDW (Commercial Data Warehouse)
+  * HDFS + Kudu storage backends
+  * Hive Metastore (for table metadata)
+  * LLVM JIT code generation
+- Research:
+  * Cloudera 2012: "Impala: A Modern, Open-Source SQL Engine for HDFS"
+  * Cloudera 2015: "Impala: A Case Study for MPP SQL on Hadoop"
+  * Apache Impala spec (2017): LLVM codegen + Kudu integration
+- Insight: "Impala IS the MPP pattern applied to Hadoop — the same pattern as Teradata/Exadata but on commodity hardware."
+
+#### 5. /starrocks — StarRocks (MySQL-compatible lakehouse query, 2021)
+- Why it matters: Fastest Trino alternative for BI workloads.
+  MySQL-compatible (clients don't need to change). Forked from Apache Doris.
+- Origin: StarRocks Inc. 2021 (fork of Apache Doris, Apache-incubating 2023)
+- Unique features:
+  1. MySQL-compatible protocol (no client changes needed)
+  2. Vectorized execution (SIMD-optimised, Apache Arrow-based)
+  3. External catalog support (reads Iceberg/Delta/Hive directly)
+  4. CBO (cost-based optimiser) with runtime filter pushdown
+- Why it evolved (shortfalls of prior):
+  1. Trino was fast but had no MySQL protocol (BI tools needed adapters)
+  2. Doris was MySQL-compatible but not lakehouse-native (couldn't read Iceberg)
+  3. No engine combined MySQL protocol + vectorised execution + lakehouse reads
+  4. Commercial warehouses (Snowflake) were too expensive for BI-only workloads
+- Datasets (3 examples × 5 languages):
+  1. BI dashboards on Iceberg (synthetic 1TB) — sub-second Looker/Tableau queries
+  2. Multi-tenant SaaS analytics (synthetic 1000 tenants) — per-tenant resource isolation
+  3. Sub-second BI on Delta (synthetic 500GB) — federated Delta + MySQL join
+- Computational tooling:
+  * StarRocks FE (Front End — MySQL-compatible) + BE (Back End — vectorised)
+  * External catalog: Iceberg/Delta/Hive/JDBC
+  * CBO + runtime filter pushdown
+  * Local cache (data-locality-aware)
+  * Apache Arrow vectorised execution
+- Research:
+  * StarRocks 2021: "The Fastest OLAP Engine for Lakehouse"
+  * Apache Doris origin (2018): Baidu's MPP SQL engine
+  * StarRocks 2023: "Vectorised Execution + Lakehouse Catalog Support"
+- Insight: "StarRocks IS Doris + lakehouse — the MySQL protocol makes it drop-in for BI tools."
+
+
+### Phase 2: Streaming ingestion patterns (2 pages)
+Priority: HIGH — connects Kafka to the lakehouse
+
+#### 6. /kafka-connect — Kafka Connect + Debezium CDC → Iceberg/Delta/Hudi
+- Why it matters: The standard pipeline for operational data → lakehouse.
+  Kafka Connect is the framework; Debezium is the CDC source connector.
+- Origin: Confluent 2012 (Kafka Connect), Debezium 2016 (Red Hat)
+- Unique features:
+  1. Source + Sink connectors (pluggable framework, 200+ connectors)
+  2. Debezium CDC (log-based, not trigger-based — zero impact on source DB)
+  3. Exactly-once via Kafka transactions
+  4. Schema Registry integration (auto-evolve schemas)
+- Why it evolved (shortfalls of prior):
+  1. Batch ETL (Sqoop) was too slow (hourly, not real-time)
+  2. Trigger-based CDC impacted source DB performance
+  3. No standard framework for Kafka → S3/lakehouse sinks
+  4. No schema evolution for CDC payloads
+- Datasets (3 examples × 5 languages):
+  1. MySQL CDC (Debezium, synthetic 100M txns/day) — binlog → Kafka → Iceberg
+  2. PostgreSQL logical replication (synthetic 50M txns/day) — WAL → Kafka → Delta
+  3. MongoDB change streams (synthetic 10M docs) — oplog → Kafka → Hudi MOR
+- Computational tooling:
+  * Kafka Connect distributed mode (workers + connector plugins)
+  * Debezium connectors (MySQL/PostgreSQL/MongoDB/Oracle/SQL Server)
+  * Iceberg/Delta/Hudi sink connectors
+  * Schema Registry (Confluent/Glue)
+  * Kafka Connect REST API (provisioning + monitoring)
+  * Debezium transformations (Single Message Transforms)
+- Research:
+  * Confluent 2012: "Kafka Connect — A Framework for Moving Data"
+  * Debezium 2016: "Change Data Capture for Databases"
+  * Debezium 2020: "Log-based CDC vs Trigger-based — Performance Analysis"
+- Insight: "Kafka Connect IS the ETL framework for the streaming era — Debezium IS the CDC layer."
+
+#### 7. /schema-registry — Confluent Schema Registry + Glue + Iceberg schema evolution
+- Why it matters: Schema evolution is the contract between producers and consumers.
+  Without it, any schema change breaks downstream consumers.
+- Origin: Confluent 2014 (Schema Registry), Avro 2009 (Hadoop), Protobuf 2008 (Google)
+- Unique features:
+  1. Backward/forward/full compatibility modes (configurable per subject)
+  2. Avro/Protobuf/JSON Schema support (pluggable serialiser)
+  3. Subject-based naming (topic-key, topic-value, record-name strategies)
+  4. Schema evolution rules (add optional field, remove optional field, rename via alias)
+- Why it evolved (shortfalls of prior):
+  1. No schema enforcement in Kafka (any bytes could be sent)
+  2. Avro schemas were scattered (no central registry)
+  3. No compatibility checking (any change broke consumers)
+  4. No schema discovery (consumers didn't know the schema)
+- Datasets (3 examples × 5 languages):
+  1. Avro schema evolution (synthetic 100M events) — backward + forward compatible changes
+  2. Protobuf field compatibility (synthetic 50M events) — field addition + removal
+  3. JSON Schema validation (synthetic 10M events) — strict + lenient validation
+- Computational tooling:
+  * Confluent Schema Registry (REST API, Avro/Protobuf/JSON)
+  * AWS Glue Schema Registry (AWS-native, IAM-authenticated)
+  * Apicurio Registry (open-source, CNCF)
+  * Iceberg schema evolution (column ID stability, rename/add/drop)
+  * Debezium schema history (stores all DDL changes)
+  * dbt schema tests (column-level validation)
+- Research:
+  * Confluent 2014: "Schema Registry — Managing Schemas for Kafka"
+  * Avro 2009: "Apache Avro — Data Serialization System"
+  * Google 2008: "Protocol Buffers — Google's Data Interchange Format"
+- Insight: "Schema Registry IS the type system for the data pipeline — like TypeScript for JSON."
+
+
+### Phase 3: Lakehouse governance (2 pages)
+Priority: MEDIUM — governance + lineage + contracts
+
+#### 8. /lineage — OpenLineage + Apache Atlas + Spline + Unity Lineage
+- Why it matters: Track data flow from source to dashboard.
+  GDPR audit, impact analysis, debug broken pipelines.
+- Origin: Apache Atlas 2015 (Hortonworks), OpenLineage 2020 (WeWork/Marquez),
+  Spline 2019 (ABSA), Databricks Unity Lineage 2021
+- Unique features:
+  1. OpenLineage standard (cross-tool lineage protocol)
+  2. Column-level lineage (track which source column feeds which dashboard column)
+  3. Real-time lineage (Airflow/Spark emit events as jobs run)
+  4. Visual graph (DAG of data flow, queryable)
+- Why it evolved (shortfalls of prior):
+  1. No standard lineage protocol (every tool had its own)
+  2. Apache Atlas was Hadoop-only (didn't cover Spark/Trino/Flink)
+  3. No column-level lineage (only table-level)
+  4. No real-time lineage (only batch, after-the-fact)
+- Datasets (3 examples × 5 languages):
+  1. Multi-hop lineage (Kafka → Bronze → Silver → Gold → BI) — GDPR audit trail
+  2. Impact analysis (if we change this column, what breaks?) — downstream blast radius
+  3. Debug broken pipeline (which job produced the bad data?) — root cause analysis
+- Computational tooling:
+  * OpenLineage (standard protocol + Airflow/Spark/DBT integrations)
+  * Marquez (reference implementation, visual UI)
+  * Apache Atlas (Hadoop-native, HBase-backed)
+  * Spline (Spark lineage capture, ABSA)
+  * Databricks Unity Catalog Lineage (Delta-native)
+  * DataHub (LinkedIn, open-source metadata platform)
+- Research:
+  * WeWork 2020: "OpenLineage — A Standard for Data Lineage"
+  * Hortonworks 2015: "Apache Atlas — Metadata + Governance for Hadoop"
+  * LinkedIn 2020: "DataHub — LinkedIn's Metadata Platform"
+- Insight: "Lineage IS the dependency graph for data — like a package-lock.json but for tables."
+
+#### 9. /data-contracts — Data contracts pattern (dbt + GE + Schema Registry)
+- Why it matters: Producer/consumer agreements with SLAs.
+  Without contracts, any schema change breaks downstream consumers silently.
+- Origin: Chad Sanderson 2022 (data contracts movement), dbt 2020 (schema tests),
+  Great Expectations 2017 (data quality framework)
+- Unique features:
+  1. Contract = schema + SLA + ownership (producer owns, consumer subscribes)
+  2. Schema enforcement (contract validates data on write, rejects non-conforming)
+  3. SLA monitoring (freshness, completeness, accuracy — alert if SLA violated)
+  4. Versioned contracts (semantic versioning, backward-compat checks)
+- Why it evolved (shortfalls of prior):
+  1. No ownership (data was nobody's responsibility)
+  2. No schema enforcement (any bytes could land in the lake)
+  3. No SLA (consumers didn't know when data would be fresh)
+  4. No versioning (schema changes broke consumers silently)
+- Datasets (3 examples × 5 languages):
+  1. Order events contract (synthetic 100M events) — producer/consumer agreement
+  2. Customer PII contract (synthetic 10M records) — GDPR-compliant data sharing
+  3. ML feature contract (synthetic 50M features) — train/serve consistency guarantee
+- Computational tooling:
+  * dbt (schema tests + contracts in YAML)
+  * Great Expectations (data quality validation framework)
+  * Confluent Schema Registry (schema enforcement for streaming)
+  * DataHub (contract discovery + subscription)
+  * OpenLineage (contract compliance monitoring)
+  * GitHub (contract versioning via PR review)
+- Research:
+  * Chad Sanderson 2022: "Data Contracts — A New Paradigm for Data Governance"
+  * dbt 2020: "Schema Tests + Contracts for Analytics Engineering"
+  * Great Expectations 2017: "Data Quality Framework for Pipelines"
+- Insight: "Data contracts ARE the API gateway pattern for data — like OpenAPI specs but for tables."
+
+
+### Phase 4: Vendor case studies (4 pages)
+Priority: MEDIUM — production deployment deep dives
+
+#### 10. /tabular — Tabular (Iceberg company, Snowflake acquired 2024)
+- Why it matters: The founding team (Ryan Blue, Daniel Weeks) wrote the Iceberg spec.
+  Tabular was the first SaaS Iceberg platform. Snowflake acquired for ~$1B (2024).
+- Origin: Tabular Inc. 2021 (founded by Iceberg creators), acquired by Snowflake 2024
+- Unique features:
+  1. SaaS Iceberg platform (managed catalog + compute)
+  2. Founded by Iceberg spec authors (Ryan Blue, Daniel Weeks)
+  3. Multi-cloud (AWS + GCP + Azure in one platform)
+  4. Snowflake integration post-acquisition
+- Datasets (3 examples × 5 languages):
+  1. Tabular SaaS Iceberg platform (synthetic 10TB) — managed catalog + Trino compute
+  2. Multi-cloud catalog (synthetic 5TB per cloud) — one catalog, three clouds
+  3. Time-travel at scale (synthetic 1B rows, 1000 snapshots) — audit + reproducibility
+- Computational tooling:
+  * Tabular SaaS platform (managed catalog + REST API)
+  * Trino (Tabular's compute engine)
+  * Snowflake (post-acquisition integration)
+  * AWS S3 + GCP GCS + Azure ADLS (multi-cloud storage)
+  * Iceberg REST catalog (Tabular's implementation)
+- Research:
+  * Tabular 2021: "The First SaaS Iceberg Platform"
+  * Snowflake 2024: "Snowflake Acquires Tabular — The Iceberg Company"
+  * Ryan Blue 2017: "Engineering Netflix's Distributed Time-Travel Infrastructure" (Iceberg origin)
+- Insight: "Tabular IS the Iceberg spec as a business — the format authors monetised their own standard."
+
+#### 11. /databricks-lakehouse — Databricks production deployment deep dive
+- Why it matters: Delta + Unity + MLflow + Databricks SQL end-to-end.
+  The most production-deployed lakehouse stack. Uber, Airbnb, JPMorgan use it.
+- Origin: Databricks 2013 (founded by Spark creators), Delta 2017, Unity 2021
+- Unique features:
+  1. Integrated platform (Delta + Unity + MLflow + Databricks SQL + Spark)
+  2. Unity Catalog governance (column-level RBAC + lineage + audit)
+  3. MLflow integration (ML lifecycle on the same platform)
+  4. Photon engine (vectorised C++ execution, 3-5x faster than Spark)
+- Datasets (3 examples × 5 languages):
+  1. Uber ML platform (synthetic 1B events) — Delta + MLflow + feature stores
+  2. Airbnb analytics (synthetic 5TB) — Delta + Databricks SQL + Looker
+  3. JPMorgan risk (synthetic 100M trades) — Delta + Unity + regulatory reporting
+- Computational tooling:
+  * Databricks Lakehouse Platform (managed Spark + Delta + Unity + MLflow)
+  * Photon (vectorised C++ execution engine, 2021)
+  * Unity Catalog (governance + lineage + audit)
+  * MLflow (experiment tracking + model registry)
+  * Databricks SQL (serverless SQL warehouse)
+  * Delta Lake (open table format)
+- Research:
+  * Databricks 2013: "Apache Spark — A Unified Analytics Engine"
+  * Armbrust 2020: "Lakehouse: A New Generation of Open Platforms" (CIDR)
+  * Databricks 2021: "Unity Catalog — Unified Governance for Data + AI"
+- Insight: "Databricks IS the Apple of data — integrated hardware+software+format+catalog in one stack."
+
+#### 12. /snowflake-polaris — Snowflake Polaris + Iceberg open lakehouse
+- Why it matters: Snowflake's strategic counter-bet to Databricks.
+  Polaris (open-source, Apache 2024) + Iceberg = open lakehouse alternative.
+- Origin: Snowflake 2014, Polaris 2024 (Apache-licensed), Tabular acquisition 2024
+- Unique features:
+  1. Apache-licensed REST catalog (open, multi-cloud)
+  2. Snowflake compute (reads external Iceberg tables natively)
+  3. Multi-cloud (AWS + GCP + Azure in one catalog)
+  4. Tabular team (Iceberg authors now at Snowflake)
+- Datasets (3 examples × 5 languages):
+  1. Snowflake external tables on Iceberg (synthetic 10TB) — cross-engine read
+  2. Polaris REST catalog (synthetic 5TB) — Spark + Trino + DuckDB + Snowflake read
+  3. Cross-engine federation (synthetic 1TB) — Snowflake + Spark + Trino on same Iceberg
+- Computational tooling:
+  * Snowflake Polar Federation (reads external Iceberg)
+  * Polaris Catalog (Apache-licensed REST catalog)
+  * Apache Iceberg (table format)
+  * Spark + Trino + DuckDB (compute engines)
+  * AWS S3 + GCP GCS + Azure ADLS (multi-cloud storage)
+- Research:
+  * Snowflake 2014: "The Data Warehouse Built for the Cloud"
+  * Snowflake 2024: "Polaris Catalog — Open-Source REST Catalog for Iceberg"
+  * Snowflake 2024: "Snowflake Acquires Tabular — The Iceberg Company"
+- Insight: "Polaris IS Snowflake's bet that the catalog IS the new database — open wins."
+
+#### 13. /aws-lake-formation — AWS Lake Formation deep dive
+- Why it matters: Cell-level RLS, cross-account governance, Glue Catalog integration.
+  The most production-deployed lakehouse governance on AWS.
+- Origin: AWS 2018 (Lake Formation launch), Glue Catalog 2016
+- Unique features:
+  1. Cell-level row/column security (RLS + CLS)
+  2. LF-tags (label-based governance, not just role-based)
+  3. Cross-account data sharing (via RAM + Lake Formation)
+  4. Glue Catalog integration (metadata + governance in one)
+- Datasets (3 examples × 5 languages):
+  1. Multi-account governance (synthetic 3 accounts, 10TB) — cross-account LF grants
+  2. Partner data sharing (synthetic 5TB) — cell-level RLS for partner access
+  3. LF-tags governance (synthetic 100 tables) — tag-based policy enforcement
+- Computational tooling:
+  * AWS Lake Formation (governance layer)
+  * AWS Glue Data Catalog (metadata layer)
+  * AWS RAM (Resource Access Manager — cross-account sharing)
+  * Amazon Athena (serverless query)
+  * Amazon Redshift Spectrum (federated query)
+  * AWS IAM + STS (authentication + cross-account roles)
+- Research:
+  * AWS 2018: "Lake Formation — Data Lake Management for AWS"
+  * AWS 2020: "Lake Formation Row/Column Security"
+  * AWS 2022: "LF-tags — Label-Based Governance for Data Lakes"
+- Insight: "Lake Formation IS IAM for data — the same role-based access control, applied to tables."
+
+
+## Build pattern (per page)
+
+Each page follows the established layout:
+1. PageHeader (eyebrow + title + description + KPI badges)
+2. KPIs (4 stat cards)
+3. Architecture diagram (custom SVG with hover-tooltips)
+4. Multi-language code blocks (SQL + Python + Scala, 3-5 blocks per page)
+5. Pyodide demo with synthetic data (in-browser executable)
+6. Comparison table (vs siblings)
+7. Why-evolved section (3-4 shortfalls of prior platform)
+8. Unique-features section (4 differentiators in 2x2 grid)
+9. DatasetCards (3 examples × 5 languages: Scala/Rust/Go/Elixir/Zig)
+10. Computational-tooling section (engines + catalogs + tools)
+11. Research + production case studies
+12. Deeper-thought insight ("X IS Y" unifying view)
+13. RelatedTopics (cross-links to sibling pages)
+14. Cross-links (links to all sibling pages in the group)
+
+
+## Guardrails (already in place)
+
+- backup/stable-pre-break branch on both remotes (at commit 119e136)
+- stable-2024-09-25 tag on both remotes
+- .github/CODEOWNERS (enforces review on critical files)
+- .github/CONTRIBUTING.md (documents guardrail policy + recovery procedure)
+- .github/workflows/guardrail-audit.yml (verifies protected files on every push)
+- scripts/pre-push-guardrail.sh (blocks accidental worklog.md deletion)
+- .git/hooks/pre-push (installed locally in new sandbox)
+
+Recovery: git fetch --all && git reset --hard backup/stable-pre-break
