@@ -3409,3 +3409,31 @@ Stage Summary:
 - Platform now has 113 pages total.
 - Each page has: DEDICATED math section (5 equations), custom SVG diagrams (NO web images), Pyodide demo, comparison table, why-evolved, unique features, computational tooling, research, deeper-thought insight.
 - Total math equations across the 4 pages: 20 (attention + PE + norm + Flash + SwiGLU + DDPM + score + CFG + LoRA + QLoRA + NF4 + RLHF + DPO + ReAct + state + tool + memory + multi-agent)
+
+---
+Task ID: computational-biology-new-design
+Agent: Super Z (main)
+Task: Build /computational-biology page with NEW design pattern: Foldable components (progressive disclosure), ScienceShort (looping 5-phase animation), deep math with "Why this matters" callouts, custom SVGs, wet-lab-to-marketplace narrative.
+
+Work Log:
+- Built 2 NEW reusable components:
+  * Foldable: collapsible section (title + summary always visible, content hidden until click). Uses framer-motion for smooth expand/collapse. Progressive disclosure pattern.
+  * ScienceShort: looping multi-phase animation (custom SVG per phase, auto-cycles every 1.5s). The "visual hook" at the top of the page.
+- Built /computational-biology page using the new design:
+  * ScienceShort: 5 phases (Wet Lab → NumPy → Math → Publication → Marketplace) with custom SVGs
+  * Foldable math section: 5 equations (Newton's F=ma, Velocity Verlet, Lennard-Jones, AlphaFold attention, FBA) — each with "Why this matters" connecting to science
+  * Custom SVG: AlphaFold2 architecture (MSA → evoformer → structure module)
+  * Pyodide: Velocity Verlet + Lennard-Jones molecular dynamics (5 atoms, 100 steps, energy conservation)
+  * Foldable: tooling, research, deeper-thought insight sections
+  * Comparison table: AMBER vs GROMACS vs NAMD vs OpenMM
+  * Wet-lab-to-marketplace: 23andMe, Recursion, Insitro, DeepMind
+- Lint clean, static export built (114 pages), commit 9434645 pushed.
+- Verified live: HTTP 200, content verified (Verlet, Lennard-Jones, AlphaFold, wet lab, marketplace).
+
+Stage Summary:
+- NEW DESIGN PATTERN established: Foldable + ScienceShort + deep math with "Why this matters".
+- Platform now has 114 pages.
+- This page is the REFERENCE for the new design — future Phase J pages will follow this pattern.
+- The Foldable component enables progressive disclosure (fold heavy content, show on click).
+- The ScienceShort provides the visual hook (looping animation before the deep content).
+- The math sections have "Why this matters" callouts connecting equations to science outcomes.
