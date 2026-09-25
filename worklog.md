@@ -3537,3 +3537,116 @@ Stage Summary:
 - Each card has "X IS Y" insight = the unexpected connection that bridges disciplines.
 - The /elegant-code page is the CENTREPIECE of the platform's thesis: "the platform should demonstrate how to THINK across disciplines."
 - Platform now has 118 pages total.
+
+---
+Task ID: elegant-code-propagation
+Agent: Super Z (main)
+Task: Propagate the cross-disciplinary elegant-code cards from the central /elegant-code page into 4 related host pages so the multi-disciplinary thesis surfaces wherever it is most relevant.
+
+Work Log:
+- Added inline SectionCard + DatasetCards blocks to 4 existing pages, each pulling one or two ELEGANT_CODE_CARDS from the shared _elegant_code_cards.tsx (no duplication of code):
+  * transformer-deep-dive: Attention card (idx 1) — bridges protein folding (AlphaFold2) ↔ NLP (GPT-4) — "Attention IS natural selection".
+  * bioinformatics-pipelines: Poisson card (idx 2) — bridges sequencing ↔ server load ↔ radioactivity — "Poisson IS the law of rare events".
+  * computational-biology: Verlet card (idx 4) — bridges MD (AMBER) ↔ games (Havok) ↔ spacecraft (NASA) — "Verlet IS time-reversal symmetry".
+  * numpy-scipy: SVD + FFT cards (idx 0 and 3) — SVD bridges genomics/audio/finance; FFT bridges mass-spec/audio/cryo-EM — "SVD IS the Fourier transform for data" and "FFT IS the change of basis".
+- Fixed two missing-import lint errors (DatasetCards + ELEGANT_CODE_CARDS) in computational-biology.tsx and numpy-scipy.tsx after the initial add.
+- Re-linted all 4 files: 0 errors / 0 warnings.
+- Static build: backed up src/app/api → .api-routes-backup, freed memory (killed stray next-server + jest-worker processes that had grown to 1.5 GB RSS), ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 and NODE_OPTIONS=--max-old-space-size=2048 — succeeded with all 118 pages prerendered as static content.
+- Verified all 4 modified pages in out/ — each contains the new "Cross-disciplinary elegance" SectionCard and the relevant card(s).
+- Restored src/app/api, recreated out/.nojekyll.
+- Commit 5d926d3 "feat: propagate elegant-code cards into 4 host pages" pushed to private main (97f2731 → 5d926d3).
+
+Stage Summary:
+- The 10 cross-disciplinary elegant-code cards now propagate to 4 host pages — a reader on transformer-deep-dive, bioinformatics-pipelines, computational-biology, or numpy-scipy encounters the multi-disciplinary thesis inline, not just on the central /elegant-code page.
+- All 5 host pages share the same _elegant_code_cards.tsx source of truth — no duplicated code blocks (the same Scala/Rust/Go/Elixir/Zig snippets render in both /elegant-code and the host page).
+- Lint clean, static build clean (118 pages), pushed to private main.
+- Platform now demonstrates the thesis from 5 entry points: the central /elegant-code page plus 4 contextual in-page cards.
+
+---
+Task ID: elegant-code-full-propagation
+Agent: Super Z (main)
+Task: Propagate the remaining 5 cross-disciplinary elegant-code cards (Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy) into their most relevant host pages so all 10 cards appear inline somewhere on the platform, not just on the central /elegant-code page.
+
+Work Log:
+- Mapped each remaining card to its most contextually relevant host page:
+  * Navier-Stokes (idx 5, weather ↔ blood ↔ turbulence) → computational-physics.tsx (CFD is a section there)
+  * Gradient Descent (idx 6, ML ↔ evolution ↔ thermodynamics) → tabular.tsx (gradient boosting = gradient descent on trees)
+  * Bayes (idx 7, genetics ↔ spam ↔ quantum) → alphamissense.tsx (variant pathogenicity IS Bayesian inference on evolutionary experiments)
+  * Euler's Method (idx 8, ODEs ↔ games ↔ finance) → space-science.tsx (satellite trajectory propagation = Euler integration)
+  * Entropy (idx 9, information ↔ thermodynamics ↔ genetics) → systems-biology.tsx (cell ↔ gas ↔ genome all use H = -Σ p log p)
+- For each host page, added a new SectionCard titled "Cross-disciplinary elegance — <equation> bridges <science1>, <science2>, <science3>" with a one-paragraph description framing why THIS card matters HERE (e.g. "AlphaMissense predicting pathogenicity IS a spam filter classifying a VUS").
+- Each card pulls from the shared ELEGANT_CODE_CARDS source of truth via DatasetCards — no duplicated code blocks.
+- Inserted just before RelatedTopics (computational-physics, tabular, space-science) or just before the inline link list (alphamissense, systems-biology — these have no RelatedTopics).
+- Added missing imports where needed:
+  * computational-physics: DatasetCards + ELEGANT_CODE_CARDS (Sparkles was already there)
+  * tabular: ELEGANT_CODE_CARDS (DatasetCards already imported)
+  * alphamissense: DatasetCards + ELEGANT_CODE_CARDS + Sparkles
+  * systems-biology: DatasetCards + ELEGANT_CODE_CARDS + Sparkles
+  * space-science: DatasetCards + ELEGANT_CODE_CARDS (Sparkles was already there)
+- Lint clean across all 5 files (0 errors / 0 warnings).
+- Static build: backed up src/app/api → .api-routes-backup, freed memory (3.4 GiB free after killing stray next-server), ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 + NODE_OPTIONS=--max-old-space-size=2048 — succeeded with all 118 pages prerendered as static content.
+- Verified all 5 pages contain the expected "Cross-disciplinary elegance — <equation>" title in out/<page>/index.html.
+- Restored src/app/api, recreated out/.nojekyll.
+- Commit 2bca960 "feat: propagate remaining 5 elegant-code cards to host pages" pushed to private main (5d926d3 → 2bca960).
+
+Stage Summary:
+- ALL 10 cross-disciplinary elegant-code cards now propagate to a host page.
+- Total propagation: 9 host pages (4 from commit 5d926d3 + 5 from commit 2bca960) plus the central /elegant-code page itself.
+- Each host page displays ONE cross-disciplinary card (except numpy-scipy which has TWO: SVD + FFT).
+- A reader on any of these 9 host pages encounters the platform's multi-disciplinary thesis inline, not just on the central /elegant-code page.
+- Lint clean, static build clean (118 pages), pushed to private main.
+- The platform's thesis — "demonstrate how to THINK across disciplines" — is now surfaced from 10 entry points (1 central + 9 contextual).
+
+---
+Task ID: connections-hub-home-footer
+Agent: Super Z (main)
+Task: Add three new surfaces for the platform's multi-disciplinary thesis: (1) a dedicated /connections navigation hub, (2) a "see the connections" preview block on the home page, and (3) a "Related elegant-code" footer on every host page enabling card → card navigation.
+
+Work Log:
+- Created src/app/_lib/elegant-code-map.ts (the single source of truth):
+  * ELEGANT_CODE_MAP — 10 mappings (one per card) with name, equation, sciences, insightShort, hostPages[], hostReasons[].
+  * cardsOnHostPage(pageId) — inverse lookup.
+  * recommendedCards(cardIndex) — hand-curated adjacency graph (CARD_NEIGHBORS dict).
+- Registered the new "connections" PageId in router.ts and added the page metadata (group: "Elegant Code", icon: "Network").
+- Created src/app/connections/page.tsx route (single-line wrapper delegating to the ConnectionsPage component).
+- Built src/app/_pages/connections.tsx (ConnectionsPage):
+  * 4 KPIs: 10 cards, 9 host pages, 50 code blocks, 30+ science bridges.
+  * Card → host page table (10 rows × 6 cols: #, equation, sciences bridged, "X IS Y" insight, host page links, why-it-fits reason).
+  * Host page → cards inverse map (9 host tiles, each showing which card(s) propagate to it).
+  * Card → card adjacency graph (10 tiles, each showing up to 3 mathematical cousins).
+  * Insight section "the platform IS a graph, not a tree" — explains why trees hide cross-disciplinary connections and graphs surface them.
+- Modified src/app/_pages/home.tsx:
+  * Added ELEGANT_CODE_MAP import and Sparkles + Brain + Atom icon imports.
+  * Inserted new "See the connections" section between Knowledge Loop and Solution Principles.
+  * The section renders a 3-column grid of 10 cards, each showing equation, "X IS Y" insight, sciences bridged, and a CTA to the host page.
+  * Added two CTA buttons at the bottom: "See the full card → host map" (links to /connections) and "Browse all 10 cards in detail" (links to /elegant-code).
+- Created src/app/_components/related-elegant-code.tsx (RelatedElegantCode component, ~100 lines):
+  * Modeled after RelatedTopics but for card → card navigation.
+  * Accepts hostPage (PageId), sourceCard (number), or cardIndices (number[]) props.
+  * Computes mathematical cousins via recommendedCards(), dedupes, excludes base cards, sorts by recommendation frequency.
+  * Renders up to 6 cousin cards as clickable tiles linking to /elegant-code#card-N.
+  * Includes a CTA at the bottom to /connections for the full map.
+- Wrote a Python script (scripts/add_related_elegant_code_footers.py) to apply the footer to all 9 host pages with one run:
+  * Added the import to each file (after the hrefFor import line).
+  * Inserted `<RelatedElegantCode hostPage="{id}" as never} />` immediately after the cross-disciplinary SectionCard's closing tag on each host page.
+  * All 9 files updated successfully in one run (numpy-scipy, transformer-deep-dive, bioinformatics-pipelines, computational-biology, computational-physics, tabular, alphamissense, systems-biology, space-science).
+- Briefly tried adding the footer to /elegant-code itself with `cardIndices={[0..9]}` — but the component correctly returns null when all cards are already on the page (no cousins to recommend), so reverted to keep the page clean (all 10 cards are already rendered inline above).
+- Lint clean across all 14 modified/new files (0 errors / 0 warnings).
+- Static build: backed up src/app/api → .api-routes-backup, freed memory, ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 + NODE_OPTIONS=--max-old-space-size=2048 — succeeded with all 119 pages prerendered as static content.
+- Verified the rendered HTML contains:
+  * "See the connections" heading on the home page (out/index.html).
+  * "Card → host page map" heading on /connections.
+  * "Related elegant-code — mathematical cousins" footer on all 9 host pages.
+- (Investigation note: grep counts of "mathematical cousins" show 2× per footer in the static HTML — this is Next.js 16 RSC payload serialization, not a real duplicate render. The same doubling appears for RelatedTopics headings and the cross-disciplinary SectionCard titles. The user-visible page renders the footer exactly once.)
+- Restored src/app/api, recreated out/.nojekyll.
+- Commit 427d0dc "feat: add /connections hub, home preview, and card-graph footers" pushed to private main (2bca960 → 427d0dc).
+
+Stage Summary:
+- THREE new surfaces for the multi-disciplinary thesis:
+  1. /connections — full navigation hub with table + inverse map + adjacency graph + insight.
+  2. Home page — 10-card preview grid + two CTAs.
+  3. RelatedElegantCode footer — on every host page, with hand-curated cousin cards.
+- The new src/app/_lib/elegant-code-map.ts is the single source of truth — all three surfaces read from it, so future additions (new card, new host, new cousin) require editing only one file.
+- Platform now has 119 pages total (was 118; added /connections).
+- The card → card graph (10 cards × 3 cousins = 30 hand-curated edges) means a reader on any host page can surf the full network of 'X IS Y' connections without having to leave their current context.
+- Lint clean, static build clean, pushed to private main.
