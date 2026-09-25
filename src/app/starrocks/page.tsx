@@ -1,2 +1,2 @@
-import { StarrocksPage } from "../_pages/starrocks";
-export default function Page() { return <StarrocksPage />; }
+import { StarRocksPage } from "../_pages/starrocks";
+export default function Page() { return <StarRocksPage />; }
