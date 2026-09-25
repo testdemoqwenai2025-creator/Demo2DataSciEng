@@ -109,6 +109,10 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Feature Store Deep Dive", ids: ["feature-store-deep-dive"] },
   { title: "Vector DB Deep Dive", ids: ["vector-db-deep-dive"] },
   { title: "LLMOps", ids: ["llmops"] },
+  { title: "Data Mesh Deep Dive", ids: ["data-mesh-deep-dive"] },
+  { title: "Streaming SQL", ids: ["streaming-sql"] },
+  { title: "Data Contracts DD", ids: ["data-contracts-deep-dive"] },
+  { title: "Privacy Tech", ids: ["privacy-enhancing-tech"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";

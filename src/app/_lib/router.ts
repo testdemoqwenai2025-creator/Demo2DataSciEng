@@ -105,13 +105,17 @@ export type PageId =
   | "mlflow-deep-dive"
   | "feature-store-deep-dive"
   | "vector-db-deep-dive"
-  | "llmops";
+  | "llmops"
+  | "data-mesh-deep-dive"
+  | "streaming-sql"
+  | "data-contracts-deep-dive"
+  | "privacy-enhancing-tech";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps" | "Data Mesh Deep Dive" | "Streaming SQL" | "Data Contracts Deep Dive" | "Privacy Enhancing Tech";
   icon: string;
   description: string;
 }
@@ -909,6 +913,38 @@ export const PAGES: PageMeta[] = [
     group: "LLMOps",
     icon: "Brain",
     description: "LLMOps: prompt registry, LLM evaluation (LLM-as-judge, BLEU/ROUGE), guardrails (PII, hallucination), RAG pipeline (hybrid search + reranking). Math: attention QK^T/√d, perplexity, recall@k. Science: biomedical RAG, chemistry LLM, clinical trial NLP.",
+  },
+  {
+    id: "data-mesh-deep-dive",
+    label: "Data Mesh Deep Dive — Domain-Oriented Data Products",
+    shortLabel: "Data Mesh DD",
+    group: "Data Mesh Deep Dive",
+    icon: "Network",
+    description: "Data mesh deep dive: domain-driven data products, self-serve platform, federated governance. Zhamak Dehghani 2019. Math: graph theory, information theory for quality.",
+  },
+  {
+    id: "streaming-sql",
+    label: "Streaming SQL — Flink SQL + Spark + Materialize + RisingWave",
+    shortLabel: "Streaming SQL",
+    group: "Streaming SQL",
+    icon: "Activity",
+    description: "Streaming SQL: Flink SQL (stream-table duality, temporal joins, windowing), Spark Structured Streaming, Materialize (differential dataflow), RisingWave. Math: watermark, event-time.",
+  },
+  {
+    id: "data-contracts-deep-dive",
+    label: "Data Contracts Deep Dive — Schema + SLA + Ownership",
+    shortLabel: "Data Contracts DD",
+    group: "Data Contracts Deep Dive",
+    icon: "ShieldCheck",
+    description: "Data contracts deep dive: formal contract specification (preconditions, postconditions, invariants), compatibility checking (backward/forward/full), code enforcement via dbt tests + GE + Schema Registry.",
+  },
+  {
+    id: "privacy-enhancing-tech",
+    label: "Privacy-Enhancing Tech — Differential Privacy + Federated Learning + HE",
+    shortLabel: "Privacy Tech",
+    group: "Privacy Enhancing Tech",
+    icon: "ShieldCheck",
+    description: "Privacy-enhancing tech: differential privacy (epsilon-DP, Laplace/Gaussian mechanisms), federated learning (FedAvg, FedProx), homomorphic encryption (Paillier, BFV/BGV, CKKS). Math: epsilon-DP, sensitivity, Enc(a)+Enc(b)=Enc(a+b).",
   },
 ];
 
