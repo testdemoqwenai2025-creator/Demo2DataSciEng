@@ -2440,3 +2440,34 @@ Stage Summary:
 - Guardrails in place: backup branch + tag on both remotes, CODEOWNERS, CONTRIBUTING.md, guardrail-audit.yml workflow, pre-push hook.
 - Recovery procedure: `git fetch --all && git reset --hard backup/stable-pre-break` restores to the pre-guardrail stable state (commit 119e136). For full recovery including guardrails: `git reset --hard 1aac913`.
 - Ready for the break. Tomorrow: clone to new sandbox + build 13 new pages.
+
+---
+Task ID: new-sandbox-setup
+Agent: Super Z (main)
+Task: Create new private repo (AppDataSciEng2-Advance) + new public repo (Demo2DataSciEng) + set up sync + clone to fresh sandbox at /home/z/appdatasci2/.
+
+Work Log:
+- Created private repo `AppDataSciEng2-Advance` via GitHub API (private: true).
+- Created public repo `Demo2DataSciEng` via GitHub API (private: false).
+- Mirror-cloned `AppDataSci-Advanced` → pushed all branches + tags to both new repos.
+- Cloned `AppDataSciEng2-Advance` to new sandbox at `/home/z/appdatasci2/`.
+- Configured remotes: `private` → AppDataSciEng2-Advance, `public` → Demo2DataSciEng.
+- Updated `next.config.ts`: basePath from `/DemoAppDataSci` → `/Demo2DataSciEng`.
+- Updated `sync-to-public.yml`: repo name check + mirror target URL for new repos.
+- Set `SYNC_TO_PUBLIC_PAT` secret on new private repo via GitHub API (NaCl SealedBox encryption).
+- Enabled GitHub Pages on `Demo2DataSciEng` (build_type: workflow).
+- Installed pre-push guardrail hook at `.git/hooks/pre-push`.
+- Committed config changes (f4b30cc) + pushed to private/main.
+- Sync workflow mirrored to public/main, deploy workflow built + published to GitHub Pages.
+- Verified live at https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/:
+  * HTTP 200 on /, /iceberg/, /fintech/
+  * Content verified: "Apache Iceberg" + "Quant scenarios" present
+- Old site (https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/) still works (HTTP 200).
+
+Stage Summary:
+- New sandbox ready at `/home/z/appdatasci2/` with all code + guardrails.
+- New private repo: github.com/testdemoqwenai2025-creator/AppDataSciEng2-Advance
+- New public repo: github.com/testdemoqwenai2025-creator/Demo2DataSciEng
+- New live site: https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
+- Sync + deploy workflows configured + working.
+- Ready to build the 13 new pages (Pinot, Paimon, Druid, Impala, StarRocks, Kafka Connect, Schema Registry, Lineage, Data Contracts, Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
