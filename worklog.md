@@ -3021,3 +3021,86 @@ Stage Summary:
   * Orchestration (Airflow/Dagster) — pipeline scheduling
   * Data quality (Great Expectations/Monte Carlo/Elementary) — quality enforcement
   * Lakehouse (Iceberg/Delta/Hudi/Glue/Catalogs) — storage + format layer
+
+---
+Task ID: phaseE-remaining
+Agent: Super Z (main)
+Task: Finalise Phase E ML deep-dive pages — verify + lint + build + commit + push the 3 remaining Phase E pages (feature-store-deep-dive, vector-db-deep-dive, llmops) + the _dataset_examples13.tsx file (12 examples × 5 langs = 60 code blocks + 4 Pyodide math simulations). These were built in a prior step alongside mlflow-deep-dive.tsx — this task finalises the build + push.
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md — confirmed all prior phases (1-4 + A + B + C + D) complete. Previous commit 04c79d6 registered Phase E route stubs (mlflow-deep-dive + feature-store-deep-dive + vector-db-deep-dive + llmops) in router + sidebar.
+- Read /home/z/appdatasci2/src/app/_pages/mlflow-deep-dive.tsx (684 lines) — REFERENCE IMPLEMENTATION with dedicated Mathematical Foundations SectionCard (bias-variance, AUC-ROC, Bayesian HPO) using <p className="font-mono text-xs"> display equations + <code> inline.
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx — DatasetExample interface (id, step, title, subtitle, accent, icon, badge, brief, stats, codeTabs, runnablePython, insight, tools).
+- Read /home/z/appdatasci2/src/app/_components/_dataset_examples13.tsx (784 lines) — confirmed it contains all 4 export arrays (MLFLOW_SCIENCE_EXAMPLES, FEATURE_STORE_SCIENCE_EXAMPLES, VECTOR_DB_SCIENCE_EXAMPLES, LLMOPS_SCIENCE_EXAMPLES), 3 examples each × 5 langs = 60 code blocks + 4 Pyodide simulations using only math/random/collections.
+
+Existing pages verified (all 3 already built before this task — verified structure matches mlflow pattern exactly):
+
+| File | Lines | Sections (13/13 verified) |
+|------|-------|----------------------------|
+| src/app/_pages/feature-store-deep-dive.tsx | 1018 | PageHeader + 4 KPIs + Mathematical Foundations (PIT/freshness/PSI/Shapley — 4 boxed equations) + FeastArchitectureDiagram (SVG) + 4 code blocks (Feast feature_store.yaml + PIT joins + Tecton streaming + SageMaker FS) + PyodideRunner + 4-way comparison (Feast/Tecton/SageMaker/Vertex) + Why-evolved (4 shortfalls) + 2×2 unique features + DatasetCards + Computational tooling + Research (5 deployments) + Deeper-thought insight + RelatedTopics + cross-links |
+| src/app/_pages/vector-db-deep-dive.tsx | 1002 | PageHeader + 4 KPIs + Mathematical Foundations (cosine/L2/dot + HNSW + IVF + LSH + recall@k — 5 boxed equations) + VectorDbArchitectureDiagram (SVG) + 4 code blocks (Pinecone Python + Weaviate GraphQL + Milvus HNSW + pgvector SQL) + PyodideRunner + 5-way comparison (Pinecone/Weaviate/Milvus/pgvector/Qdrant) + Why-evolved + 2×2 unique features + DatasetCards + Computational tooling + Research + Deeper-thought + RelatedTopics |
+| src/app/_pages/llmops.tsx | 1097 | PageHeader + 4 KPIs + Mathematical Foundations (Attention Q·K^T/√d_k + Embedding geometry ||e₁-e₂||₂ vs cos(e₁,e₂) + Retrieval recall@k/precision@k/MRR + Perplexity exp(-1/N Σ log p) + BLEU BP×exp(Σ w_n log p_n) — 5 boxed equations) + LlmopsArchitectureDiagram (SVG) + 5 code blocks (Prompt Registry + RAG pipeline + Guardrails + BLEU/ROUGE/Perplexity + LangSmith eval) + PyodideRunner + 4-way comparison (LangChain/LlamaIndex/Haystack/DSPy) + Why-evolved + 2×2 unique features + DatasetCards + Computational tooling + Research + Deeper-thought + RelatedTopics |
+
+Math-section content per page (verified in source + built HTML):
+
+### feature-store-deep-dive.tsx — "Mathematical foundations — PIT, freshness, PSI, Shapley values" (SectionCard with 4 boxed equations):
+1. Point-in-time correctness: PIT(e, t_e) = argmax{t_f} f(e, t_f) subject to t_f ≤ t_e (prevents look-ahead bias, AUC inflation of 0.05-0.10 without PIT join)
+2. Feature freshness: staleness(t_now) = t_now − t_feature_last_updated (with SLA thresholds: sensors <60s, clinical <15min, genomics <24h)
+3. PSI: PSI = Σᵢ (p_i^cur − p_i^ref) × ln(p_i^cur / p_i^ref) with thresholds <0.10 stable, 0.10-0.25 warning, ≥0.25 drift (KL-divergence derived)
+4. Shapley values: φᵢ = Σ_{S⊆N\{i}} |S|!·(n−|S|−1)! / n! × [f(S∪{i}) − f(S)] with 4 axioms (Efficiency, Symmetry, Dummy, Additivity) + TreeSHAP approximation
+
+### vector-db-deep-dive.tsx — "Mathematical foundations — distance metrics, HNSW, IVF, LSH, recall" (SectionCard with 5 boxed equations):
+1. Distance metrics: cosine_sim(a,b) = (a·b)/(‖a‖·‖b‖) · L2_dist = √Σ(a_i−b_i)² · dot_product = Σa_i·b_i (when to use each)
+2. HNSW: search_complexity = O(log n) routing + O(ef) refinement (layered graph: M=16, ef=64, ~94 comparisons vs 150M brute-force for 150M vectors)
+3. IVF: IVF_complexity = O(nlist + nprobe·N/nlist) (Voronoi partitioning via k-means, nlist=1024 nprobe=8 → 12K scanned vs 1.5M)
+4. LSH: P(h(x)=h(y)) = 1 − d(x,y)^n (Hamming), random-hyperplane LSH for cosine: P = 1 − θ/π
+5. recall@k = |ANN_k ∩ NN_k| / |NN_k| (HNSW 0.90-0.95, IVF 0.85-0.90, LSH 0.70-0.85)
+
+### llmops.tsx — "Mathematical foundations — attention, embeddings, retrieval, perplexity, BLEU" (SectionCard with 5 boxed equations):
+1. Attention: Attention(Q,K,V) = softmax(QKᵀ/√d_k) × V (Bahdanau 2014 additive → Vaswani 2017 scaled dot-product, with 1/√d_k variance stabilisation + multi-head + causal mask)
+2. Embedding geometry: ‖e₁−e₂‖₂ = √Σ(e₁_i−e₂_i)² (Euclidean) vs cos(e₁,e₂) = (e₁·e₂)/(‖e₁‖·‖e₂‖) (angular) + Johnson-Lindenstrauss lemma O(log n / ε²) dims
+3. Retrieval metrics: recall@k = |relevant ∩ retrieved_k| / |relevant| · precision@k = |relevant ∩ retrieved_k| / k · MRR = (1/|Q|)·Σ 1/rank(q)
+4. Perplexity: PP = exp(−(1/N)·Σ log p(x_i | x_<i)) (GPT-4 Wikipedia ≈ 8-12, GPT-2 ≈ 30, uniform random = |V|)
+5. BLEU: BLEU = BP × exp(Σ w_n × log p_n) with brevity penalty BP = min(1, exp(1 − r/c)) (modified n-gram precision n=1..4, BLEU-4 standard)
+
+Issues encountered + fixes:
+
+1. **Unescaped `${config("min_conf")}` in Scala s-string** (line 72 of _dataset_examples13.tsx): Inside a Spark Scala `s"""..."""` SQL string interpolation, `${config("min_conf")}` is valid Scala s-string interpolation. But the entire code block is wrapped in a JS template literal — JS parsed `${config("min_conf")}` as JS INTERPOLATION (with `config` undefined in scope). Build failed with `ReferenceError: config is not defined` during static prerender of /feature-store-deep-dive (and the other 3 pages importing the file). **Fix**: escaped as `\${config("min_conf")}` (single backslash + dollar + brace → outputs literal `${config("min_conf")}` in the string, valid Scala s-string interpolation, no JS interpolation).
+
+Lint + build verification:
+- ESLint: `bunx eslint src/app/_pages/{feature-store-deep-dive,vector-db-deep-dive,llmops}.tsx src/app/_components/_dataset_examples13.tsx --max-warnings=0` → all pass (0 errors, 0 warnings).
+- Build: `GITHUB_PAGES=true bun run build:static` → succeeded after fix. 101/101 pages prerendered (97 prior + 4 new Phase E: mlflow-deep-dive + feature-store-deep-dive + vector-db-deep-dive + llmops).
+- src/app/api directory moved aside to .api-routes-backup/ during build (z-ai-web-dev-sdk doesn't work in static export), restored after build. src/app/api/agent-triage/route.ts present post-build. .nojekyll touched in out/.
+- Output verification:
+  * out/feature-store-deep-dive/index.html ✅ — PSI keyword appears 55 times, Shapley 39 times (math section + content)
+  * out/vector-db-deep-dive/index.html ✅ — HNSW 131 times, IVF 93 times (math section + content)
+  * out/llmops/index.html ✅ — Attention 14 times, BLEU 49 times (math section + content)
+  * out/mlflow-deep-dive/index.html ✅ — reference page from prior task
+
+Commit + push:
+- SHA: acc339b on private/main (AppDataSciEng2-Advance)
+- Previous: 04c79d6 (Phase E route stubs registered)
+- Push: `git push private main` → 04c79d6..acc339b. Pre-push guardrail checks passed.
+- Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+
+Stage Summary — Phase E complete + ALL PHASES COMPLETE:
+
+- 5 new files (4 pages + 1 dataset_examples file): 4,585 lines of TypeScript/TSX added.
+- 4 ML deep-dive pages (mlflow-deep-dive, feature-store-deep-dive, vector-db-deep-dive, llmops) — each follows the mlflow reference pattern exactly with all 13 sections (PageHeader + KPIs + dedicated Mathematical Foundations SectionCard + Architecture SVG + 4-5 code blocks + Pyodide demo + Comparison table + Why-evolved + 2×2 unique features + DatasetCards + Computational tooling + Research + Deeper-thought insight + RelatedTopics + cross-links).
+- 12 scientific dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 60 code blocks in _dataset_examples13.tsx + 4 Pyodide math simulations (using only math/random/collections).
+- Each page's Mathematical Foundations SectionCard has 4-5 boxed equations rendered in <p className="font-mono"> with extensive derivation/interpretation inline — these are the formal definitions, not heuristics.
+- The 12 scientific examples show how ML platforms apply to scientific workloads:
+  * Life sciences: genomics variant-calling tracking (MLflow, 3 callers × 5 configs = 15 runs), genomics SNP features (Feast, 3B SNPs, allele frequencies via Spark on Iceberg → Redis sub-ms), protein embedding search (ESM-2 + Milvus HNSW, 250M proteins × 1280-dim), biomedical RAG (PubMed + BioBERT + GPT-4, 35M papers), clinical trial matching via LLM (500k trials, citation guardrail)
+  * Chemistry: molecular similarity (ECFP4 + Milvus IVF, 1B molecules), chemistry LLM (SMILES generation + RDKit guardrail, ~20% rejection)
+  * Sensors: environmental sensor features (Feast + PSI drift monitoring, 50k sensors × 7 metrics × 3 windows)
+  * Clinical: clinical trial patient features (Feast point-in-time correctness, 10k patients × 200 features, leakage prevention)
+  * Genomics variant clustering: DNA-BERT + Pinecone HNSW+IVF hybrid, 3B variants × 768-dim
+
+All phases complete:
+- Phase 1-4: 13 foundational pages (snowflake, dbt, databricks, etc.) + scientific-lakehouse-examples
+- Phase A: 4 streaming pages (flink, kafka, pulsar, spark-streaming) + 6 streaming examples
+- Phase B: 3 data quality / observability pages (great-expectations, monte-carlo, elementary) + 6 examples
+- Phase C: 3 cloud warehouse pages (bigquery, redshift, clickhouse) + 6 examples
+- Phase D: 3 orchestration pages (dbt-deep-dive, airflow, dagster) + 6 examples
+- Phase E: 4 ML platform deep-dive pages (mlflow-deep-dive, feature-store-deep-dive, vector-db-deep-dive, llmops) + 12 ML scientific examples
+- Total: 101 pages total, 30+ scientific dataset examples across the platform, each with 5-language code + Pyodide simulation.
