@@ -14,6 +14,8 @@ import {
   Workflow, Dna, Microscope, Sparkles, History, TrendingUp, Boxes,
   Activity, Sigma, Layers, FlaskConical, FileText, Beaker,
 } from "lucide-react";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 
 const KPIS = [
   { label: "GATK variant calling", value: "BWA → MarkDups → BQSR → HaplotypeCaller", hint: "Pipeline: align reads (BWA-MEM), mark PCR duplicates, recalibrate base quality, call haplotypes locally (de novo assembly), joint genotype, annotate (VEP). 30× WGS = ~100 GB BAM per genome.", deltaTone: "flat" as const },
@@ -605,6 +607,19 @@ export function BioinformaticsPipelinesPage() {
           <p><strong className="text-foreground/80">DeepVariant shows ML can beat statistical pipelines — but the math still matters.</strong> DeepVariant (Google 2017) re-cast variant calling as image classification on pileup images — and outperformed the hand-engineered GATK statistical model. This is a recurring pattern in computational science: classical methods encode domain knowledge in probability distributions (binomial, Poisson); ML methods encode it implicitly in learned weights. But the underlying probability theory still informs: data generation IS Poisson, base quality IS Phred, samples ARE conditionally independent given genotypes. The math IS the inductive bias — even when the model is a CNN. The pipeline IS still GATK + VEP + ACMG — the marketplace didn't change because the underlying biology didn't change.</p>
         </div>
       </Foldable>
+
+      {/* Cross-disciplinary elegant-code card — Poisson */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Poisson bridges sequencing, networks, and radioactive decay"
+        description="Poisson (P(k) = λ^k e^(-λ)/k!) IS the law of rare events. Sequencing reads, server requests, and radioactive decays are ALL independent rare events. A bioinformatician and a network engineer are solving the same equation."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 2)}
+          intro="Poisson (sequencing ↔ networks ↔ decay): the SAME equation describes read coverage, server load, and radioactivity — because all three are independent rare events."
+        />
+      </SectionCard>
 
       <RelatedTopics topics={[
         { id: "bioinformatics" as const, reason: "Bioinformatics (sequence analysis foundations)" },

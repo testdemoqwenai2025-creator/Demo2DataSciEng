@@ -9,6 +9,8 @@ import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { Foldable } from "../_components/foldable";
 import { ScienceShort } from "../_components/science-short";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -516,6 +518,19 @@ export function ComputationalBiologyPage() {
           <p><strong className="text-foreground/80">Attention IS the folding algorithm.</strong> AlphaFold didn't learn physics — it learned co-evolution patterns. Residues that mutate together across evolution are in physical contact. Column attention on the MSA finds these co-evolving pairs → distance predictions → 3D structure. The attention matrix IS the contact map — softmax(QK^T) measures co-evolution strength. This is why AlphaFold works: attention captures the statistical signature of folding without ever solving Newton's equations.</p>
         </div>
       </Foldable>
+
+      {/* Cross-disciplinary elegant-code card — Verlet */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Verlet bridges molecular dynamics, games, and orbits"
+        description="Verlet (r(t+Δt) = 2r(t) - r(t-Δt) + F/m×Δt²) IS time-reversal symmetry. A biochemist simulating protein folding (AMBER), a game developer simulating ragdoll physics (Havok), and an aerospace engineer simulating spacecraft (NASA) use the SAME formula because all three simulate Hamiltonian systems."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 4)}
+          intro="Verlet (MD ↔ games ↔ orbits): the SAME symplectic integrator for protein folding, ragdoll physics, and spacecraft trajectories."
+        />
+      </SectionCard>
 
       <RelatedTopics topics={[
         { id: "numpy-scipy" as const, reason: "NumPy N-D arrays power MD + AlphaFold" },

@@ -10,6 +10,8 @@ import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Brain, Atom, Sparkles, History, TrendingUp, Boxes, Server, Network, Zap, Layers } from "lucide-react";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 
 const KPIS = [
   { label: "Origin", value: "Vaswani 2017 (Google)", hint: "Attention Is All You Need — replaced RNN/LSTM with self-attention. The most-cited AI paper of the decade.", deltaTone: "flat" as const },
@@ -432,6 +434,19 @@ export function TransformerDeepDivePage() {
           <p><strong className="text-foreground/80">Flash Attention IS the I/O-optimal algorithm.</strong> The standard attention algorithm materializes the full N×N matrix in HBM — a bandwidth bottleneck. Flash Attention recognises that the matrix never needs to be fully materialized — the softmax can be computed in blocks (online normalization). This is the same insight as MapReduce: don't materialize intermediate results, compute in blocks. Flash Attention IS MapReduce for attention matrices.</p>
           <p><strong className="text-foreground/80">RoPE IS complex multiplication.</strong> RoPE rotates Q and K in 2D subspaces. Mathematically, this is complex multiplication: e^(imθ) × (q_r + i q_i) = rotation by angle mθ. The relative position m appears naturally in the dot product: <code className="font-mono">q^T R_m^T R_n k = q^T R_(n-m) k</code> — the rotation by m cancels, leaving relative position (n-m). RoPE IS complex exponentiation, repackaged as real matrix multiplication.</p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Attention */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Attention bridges protein folding and NLP"
+        description="Attention (softmax(QK^T/√d_k)×V) IS natural selection. The same architecture that parses language (GPT-4) folds proteins (AlphaFold2). DNA IS a language — and attention is how you parse any language, natural or biological."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 1)}
+          intro="Attention (protein folding ↔ NLP): the SAME equation parses language AND predicts protein structure — because DNA IS a language."
+        />
       </SectionCard>
 
       <RelatedTopics topics={[

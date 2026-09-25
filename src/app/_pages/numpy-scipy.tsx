@@ -7,6 +7,8 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
+import { DatasetCards } from "../_components/dataset-cards";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -861,6 +863,19 @@ export function NumpyScipyPage() {
             <strong className="text-foreground/80">The wet lab → marketplace pipeline IS the scientific method commercialised.</strong> The pipeline (data generation → NumPy processing → publication → IP → startup → market) is the modern scientific method applied to commercial outcomes. 23andMe commercialised PCA on genotypes. Recursion commercialised microscopy ML. Insitro commercialised drug discovery ML. All start with <code className="font-mono">import numpy as np</code>. The NumPy ndarray is the atom of the modern bioeconomy — every biotech startup is built on N-D arrays.
           </p>
         </div>
+      </SectionCard>
+
+      {/* Cross-disciplinary elegant-code cards — SVD + FFT */}
+      <SectionCard
+        title="Cross-disciplinary elegance — SVD + FFT bridge 6 sciences"
+        description="SVD connects genomics to audio to finance. FFT connects mass spec to music to cryo-EM. These cards show how ONE equation from NumPy bridges multiple sciences — the multi-disciplinary elegance that no single PhD sees alone."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 0 || i === 3)}
+          intro="SVD (genomics ↔ audio ↔ finance) + FFT (mass spec ↔ audio ↔ cryo-EM). Each card shows ONE NumPy equation bridging 3 sciences."
+        />
       </SectionCard>
 
       <RelatedTopics topics={[
