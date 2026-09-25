@@ -2994,3 +2994,30 @@ All phases complete:
 - Phase C: 3 cloud warehouse pages (bigquery, redshift, clickhouse) + 6 examples
 - Phase D: 3 orchestration pages (dbt-deep-dive, airflow, dagster) + 6 examples
 - Total: 30+ concept pages, 30+ scientific dataset examples across the platform.
+
+---
+Task ID: phases-BCD-complete
+Agent: Super Z (main) + 3 subagents
+Task: Build Phase C (BigQuery, Redshift, ClickHouse), Phase D (dbt-deep-dive, Airflow, Dagster), Phase B (Great Expectations, Monte Carlo, Elementary) — 9 new pages with 18 scientific dataset examples.
+
+Work Log:
+- Phase C (subagent): BigQuery, Redshift, ClickHouse — 3 pages, 5,151 lines, commit 56a00e1
+- Phase D (subagent): dbt-deep-dive, Airflow, Dagster — 3 pages, 6,111 lines, commit dce4bce
+- Phase B (subagent): Great Expectations, Monte Carlo, Elementary — 3 pages, 5,160 lines, commit 4b638dc
+- Total new code: ~16,422 lines across 9 pages + 3 dataset_examples files
+- Total science examples: 18 (9 pages × 2 examples) × 5 languages = 90 code blocks
+- All lint clean, all static exports verified, all commits pushed to private/main
+- Verified live on preview: all 9 new pages return HTTP 200
+
+Stage Summary:
+- ALL PHASES COMPLETE (A + B + C + D).
+- Platform now has 97 pages total.
+- Each page follows the /iceberg.tsx reference pattern with all 13 sections.
+- All pages have DatasetCards with scientific examples (life sciences, sensors, physics, mathematics).
+- The medallion Bronze→Silver→Gold pattern is now demonstrated across:
+  * Streaming (Flink/Kafka/Pulsar/Spark Streaming) — Bronze tier ingest
+  * Data warehouses (BigQuery/Redshift/ClickHouse) — Silver/Gold tier analytics
+  * Transformation (dbt) — Silver tier models
+  * Orchestration (Airflow/Dagster) — pipeline scheduling
+  * Data quality (Great Expectations/Monte Carlo/Elementary) — quality enforcement
+  * Lakehouse (Iceberg/Delta/Hudi/Glue/Catalogs) — storage + format layer
