@@ -113,6 +113,10 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Streaming SQL", ids: ["streaming-sql"] },
   { title: "Data Contracts DD", ids: ["data-contracts-deep-dive"] },
   { title: "Privacy Tech", ids: ["privacy-enhancing-tech"] },
+  { title: "NumPy/SciPy", ids: ["numpy-scipy"] },
+  { title: "Dask/Ray", ids: ["dask-ray"] },
+  { title: "GPU Computing", ids: ["gpu-computing"] },
+  { title: "Jupyter", ids: ["jupyter"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
