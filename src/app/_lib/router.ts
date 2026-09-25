@@ -117,13 +117,14 @@ export type PageId =
   | "transformer-deep-dive"
   | "diffusion-models-deep-dive"
   | "fine-tuning-deep-dive"
-  | "agent-frameworks";
+  | "agent-frameworks"
+  | "computational-biology";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps" | "Data Mesh Deep Dive" | "Streaming SQL" | "Data Contracts Deep Dive" | "Privacy Enhancing Tech" | "NumPy SciPy" | "Dask Ray" | "GPU Computing" | "Jupyter" | "Transformer Deep Dive" | "Diffusion Models Deep Dive" | "Fine-Tuning Deep Dive" | "Agent Frameworks";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps" | "Data Mesh Deep Dive" | "Streaming SQL" | "Data Contracts Deep Dive" | "Privacy Enhancing Tech" | "NumPy SciPy" | "Dask Ray" | "GPU Computing" | "Jupyter" | "Transformer Deep Dive" | "Diffusion Models Deep Dive" | "Fine-Tuning Deep Dive" | "Agent Frameworks" | "Computational Biology";
   icon: string;
   description: string;
 }
@@ -1017,6 +1018,14 @@ export const PAGES: PageMeta[] = [
     group: "Agent Frameworks",
     icon: "Network",
     description: "AI agent frameworks: ReAct (Thought→Action→Observation), multi-agent orchestration (supervisor/hierarchical/peer), LangGraph (graph-based), tool use, memory. Math: action probability, state transitions.",
+  },
+  {
+    id: "computational-biology",
+    label: "Computational Biology — MD, AlphaFold, Docking, Systems Bio",
+    shortLabel: "Comp Biology",
+    group: "Computational Biology",
+    icon: "Atom",
+    description: "Computational biology deep dive: molecular dynamics (AMBER, GROMACS, Verlet integration, N-D force arrays), protein folding (AlphaFold2, MSA attention, evoformer), drug docking (AutoDock Vina, N-D conformer search, scoring), systems biology (FBA, ODE, parameter estimation). Math: Newton's equations, force fields, attention, FBA. Wet lab → NumPy → publication → marketplace.",
   },
 ];
 
