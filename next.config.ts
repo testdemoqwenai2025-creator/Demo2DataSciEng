@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 // When GITHUB_PAGES=true (set by the deploy workflow), build for static export
-// with basePath=/DemoAppDataSci so the site is served from
-// https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/
+// with basePath=/Demo2DataSciEng so the site is served from
+// https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
 // In dev mode (no env var), the dev server runs at / with no basePath.
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
-const repoName = "DemoAppDataSci";
+const repoName = "Demo2DataSciEng";
 
 const basePath = isGitHubPages ? `/${repoName}` : "";
 

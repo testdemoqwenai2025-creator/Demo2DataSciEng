@@ -1,5 +1,5 @@
 # ============================================================
-# Sync workflow: AppDataSci-Advanced (private) → DemoAppDataSci (public)
+# Sync workflow: AppDataSciEng2-Advance (private) → Demo2DataSciEng (public)
 # On every push to main, mirror the commit to the public preview repo.
 # ============================================================
 name: Mirror to public preview repo
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     # Only run on the private source-of-truth repo — the synced public copy has
     # the workflow file too, but SYNC_TO_PUBLIC_PAT secret only exists on private
-    if: ${{ github.repository == 'testdemoqwenai2025-creator/AppDataSci-Advanced' }}
+    if: ${{ github.repository == 'testdemoqwenai2025-creator/AppDataSciEng2-Advance' }}
     steps:
       - name: Checkout private source
         uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
           # Plain --force is intentional here because the public repo is a pure
           # preview mirror; only this workflow is allowed to push to it (enforced
           # via branch protection on the public repo).
-          git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/DemoAppDataSci.git"
+          git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/Demo2DataSciEng.git"
           # Fetch public's current main so we can detect divergent history
           git fetch public main || true
           # Push main → main, force-overwriting public main with the latest private commit
