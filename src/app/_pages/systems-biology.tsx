@@ -987,6 +987,19 @@ export function SystemsBiologyPage() {
         />
       </SectionCard>
 
+      {/* Cross-disciplinary elegant-code cards — PageRank + Lloyd's (new) */}
+      <SectionCard
+        title="Cross-disciplinary elegance — PageRank + Lloyd's bridge gene networks and population structure"
+        description="PageRank (PR(p) = (1-d) + d·Σ(PR(q)/L(q))) ranks STRING's 19.5M-PPI network — TP53 PR ≈ 0.025 → most essential human gene. Lloyd's k-means clusters 1000-Genomes 2504 individuals by 10-dim SNP PCA — recovers Out-of-Africa ancestry. Both equations also rank global ports (UN COMTRADE) and cluster vessels — the math doesn't know if the nodes are genes, individuals, or vessels."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 15 || i === 19)}
+          intro="PageRank (fintech ↔ maritime ↔ genetics) + Lloyd's (maritime ↔ genetics ↔ ML): the SAME eigenvector ranks banks, ports, and genes; the SAME iterate clusters ports, populations, and images."
+        />
+      </SectionCard>
+
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"systems-biology" as never} />
 

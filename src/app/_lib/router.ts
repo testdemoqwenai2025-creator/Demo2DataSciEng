@@ -123,7 +123,8 @@ export type PageId =
   | "computational-physics"
   | "bioinformatics-pipelines"
   | "elegant-code"
-  | "connections";
+  | "connections"
+  | "global-shipping";
 
 export interface PageMeta {
   id: PageId;
@@ -1071,6 +1072,14 @@ export const PAGES: PageMeta[] = [
     group: "Elegant Code",
     icon: "Network",
     description: "Index of the 10 cross-disciplinary elegant-code cards and the host pages where each one is propagated. The map shows where the platform's multi-disciplinary thesis surfaces inline, so a reader on any host page can navigate the full graph of cross-disciplinary connections.",
+  },
+  {
+    id: "global-shipping",
+    label: "Global Shipping — Maritime, Ports, AIS Vessel Tracking",
+    shortLabel: "Global Shipping",
+    group: "Computational Science",
+    icon: "Anchor",
+    description: "Maritime analytics on 100K vessels × 10⁹ AIS positions: Haversine port-to-port distance, Kalman vessel tracking, PageRank port centrality, Monte Carlo berth congestion, Markov port-state transitions, GBM container dwell times, VaR Solvency II risk, Lloyd's port clustering. The maritime host for cross-disciplinary elegant-code cards.",
   },
 ];
 

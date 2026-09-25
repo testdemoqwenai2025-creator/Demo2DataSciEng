@@ -4,15 +4,16 @@ import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
+import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Atom, Sparkles, TrendingUp, Boxes, Network, Cpu } from "lucide-react";
 
 const KPIS = [
-  { label: "Math equations", value: "5 cross-disciplinary", hint: "SVD, Attention, Poisson, FFT, Verlet — each connecting 3+ sciences via one equation", deltaTone: "up" as const },
+  { label: "Math equations", value: "20 cross-disciplinary", hint: "SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy, Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's — each connecting 3+ sciences via one equation", deltaTone: "up" as const },
   { label: "Languages", value: "5 (Scala/Rust/Go/Elixir/Zig)", hint: "Each equation expressed in 5 languages — showing that elegance transcends language", deltaTone: "flat" as const },
-  { label: "Sciences bridged", value: "12+ disciplines", hint: "Genomics, NLP, audio, chemistry, physics, games, aerospace, finance, networks, microscopy, biology, queueing theory", deltaTone: "up" as const },
+  { label: "Sciences bridged", value: "20+ disciplines", hint: "Genomics, NLP, audio, chemistry, physics, games, aerospace, finance, networks, microscopy, biology, queueing theory, maritime, aviation, astronomy, climate, RL, ML, thermodynamics, evolution", deltaTone: "up" as const },
   { label: "Insight depth", value: "'X IS Y' connections", hint: "The unexpected connections that no single PhD sees alone — this is the platform's core value", deltaTone: "up" as const },
 ];
 
@@ -37,16 +38,18 @@ export function ElegantCodePage() {
         ))}
       </div>
 
-      {/* The cards — 5 elegant code scenarios */}
+      {/* The cards — 20 elegant code scenarios */}
       <SectionCard
-        title="5 elegant code scenarios — math → code → science → unexpected connection"
-        description="Each card opens a lazy popup showing: the mathematical equation (the foundation), elegant code in 5 languages (the expression), the science domain (the application), and the 'X IS Y' insight (the unexpected connection that bridges disciplines). The code is REPRESENTATIONAL — it shows HOW to think, not HOW to run. The elegance emerges from the mathematics; the code is just the expression."
+        title="20 elegant code scenarios — math → code → science → unexpected connection"
+        description="Each card opens a lazy popup showing: the mathematical equation (the foundation), elegant code in 5 languages (the expression), the science domain (the application), and the 'X IS Y' insight (the unexpected connection that bridges disciplines). The code is REPRESENTATIONAL — it shows HOW to think, not HOW to run. The elegance emerges from the mathematics; the code is just the expression. The 'Hosted on' badge on each card shows which other pages on the platform surface that card inline."
         icon={<Sparkles className="h-5 w-5" />}
-        badge="5 cards × 5 langs"
+        badge="20 cards × 5 langs"
       >
         <DatasetCards
           examples={ELEGANT_CODE_CARDS}
-          intro="SVD (genomics ↔ audio ↔ finance), Attention (protein folding ↔ NLP), Poisson (sequencing ↔ networks ↔ decay), FFT (mass spec ↔ audio ↔ cryo-EM), Verlet (MD ↔ games ↔ orbits). Each card shows ONE equation bridging 3+ sciences, with elegant code in Scala/Rust/Go/Elixir/Zig."
+          anchorPrefix="card-"
+          hostedOnByIndex={(i) => ELEGANT_CODE_MAP[i]?.hostPages ?? []}
+          intro="SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy (Phase J) + Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's (Phase K). Each card shows ONE equation bridging 3+ sciences, with elegant code in Scala/Rust/Go/Elixir/Zig."
         />
       </SectionCard>
 

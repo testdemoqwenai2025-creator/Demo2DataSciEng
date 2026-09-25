@@ -53,6 +53,10 @@ export interface DatasetExample {
 interface DatasetCardsProps {
   examples: DatasetExample[];
   intro?: string;
+  /** Optional: returns the list of host page IDs that the card at this index appears on. */
+  hostedOnByIndex?: (index: number) => string[];
+  /** Optional: anchor prefix for each card (e.g. "card-" → id="card-0", "card-1", …). */
+  anchorPrefix?: string;
 }
 
 // ============================================================
@@ -157,7 +161,7 @@ function MultiLangCode({ tabs, runnablePython }: { tabs: LangTab[]; runnablePyth
 // Main component
 // ============================================================
 
-export function DatasetCards({ examples, intro }: DatasetCardsProps) {
+export function DatasetCards({ examples, intro, hostedOnByIndex, anchorPrefix }: DatasetCardsProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   const openCard = openId ? examples.find((e) => e.id === openId) : null;
 
@@ -174,49 +178,66 @@ export function DatasetCards({ examples, intro }: DatasetCardsProps) {
 
       {/* Cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {examples.map((e) => (
-          <motion.button
-            key={e.id}
-            type="button"
-            onClick={() => setOpenId(e.id)}
-            className="relative rounded-xl overflow-hidden border border-border/60 hover:border-primary/60 hover:shadow-lg transition-all bg-gradient-to-br from-card to-muted/30 group text-left"
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            aria-label={`Open: ${e.title}`}
-          >
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
-                  style={{ backgroundColor: e.accent + "20" }}>
-                  {e.icon}
-                </div>
-                <Badge variant="outline" className="text-[10px]" style={{ color: e.accent }}>
-                  {e.badge}
-                </Badge>
-              </div>
-              <p className="text-xs font-bold leading-tight" style={{ color: e.accent }}>
-                {e.title}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-1 font-mono leading-snug">{e.subtitle}</p>
-              {/* Mini preview: dataset stats */}
-              <div className="mt-3 space-y-0.5 text-[10px]">
-                {e.stats.slice(0, 3).map((s) => (
-                  <div key={s.label} className="flex justify-between text-muted-foreground">
-                    <span>{s.label}</span>
-                    <span className="font-mono">{s.value}</span>
+        {examples.map((e, idx) => {
+          const hostedOn = hostedOnByIndex ? hostedOnByIndex(idx) : [];
+          return (
+            <motion.button
+              key={e.id}
+              id={anchorPrefix ? `${anchorPrefix}${idx}` : undefined}
+              type="button"
+              onClick={() => setOpenId(e.id)}
+              className="relative rounded-xl overflow-hidden border border-border/60 hover:border-primary/60 hover:shadow-lg transition-all bg-gradient-to-br from-card to-muted/30 group text-left scroll-mt-20"
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              aria-label={`Open: ${e.title}`}
+            >
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
+                    style={{ backgroundColor: e.accent + "20" }}>
+                    {e.icon}
                   </div>
-                ))}
+                  <Badge variant="outline" className="text-[10px]" style={{ color: e.accent }}>
+                    {e.badge}
+                  </Badge>
+                </div>
+                <p className="text-xs font-bold leading-tight" style={{ color: e.accent }}>
+                  {e.title}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1 font-mono leading-snug">{e.subtitle}</p>
+                {/* Mini preview: dataset stats */}
+                <div className="mt-3 space-y-0.5 text-[10px]">
+                  {e.stats.slice(0, 3).map((s) => (
+                    <div key={s.label} className="flex justify-between text-muted-foreground">
+                      <span>{s.label}</span>
+                      <span className="font-mono">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Hosted-on badge (only if provided) */}
+                {hostedOn.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-border/40">
+                    <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">Hosted on</p>
+                    <div className="flex flex-wrap gap-1">
+                      {hostedOn.map((h) => (
+                        <span key={h} className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                          /{h}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Step indicator */}
+                <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
+                  <span className="font-mono">example {e.step}/{examples.length}</span>
+                  <span>·</span>
+                  <span className="font-mono">Scala · Rust · Go · Elixir · Zig</span>
+                </div>
               </div>
-              {/* Step indicator */}
-              <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
-                <span className="font-mono">example {e.step}/{examples.length}</span>
-                <span>·</span>
-                <span className="font-mono">Scala · Rust · Go · Elixir · Zig</span>
-              </div>
-            </div>
-            <div className="h-1" style={{ backgroundColor: e.accent }} />
-          </motion.button>
-        ))}
+              <div className="h-1" style={{ backgroundColor: e.accent }} />
+            </motion.button>
+          );
+        })}
       </div>
 
       {/* Lazy modal */}

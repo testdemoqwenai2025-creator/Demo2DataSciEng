@@ -8,6 +8,8 @@ import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { DatasetCards } from "../_components/dataset-cards";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { MONTE_CARLO_SCIENCE_EXAMPLES } from "../_components/_dataset_examples12";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -950,6 +952,21 @@ export function MonteCarloPage() {
           </p>
         </div>
       </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Monte Carlo */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Monte Carlo bridges options, port congestion, and rare variants"
+        description="Monte Carlo (E[f(X)] ≈ (1/N)·Σ f(X_i)) IS the universal estimation equation. A CME quant pricing an exotic option via 10⁶ GBM paths, a port captain simulating 10⁵ vessel arrivals to estimate berth congestion, and a geneticist running 10⁶ permutations to estimate rare-variant significance all use the SAME averaging — Metropolis 1946 invented this at Los Alamos."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 17)}
+          intro="Monte Carlo (fintech ↔ maritime ↔ genetics): the SAME averaging samples exotic options, port congestion, and rare-variant p-values — because all three estimate E[f(X)] via random draws."
+        />
+      </SectionCard>
+
+      <RelatedElegantCode hostPage={"monte-carlo" as never} />
 
       <RelatedTopics topics={[
         { id: "great-expectations" as const, reason: "Open-source expectation suites — declarative rules (complementary to MC)" },

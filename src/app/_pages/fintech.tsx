@@ -7,6 +7,9 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
+import { DatasetCards } from "../_components/dataset-cards";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { FintechInteractives } from "../_components/fintech-interactives";
 import { FintechShortsCarousel } from "../_components/fintech-shorts";
 import { FintechGallery3D } from "../_components/fintech-gallery-3d";
@@ -1094,6 +1097,21 @@ export function FintechPage() {
           </p>
         </div>
       </SectionCard>
+
+      {/* 5 cross-disciplinary elegant-code cards — fintech IS the universal application domain */}
+      <SectionCard
+        title="5 cross-disciplinary elegant-code cards — fintech IS the universal application domain"
+        description="Five of the platform's 20 elegant-code cards surface here, each showing ONE math equation bridging fintech ↔ 2+ other sciences. Black-Scholes (cargo ↔ SPX ↔ alleles), Kelly (bets ↔ alleles ↔ actions), VaR (banks ↔ ports ↔ climate), GBM (stocks ↔ dwell ↔ drift), Monte Carlo (options ↔ congestion ↔ variants)."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="5 cards × 5 langs"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => [10, 12, 14, 17, 18].includes(i))}
+          intro="Black-Scholes (fintech ↔ maritime ↔ genetics), Kelly (fintech ↔ genetics ↔ RL), VaR (fintech ↔ maritime ↔ climate), Monte Carlo (fintech ↔ maritime ↔ genetics), GBM (fintech ↔ maritime ↔ genetics). Each card shows ONE equation bridging 3+ sciences, with elegant code in 5 languages."
+        />
+      </SectionCard>
+
+      <RelatedElegantCode hostPage={"fintech" as never} />
 
       <RelatedTopics topics={[
         { id: "databricks" as const, reason: "Spark for Monte Carlo pricing" },

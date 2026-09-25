@@ -10,8 +10,11 @@ import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Layers, Zap, TrendingUp, Terminal, Brain,
-  Activity, Dna, Microscope, GitCompare,
+  Activity, Dna, Microscope, GitCompare, Sparkles,
 } from "lucide-react";
+import { DatasetCards } from "../_components/dataset-cards";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 
 const KPIS = [
   { label: "Amino acids", value: "20-letter alphabet", hint: "ACDEFGHIKLMNPQRSTVWY → tokens", deltaTone: "flat" as const },
@@ -850,6 +853,21 @@ export function BioinformaticsPage() {
           <p><strong className="text-foreground/80">AlphaFold2's structure head IS a conditional diffusion model.</strong> The Structure Module starts from random 3D coordinates and iteratively refines them to a physically plausible structure, conditioned on the ESM-2 / Evoformer sequence embedding. This is mathematically identical to ADR-027's DDPM: x_T = random, x_0 = structure, the network predicts the noise (refinement direction). The connection: protein folding IS denoising from random coordinates to a ground-state structure, conditioned on sequence. The 'thermodynamic minimum' (Anfinsen's theorem, 1973 — a protein's native structure is the global free-energy minimum) is the same variational principle as ADR-027's reverse SDE. The diffusion model IS the Anfinsen ansatz, made computational. AlphaFold2 didn't invent new math — it ported diffusion models to molecular structure prediction, with SE(3)-equivariance as the inductive bias that respects 3D physics. This connects the entire platform's GenAI stack: ADR-027 (image diffusion), ADR-033 (SigLIP), ADR-034 (ESM-2 + AlphaFold2) are three instances of the same contrastive-learning + conditional-diffusion pattern, on three modalities. The 'biology IS machine learning' claim from ESM-2's paper is not hyperbole — it's a structural fact about the mathematics of evolution.</p>
         </div>
       </SectionCard>
+
+      {/* Cross-disciplinary elegant-code card — Markov */}
+      <SectionCard
+        title="Cross-disciplinary elegance — Markov bridges DNA, credit ratings, and port states"
+        description="Markov (π(t+1) = π(t)·P) IS the universal state-transition equation. Jukes-Cantor DNA substitution (1969), Moody's credit rating transitions (8-state AAA→D), and AIS port-state transitions (50-state) all use the SAME matrix update — the memoryless property is universal. Markov 1906 invented this for linguistics."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => i === 13)}
+          intro="Markov (genetics ↔ fintech ↔ maritime): the SAME memoryless update models DNA substitution, credit ratings, and port-state transitions — because all three ask ‘what's next given now?’."
+        />
+      </SectionCard>
+
+      <RelatedElegantCode hostPage={"bioinformatics" as never} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("multimodal-rag")} className="text-sm text-primary hover:underline">→ Multi-modal RAG (same shared embedding space, different modality)</Link>

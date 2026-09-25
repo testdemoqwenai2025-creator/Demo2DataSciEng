@@ -511,9 +511,9 @@ export function HomePage() {
       {/* See the connections — the platform's multi-disciplinary thesis */}
       <section>
         <PageHeader
-          eyebrow="Cross-disciplinary elegance · 10 equations × 9 host pages"
+          eyebrow="Cross-disciplinary elegance · 20 equations × 10 host pages"
           title="See the connections — the multi-disciplinary thesis in action"
-          description="Modern computational science is the INTERSECTION of disciplines, not the depth of one. The same math equation bridges genomics, audio, finance, NLP, physics, aerospace, and games — and the platform's 10 elegant-code cards surface that intersection. Each card appears inline on its most relevant host page, so the thesis meets the reader where they already are."
+          description="Modern computational science is the INTERSECTION of disciplines, not the depth of one. The same math equation bridges genomics, audio, finance, NLP, physics, aerospace, games, maritime, aviation, and climate — and the platform's 20 elegant-code cards surface that intersection. Each card appears inline on its most relevant host page, so the thesis meets the reader where they already are."
         />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {ELEGANT_CODE_MAP.map((m) => (
@@ -550,7 +550,7 @@ export function HomePage() {
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link href={hrefFor("elegant-code" as never)}>
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Browse all 10 cards in detail
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Browse all 20 cards in detail
             </Link>
           </Button>
         </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { ElegantCodeGraph } from "../_components/elegant-code-graph";
 import { ELEGANT_CODE_MAP, cardsOnHostPage, recommendedCards } from "../_lib/elegant-code-map";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor, pageById, type PageId } from "../_lib/router";
@@ -9,10 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Network, Sparkles, TrendingUp, ArrowRight, Boxes, Brain, Atom, Layers } from "lucide-react";
 
 const KPIS = [
-  { label: "Cards", value: "10 equations", hint: "Each card bridges 3+ sciences with the same math: SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy.", deltaTone: "flat" as const },
-  { label: "Host pages", value: "9 contextual", hint: "Where each card is propagated inline — readers meet the thesis where it matters most, not only on /elegant-code.", deltaTone: "up" as const },
-  { label: "Code blocks", value: "50 (10 × 5 langs)", hint: "Same Scala/Rust/Go/Elixir/Zig snippets shared via ELEGANT_CODE_CARDS — no duplication.", deltaTone: "flat" as const },
-  { label: "Science bridges", value: "30+ connections", hint: "10 cards × 3+ sciences each — the cross-disciplinary adjacencies that no single PhD sees alone.", deltaTone: "up" as const },
+  { label: "Cards", value: "20 equations", hint: "Each card bridges 3+ sciences with the same math: SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy + Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's.", deltaTone: "flat" as const },
+  { label: "Host pages", value: "10 contextual", hint: "Where each card is propagated inline — readers meet the thesis where it matters most, not only on /elegant-code.", deltaTone: "up" as const },
+  { label: "Code blocks", value: "100 (20 × 5 langs)", hint: "Same Scala/Rust/Go/Elixir/Zig snippets shared via ELEGANT_CODE_CARDS — no duplication.", deltaTone: "flat" as const },
+  { label: "Science bridges", value: "60+ connections", hint: "20 cards × 3+ sciences each + 60 hand-curated cousin edges — the cross-disciplinary adjacencies that no single PhD sees alone.", deltaTone: "up" as const },
 ];
 
 export function ConnectionsPage() {
@@ -36,12 +37,22 @@ export function ConnectionsPage() {
         ))}
       </div>
 
+      {/* Interactive D3 force-directed graph */}
+      <SectionCard
+        title="Interactive graph — drag any node, hover for equation + insight"
+        description="The 20 cards are nodes; the ~30 hand-curated cousin edges are arcs. Drag any node to reposition (the simulation will re-equilibrate). Hover any node to see its equation + 'X IS Y' insight. Click any node to open the full card on /elegant-code#card-N. THIS is the 'graph, not a tree' thesis made tangible — surf the network of cross-disciplinary mathematics by following any edge."
+        icon={<Network className="h-5 w-5" />}
+        badge="D3.js interactive"
+      >
+        <ElegantCodeGraph height={620} />
+      </SectionCard>
+
       {/* Card → Host mapping */}
       <SectionCard
         title="Card → host page map — where each equation surfaces inline"
         description="Each elegant-code card is propagated to the host page where its equation is most contextually relevant. The reader on a host page encounters the thesis naturally — and can navigate back to the central /elegant-code page for the full multi-language code (Scala/Rust/Go/Elixir/Zig)."
         icon={<Network className="h-5 w-5" />}
-        badge="10 rows"
+        badge="20 rows"
       >
         <div className="overflow-x-auto -mx-2">
           <table className="w-full text-sm border-collapse">
@@ -100,7 +111,7 @@ export function ConnectionsPage() {
         title="Host page → cards — what thesis surfaces where you already are"
         description="The inverse view: every host page and the card(s) propagated onto it. Useful if you're a reader on (say) transformer-deep-dive and want to know which other cards might be worth visiting."
         icon={<Boxes className="h-5 w-5" />}
-        badge="9 hosts"
+        badge="10 hosts"
       >
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {uniqueHostPages().map((hp) => {
@@ -131,9 +142,9 @@ export function ConnectionsPage() {
       {/* Card → card adjacency graph */}
       <SectionCard
         title="Card → card adjacency — the graph of mathematical cousins"
-        description="Each card has up to 3 mathematical cousins: cards whose sciences overlap or whose equation family is mathematically adjacent. SVD ↔ FFT (both are change-of-basis). Verlet ↔ Euler (both are integrators). Bayes ↔ Gradient Descent (both are learning rules). Use this graph to surf the full network of 'X IS Y' connections — start anywhere, end up everywhere."
+        description="Each card has up to 3 mathematical cousins: cards whose sciences overlap or whose equation family is mathematically adjacent. SVD ↔ FFT (both are change-of-basis). Verlet ↔ Euler (both are integrators). Bayes ↔ Gradient Descent (both are learning rules). Black-Scholes ↔ GBM (Black-Scholes derives from GBM). Use this graph to surf the full network of 'X IS Y' connections — start anywhere, end up everywhere. The interactive D3 graph above visualises the same adjacency; this section is the tabular form for quick scanning."
         icon={<Network className="h-5 w-5" />}
-        badge="card graph"
+        badge="20 cards"
       >
         <div className="grid md:grid-cols-2 gap-3">
           {ELEGANT_CODE_MAP.map((m) => {
