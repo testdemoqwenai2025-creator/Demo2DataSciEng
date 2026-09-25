@@ -79,11 +79,24 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Apache Hudi", ids: ["hudi"] },
   { title: "Delta Lake", ids: ["delta-lake"] },
   { title: "Catalogs", ids: ["catalogs"] },
+  { title: "Apache Pinot", ids: ["pinot"] },
+  { title: "Apache Paimon", ids: ["paimon"] },
+  { title: "Apache Druid", ids: ["druid"] },
+  { title: "Apache Impala", ids: ["impala"] },
+  { title: "StarRocks", ids: ["starrocks"] },
+  { title: "Kafka Connect", ids: ["kafka-connect"] },
+  { title: "Schema Registry", ids: ["schema-registry"] },
+  { title: "Lineage", ids: ["lineage"] },
+  { title: "Data Contracts", ids: ["data-contracts"] },
+  { title: "Tabular", ids: ["tabular"] },
+  { title: "Databricks Lakehouse", ids: ["databricks-lakehouse"] },
+  { title: "Snowflake Polaris", ids: ["snowflake-polaris"] },
+  { title: "AWS Lake Formation", ids: ["aws-lake-formation"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
-const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/DemoAppDataSci";
-const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSci-Advanced";
+const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/Demo2DataSciEng";
+const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSciEng2-Advance";
 
 function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () => void }) {
   return (
@@ -252,7 +265,6 @@ export function AppShell({ children }: AppShellProps) {
       // Home — just clear the hash
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

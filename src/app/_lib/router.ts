@@ -75,13 +75,26 @@ export type PageId =
   | "glue"
   | "hudi"
   | "delta-lake"
-  | "catalogs";
+  | "catalogs"
+  | "pinot"
+  | "paimon"
+  | "druid"
+  | "impala"
+  | "starrocks"
+  | "kafka-connect"
+  | "schema-registry"
+  | "lineage"
+  | "data-contracts"
+  | "tabular"
+  | "databricks-lakehouse"
+  | "snowflake-polaris"
+  | "aws-lake-formation";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation";
   icon: string;
   description: string;
 }
@@ -638,6 +651,110 @@ export const PAGES: PageMeta[] = [
     group: "Catalogs",
     icon: "Network",
     description: "Comparison of metadata/catalog systems: AWS Glue Data Catalog, Hive Metastore, Nessie (Git-for-data), Databricks Unity Catalog, Snowflake Polaris, Iceberg REST Catalog. The metadata-layer battle.",
+  },
+  {
+    id: "pinot",
+    label: "Apache Pinot — Real-time OLAP",
+    shortLabel: "Pinot",
+    group: "Apache Pinot",
+    icon: "Zap",
+    description: "LinkedIn-origin real-time OLAP engine with star-tree index for sub-second analytics on billions of rows. 50B events/day at LinkedIn.",
+  },
+  {
+    id: "paimon",
+    label: "Apache Paimon — Streaming-native Table Format",
+    shortLabel: "Paimon",
+    group: "Apache Paimon",
+    icon: "Database",
+    description: "Flink-first streaming-native table format (2023) with changelog mode + partial-update merge. Treats tables as streams.",
+  },
+  {
+    id: "druid",
+    label: "Apache Druid — Time-series OLAP",
+    shortLabel: "Druid",
+    group: "Apache Druid",
+    icon: "Activity",
+    description: "Sub-second queries on event/time-series data at scale. Netflix, Airbnb, Alibaba use Druid for real-time analytics.",
+  },
+  {
+    id: "impala",
+    label: "Apache Impala — Hadoop MPP SQL",
+    shortLabel: "Impala",
+    group: "Apache Impala",
+    icon: "Cpu",
+    description: "Cloudera-origin MPP SQL engine (2012) for HDFS + Kudu. LLVM JIT codegen. Still relevant for on-prem Hadoop stacks.",
+  },
+  {
+    id: "starrocks",
+    label: "StarRocks — MySQL-compatible Lakehouse Query",
+    shortLabel: "StarRocks",
+    group: "StarRocks",
+    icon: "Database",
+    description: "MySQL-compatible lakehouse query engine (2021 fork of Doris). Vectorised SIMD execution, reads Iceberg/Delta/Hive directly. Fastest Trino alternative for BI.",
+  },
+  {
+    id: "kafka-connect",
+    label: "Kafka Connect + Debezium — CDC to Lakehouse",
+    shortLabel: "Kafka Connect",
+    group: "Kafka Connect",
+    icon: "ArrowLeftRight",
+    description: "Standard pipeline for operational data → lakehouse. Kafka Connect framework + Debezium log-based CDC. 200+ connectors, exactly-once via Kafka transactions.",
+  },
+  {
+    id: "schema-registry",
+    label: "Schema Registry — Avro/Protobuf/JSON Schema Evolution",
+    shortLabel: "Schema Registry",
+    group: "Schema Registry",
+    icon: "ShieldCheck",
+    description: "Confluent Schema Registry + Glue Schema Registry + Iceberg schema evolution. Backward/forward/full compatibility. The type system for the data pipeline.",
+  },
+  {
+    id: "lineage",
+    label: "Data Lineage — OpenLineage + Atlas + Spline",
+    shortLabel: "Lineage",
+    group: "Lineage",
+    icon: "Network",
+    description: "Track data flow from source to dashboard. OpenLineage standard, Apache Atlas, Spline, Unity Lineage. GDPR audit, impact analysis, root cause.",
+  },
+  {
+    id: "data-contracts",
+    label: "Data Contracts — Producer/Consumer Agreements",
+    shortLabel: "Data Contracts",
+    group: "Data Contracts",
+    icon: "ShieldCheck",
+    description: "Schema + SLA + ownership agreements between data producers and consumers. dbt tests + Great Expectations + Schema Registry. API gateway pattern for data.",
+  },
+  {
+    id: "tabular",
+    label: "Tabular — SaaS Iceberg Platform (Snowflake-acquired)",
+    shortLabel: "Tabular",
+    group: "Tabular",
+    icon: "Boxes",
+    description: "First SaaS Iceberg platform, founded by Iceberg spec authors (Ryan Blue, Daniel Weeks). Acquired by Snowflake 2024. Multi-cloud managed Iceberg.",
+  },
+  {
+    id: "databricks-lakehouse",
+    label: "Databricks Lakehouse — Production Deep Dive",
+    shortLabel: "Databricks LH",
+    group: "Databricks Lakehouse",
+    icon: "Boxes",
+    description: "Delta + Unity + MLflow + Databricks SQL + Photon end-to-end. Uber, Airbnb, JPMorgan production stack. The most deployed lakehouse platform.",
+  },
+  {
+    id: "snowflake-polaris",
+    label: "Snowflake Polaris — Open Lakehouse Counter-bet",
+    shortLabel: "Snowflake Polaris",
+    group: "Snowflake Polaris",
+    icon: "Cloud",
+    description: "Snowflake's Apache-licensed REST catalog (2024) + Iceberg open lakehouse. Strategic counter-bet to Databricks Unity. Tabular team now at Snowflake.",
+  },
+  {
+    id: "aws-lake-formation",
+    label: "AWS Lake Formation — Lakehouse Governance Deep Dive",
+    shortLabel: "Lake Formation",
+    group: "AWS Lake Formation",
+    icon: "ShieldCheck",
+    description: "Cell-level RLS, LF-tags governance, cross-account data sharing. The most production-deployed lakehouse governance on AWS. IAM for data.",
   },
 ];
 
