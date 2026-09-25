@@ -113,13 +113,17 @@ export type PageId =
   | "numpy-scipy"
   | "dask-ray"
   | "gpu-computing"
-  | "jupyter";
+  | "jupyter"
+  | "transformer-deep-dive"
+  | "diffusion-models-deep-dive"
+  | "fine-tuning-deep-dive"
+  | "agent-frameworks";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps" | "Data Mesh Deep Dive" | "Streaming SQL" | "Data Contracts Deep Dive" | "Privacy Enhancing Tech" | "NumPy SciPy" | "Dask Ray" | "GPU Computing" | "Jupyter";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps" | "Data Mesh Deep Dive" | "Streaming SQL" | "Data Contracts Deep Dive" | "Privacy Enhancing Tech" | "NumPy SciPy" | "Dask Ray" | "GPU Computing" | "Jupyter" | "Transformer Deep Dive" | "Diffusion Models Deep Dive" | "Fine-Tuning Deep Dive" | "Agent Frameworks";
   icon: string;
   description: string;
 }
@@ -981,6 +985,38 @@ export const PAGES: PageMeta[] = [
     group: "Jupyter",
     icon: "FileText",
     description: "Jupyter notebooks, JupyterHub (multi-user), JupyterLab, Voilà (interactive dashboards), Binder, Colab. The reproducible research platform from wet lab to publication.",
+  },
+  {
+    id: "transformer-deep-dive",
+    label: "Transformer Deep Dive — Multi-Head Attention, RoPE, Flash Attention",
+    shortLabel: "Transformer DD",
+    group: "Transformer Deep Dive",
+    icon: "Brain",
+    description: "Transformer deep dive: multi-head attention softmax(QK^T/√d_k)×V, sinusoidal/RoPE/ALiBi positional encoding, LayerNorm/RMSNorm, FFN/SwiGLU, Flash Attention tiled O(N²/M). Math: attention, PE, norm, Flash.",
+  },
+  {
+    id: "diffusion-models-deep-dive",
+    label: "Diffusion Models Deep Dive — DDPM, Score Matching, Latent Diffusion",
+    shortLabel: "Diffusion DD",
+    group: "Diffusion Models Deep Dive",
+    icon: "Atom",
+    description: "Diffusion deep dive: DDPM (Ho 2020), score matching (Song 2019), latent diffusion (Rombach 2022), Stable Diffusion, classifier-free guidance. Math: forward/reverse process, score function, guidance.",
+  },
+  {
+    id: "fine-tuning-deep-dive",
+    label: "Fine-Tuning Deep Dive — LoRA, QLoRA, PEFT, RLHF, DPO",
+    shortLabel: "Fine-Tuning DD",
+    group: "Fine-Tuning Deep Dive",
+    icon: "Cpu",
+    description: "Fine-tuning deep dive: full fine-tuning, LoRA (W=W0+BA), QLoRA (NF4 quantization), PEFT (prefix/prompt/adapter), RLHF (PPO), DPO (Direct Preference Optimization). Math: LoRA decomposition, DPO loss.",
+  },
+  {
+    id: "agent-frameworks",
+    label: "Agent Frameworks — AutoGPT, CrewAI, LangGraph, Multi-Agent",
+    shortLabel: "Agent Frameworks",
+    group: "Agent Frameworks",
+    icon: "Network",
+    description: "AI agent frameworks: ReAct (Thought→Action→Observation), multi-agent orchestration (supervisor/hierarchical/peer), LangGraph (graph-based), tool use, memory. Math: action probability, state transitions.",
   },
 ];
 

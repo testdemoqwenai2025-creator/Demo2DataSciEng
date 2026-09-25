@@ -117,6 +117,10 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Dask/Ray", ids: ["dask-ray"] },
   { title: "GPU Computing", ids: ["gpu-computing"] },
   { title: "Jupyter", ids: ["jupyter"] },
+  { title: "Transformer DD", ids: ["transformer-deep-dive"] },
+  { title: "Diffusion DD", ids: ["diffusion-models-deep-dive"] },
+  { title: "Fine-Tuning DD", ids: ["fine-tuning-deep-dive"] },
+  { title: "Agent Frameworks", ids: ["agent-frameworks"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
