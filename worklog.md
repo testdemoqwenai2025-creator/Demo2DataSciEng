@@ -2471,3 +2471,23 @@ Stage Summary:
 - New live site: https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
 - Sync + deploy workflows configured + working.
 - Ready to build the 13 new pages (Pinot, Paimon, Druid, Impala, StarRocks, Kafka Connect, Schema Registry, Lineage, Data Contracts, Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
+
+---
+Task ID: preview-endpoint-verification
+Agent: Super Z (main)
+Task: Verify Demo2DataSciEng preview endpoint is live + provide next-phase suggestions. Push worklog to private repo.
+
+Work Log:
+- Verified preview endpoint: https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
+  * HTTP 200 on /, /iceberg/, /glue/, /delta-lake/, /hudi/, /data-lakehouse/, /catalogs/, /fintech/
+  * Sidebar shows all groups: Data Lakehouse, Apache Iceberg, AWS Glue, Apache Hudi, Delta Lake, Catalogs, Fintech
+- Architecture confirmed:
+  * Private repo (AppDataSciEng2-Advance) = source-of-truth — all code + worklog pushed here
+  * Public repo (Demo2DataSciEng) = observer/preview — mirrored via sync workflow, deployed to GitHub Pages
+  * Deploy flow: push private/main → sync mirrors to public/main → deploy builds static export → publishes to Pages
+  * Public endpoint provides 24/7/365 live preview for interested clients without legal complications
+
+Stage Summary:
+- Preview endpoint live + verified.
+- Private repo is source-of-truth; public repo is the observer.
+- Ready for next phase: 13 new pages (Pinot, Paimon, Druid, Impala, StarRocks, Kafka Connect, Schema Registry, Lineage, Data Contracts, Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
