@@ -3457,3 +3457,25 @@ Work Log:
 
 Stage Summary:
 3 new pages built (~1890 lines total) following the Foldable+ScienceShort reference pattern. Each page has: ScienceShort 5-phase loop animation, Foldable Math section with 5 equations (each with "Why this matters" paragraph), custom SVG diagram (NO web images), Pyodide demo using only math/random/collections, comparison table (4 tools × 6 features), Why-evolved (4 shortfalls, Foldable), Unique features (2×2 grid), Computational tooling (Foldable), Research (Foldable), Insight (Foldable), RelatedTopics, inline links. All JSX text avoids `>`/`<`/`{` (uses Unicode →, ≤, ≥, ², ³, Δ, ε, λ, ψ, Σ, ∇, etc.). All Python f-strings use `{}` only (no `${` template-literal interpolation conflicts). Lint passes, build passes, pages verified in out/.
+
+---
+Task ID: phaseJ-science-pages-complete
+Agent: Super Z (main) + subagent
+Task: Build Phase J domain-specific science pages (Computational Chemistry, Computational Physics, Bioinformatics Pipelines) using the Foldable + ScienceShort design pattern.
+
+Work Log:
+- Registered 3 new page IDs in router + sidebar + route stubs.
+- Subagent built 3 pages (1,891 lines total) following the computational-biology.tsx reference:
+  * computational-chemistry: Schrödinger, Kohn-Sham, Born-Oppenheimer, Arrhenius, HOMO-LUMO + SCF loop SVG + Arrhenius Pyodide
+  * computational-physics: Metropolis, Navier-Stokes, Reynolds, FEM, Lattice QCD + MCMC SVG + Metropolis Pyodide
+  * bioinformatics-pipelines: Poisson, binomial, negative binomial, Phred, Hardy-Weinberg + GATK pipeline SVG + Poisson Pyodide
+- Each page has: ScienceShort (5 phases), Foldable math (5 equations with "Why this matters"), custom SVG, Pyodide, comparison table, Foldable sections for tooling/research/insight.
+- All lint clean, static export built (117 pages), commits pushed to private/main.
+- Verified live: all 3 pages HTTP 200, math content verified (Schrödinger, Kohn-Sham, Arrhenius, HOMO, LUMO on chemistry; Metropolis, Navier-Stokes, Reynolds, Monte Carlo, Lattice on physics; GATK, Poisson, Phred, Hardy-Weinberg, HaplotypeCaller on bio-pipelines).
+
+Stage Summary:
+- Phase J COMPLETE — 3 domain-specific science pages.
+- Platform now has 117 pages total.
+- The Foldable + ScienceShort design pattern is now established across 4 science pages (computational-biology + chemistry + physics + bio-pipelines).
+- Total math equations across Phase J: 20 (5 per page × 4 pages).
+- Each page has the wet-lab-to-marketplace narrative connecting computational methods to commercial outcomes.
