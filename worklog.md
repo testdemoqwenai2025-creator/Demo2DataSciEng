@@ -3650,3 +3650,36 @@ Stage Summary:
 - Platform now has 119 pages total (was 118; added /connections).
 - The card → card graph (10 cards × 3 cousins = 30 hand-curated edges) means a reader on any host page can surf the full network of 'X IS Y' connections without having to leave their current context.
 - Lint clean, static build clean, pushed to private main.
+---
+Task ID: lakehouse-deep-thoughts-and-deploy-verify
+Agent: Super Z (main)
+Task: Verify all 6 Data Lakehouse pages deployed with the 4 new sections (Why-evolved + Unique-features + DatasetCards + Computational-tooling). Provide next-phase suggestions.
+
+Work Log:
+- Built reusable DatasetCards component (cards → lazy popup with brief + dataset stats + 5-language code tabs + insight callout).
+- Built 3 dataset-examples files (_dataset_examples.tsx, _dataset_examples2.tsx, _dataset_examples3.tsx) with 18 total examples (6 platforms × 3 examples × 5 languages = 90 code blocks total).
+- Updated /iceberg page as reference implementation (4 new sections inserted before Research).
+- Delegated updates to /glue, /delta-lake, /hudi, /data-lakehouse, /catalogs to a full-stack-developer subagent (Task ID: batch-5-pages-update).
+- Subagent completed all 5 page updates, lint passed, static export built, commit b4bf2ca + dd5f82f pushed.
+- Sync + deploy workflows mirrored + built.
+- Verified live at https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/:
+  * All 6 pages return HTTP 200 with size increase (230-420KB → 270-420KB).
+  * Why-evolved sections present on all 6 pages.
+  * Unique-features sections present on all 6 pages.
+  * Computational-tooling sections present on all 6 pages.
+  * DatasetCards render with 5-language code tabs ("Scala · Rust · Go · Elixir · Zig") on all 6 pages.
+  * Dataset card titles verified per page:
+    - /iceberg: Wikipedia Pageviews, NYC Taxi, NOAA Climate
+    - /glue: Multi-source ETL, Streaming CDC, Cross-account
+    - /delta-lake: Clickstream+CDF, ML Feature Store, Ride-sharing Z-Order
+    - /hudi: Uber Trip CDC, IoT Sensor Stream, Customer Master CDC
+    - /data-lakehouse: Netflix-scale streaming, ML Feature Platform, Real-time Supply Chain
+    - /catalogs: Polaris Multi-cloud, Nessie Branch, Unity Governance
+
+Stage Summary:
+- All 6 Data Lakehouse group pages now have consistent structure: PageHeader → KPIs → architecture diagram → multi-lang code blocks → Pyodide demo → comparison table → **Why-evolved (3-4 shortfalls) + Unique-features (4 differentiators in 2x2 grid) + DatasetCards (3 examples × 5 languages) + Computational-tooling (engines + catalogs)** → Research → Insight → RelatedTopics.
+- 18 dataset examples total (6 platforms × 3), each with code in Scala + Rust + Go + Elixir + Zig = 90 code blocks.
+- Real public datasets featured: Wikipedia Pageviews (1.5TB/mo), NYC TLC Taxi (50GB/yr), NOAA Climate (500GB), Uber-scale synthetic CDC, Netflix-scale synthetic streaming.
+- All Pyodide demos include synthetic data + hypothetical scenarios.
+- Commit SHA on private/main: dd5f82f (pushed via sync workflow to public/main, deployed via deploy workflow to GitHub Pages).
+
