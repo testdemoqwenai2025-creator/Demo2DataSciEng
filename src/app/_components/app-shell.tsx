@@ -96,6 +96,15 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Apache Kafka", ids: ["kafka"] },
   { title: "Apache Pulsar", ids: ["pulsar"] },
   { title: "Spark Streaming", ids: ["spark-streaming"] },
+  { title: "Google BigQuery", ids: ["bigquery"] },
+  { title: "AWS Redshift", ids: ["redshift"] },
+  { title: "ClickHouse", ids: ["clickhouse"] },
+  { title: "dbt Deep Dive", ids: ["dbt-deep-dive"] },
+  { title: "Apache Airflow", ids: ["airflow"] },
+  { title: "Dagster", ids: ["dagster"] },
+  { title: "Great Expectations", ids: ["great-expectations"] },
+  { title: "Monte Carlo", ids: ["monte-carlo"] },
+  { title: "Elementary", ids: ["elementary"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";

@@ -92,13 +92,22 @@ export type PageId =
   | "flink"
   | "kafka"
   | "pulsar"
-  | "spark-streaming";
+  | "spark-streaming"
+  | "bigquery"
+  | "redshift"
+  | "clickhouse"
+  | "dbt-deep-dive"
+  | "airflow"
+  | "dagster"
+  | "great-expectations"
+  | "monte-carlo"
+  | "elementary";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary";
   icon: string;
   description: string;
 }
@@ -791,6 +800,79 @@ export const PAGES: PageMeta[] = [
     group: "Spark Streaming",
     icon: "Activity",
     description: "Spark Structured Streaming: micro-batch vs continuous, watermarks, stateful ops. Scientific examples: batch+streaming genomics, IoT sensor windows, LHC online monitoring.",
+  },
+
+  {
+    id: "bigquery",
+    label: "Google BigQuery — Serverless Cloud Data Warehouse",
+    shortLabel: "BigQuery",
+    group: "Google BigQuery",
+    icon: "Database",
+    description: "BigQuery deep dive: columnar storage, BI Engine, partitioning, clustering, Materialized Views, BigLake (Iceberg on GCS). Scientific examples: genomics on BigQuery, climate data, NASA datasets.",
+  },
+  {
+    id: "redshift",
+    label: "AWS Redshift — Petabyte-scale Cloud Data Warehouse",
+    shortLabel: "Redshift",
+    group: "AWS Redshift",
+    icon: "Database",
+    description: "Redshift deep dive: columnar, sort keys, distribution styles, Spectrum, Serverless, RA3. Scientific examples: genomics on Redshift, NASA MODIS, climate analytics.",
+  },
+  {
+    id: "clickhouse",
+    label: "ClickHouse — Columnar OLAP at Extreme Scale",
+    shortLabel: "ClickHouse",
+    group: "ClickHouse",
+    icon: "Zap",
+    description: "ClickHouse: MergeTree engine, materialised views, real-time ingestion, vectorised execution. Yandex origin. Scientific examples: genomics variant queries, IoT telemetry, time-series analytics.",
+  },
+  {
+    id: "dbt-deep-dive",
+    label: "dbt — Analytics Engineering Deep Dive",
+    shortLabel: "dbt",
+    group: "dbt Deep Dive",
+    icon: "Layers",
+    description: "dbt deep dive: models, tests, macros, materializations, Semantic Layer, dbt Cloud. Scientific examples: genomics transform models, clinical trial QA, sensor data contracts.",
+  },
+  {
+    id: "airflow",
+    label: "Apache Airflow — Data Pipeline Orchestration",
+    shortLabel: "Airflow",
+    group: "Apache Airflow",
+    icon: "Workflow",
+    description: "Airflow deep dive: DAGs, operators, sensors, XCom, smart sensors, TaskFlow API. Airbnb origin. Scientific examples: genomics pipeline DAGs, LHC analysis workflows, sensor ETL.",
+  },
+  {
+    id: "dagster",
+    label: "Dagster — Asset-Oriented Data Orchestration",
+    shortLabel: "Dagster",
+    group: "Dagster",
+    icon: "Workflow",
+    description: "Dagster: software-defined assets, IO manager, partitions, resource system. Scientific examples: genomics asset graphs, sensor data partitions, ML feature pipelines.",
+  },
+  {
+    id: "great-expectations",
+    label: "Great Expectations — Data Quality Framework",
+    shortLabel: "Great Expectations",
+    group: "Great Expectations",
+    icon: "ShieldCheck",
+    description: "Great Expectations: expectation suites, data docs, checkpoints, profiling. Scientific examples: genomics QC, clinical trial data validation, sensor calibration checks.",
+  },
+  {
+    id: "monte-carlo",
+    label: "Monte Carlo — Data Observability Platform",
+    shortLabel: "Monte Carlo",
+    group: "Monte Carlo",
+    icon: "Activity",
+    description: "Monte Carlo: anomaly detection, freshness, volume, schema, lineage monitoring. Scientific examples: genomics data freshness, sensor anomaly detection, LHC data quality monitoring.",
+  },
+  {
+    id: "elementary",
+    label: "Elementary — dbt-native Data Observability",
+    shortLabel: "Elementary",
+    group: "Elementary",
+    icon: "Activity",
+    description: "Elementary: dbt-native anomaly detection, data tests, freshness, schema changes. Scientific examples: genomics dbt model anomalies, sensor data freshness, clinical trial schema drift.",
   },
 ];
 
