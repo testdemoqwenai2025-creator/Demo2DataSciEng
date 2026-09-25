@@ -11,6 +11,7 @@ import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { TABULAR_EXAMPLES } from "../_components/_dataset_examples7";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -975,6 +976,9 @@ export function TabularPage() {
           intro="Gradient Descent (ML ↔ evolution ↔ thermodynamics): the SAME descent rule powers GPT-4 training, natural selection, and protein folding — because all three minimise a landscape."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"tabular" as never} />
 
       <RelatedTopics topics={[
         { id: "iceberg" as const, reason: "Anchor — Tabular hosts Iceberg tables, founded by Iceberg spec authors" },

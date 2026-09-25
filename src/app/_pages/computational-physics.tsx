@@ -11,6 +11,7 @@ import { ScienceShort } from "../_components/science-short";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Atom, Sparkles, History, TrendingUp, Boxes,
@@ -642,6 +643,9 @@ export function ComputationalPhysicsPage() {
           intro="Navier-Stokes (weather ↔ blood ↔ turbulence): the SAME PDE governs the atmosphere, the aorta, and a Boeing wing — because all three are viscous fluids."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"computational-physics" as never} />
 
       <RelatedTopics topics={[
         { id: "quantum-computing" as const, reason: "Quantum Computing (exact path integrals on quantum hardware)" },

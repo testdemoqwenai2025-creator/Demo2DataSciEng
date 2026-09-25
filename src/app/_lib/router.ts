@@ -122,7 +122,8 @@ export type PageId =
   | "computational-chemistry"
   | "computational-physics"
   | "bioinformatics-pipelines"
-  | "elegant-code";
+  | "elegant-code"
+  | "connections";
 
 export interface PageMeta {
   id: PageId;
@@ -1062,6 +1063,14 @@ export const PAGES: PageMeta[] = [
     group: "Elegant Code",
     icon: "Sparkles",
     description: "5 cross-disciplinary scenarios showing how ONE math equation bridges 3+ sciences. SVD (genomics↔audio↔finance), Attention (folding↔NLP), Poisson (sequencing↔networks↔decay), FFT (mass spec↔audio↔cryo-EM), Verlet (MD↔games↔orbits). Code in Scala/Rust/Go/Elixir/Zig. 'X IS Y' insights = the unexpected connections no single PhD sees.",
+  },
+  {
+    id: "connections",
+    label: "Connections — Card → Host Page Map of the Multi-disciplinary Thesis",
+    shortLabel: "Connections",
+    group: "Elegant Code",
+    icon: "Network",
+    description: "Index of the 10 cross-disciplinary elegant-code cards and the host pages where each one is propagated. The map shows where the platform's multi-disciplinary thesis surfaces inline, so a reader on any host page can navigate the full graph of cross-disciplinary connections.",
   },
 ];
 

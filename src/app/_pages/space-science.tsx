@@ -10,6 +10,7 @@ import { SpaceInteractives } from "../_components/space-interactives";
 import { SpaceShortsCarousel } from "../_components/space-shorts";
 import { SpaceGallery3D } from "../_components/space-gallery-3d";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Zap, TrendingUp, Terminal, Brain, Activity, Atom, Network, Sparkles } from "lucide-react";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1131,6 +1132,9 @@ export function SpaceSciencePage() {
           intro="Euler's Method (orbital mechanics ↔ games ↔ finance): the SAME first-order integrator powers satellite propagation, game physics, and option pricing — because all three discretise continuous dynamics."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"space-science" as never} />
 
       <RelatedTopics topics={[
         { id: "databricks" as const, reason: "Spark for JWST/LIGO analysis" },

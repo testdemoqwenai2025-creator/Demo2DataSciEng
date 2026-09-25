@@ -10,6 +10,7 @@ import { RelatedTopics } from "../_components/related-topics";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Database, Boxes, Activity, Sparkles, History, Atom,
@@ -877,6 +878,9 @@ export function NumpyScipyPage() {
           intro="SVD (genomics ↔ audio ↔ finance) + FFT (mass spec ↔ audio ↔ cryo-EM). Each card shows ONE NumPy equation bridging 3 sciences."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"numpy-scipy" as never} />
 
       <RelatedTopics topics={[
         { id: "bioinformatics" as const, reason: "Bioinformatics page — NumPy for genomics (ESM-2, BWA, BLAST)" },

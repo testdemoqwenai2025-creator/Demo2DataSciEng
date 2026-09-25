@@ -5,6 +5,7 @@ import { EXEC_KPIS, COMPANY, REVENUE_TREND, CHANNEL_MIX, DAILY_INGEST } from "..
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { ArchBox, ArchLayer, ArchArrow } from "../_components/arch-diagram";
 import { HomeSearch } from "../_components/home-search";
+import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
 import { hrefFor } from "../_lib/router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,9 @@ import {
   Layers,
   Activity,
   CircleCheck,
+  Sparkles,
+  Brain,
+  Atom,
   Cpu,
   Cloud,
   BookOpen,
@@ -501,6 +505,54 @@ export function HomePage() {
             <span className="text-primary">↻</span>
             <span className="text-[10px] italic">back to Research</span>
           </div>
+        </div>
+      </section>
+
+      {/* See the connections — the platform's multi-disciplinary thesis */}
+      <section>
+        <PageHeader
+          eyebrow="Cross-disciplinary elegance · 10 equations × 9 host pages"
+          title="See the connections — the multi-disciplinary thesis in action"
+          description="Modern computational science is the INTERSECTION of disciplines, not the depth of one. The same math equation bridges genomics, audio, finance, NLP, physics, aerospace, and games — and the platform's 10 elegant-code cards surface that intersection. Each card appears inline on its most relevant host page, so the thesis meets the reader where they already are."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {ELEGANT_CODE_MAP.map((m) => (
+            <SectionCard key={m.cardIndex} className="hover:border-primary/40 transition-colors">
+              <div className="flex items-start gap-2 mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md shrink-0 bg-primary/10 text-primary">
+                  <Sparkles className="h-4 w-4" />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold leading-tight">{m.name}</p>
+                  <p className="font-mono text-[10px] text-muted-foreground mt-0.5">{m.equation}</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                <span className="italic text-primary/90">{m.insightShort}</span> — bridges{" "}
+                {m.sciences.map((s, i) => (
+                  <span key={s}>{s}{i < m.sciences.length - 1 && <span className="text-muted-foreground/60"> ↔ </span>}</span>
+                ))}
+                .
+              </p>
+              <Button asChild variant="ghost" size="sm" className="-ml-2 -mb-1 text-primary">
+                <Link href={hrefFor(m.hostPages[0] as never)}>
+                  {m.hostPages[0]} <ArrowRight className="h-3 w-3 ml-1" />
+                </Link>
+              </Button>
+            </SectionCard>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button asChild variant="default" size="sm">
+            <Link href={hrefFor("connections" as never)}>
+              <Network className="h-3.5 w-3.5 mr-1.5" /> See the full card → host map
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href={hrefFor("elegant-code" as never)}>
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Browse all 10 cards in detail
+            </Link>
+          </Button>
         </div>
       </section>
 

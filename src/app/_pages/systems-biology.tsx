@@ -10,6 +10,7 @@ import { ImageModal } from "../_components/image-modal";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Layers, Zap, TrendingUp, Terminal, Brain,
@@ -985,6 +986,9 @@ export function SystemsBiologyPage() {
           intro="Entropy (information ↔ thermodynamics ↔ genetics): the SAME formula measures message information, gas disorder, and population heterozygosity — because all three quantify surprise in a distribution."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"systems-biology" as never} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("genetic-materials")} className="text-sm text-primary hover:underline">→ Genetic Materials (variant → protein input)</Link>

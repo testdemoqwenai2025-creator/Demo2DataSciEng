@@ -9,6 +9,7 @@ import { RelatedTopics } from "../_components/related-topics";
 import { Foldable } from "../_components/foldable";
 import { ScienceShort } from "../_components/science-short";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import {
   Workflow, Dna, Microscope, Sparkles, History, TrendingUp, Boxes,
@@ -620,6 +621,9 @@ export function BioinformaticsPipelinesPage() {
           intro="Poisson (sequencing ↔ networks ↔ decay): the SAME equation describes read coverage, server load, and radioactivity — because all three are independent rare events."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"bioinformatics-pipelines" as never} />
 
       <RelatedTopics topics={[
         { id: "bioinformatics" as const, reason: "Bioinformatics (sequence analysis foundations)" },

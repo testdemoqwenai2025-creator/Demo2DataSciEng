@@ -8,6 +8,7 @@ import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import { Cpu, Brain, Atom, Sparkles, History, TrendingUp, Boxes, Server, Network, Zap, Layers } from "lucide-react";
 import { DatasetCards } from "../_components/dataset-cards";
@@ -448,6 +449,9 @@ export function TransformerDeepDivePage() {
           intro="Attention (protein folding ↔ NLP): the SAME equation parses language AND predicts protein structure — because DNA IS a language."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"transformer-deep-dive" as never} />
 
       <RelatedTopics topics={[
         { id: "transformer" as const, reason: "Transformer overview page" },

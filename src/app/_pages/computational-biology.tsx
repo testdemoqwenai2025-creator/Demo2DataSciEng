@@ -12,6 +12,7 @@ import { ScienceShort } from "../_components/science-short";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { Badge } from "@/components/ui/badge";
 import {
   Cpu, Brain, Atom, Sparkles, History, TrendingUp, Boxes,
@@ -531,6 +532,9 @@ export function ComputationalBiologyPage() {
           intro="Verlet (MD ↔ games ↔ orbits): the SAME symplectic integrator for protein folding, ragdoll physics, and spacecraft trajectories."
         />
       </SectionCard>
+
+      {/* Related elegant-code — card → card adjacency footer */}
+      <RelatedElegantCode hostPage={"computational-biology" as never} />
 
       <RelatedTopics topics={[
         { id: "numpy-scipy" as const, reason: "NumPy N-D arrays power MD + AlphaFold" },
