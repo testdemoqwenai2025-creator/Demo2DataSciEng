@@ -3683,3 +3683,84 @@ Stage Summary:
 - All Pyodide demos include synthetic data + hypothetical scenarios.
 - Commit SHA on private/main: dd5f82f (pushed via sync workflow to public/main, deployed via deploy workflow to GitHub Pages).
 
+---
+Task ID: phase-k-20-cards-and-d3-graph
+Agent: Super Z (main)
+Task: Expand to 20 elegant-code cards (10 new fintech+maritime+sciences), build /global-shipping host page, add interactive D3.js force-directed graph on /connections, enhance DatasetCards with card anchors + hosted-on badges, propagate new cards to fintech/monte-carlo/bioinformatics/systems-biology, update home preview.
+
+Work Log:
+- Enhanced DatasetCards component:
+  * Added `id={anchorPrefix}${idx}}` (e.g. id="card-0") to each card button — deep-link anchors now work
+  * Added optional `hostedOnByIndex?: (idx) => string[]` prop that renders a "Hosted on" badge row at the bottom of each card showing which host pages surface it
+  * Added `scroll-mt-20` for anchor offset when navigating via #card-N hash
+- Built 10 NEW elegant-code cards (indices 10-19) via 3 Python scripts (persisted at ~/my-project/scripts/):
+  1. append_phase_k_cards.py — Black-Scholes + Haversine
+  2. append_phase_k_cards_part2.py — Kelly + Markov
+  3. append_phase_k_cards_part3.py — VaR + PageRank + Kalman + Monte Carlo + GBM + Lloyd's
+- Each new card follows the exact pattern of the existing 10: id, step, title, subtitle, accent, icon, badge, brief{dataset,scale,why}, stats[4], tools[], codeTabs[5 langs], runnablePython, insight.
+- All 10 new cards focus on sciences + fintech + maritime/transportation with real datasets:
+  * Black-Scholes: CME SPX options + Lloyd's cargo + Fisher allele substitution
+  * Haversine: MarineTraffic AIS + FlightAware ADS-B + Gaia DR3 celestial
+  * Kelly: Jim Simons Medallion + Haldane alleles + Thompson sampling
+  * Markov: Jukes-Cantor DNA + Moody's credit + AIS port-state
+  * VaR: JPMorgan Basel III + Lloyd's Solvency II + NOAA FEMA flood
+  * PageRank: BIS banks + UN COMTRADE ports + STRING PPIs
+  * Kalman: MarineTraffic AIS + FlightAware ADS-B + 1000-Genomes alleles
+  * Monte Carlo: CME option paths + Rotterdam berth sims + PLINK permutations
+  * GBM: SPX 1950-2024 + Rotterdam dwell + Wright-Fisher drift
+  * Lloyd's: UN COMTRADE ports + 1000-Genomes PCA + ImageNet ResNet-50
+- Added `global-shipping` PageId to router.ts with full metadata
+- Created /global-shipping route + page (~280 lines):
+  * 4 KPIs (10⁹ AIS positions/yr, 50K ports, 100K vessels, $24T global trade)
+  * 5-phase ScienceShort loop (AIS Feed → Track+Predict → Port Analytics → Risk → Marketplace)
+  * Foldable math section (Haversine, Kalman, PageRank, Markov, GBM)
+  * 8 cross-disciplinary elegant-code cards propagated inline (Haversine 11, Markov 13, VaR 14, PageRank 15, Kalman 16, Monte Carlo 17, GBM 18, Lloyd's 19)
+  * Pyodide demo: Haversine port-to-port distances + Kalman 1D vessel tracking
+  * Foldable tooling section (6 production tools: MarineTraffic AIS, UN COMTRADE, Lloyd's Register, PostGIS+pgvector, Spark+Delta, D3.js+Mapbox)
+  * Comparison table (MarineTraffic vs UN COMTRADE vs Lloyd's vs UNCTAD PortWatch × 6 features)
+  * Insight: 'global shipping IS the original distributed system'
+  * RelatedElegantCode hostPage="global-shipping" footer
+- Updated ELEGANT_CODE_MAP to include all 20 cards with their hostPages + extended CARD_NEIGHBORS with 30 hand-curated cousin edges (Black-Scholes↔GBM, Haversine↔PageRank, Kelly↔Gradient Descent, Markov↔Kalman, VaR↔Monte Carlo, PageRank↔Markov, Kalman↔Verlet, Monte Carlo↔GBM, GBM↔Euler, Lloyd's↔SVD).
+- Installed d3@7.9.0 + @types/d3@7.4.3 via `bun add d3` + `bun add -d @types/d3`.
+- Built src/app/_components/elegant-code-graph.tsx (~165 lines):
+  * D3.js force-directed simulation with 20 nodes + ~30 deduped edges
+  * Each node colored by card index (oklch hue = i × 36° mod 360°)
+  * Drag behavior (alphaTarget 0.3 on dragstart, null fx/fy on dragend)
+  * Hover shows equation + insight + sciences in a panel below the SVG
+  * Click opens /elegant-code#card-N for the full card
+  * ResizeObserver to keep the SVG width responsive
+- Added ElegantCodeGraph to /connections page as a new SectionCard titled 'Interactive graph — drag any node, hover for equation + insight'
+- Updated /connections KPIs: 20 cards, 10 host pages, 100 code blocks, 60+ science bridges
+- Updated /connections table badges: 20 rows, 10 hosts, 20 cards
+- Updated /elegant-code page:
+  * KPIs updated (20 cards, 100 code blocks, 20+ sciences)
+  * SectionCard badge updated to "20 cards × 5 langs"
+  * DatasetCards now uses anchorPrefix="card-" + hostedOnByIndex={(i) => ELEGANT_CODE_MAP[i]?.hostPages ?? []}
+  * Each of the 20 cards now has id="card-N" anchor + "Hosted on" badge row
+- Propagated the 10 new cards to existing host pages:
+  * /fintech: 5 cards (Black-Scholes, Kelly, VaR, Monte Carlo, GBM) + RelatedElegantCode footer
+  * /monte-carlo: Monte Carlo card + RelatedElegantCode footer
+  * /bioinformatics: Markov card + RelatedElegantCode footer
+  * /systems-biology: PageRank + Lloyd's cards (footer already present)
+- Updated /home preview eyebrow to "20 equations × 10 host pages" + button label to "Browse all 20 cards in detail"
+- Lint clean across all 14 modified/new files
+- Static build: backed up src/app/api → .api-routes-backup, freed memory (3.4 GiB free), ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 + NODE_OPTIONS=--max-old-space-size=2048 — succeeded with all 120 pages prerendered as static content.
+- Verified in out/:
+  * /connections contains "20 equations", "Card → host page", "Interactive graph"
+  * /global-shipping renders (304 KB)
+  * /elegant-code contains "Hosted on" badges
+  * /home contains "See the connections" preview with 20 cards
+  * /fintech, /monte-carlo, /bioinformatics, /systems-biology all render their new cards + footers
+- Restored src/app/api, recreated out/.nojekyll.
+- Commit b691248 "feat: Phase K — expand to 20 elegant-code cards, add /global-shipping, D3.js graph" pushed to private main (85fe495 → b691248).
+- Ran sync-session-to-repo.sh to append this task entry to the repo worklog + sync any new scripts.
+
+Stage Summary:
+- 20 cross-disciplinary elegant-code cards (was 10) — 100 code blocks in 5 languages (was 50).
+- 60+ science bridges (20 cards × 3+ sciences each + 30 hand-curated cousin edges).
+- 10 host pages now surface cards inline (was 9): numpy-scipy, transformer-deep-dive, bioinformatics-pipelines, computational-biology, computational-physics, tabular, alphamissense, systems-biology, space-science, + new global-shipping + existing fintech/monte-carlo/bioinformatics also now host new cards.
+- /global-shipping is the maritime hub (AIS + ports + vessels + Lloyd's + UN COMTRADE).
+- /connections now has an interactive D3.js force-directed graph making the "graph, not a tree" thesis tangible.
+- DatasetCards enhanced with card-N anchors + hosted-on badges — footer deep-links now work, bidirectional map complete.
+- Platform now has 120 pages (was 119; added /global-shipping).
+- Lint clean, static build clean, pushed to private main.
