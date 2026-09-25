@@ -2566,3 +2566,45 @@ Stage Summary:
 - 3 new files added: src/app/_components/_dataset_examples5.tsx (2,549 lines), src/app/_pages/kafka-connect.tsx (994 lines), src/app/_pages/schema-registry.tsx (994 lines) — total 4,537 lines.
 - Phase 2 (2 pages) complete. Ready for Phase 3 (Lineage, Data Contracts) + Phase 4 (Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
 - Each page has: PageHeader + 4 KPIs + interactive SVG architecture diagram + 5 code blocks + Pyodide executable demo + comparison table + Why-evolved section + Unique features 2×2 grid + DatasetCards (3 examples × 5 langs) + Computational tooling ecosystem + Research case studies + Deeper-thought insight + RelatedTopics cross-links.
+
+---
+Task ID: phase3-pages
+Agent: Super Z (main)
+Task: Build 2 Phase 3 pages (Lineage, Data Contracts) in src/app/_pages/ + _dataset_examples6.tsx with 6 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig). Each page mirrors /iceberg.tsx structure exactly.
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md (latest commits: 1573fb4 docs append, d477e8c phase2-pages, 3455560 phase1-pages, 86ea52b stub registration).
+- Read /home/z/appdatasci2/download/next-phase-build-plan.txt — Phase 3 sections (Lineage #8, Data Contracts #9) detail origin, unique features, shortfalls, datasets, computational tooling, research, insight.
+- Read /home/z/appdatasci2/src/app/_pages/iceberg.tsx (983 lines) as REFERENCE IMPLEMENTATION — followed exact structure: PageHeader → 4 KPIs → SVG diagram → 5-6 code blocks → Pyodide demo → comparison table → Why-evolved → Unique-features (2×2 grid) → DatasetCards → Computational-tooling → Research → Deeper-thought insight → RelatedTopics + cross-links.
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx for DatasetExample interface (id, step, title, subtitle, accent, icon, badge, brief, stats, codeTabs, runnablePython, insight, tools).
+- Read /home/z/appdatasci2/src/app/_components/_dataset_examples5.tsx (2,549 lines) as reference for the DatasetExample structure + the 5-lang code tab pattern (Scala/Rust/Go/Elixir/Zig) + runnablePython + insight + tools string[].
+- Read /home/z/appdatasci2/agent-ctx/phase2-pages-super-z.md — previous agent's notes on escaping ${var} in Scala s-strings + Phase 4 stub build issues.
+- Verified route folders src/app/lineage/page.tsx + src/app/data-contracts/page.tsx already existed (commit 86ea52b registered stubs importing LineagePage + DataContractsPage).
+- Built src/app/_components/_dataset_examples6.tsx (2,819 lines):
+  * LINEAGE_EXAMPLES (3): multi-hop GDPR audit (Kafka→Bronze→Silver→Gold→BI, 100M events/day, BFS blast radius), impact analysis with column-level blast radius (1 column change → 14 downstream consumers), root cause analysis for broken BI dashboard (upstream BFS + suspect jobs + prime suspect identification).
+  * DATA_CONTRACTS_EXAMPLES (3): order events contract (100M events/day, 12 consumers, 4 SLA dimensions, 0 breaking changes since v3), customer PII contract (10M records, GDPR Article 15/16/17/20 enforcement, 3 access tiers), ML feature contract (50M features, train/serve consistency, skew < 0.1%).
+  * Each example has 5 code tabs (Scala/Rust/Go/Elixir/Zig) + runnable Python (Pyodide) using only math/random/collections + hashlib.
+- Built src/app/_pages/lineage.tsx (1,061 lines): lineage topology diagram (Airflow/Spark/dbt → OpenLineage API → backend → UI → consumers), OpenLineage Airflow listener (parent runId chaining), Spark listener with column-level lineage, Marquez REST API (downstream/upstream BFS + column-level), Apache Atlas Hive hooks, Unity Catalog Delta-native lineage, Spline Spark DataFrame lineage, Pyodide lineage graph BFS simulation (downstream blast radius + upstream RCA + suspect job identification), OpenLineage vs Atlas vs Spline vs Unity vs DataHub comparison table.
+- Built src/app/_pages/data-contracts.tsx (1,061 lines): contract architecture diagram (producer → contract → Schema Registry + GE + DataHub + OpenLineage → consumer), dbt contract YAML (schema tests + contracts + meta fields + SLAs), Great Expectations Python (Expectation Suite + Spark execution engine + producer-side validation), Confluent Schema Registry contract (BACKWARD_TRANSITIVE + v4 breaking change rejection), DataHub contract YAML (producer + SLA + schema + consumers + compliance), OpenLineage compliance monitoring (freshness + schema + consumer impact + alert webhook + daily report), Pyodide data contract enforcement simulation (validate 100K events + DLQ + SLA monitoring + consumer impact analysis + counterfactual without contract), dbt vs GE vs Schema Registry vs DataHub vs OpenLineage comparison table.
+- Lint: bunx eslint src/app/_pages/{lineage,data-contracts}.tsx src/app/_components/_dataset_examples6.tsx --max-warnings=0 → all pass.
+- Fixed 4 issues during build:
+  1. Unescaped ${impacted.size}, ${upstream.size}, ${consumer.*}, ${consumer.freshnessSla}, ${consumer.completenessSla} in Scala s-strings inside JS template literals — JS interpreted as interpolation, threw ReferenceError at module load. Initially fixed these 5 with sed `\\${` → `\${` (single backslash).
+  2. But 18 more unescaped ${...} interpolations remained in Scala code (c.column, c.depth, c.job, c.dataset, c.owner, affectedJobs.size, cols.size, runs.size, r.startedAt, r.runId, r.jobName, inputs.map, plan.getOrElse, prime.jobName, trainingFeatures.count, servingFeatures.size, contract.maxSkewPercent, etc.) — each threw "X is not defined" ReferenceError at module evaluation. Used a Python script to walk the file and prepend a single backslash to every `${` not already preceded by a backslash, escaping all 18 properly.
+  3. Unescaped `<` in JSX text content (line 870 "P95 lag < 5min", "order_id nulls < 0%"; line 983 "amount < 0"; line 1015 "P95 < 100ms", "data < 5min stale", "P95 < 5min", "order_id nulls < 0%") — JSX parser interpreted `<` followed by alphanumeric as the start of a tag. Fixed by rewording ("below 5min", "at 0%", "below 0", "below 100ms", "less than 5min stale").
+  4. Unescaped `>` in JSX text content (line 992 "lag > 5min") — same parser issue. Fixed by rewording ("lag greater than 5min").
+- Build: GITHUB_PAGES=true bun run build:static — succeeded after fixes. 80/80 pages prerendered including /lineage and /data-contracts.
+  * Side-note: had to temporarily move 4 Phase 4 stub route folders (tabular, databricks-lakehouse, snowflake-polaris, aws-lake-formation) aside during build — these reference _pages/<name>.tsx files that don't exist yet (Phase 4 pages not built). Backed up to .stub-routes-backup/, restored after build.
+  * Side-note: also had to temporarily move src/app/api aside during build (the route uses z-ai-web-dev-sdk which doesn't work in static export).
+- Verify: out/lineage/index.html ✅, out/data-contracts/index.html ✅.
+- .nojekyll touched in out/.
+- Commit: 02bc46d "feat: add Phase 3 pages (Lineage, Data Contracts) + _dataset_examples6.tsx"
+- Push: 1573fb4..02bc46d on private/main (AppDataSciEng2-Advance). Pre-push guardrail checks passed.
+
+Stage Summary:
+- HEAD = 02bc46d on private/main (AppDataSciEng2-Advance). Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+- 3 new files added: src/app/_components/_dataset_examples6.tsx (2,819 lines), src/app/_pages/lineage.tsx (1,061 lines), src/app/_pages/data-contracts.tsx (1,061 lines) — total 4,941 lines.
+- Phase 3 (2 pages) complete. Ready for Phase 4 (Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation).
+- Each page has: PageHeader + 4 KPIs + interactive SVG architecture diagram + 6 code blocks + Pyodide executable demo + comparison table + Why-evolved section + Unique features 2×2 grid + DatasetCards (3 examples × 5 langs) + Computational tooling ecosystem + Research case studies (7 paragraphs) + Deeper-thought insight (5 paragraphs) + RelatedTopics (8 cross-links) + 5 inline link buttons.
+- Lineage page specifics: OpenLineage + Atlas + Spline + Unity Lineage + DataHub. Column-level lineage, parent runId chaining, downstream/upstream BFS for GDPR audit + impact analysis + RCA. 5-way comparison table.
+- Data Contracts page specifics: dbt + Great Expectations + Confluent Schema Registry + DataHub + OpenLineage. Schema + SLA + ownership bundle, compile-time type-safety, runtime compliance monitoring. 5-way comparison table.
+- 6 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 30 code examples in _dataset_examples6.tsx + 6 Pyodide simulations.
