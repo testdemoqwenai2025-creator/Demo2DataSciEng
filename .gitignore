@@ -76,3 +76,4 @@ tool-results/
 
 # Note: scripts/ is now fully tracked — these are project deliverables,
 # safe to commit (PATs are passed as CLI args at runtime, not hardcoded)
+.api-routes-backup/
