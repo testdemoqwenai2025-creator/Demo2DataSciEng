@@ -3383,3 +3383,29 @@ Stage Summary — Phase G AI deep-dive pages complete:
 - All pages have custom-designed SVG diagrams (NO web images).
 - Math notation rendered as plain text in JSX (avoiding `{` `}` that would be parsed as JSX expressions).
 - The wet-lab-to-marketplace narrative is maintained (insight sections link each page to real-world outcomes: Stable Diffusion / DALL-E 3 / Sora for diffusion; LLaMA community fine-tunes / InstructGPT / GPT-4 alignment for fine-tuning; Cursor / Devin / Perplexity / Cognition for agent frameworks).
+
+---
+Task ID: phaseG-ai-deep-dive-complete
+Agent: Super Z (main) + subagent
+Task: Build Phase G AI deep-dive pages (Transformer, Diffusion, Fine-Tuning, Agent Frameworks) under ML Platform with deep mathematical foundations + custom SVG diagrams.
+
+Work Log:
+- Built transformer-deep-dive.tsx directly (main agent) with:
+  * Math: Attention softmax(QK^T/√d_k)×V, multi-head, sinusoidal PE, RoPE, LayerNorm vs RMSNorm, Flash Attention tiling, SwiGLU/MoE
+  * Custom SVG: Transformer block (attention + FFN + residual + norm)
+  * Pyodide: attention + PE + LayerNorm + RMSNorm + Flash memory analysis
+  * Evolution table: original (2017) → modern (LLaMA/GPT-4)
+  * 5 math equations, 4 unique features, 6 research papers
+- Subagent built 3 remaining pages (1,847 lines total):
+  * diffusion-models-deep-dive: 5 math equations (forward/reverse/score/loss/CFG), 2 SVGs, Pyodide
+  * fine-tuning-deep-dive: 5 math equations (LoRA/QLoRA/NF4/RLHF-PPO/DPO), 3 SVGs, Pyodide
+  * agent-frameworks: 5 math equations (ReAct/state/tool/memory/multi-agent), 3 SVGs, Pyodide
+- Fixed JSX parsing bug in transformer-deep-dive (R_{n-m} → R_(n-m))
+- All lint clean, static export built (113 pages), commits pushed to private/main
+- Verified live: all 4 pages HTTP 200, math content verified (softmax, attention, Flash, RMSNorm, RoPE on transformer; LoRA, QLoRA, NF4, RLHF, DPO on fine-tuning)
+
+Stage Summary:
+- Phase G AI deep-dive COMPLETE — 4 pages under ML Platform.
+- Platform now has 113 pages total.
+- Each page has: DEDICATED math section (5 equations), custom SVG diagrams (NO web images), Pyodide demo, comparison table, why-evolved, unique features, computational tooling, research, deeper-thought insight.
+- Total math equations across the 4 pages: 20 (attention + PE + norm + Flash + SwiGLU + DDPM + score + CFG + LoRA + QLoRA + NF4 + RLHF + DPO + ReAct + state + tool + memory + multi-agent)
