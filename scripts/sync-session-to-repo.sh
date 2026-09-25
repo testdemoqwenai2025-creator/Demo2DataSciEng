@@ -8,24 +8,19 @@
 # and worklog entry must live in the private repository so the work is
 # recoverable from any clone.
 #
-# Usage: bash /home/z/my-project/scripts/sync-session-to-repo.sh
-#
 # Algorithm:
 #   1. Copy any new/updated scripts from the session scripts dir.
-#   2. For the worklog, split the session log into "task entry" blocks (each
-#      starts with a `---` separator and a `Task ID:` line). For each block,
-#      check if its Task ID is already in the repo's worklog. If not, append
-#      the block. This avoids the bug where "append everything from the first
-#      missing entry" would duplicate entries that are already present later
-#      in the session log.
+#   2. For the worklog, use a SIMPLE grep-based missing-entry detection:
+#      for each Task ID in the session log, if it's NOT in the repo worklog,
+#      find its block (from the --- separator BEFORE it to the next --- separator)
+#      and append it. This is more robust than the previous awk-based approach,
+#      which had a bug that caused mass duplication.
 #   3. Commit + push to private/main.
 #
 # Safety:
 #   - Idempotent: re-running it after no changes is a no-op.
-#   - Never overwrites newer content in the app repo with older content from
-#     the session log — it only APPENDS new task entries, never edits or
-#     reorders existing ones.
-#   - Never duplicates a Task ID that's already in the repo.
+#   - Never duplicates a Task ID that's already in the repo (per grep check).
+#   - Skips blocks whose Task ID is already in the repo.
 
 set -euo pipefail
 
@@ -44,7 +39,7 @@ fi
 
 cd "$APP_REPO"
 
-# 1. Sync scripts — copy any new or updated scripts from the session dir.
+# 1. Sync scripts.
 NEW_SCRIPTS=0
 if [ -d "$SESSION_SCRIPTS_DIR" ]; then
   mkdir -p scripts
@@ -59,55 +54,47 @@ if [ -d "$SESSION_SCRIPTS_DIR" ]; then
   done
 fi
 
-# 2. Append any new task entries from the session worklog that aren't yet in
-#    the repo's worklog. We split the session log into "task entry" blocks
-#    (each starts with a `---` line followed by a `Task ID:` line) and append
-#    each missing block individually.
+# 2. Append missing worklog entries.
 WORKLOG_ADDED=0
 if [ -f worklog.md ]; then
-  # Build a temp file of all repo Task IDs (one per line, no "Task ID: " prefix).
+  # Build a list of Task IDs in the repo worklog.
   repo_ids_file=$(mktemp)
   grep "^Task ID: " worklog.md | sed 's/^Task ID: //' | sort -u > "$repo_ids_file"
 
-  # Split the session log into blocks. Each block starts at a `---` line that
-  # is immediately followed by a `Task ID:` line. We use awk to emit one block
-  # per missing Task ID to a temp file, then concatenate.
+  # For each Task ID in the session log, check if it's missing from the repo.
+  # If missing, extract its block and append.
+  session_ids_file=$(mktemp)
+  grep "^Task ID: " "$SESSION_LOG" | sed 's/^Task ID: //' > "$session_ids_file"
+
   new_blocks_file=$(mktemp)
-  awk -v repo_ids_file="$repo_ids_file" '
-    BEGIN {
-      while ((getline line < repo_ids_file) > 0) {
-        repo_ids[line] = 1
-      }
-      close(repo_ids_file)
-      in_block = 0
-      current_id = ""
-      block_buf = ""
-    }
-    /^---$/ {
-      # If we were in a block, emit it (only if its Task ID is missing).
-      if (in_block && current_id != "" && !(current_id in repo_ids)) {
-        print block_buf >> new_blocks_file
-      }
-      # Start a new block.
-      in_block = 1
-      block_buf = $0 "\n"
-      current_id = ""
-      next
-    }
-    {
-      if (in_block) {
-        block_buf = block_buf $0 "\n"
-        if ($0 ~ /^Task ID: /) {
-          current_id = substr($0, 11)
-        }
-      }
-    }
-    END {
-      if (in_block && current_id != "" && !(current_id in repo_ids)) {
-        print block_buf >> new_blocks_file
-      }
-    }
-  ' new_blocks_file="$new_blocks_file" "$SESSION_LOG"
+  while IFS= read -r id; do
+    # Skip if already in repo.
+    if grep -qxF "$id" "$repo_ids_file"; then
+      continue
+    fi
+
+    # Find the line of "Task ID: $id" in the session log.
+    task_line=$(grep -n "^Task ID: $id$" "$SESSION_LOG" | head -1 | cut -d: -f1)
+    if [ -z "$task_line" ]; then continue; fi
+
+    # Find the --- separator that PRECEDES this Task ID line.
+    sep_line=$(awk -v tl="$task_line" 'NR < tl && /^---$/ {last=NR} END {print last}' "$SESSION_LOG")
+
+    # Find the next --- separator AFTER this Task ID line (or EOF).
+    next_sep_line=$(awk -v tl="$task_line" 'NR > tl && /^---$/ {print NR; exit}' "$SESSION_LOG")
+    if [ -z "$next_sep_line" ]; then
+      # No next separator — go to end of file.
+      end_line=$(wc -l < "$SESSION_LOG")
+    else
+      # Stop one line BEFORE the next --- separator (so we don't include it).
+      end_line=$((next_sep_line - 1))
+    fi
+
+    # Extract the block (from sep_line to end_line, inclusive).
+    echo "  + adding entry: $id"
+    awk -v s="$sep_line" -v e="$end_line" 'NR >= s && NR <= e' "$SESSION_LOG" >> "$new_blocks_file"
+    echo "" >> "$new_blocks_file"
+  done < "$session_ids_file"
 
   if [ -s "$new_blocks_file" ]; then
     added_lines=$(wc -l < "$new_blocks_file")
@@ -115,17 +102,16 @@ if [ -f worklog.md ]; then
     WORKLOG_ADDED=1
     echo "  + appended $added_lines lines of new task entries to worklog.md"
   fi
-  rm -f "$repo_ids_file" "$new_blocks_file"
+  rm -f "$repo_ids_file" "$session_ids_file" "$new_blocks_file"
 fi
 
-# 3. Commit + push if there's anything to commit.
+# 3. Commit + push.
 git add -A
 if git diff --cached --quiet; then
   echo "Nothing to commit — everything already in sync."
   exit 0
 fi
 
-# Build a short commit message.
 MSG_LINES=("chore: sync session worklog + scripts to private repo")
 MSG_LINES+=("")
 if [ $NEW_SCRIPTS -gt 0 ]; then
