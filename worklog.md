@@ -2608,3 +2608,53 @@ Stage Summary:
 - Lineage page specifics: OpenLineage + Atlas + Spline + Unity Lineage + DataHub. Column-level lineage, parent runId chaining, downstream/upstream BFS for GDPR audit + impact analysis + RCA. 5-way comparison table.
 - Data Contracts page specifics: dbt + Great Expectations + Confluent Schema Registry + DataHub + OpenLineage. Schema + SLA + ownership bundle, compile-time type-safety, runtime compliance monitoring. 5-way comparison table.
 - 6 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 30 code examples in _dataset_examples6.tsx + 6 Pyodide simulations.
+
+---
+Task ID: phase4-pages
+Agent: Super Z (main)
+Task: Build 4 Phase 4 pages (Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation) in src/app/_pages/ + src/app/_components/_dataset_examples7.tsx with 12 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig). Each page mirrors the /iceberg.tsx reference implementation exactly. This is the FINAL batch — completes all 13 new pages registered in router (commit 86ea52b).
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md — confirmed Phase 1 (Pinot/Paimon/Druid/Impala/StarRocks, 2013c99), Phase 2 (Kafka Connect/Schema Registry, d477e8c), Phase 3 (Lineage/Data Contracts, 02bc46d) all complete and pushed to private/main.
+- Read /home/z/appdatasci2/download/next-phase-build-plan.txt — Phase 4 detailed per-page plan (Tabular founded by Iceberg spec authors + Snowflake-acquired 2024; Databricks Lakehouse Delta+Unity+MLflow+Photon production deep dive; Snowflake Polaris Apache-licensed REST catalog 2024; AWS Lake Formation cell-level RLS + LF-tags governance).
+- Read /home/z/appdatasci2/src/app/_pages/iceberg.tsx (983 lines) — REFERENCE IMPLEMENTATION.
+- Read /home/z/appdatasci2/src/app/_pages/catalogs.tsx — Phase 3 patterns reference (already covers Polaris config in catalogs page; this Phase 4 Snowflake Polaris page goes deeper on cross-engine federation + Tabular acquisition).
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx — DatasetExample interface.
+- Read /home/z/appdatasci2/src/app/_components/_dataset_examples6.tsx (3,092 lines) — Phase 3 dataset examples reference.
+- Read /home/z/appdatasci2/agent-ctx/phase3-pages-super-z.md — previous agent's notes on ${var} escaping + JSX text rewording for unescaped </>.
+- Verified route folders src/app/{tabular,databricks-lakehouse,snowflake-polaris,aws-lake-formation}/page.tsx already existed (commit 86ea52b registered stubs importing TabularPage/DatabricksLakehousePage/SnowflakePolarisPage/AwsLakeFormationPage from ../_pages/<name>).
+- Built src/app/_components/_dataset_examples7.tsx (5,438 lines):
+  * TABULAR_EXAMPLES (3): SaaS Iceberg platform on 10TB (managed catalog + Trino), multi-cloud catalog on 15TB across 3 clouds (one OAuth2 credential), time-travel at scale with 1B rows × 1000 snapshots (sub-second manifest tree lookup).
+  * DATABRICKS_LAKEHOUSE_EXAMPLES (3): Uber ML platform on 1B events/day (Delta + MLflow + Unity + Photon), Airbnb analytics on 5TB with Looker (Liquid Clustering + Photon), JPMorgan risk on 100M trades/day (Delta + Unity MNPI RBAC + regulatory reporting).
+  * SNOWFLAKE_POLARIS_EXAMPLES (3): external Iceberg tables on 10TB cross-engine (Snowflake+Spark+Trino+DuckDB), Polaris REST catalog on 5TB multi-engine (4 engines single endpoint), cross-engine federation on 1TB (Snowflake+Spark+Trino same snapshot zero drift).
+  * AWS_LAKE_FORMATION_EXAMPLES (3): multi-account governance on 10TB across 3 accounts (cross-account LF grants via STS AssumeRole), partner data sharing on 5TB with cell-level RLS (row filter + column mask), LF-tags governance on 100 tables (tag-based policy enforcement, 5 grants vs 500 per-resource).
+  * Each example has 5 code tabs (Scala/Rust/Go/Elixir/Zig) + runnable Python (Pyodide) using only math/random/collections.
+- Built src/app/_pages/tabular.tsx (999 lines): Tabular architecture diagram (customer S3 + Tabular SaaS + multi-engine reads via REST), Spark SQL with Tabular catalog config (multi-cloud), Tabular-managed Trino (zero cluster ops), Tabular REST API Python (no Spark/Trino), PyIceberg pure-Python client, Snowflake cross-read via external tables, Pyodide SaaS simulation (sub-second catalog lookups + multi-cloud + time-travel), Tabular vs Snowflake vs Databricks vs self-hosted comparison table, 4 unique features (founded by spec authors + fully managed catalog+compute + multi-cloud single catalog + Snowflake cross-read native).
+- Built src/app/_pages/databricks-lakehouse.tsx (972 lines): Databricks architecture diagram (Delta + Unity + MLflow + Photon + Databricks SQL end-to-end), Delta SQL with Liquid Clustering + CDF + time travel, Unity SQL with column-level RBAC + MNPI tags + lineage + audit, MLflow Python (track + register + serve with Unity-governed model registry), Photon SQL (5-10x speedup over classic Spark), Liquid Clustering SQL (2024 self-tuning replacement for Z-Order), Pyodide Lakehouse simulation (1B events Delta ingest + Unity MNPI RBAC + Photon 5-10x speedup + MLflow 50K runs + sub-100ms serving), Databricks vs Snowflake vs Tabular vs self-hosted comparison table.
+- Built src/app/_pages/snowflake-polaris.tsx (998 lines): Polaris architecture diagram (multi-cloud storage + multi-engine compute via single Apache-licensed REST catalog), Polaris YAML config (Apache-licensed, multi-cloud storage, OAuth2, RBAC), Spark SQL multi-catalog (Snowflake + Spark + Trino + DuckDB via Polaris), Snowflake external Iceberg tables (cross-engine read via Polaris, no copy into Snowflake storage), Trino + Polaris federated SQL, DuckDB + Polaris laptop read, Pyodide Polaris simulation (sub-200ms catalog calls + multi-engine query + cross-engine snapshot consistency + storage cost savings 1000x), Polaris vs Unity vs Glue vs Nessie comparison table.
+- Built src/app/_pages/aws-lake-formation.tsx (990 lines): Lake Formation architecture diagram (central governance plane for S3 + Glue + Athena + Redshift + Partner + CloudTrail), Register S3 + LF-tags + grant by tag SQL, Cell-level RLS SQL (partner data sharing row filter + column mask), Cross-account grants SQL (STS AssumeRole + temp creds 1h TTL), Audit Python (CloudTrail queries + MNPI violation detection), Data API Python (engine requests data access, LF grants temp creds scoped to grants), Pyodide LF simulation (multi-account + cell-level RLS + LF-tags + 100 tables auto-tagged + re-tag scenario + audit log), LF vs Unity vs Polaris vs Ranger comparison table.
+- Lint: bunx eslint src/app/_pages/{tabular,databricks-lakehouse,snowflake-polaris,aws-lake-formation}.tsx src/app/_components/_dataset_examples7.tsx --max-warnings=0 → all pass (0 errors, 0 warnings).
+- Fixed 2 issues during build:
+  1. Unescaped ${var} interpolations in Python f-strings inside JS template literals — initial lint pass caught ${snowflake_managed_cost:,.0f} + ${polaris_s3_cost:,.0f} in tabular + snowflake-polaris Pyodide demos. JS interpreted as interpolation, threw "Parsing error: '}' expected". Wrote Python script scripts/escape_dollar_brace.py to walk the entire _dataset_examples7.tsx file and prepend a single backslash to every unescaped ${ (12 total — all in Python f-strings). All 12 escaped as \${.
+  2. ${snowflake_managed_cost:,.0f} in snowflake-polaris.tsx — escaped by rewording to USD prefix: "USD ${snowflake_managed_cost:,.0f}/year" (JS interpolation still triggered on ${ — fixed by rewording to USD format: "USD {snowflake_managed_cost:,.0f}/year" then escaping to "USD \${snowflake_managed_cost:,.0f}/year"). Actually reworded cleanly to "USD {value:,.0f}/year" by removing the $ sign.
+- Build: GITHUB_PAGES=true bun run build:static — succeeded after fixes. 84/84 pages prerendered (Turbopack, 26.9s compile + 2.8s render). All 4 Phase 4 pages built:
+  * out/tabular/index.html ✅
+  * out/databricks-lakehouse/index.html ✅
+  * out/snowflake-polaris/index.html ✅
+  * out/aws-lake-formation/index.html ✅
+- src/app/api directory moved aside to .api-routes-backup/ during build (z-ai-web-dev-sdk doesn't work in static export), restored after build. src/app/api/agent-triage/route.ts present post-build. .nojekyll touched in out/.
+- Commit: 4db06ba "feat: add Phase 4 pages (Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation) + _dataset_examples7.tsx. ALL 13 PAGES COMPLETE."
+- Push: 274378f..4db06ba on private/main (AppDataSciEng2-Advance). Pre-push guardrail checks passed.
+- Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+
+Stage Summary:
+- HEAD = 4db06ba on private/main (AppDataSciEng2-Advance). Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+- 5 new files added: src/app/_components/_dataset_examples7.tsx (5,438 lines), src/app/_pages/tabular.tsx (999 lines), src/app/_pages/databricks-lakehouse.tsx (972 lines), src/app/_pages/snowflake-polaris.tsx (998 lines), src/app/_pages/aws-lake-formation.tsx (990 lines) — total 9,397 lines.
+- Phase 4 (4 pages) COMPLETE. ALL 13 NEW PAGES COMPLETE across 4 phases:
+  * Phase 1 (5 pages): Pinot, Paimon, Druid, Impala, StarRocks (commit 2013c99)
+  * Phase 2 (2 pages): Kafka Connect, Schema Registry (commit d477e8c)
+  * Phase 3 (2 pages): Lineage, Data Contracts (commit 02bc46d)
+  * Phase 4 (4 pages): Tabular, Databricks Lakehouse, Snowflake Polaris, AWS Lake Formation (commit 4db06ba)
+- Each of the 4 Phase 4 pages follows the /iceberg.tsx pattern exactly: PageHeader → 4 KPIs → architecture SVG diagram → 5-6 code blocks → Pyodide executable demo → comparison table → Why-evolved → Unique features (2×2) → DatasetCards → Computational tooling → Research → Deeper-thought insight → RelatedTopics + cross-links.
+- 12 dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 60 code examples in _dataset_examples7.tsx + 12 Pyodide simulations.
+- The ModernDataSciEng Platform v2 is now complete with 82 pages live (78 from before Phase 1-4 + 13 new = 82 source _pages/*.tsx files, 84 output dirs including home/_next/_not-found/404/images).
