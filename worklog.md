@@ -2691,3 +2691,28 @@ Stage Summary:
 - All pages have Pyodide-runnable demos with synthetic data.
 - All pages have Why-evolved + Unique-features + Computational-tooling + Research + Insight sections.
 - Guardrails intact: backup branch, stable tag, CODEOWNERS, pre-push hook, guardrail-audit workflow.
+
+---
+Task ID: scientific-lakehouse-examples
+Agent: Super Z (main)
+Task: Add 6 scientific-angle dataset examples to /data-lakehouse page, showing the medallion Bronze→Silver→Gold pattern applied to life sciences, sensors, physics, and mathematics.
+
+Work Log:
+- Created _dataset_examples8.tsx (1,579 lines) with 6 examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 30 code blocks + 6 Pyodide demos.
+- Updated /data-lakehouse page to add second DatasetCards section ("Scientific lakehouse — 6 examples") right after the existing production-examples section.
+- Lint clean, static export built, all 6 examples verified in out/data-lakehouse/index.html.
+- Pushed commit d13877d to private/main. Sync→deploy completed.
+- Verified live on preview: all 6 science examples present (1000 Genomes, FDA FAERS, Single-cell, AirNow, LHC, OEIS).
+
+The 6 examples:
+1. 1000 Genomes Project (100TB) — genomics medallion: Bronze VCF → Silver QC-filtered → Gold allele frequencies
+2. Clinical Trials + FDA FAERS (15M reports) — pharmacovigilance: Bronze XML → Silver dedupe → Gold drug safety signals
+3. Single-cell Genomics (50TB, 10M cells) — sparse matrix: Bronze 10x → Silver QC → Gold cell-type markers
+4. EPA AirNow + NOAA (10TB, 50k sensors) — IoT: Bronze Kafka → Silver calibrate → Gold EPA AQI by region
+5. CERN LHC Open Data (1PB, 10B events) — particle physics: Bronze raw → Silver physics objects → Gold analysis ntuples
+6. OEIS + LMFDB (370k sequences) — mathematics: Bronze raw terms → Silver computed properties → Gold pattern discovery
+
+Stage Summary:
+- The /data-lakehouse page now has 9 total dataset examples (3 production + 6 scientific), each with 5-language code (Scala/Rust/Go/Elixir/Zig) + Pyodide demo + insight.
+- Total: 9 examples × 5 languages = 45 code blocks on the data-lakehouse page alone.
+- The user's vision is confirmed: the lakehouse IS the starting point of everything — the medallion pattern applies universally from business to genomics to particle physics to pure mathematics.
