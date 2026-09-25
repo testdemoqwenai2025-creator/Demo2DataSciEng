@@ -101,13 +101,17 @@ export type PageId =
   | "dagster"
   | "great-expectations"
   | "monte-carlo"
-  | "elementary";
+  | "elementary"
+  | "mlflow-deep-dive"
+  | "feature-store-deep-dive"
+  | "vector-db-deep-dive"
+  | "llmops";
 
 export interface PageMeta {
   id: PageId;
   label: string;
   shortLabel: string;
-  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary";
+  group: "Overview" | "Ingestion" | "Storage & Compute" | "Transformation" | "Analytics" | "Governance" | "Delivery" | "About" | "Knowledge Loop" | "Modern Big Data" | "Databases" | "Streaming" | "Columnar" | "Patterns" | "Data Mesh" | "DataFrames" | "Machine Learning" | "Deep Learning" | "MLOps" | "GenAI" | "Reinforcement Learning" | "LLM Training" | "Transformer" | "Computational Science" | "Generative AI" | "Computer Vision" | "Diffusion Models" | "Distributed Training" | "MLOps & Tracing" | "Quantization & Inference" | "Inference Serving" | "RAG Deep Dive" | "Multi-modal RAG" | "Bioinformatics" | "Cheminformatics" | "Molecular Modelling" | "Genetic Materials" | "Macro Structures" | "Systems Biology" | "Cryo-EM" | "Spatial Transcriptomics" | "Single-cell Multi-omics" | "AlphaMissense" | "AlphaProteo" | "Boltz" | "AI Drug Discovery" | "Spatial Multi-omics" | "Coevolution & DCA" | "Neural Network Potentials" | "Enhanced Sampling" | "Generative Chemistry 2.0" | "Quantum Computing" | "Space Science" | "Fintech" | "Data Lakehouse" | "Apache Iceberg" | "AWS Glue" | "Apache Hudi" | "Delta Lake" | "Catalogs" | "Apache Pinot" | "Apache Paimon" | "Apache Druid" | "Apache Impala" | "StarRocks" | "Kafka Connect" | "Schema Registry" | "Lineage" | "Data Contracts" | "Tabular" | "Databricks Lakehouse" | "Snowflake Polaris" | "AWS Lake Formation" | "Apache Flink" | "Apache Kafka" | "Apache Pulsar" | "Spark Streaming" | "Google BigQuery" | "AWS Redshift" | "ClickHouse" | "dbt Deep Dive" | "Apache Airflow" | "Dagster" | "Great Expectations" | "Monte Carlo" | "Elementary" | "MLflow Deep Dive" | "Feature Store Deep Dive" | "Vector DB Deep Dive" | "LLMOps";
   icon: string;
   description: string;
 }
@@ -873,6 +877,38 @@ export const PAGES: PageMeta[] = [
     group: "Elementary",
     icon: "Activity",
     description: "Elementary: dbt-native anomaly detection, data tests, freshness, schema changes. Scientific examples: genomics dbt model anomalies, sensor data freshness, clinical trial schema drift.",
+  },
+  {
+    id: "mlflow-deep-dive",
+    label: "MLflow Deep Dive — Tracking + Registry + Recipes + Deploy",
+    shortLabel: "MLflow",
+    group: "MLflow Deep Dive",
+    icon: "Cpu",
+    description: "MLflow deep dive: experiment tracking (runs/metrics/params/artifacts), model registry (versioning/stages), recipes (training templates), deployments (K8s/SageMaker). Math: bias-variance, AUC-ROC, Bayesian HPO. Science: genomics model tracking, clinical trial ML, protein structure.",
+  },
+  {
+    id: "feature-store-deep-dive",
+    label: "Feature Store Deep Dive — Feast + Tecton + SageMaker",
+    shortLabel: "Feature Store",
+    group: "Feature Store Deep Dive",
+    icon: "Boxes",
+    description: "Feature store deep dive: Feast offline/online, Tecton streaming features, SageMaker Feature Store. Math: point-in-time joins, PSI drift, Shapley values. Science: genomics SNP features, clinical trial features, sensor features.",
+  },
+  {
+    id: "vector-db-deep-dive",
+    label: "Vector DB Deep Dive — Pinecone + Weaviate + Milvus + pgvector",
+    shortLabel: "Vector DB",
+    group: "Vector DB Deep Dive",
+    icon: "Network",
+    description: "Vector DB deep dive: Pinecone, Weaviate, Milvus, pgvector. ANN algorithms: HNSW, IVF, LSH. Math: cosine similarity, L2 distance, recall@k. Science: protein embeddings, molecular similarity, genomics variant clustering.",
+  },
+  {
+    id: "llmops",
+    label: "LLMOps — LLM Operations (Prompt Registry + Eval + Guardrails + RAG)",
+    shortLabel: "LLMOps",
+    group: "LLMOps",
+    icon: "Brain",
+    description: "LLMOps: prompt registry, LLM evaluation (LLM-as-judge, BLEU/ROUGE), guardrails (PII, hallucination), RAG pipeline (hybrid search + reranking). Math: attention QK^T/√d, perplexity, recall@k. Science: biomedical RAG, chemistry LLM, clinical trial NLP.",
   },
 ];
 

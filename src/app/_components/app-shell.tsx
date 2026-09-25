@@ -105,6 +105,10 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Great Expectations", ids: ["great-expectations"] },
   { title: "Monte Carlo", ids: ["monte-carlo"] },
   { title: "Elementary", ids: ["elementary"] },
+  { title: "MLflow Deep Dive", ids: ["mlflow-deep-dive"] },
+  { title: "Feature Store Deep Dive", ids: ["feature-store-deep-dive"] },
+  { title: "Vector DB Deep Dive", ids: ["vector-db-deep-dive"] },
+  { title: "LLMOps", ids: ["llmops"] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
