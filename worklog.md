@@ -3326,3 +3326,27 @@ All phases complete:
 - Phase F: 4 scientific computing pages (NumPy/SciPy + Dask/Ray + GPU Computing + Jupyter) + 8 scientific examples — COMPLETE
 - Phase G: 4 cross-cutting pages (Data Mesh + Streaming SQL + Data Contracts + Privacy) + 8 cross-cutting scientific examples
 - Total: 109 pages total (105 prior + 4 new Phase F), 68+ scientific dataset examples across the platform, each with 5-language code + Pyodide simulation.
+
+---
+Task ID: phaseF-scientific-computing-complete
+Agent: Super Z (main) + subagent
+Task: Build Phase F scientific computing foundations (NumPy/SciPy, Dask/Ray, GPU Computing, Jupyter) under Bioinformatics — with deep math, custom SVG diagrams, 3D-to-N-D examples, wet-lab-to-marketplace narrative.
+
+Work Log:
+- Built numpy-scipy page directly (main agent) — the CENTERPIECE with:
+  * DEDICATED Mathematical Foundations: matrix multiply (GEMM, O(n³) vs Strassen O(n^2.807)), SVD (A=UΣV^T), FFT (Cooley-Tukey O(N log N) vs DFT O(N²)), sparse (CSR O(nnz)), N-D broadcasting ((m,1)+(1,n)→(m,n))
+  * Custom SVG diagrams: N-D array 1D→5D (interactive click-through), BLAS/LAPACK hierarchy, wet-lab→marketplace pipeline
+  * 3D-to-N-D examples: 3D (genes×samples×conditions) → 4D (+timepoints) → 5D (+replicates) → N-D broadcasting
+  * 3 Pyodide demos: SVD via power iteration, FFT via DFT, N-D broadcasting
+  * Wet-lab-to-marketplace narrative: Illumina→NumPy→matplotlib→paper→23andMe/Recursion/Insitro/DeepMind
+- Subagent built Dask/Ray, GPU Computing, Jupyter pages (6,332 lines) + _dataset_examples15.tsx (3,130 lines, 8 examples × 5 langs)
+- Each page has: DEDICATED math section, custom SVG diagrams (NOT web images), science examples, wet-lab-to-marketplace narrative
+- All lint clean, static export built (109 pages), commits pushed to private/main
+- Verified live: all 4 pages HTTP 200, content verified (BLAS, LAPACK, SVD, FFT, sparse, broadcasting, wet lab, marketplace on numpy-scipy)
+
+Stage Summary:
+- Phase F COMPLETE — 4 scientific computing foundation pages.
+- Platform now has 109 pages total.
+- numpy-scipy is the richest page on the platform: interactive N-D diagram, BLAS hierarchy SVG, wet-lab-to-marketplace pipeline SVG, 3 Pyodide demos, 5 math equations, 6 science examples.
+- All pages have custom-designed SVG diagrams (NO web images).
+- The wet-lab-to-marketplace narrative connects every page to real scientific outcomes (23andMe, Recursion Pharma, Insitro, DeepMind).
