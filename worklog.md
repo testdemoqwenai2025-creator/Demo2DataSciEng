@@ -3124,3 +3124,129 @@ Stage Summary:
 - Each page has a DEDICATED Mathematical Foundations SectionCard with proper equations.
 - 12 science examples: genomics variant tracking, clinical drug response, protein structure, SNP features, clinical patient features, sensor features, protein embeddings, molecular similarity, genomics variant clustering, biomedical RAG, chemistry LLM, clinical trial matching.
 - Platform now has 101 pages total.
+
+---
+Task ID: phaseG-cross-cutting
+Agent: Super Z (main)
+Task: Build Phase G cross-cutting pages — Data Mesh Deep Dive, Streaming SQL, Data Contracts Deep Dive, Privacy-Enhancing Tech — with deep math sections + 8 scientific dataset examples (2 per page × 5 langs).
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md to confirm prior phases (1-4 + A + B + C + D + E) complete. Previous commit 76a85f9 registered Phase G route stubs (data-mesh-deep-dive + streaming-sql + data-contracts-deep-dive + privacy-enhancing-tech) in router + sidebar + route stubs.
+- Read /home/z/appdatasci2/src/app/_pages/mlflow-deep-dive.tsx (685 lines) — REFERENCE IMPLEMENTATION with DEDICATED Mathematical Foundations SectionCard (bias-variance, AUC-ROC, Bayesian HPO) using <p className="font-mono text-xs"> display equations + <code> inline.
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx — DatasetExample interface (id, step, title, subtitle, accent, icon, badge, brief, stats, codeTabs, runnablePython, insight, tools).
+- Built _dataset_examples14.tsx (1,542 lines) with 4 export arrays:
+  * MESH_SCIENCE_EXAMPLES (2): Genomics variant calling data product (1000 Genomes, 3B SNPs, 5 mesh characteristics, SLA enforcement) + Clinical trial mesh via FDA FAERS (HIPAA + 21 CFR Part 11 + EMA EudraVigilance as OPA Rego policies)
+  * STREAMING_SQL_SCIENCE_EXAMPLES (2): Real-time genomics via Flink SQL TUMBLE windows (5k variants/s, 200 NovaSeq, 60s watermark) + LHC online monitoring via Materialize differential dataflow (40M events/s, per-LB collision rate, sub-second mat views)
+  * CONTRACTS_SCIENCE_EXAMPLES (2): Genomics VCF contract (Schema=VCF-4.2, SLA=freshness<=24h, Quality=HWE p-value, Owner=genomics-lab) + Clinical trial GDPR contract (Art. 5/17/20/30 enforced as code via OPA Rego)
+  * PRIVACY_SCIENCE_EXAMPLES (2): Genomics differential privacy (Laplace mechanism on GWAS p-values, ε=1.0, sensitivity=1/√n) + Clinical trial federated learning (FedAvg weighted average across 5 hospital silos)
+- Each example: 5 code tabs (Scala/Rust/Go/Elixir/Zig) + runnablePython (using only math/random/collections) + insight + stats + brief.
+- Built 4 page files (3,669 lines total):
+  | File | Lines | Math foundations (DEDICATED SectionCard) |
+  |------|-------|--------------------------------------------|
+  | src/app/_pages/data-mesh-deep-dive.tsx | 841 | Graph theory (G=(V,E), O(1) mesh vs O(N) central), Information theory (quality = 1 - H(X|Y) where H(X|Y) = -Σ P(x,y) log P(x|y)), SLA bound (P(freshness<=T AND completeness>=C AND accuracy>=A) >= 0.999), Centrality |
+  | src/app/_pages/streaming-sql.tsx | 917 | Event time vs processing time (latency = t_process - t_event), Watermark (W(t) = max_seen(t_event) - allowed_lateness), TUMBLE (fixed-size non-overlapping [t, t+size)), HOP (sliding overlapping advancing by step), SESSION (gap-based, merge where gap <= inactivity_gap) |
+  | src/app/_pages/data-contracts-deep-dive.tsx | 925 | Formal contract C = (Schema, SLA, Q, O), Backward compat (S2 ⊇ S1), Forward compat (S1 ⊆ S2), Full compat (S1 ≅ S2 isomorphic), SLA formula (P(completion<=T_max AND error<=ε_max) >= 1-α), Semantic versioning |
+  | src/app/_pages/privacy-enhancing-tech.tsx | 986 | ε-DP (Pr[M(D)∈S] <= e^ε × Pr[M(D')∈S]), Laplace mechanism (M(x) = f(x) + Lap(Δf/ε)), Gaussian mechanism (M(x) = f(x) + N(0, σ²) where σ >= √(2ln(1.25/δ)) × Δf/ε), Composition theorems (sequential ε_total = Σεᵢ, parallel ε_total = max(εᵢ)), Homomorphic encryption (Enc(a) ⊕ Enc(b) = Enc(a+b), Enc(a) ⊗ Enc(b) = Enc(a×b), Paillier + BFV/BGV + CKKS), FedAvg (w(t+1) = Σ k (nk/n) × wk(t)) |
+- Each page follows the mlflow-deep-dive.tsx pattern exactly: 13 sections + dedicated math SectionCard (4-6 boxed equations rendered in <p className="font-mono"> with extensive derivation/interpretation).
+- Each page has comparison table (Data Mesh vs Lake vs Warehouse vs Hub / Flink SQL vs Spark SS SQL vs Materialize vs RisingWave / dbt contracts vs GE vs Schema Registry vs OpenLineage / DP vs FL vs HE vs SMPC).
+
+Issues encountered + fixes:
+
+1. **Unescaped `${h.id}` in Scala s-string** (line 1360 of _dataset_examples14.tsx): Inside a Spark Scala s-string `s"clinical.\\${h.id}_patients"`, the `\\${h.id}` was JS template literal interpolation with `h` not in scope. Build failed with `ReferenceError: h is not defined` during static prerender of /data-contracts-deep-dive. **Fix**: replaced `\\${h.id}` with `\${h.id}` (single backslash + dollar + brace → outputs literal `${h.id}` in the string, valid Scala s-string interpolation, no JS interpolation).
+
+2. **Unescaped `${freshness_h}` in Scala s-string** (line 529 of data-mesh-deep-dive.tsx): Same issue — `s"Freshness SLA violated: \\${freshness_h}h > 24h"` had `\\${freshness_h}` parsed as JS interpolation (since `\\` outputs a single `\`, then `${freshness_h}` is interpolation). Build failed with `ReferenceError: freshness_h is not defined` during static prerender of /data-mesh-deep-dive. **Fix**: replaced `\\${freshness_h}` with `\${freshness_h}`.
+
+3. **Unescaped `{t+1}` in JSX text content** (line 603 of privacy-enhancing-tech.tsx): The text `w_{t+1} = Σ_k (n_k / n) × w_k^t` inside a `<p className="font-mono">` had `{t+1}` parsed as a JSX expression with `t` not in scope. Build failed with `ReferenceError: t is not defined`. **Fix**: reworded to `w(t+1) = Σ k (nk/n) × wk(t)` (removed curly braces, used parenthesised notation — same mathematical meaning, no JSX expression ambiguity).
+
+Lint + build verification:
+- ESLint: `bunx eslint src/app/_components/_dataset_examples14.tsx src/app/_pages/{data-mesh-deep-dive,streaming-sql,data-contracts-deep-dive,privacy-enhancing-tech}.tsx --max-warnings=0` → all pass (0 errors, 0 warnings).
+- Build: `GITHUB_PAGES=true bun run build:static` → succeeded after 3 fixes. 105/105 pages prerendered (Turbopack, ~30s compile).
+- Output verification:
+  * out/data-mesh-deep-dive/index.html ✅ — Graph Theory (2), data product (53), Dehghani (31), federated computational governance (16)
+  * out/streaming-sql/index.html ✅ — TUMBLE (62), HOP (36), SESSION (36), Watermark (18)
+  * out/data-contracts-deep-dive/index.html ✅ — Chad Sanderson (10), backward (37), forward (23), isomorphic (10), full compatibility (7)
+  * out/privacy-enhancing-tech/index.html ✅ — ε-DP (60), FedAvg (79), Laplace mechanism (16), Gaussian mechanism (19), Homomorphic Encryption (20), Lap(Δf/ε) (6), σ ≥ √(2ln(1.25/δ)) (8), Composition theorems (4)
+- .nojekyll touched in out/.
+- API routes restored: src/app/api/{agent-triage, route.ts} present post-build.
+
+Commit + push:
+- SHA: f547074 on private/main (AppDataSciEng2-Advance)
+- Previous: 76a85f9 (Phase G route stubs registered)
+- Push: `git push private main` → 76a85f9..f547074. Pre-push guardrail checks passed.
+- Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+
+Stage Summary — Phase G cross-cutting pages complete:
+
+- 5 new files (4 pages + 1 dataset_examples file): 5,211 lines of TypeScript/TSX added across 5 files.
+- 4 cross-cutting pages (data-mesh-deep-dive, streaming-sql, data-contracts-deep-dive, privacy-enhancing-tech) — each follows the mlflow reference pattern exactly with all 13 sections (PageHeader + KPIs + dedicated Mathematical Foundations SectionCard + Architecture SVG + 3-4 code blocks + Pyodide demo + Comparison table + Why-evolved + 2×2 unique features + DatasetCards + Computational tooling + Research + Deeper-thought insight + RelatedTopics + cross-links).
+- 8 scientific dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 40 code blocks in _dataset_examples14.tsx + 8 Pyodide math simulations (using only math/random/collections).
+- Each page's Mathematical Foundations SectionCard has 4-6 boxed equations rendered in <p className="font-mono"> with extensive derivation/interpretation inline — these are the formal definitions, not heuristics.
+- The 8 scientific examples show how cross-cutting concepts apply to scientific workloads:
+  * Life sciences: genomics variant calling as a mesh data product (1000 Genomes, 3B SNPs, SLA), clinical trial mesh via FDA FAERS (HIPAA + 21 CFR Part 11), real-time genomics via Flink SQL TUMBLE windows, genomics VCF data contract, clinical GDPR contract, genomics differential privacy on GWAS, clinical trial federated learning
+  * Physics: LHC online monitoring via Materialize differential dataflow (40M events/sec, per-LB collision rate)
+
+All phases complete:
+- Phase 1-4: 13 foundational pages + scientific-lakehouse-examples
+- Phase A: 4 streaming pages + 6 streaming examples
+- Phase B: 3 data quality / observability pages + 6 examples
+- Phase C: 3 cloud warehouse pages + 6 examples
+- Phase D: 3 orchestration pages + 6 examples
+- Phase E: 4 ML platform deep-dive pages + 12 ML scientific examples
+- Phase G: 4 cross-cutting pages (Data Mesh + Streaming SQL + Data Contracts + Privacy) + 8 cross-cutting scientific examples
+- Total: 105 pages total, 60+ scientific dataset examples across the platform, each with 5-language code + Pyodide simulation.
+
+---
+Task ID: phaseG-cross-cutting
+Agent: Super Z (main)
+Task: Finalise Phase G cross-cutting pages — verify + lint + build + commit + push the 4 new Phase G pages (data-mesh-deep-dive + streaming-sql + data-contracts-deep-dive + privacy-enhancing-tech) + the _dataset_examples14.tsx file (8 examples × 5 langs = 40 code blocks + 8 Pyodide math simulations).
+
+Work Log:
+- Read /home/z/appdatasci2/worklog.md — confirmed all prior phases (1-4 + A + B + C + D + E) complete. Previous commit 76a85f9 registered Phase G route stubs in router + sidebar.
+- Read /home/z/appdatasci2/src/app/_pages/mlflow-deep-dive.tsx (685 lines) — REFERENCE IMPLEMENTATION with dedicated Mathematical Foundations SectionCard.
+- Read /home/z/appdatasci2/src/app/_components/dataset-cards.tsx — DatasetExample interface.
+- Built _dataset_examples14.tsx (1,542 lines) with 4 export arrays (MESH_SCIENCE_EXAMPLES, STREAMING_SQL_SCIENCE_EXAMPLES, CONTRACTS_SCIENCE_EXAMPLES, PRIVACY_SCIENCE_EXAMPLES), 2 examples each × 5 langs = 40 code blocks + 8 Pyodide simulations using only math/random/collections.
+- Built 4 page files (3,669 lines total):
+  * data-mesh-deep-dive.tsx (841 lines): graph theory G=(V,E), information theory quality=1-H(X|Y), SLA probability bound
+  * streaming-sql.tsx (917 lines): event time vs processing time, watermark W(t)=max_seen-allowed_lateness, TUMBLE/HOP/SESSION windows
+  * data-contracts-deep-dive.tsx (925 lines): formal tuple C=(Schema,SLA,Q,O), backward/forward/full compatibility, SLA formula
+  * privacy-enhancing-tech.tsx (986 lines): ε-DP, Laplace mechanism M(x)=f(x)+Lap(Δf/ε), Gaussian mechanism, composition theorems, HE (Paillier+BFV/BGV+CKKS), FedAvg
+- Each page follows mlflow pattern exactly: 13 sections + dedicated math SectionCard with 4-6 boxed equations.
+- Each page has a 4-way comparison table.
+
+Issues encountered + fixes:
+1. Unescaped `${h.id}` in Scala s-string (line 1360 of _dataset_examples14.tsx) — `\\${h.id}` parsed as JS interpolation. Fixed by using `\${h.id}` (single backslash + dollar + brace).
+2. Unescaped `${freshness_h}` in Scala s-string (line 529 of data-mesh-deep-dive.tsx) — same issue. Fixed by using `\${freshness_h}`.
+3. Unescaped `{t+1}` in JSX text content (line 603 of privacy-enhancing-tech.tsx) — `{t+1}` parsed as JSX expression. Fixed by rewording to `w(t+1)`.
+
+Lint + build verification:
+- ESLint: `bunx eslint src/app/_components/_dataset_examples14.tsx src/app/_pages/{data-mesh-deep-dive,streaming-sql,data-contracts-deep-dive,privacy-enhancing-tech}.tsx --max-warnings=0` → all pass (0 errors, 0 warnings).
+- Build: `GITHUB_PAGES=true bun run build:static` → succeeded after 3 fixes. 105/105 pages prerendered (Turbopack, ~30s compile).
+- Output verified: out/data-mesh-deep-dive/index.html (362KB), out/streaming-sql/index.html (380KB), out/data-contracts-deep-dive/index.html (388KB), out/privacy-enhancing-tech/index.html (376KB).
+- Math content keywords confirmed in built HTML: Graph Theory, Watermark, TUMBLE/HOP/SESSION, Laplace mechanism, Gaussian mechanism, Composition theorems, FedAvg, Homomorphic Encryption, ε-DP, Lap(Δf/ε), σ ≥ √(2ln(1.25/δ)).
+- API routes restored: src/app/api/{agent-triage, route.ts} present post-build. .nojekyll touched in out/.
+
+Commit + push:
+- SHA: f547074 on private/main (AppDataSciEng2-Advance)
+- Previous: 76a85f9 (Phase G route stubs registered)
+- Push: `git push private main` → 76a85f9..f547074. Pre-push guardrail checks passed.
+- Sync workflow will mirror to public/main (Demo2DataSciEng); deploy workflow will build + publish to GitHub Pages.
+
+Stage Summary — Phase G complete + ALL PHASES COMPLETE:
+
+- 5 new files (4 pages + 1 dataset_examples file): 5,211 lines of TypeScript/TSX added.
+- 4 cross-cutting pages (data-mesh-deep-dive, streaming-sql, data-contracts-deep-dive, privacy-enhancing-tech) — each follows the mlflow reference pattern exactly with all 13 sections.
+- 8 scientific dataset examples × 5 languages (Scala/Rust/Go/Elixir/Zig) = 40 code blocks in _dataset_examples14.tsx + 8 Pyodide math simulations (using only math/random/collections).
+- Each page's Mathematical Foundations SectionCard has 4-6 boxed equations rendered in <p className="font-mono"> with extensive derivation/interpretation inline — these are the formal definitions, not heuristics.
+- The 8 scientific examples show how cross-cutting concepts apply to scientific workloads:
+  * Life sciences: genomics variant calling as a mesh data product, clinical trial mesh via FDA FAERS, real-time genomics via Flink SQL TUMBLE, genomics VCF contract, clinical GDPR contract, genomics ε-DP on GWAS, clinical trial FedAvg across hospital silos
+  * Physics: LHC online monitoring via Materialize differential dataflow
+
+All phases complete:
+- Phase 1-4: 13 foundational pages + scientific-lakehouse-examples
+- Phase A: 4 streaming pages + 6 streaming examples
+- Phase B: 3 data quality / observability pages + 6 examples
+- Phase C: 3 cloud warehouse pages + 6 examples
+- Phase D: 3 orchestration pages + 6 examples
+- Phase E: 4 ML platform deep-dive pages + 12 ML scientific examples
+- Phase G: 4 cross-cutting pages (Data Mesh + Streaming SQL + Data Contracts + Privacy) + 8 cross-cutting scientific examples
+- Total: 105 pages total, 60+ scientific dataset examples across the platform, each with 5-language code + Pyodide simulation.
