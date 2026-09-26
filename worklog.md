@@ -4355,3 +4355,37 @@ Stage Summary:
 - 4 more pages cross-linked to the elegant-code ecosystem (cheminformatics, molecular-modelling, macro-structures, cryo-em).
 - citations?: string[] framework added — ready for per-card bibliography data.
 - Platform still has 131 pages. Lint clean, static build clean, all pushed and live.
+
+---
+Task ID: future-page-sidebar-badges-citations
+Agent: Super Z (main)
+Task: Build /future page (projections 10-20 years forward). Add per-page thought-count badges to the sidebar. Add per-card citation data to all 20 cards.
+
+Work Log:
+- Built src/app/_pages/future.tsx (~180 lines):
+  * The platform's most ambitious deeper thought — a page ABOUT its own future.
+  * 10 technology projections in a comparison table: current tool → future replacement (speculative) → math that stays → ETA.
+  * 6 deeper thoughts: 'the math is the anchor', 'the fold is the immune system', 'SVD useful in 2040', 'the graph gets denser', 'the thoughts are META', 'this page IS the most ambitious thought'.
+  * Registered /future PageId in router.ts + sidebar GROUPS array.
+  * Route: src/app/future/page.tsx.
+- Added per-page thought-count badges to the sidebar:
+  * New src/app/_lib/thought-counts.ts — auto-generated from source scan (124 pages, 621 total thoughts).
+  * Each page in the sidebar now shows a small badge (8px pill, bg-primary/15, text-primary, font-mono) with the thought count next to the page's short label.
+  * Script: scripts/generate_thought_counts.py (re-runnable, reads all _pages/*.tsx files).
+- Added per-card citation data to all 20 elegant-code cards:
+  * Script: scripts/add_citations.py (~200 lines, idempotent).
+  * Each card now has citations: string[] with 3-5 entries (author, year, title, URL).
+  * Examples: SVD → Beltrami 1873, Jordan 1874, Eckart-Young 1936, 1000-Genomes 2017. Attention → Vaswani 2017, Jumper 2021. Kalman → Kalman 1960, Welch-Bishop 2006. Black-Scholes → Black-Scholes 1973, Merton 1973.
+  * CitationsFold now shows a proper bibliography (unordered list) when card.citations is set.
+- Lint clean. Static build: 132 pages (was 131; added /future).
+- /future verified: 278KB, contains all projection terms (Future Evolution 6x, Technology projections 2x, Q-CS 2x, WebGPU 4x, 100M-Genomes 4x).
+- Sidebar badges verified in HTML (renders per-page in sidebar nav).
+- Citations verified in 3 JS chunks (renders in CitationsFold when modal opens).
+- Commit 6bb147a pushed to BOTH private/main AND prev-session/main.
+
+Stage Summary:
+- /future page is live — the platform's most ambitious deeper thought about its own evolution.
+- Every page in the sidebar shows a thought-count badge — readers can see which pages have the most original thinking.
+- All 20 elegant-code cards now have proper citation data (3-5 references each with author, year, title, and DOI/arXiv/JSTOR links).
+- Platform now has 132 pages. 621 deeper-thought paragraphs. 20 cards with LaTeX math + citations + 5 fold sections each.
+- Lint clean, static build clean, all pushed and live.
