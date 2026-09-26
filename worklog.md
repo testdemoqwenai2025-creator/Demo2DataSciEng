@@ -4075,3 +4075,55 @@ Stage Summary:
 - Every page on the platform now has the AskMeAnything floating button — searches platform content first, offers one-click deep-links to 7 external AI platforms (Gemini, Grok, Qwen AI, MiniMax, ChatGPT, Claude, Perplexity) with the question pre-filled.
 - Outcome tiles now have a chart-upgrade framework: 5 sample tiles render recharts bar charts when their Python code emits JSON output. The other 55 tiles are backward-compatible (text output) and can be incrementally upgraded.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: lazy-fix-skill-constellation-cross-ref-sector-index
+Agent: Super Z (main)
+Task: Fix the /living-poisson/ (and all /living-* pages) rendering issue + add lazy evaluation. Build per-card SkillConstellation. Cross-reference the Skill graph and Connections graph (color by primary skill / equation family). Build Sector → Equations reverse index on /resources.
+
+Work Log:
+- Investigated the /living-poisson/ rendering issue. Root cause: LivingEquationRunner was auto-running on mount (autoRun=true default), which loaded Pyodide (~10MB) immediately on page load. On slow connections (or GitHub Pages CDN), this caused the page to appear "not rendering properly" while Pyodide downloaded + the Python code ran.
+- Refactored LivingEquationRunner (src/app/_components/living-equation-runner.tsx) for proper lazy evaluation:
+  * New `lazy` prop (default true) — skips the initial auto-run on mount.
+  * New `hasUserClickedRunRef` ref — gates slider-driven auto-runs (only auto-update after the user clicks Run at least once).
+  * When the user clicks Run, Pyodide loads + code runs + future slider drags auto-update (300ms debounce).
+  * Added a 'Press Run live to load Pyodide' prompt when status=idle (visible on first page load).
+- Built src/app/_components/skill-constellation.tsx (~190 lines):
+  * Tiny D3 force-directed graph inside each card modal (320×240 px SVG).
+  * Center node = current card (accent-colored).
+  * 3 ring nodes around it = this card's 3 skills (orange).
+  * Outer nodes = OTHER cards that share those skills (their own accent colors).
+  * Drag any node, hover to identify, click any 'other card' node to see where else the skill shows up.
+  * Inserted in DatasetCards modal between 'Expected outcomes' and 'Implementation insight' sections.
+- Cross-referenced the Skill graph and Connections graph:
+  * On /connections (elegant-code-graph.tsx): colored each card node by its PRIMARY skill (first outcome's skill field). Built a 40+ entry skillColorMap (e.g., 'Computational biologist' = red, 'Audio engineer' = green, 'Quant analyst' = orange, 'Structural biologist' = purple, 'NLP researcher' = cyan, 'Bioinformatician' = yellow-green, etc.). Cards sharing a primary skill get the same color.
+  * On /resources (skill-graph.tsx): colored each card node by EQUATION FAMILY (8 families):
+    - Linear algebra (SVD/FFT/Lloyd's) → blue
+    - Deep learning (Attention/Gradient Descent) → purple
+    - Probability (Poisson/Bayes/Entropy) → red
+    - Stochastic processes (GBM/MC/Black-Scholes/Kalman) → orange
+    - Numerical methods (Verlet/Euler) → green
+    - Networks (PageRank/Markov) → cyan
+    - Risk (VaR) → magenta
+    - Geometry (Haversine) → amber
+    - Dynamics (Navier-Stokes) → teal
+- Built src/app/_components/sector-index.tsx (~210 lines):
+  * For each industry sector, lists every elegant-code card whose outcomes touch that sector.
+  * Built a `classifySector()` function that maps raw sector strings to canonical industries (Maritime, Fintech, Genomics & Biology, Audio, Mass Spectrometry, Cryo-EM, Meteorology, Hemodynamics, Turbulence, Aviation, Astronomy, Climate & Hydrology, Machine Learning, Game Physics, Aerospace, Orbital Mechanics, Nuclear Physics, Networks & SRE, Information Theory, Thermodynamics, Evolutionary Biology).
+  * Each entry shows: card title (color-coded), science, raw sector, skill badge, talent badge, 'live' link (if a /living-* page exists).
+  * Inserted on /resources between TalentSearch and the 10-card grid.
+- Lint clean across all 7 modified/new files.
+- Static build: 131 pages prerendered (same count).
+- Live verification (after deploy workflow):
+  * /living-poisson/ → HTTP 200, page size 248KB (was 246KB). Contains 'Press' (3x), 'Run live' (4x), 'lazy evaluation' (3x).
+  * /resources/ → HTTP 200, page size 413KB (was 407KB). Contains 'Sector → Equations' (2x), 'Maritime' (12x), 'Fintech' (5x), 'Genomics' (26x).
+  * SkillConstellation verified bundled in JS chunks (renders inside card modal when opened).
+- Commit c343abb pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- All 10 /living-* pages now load instantly (HTML only, no Pyodide on mount). Users click 'Run live' to start the live Pyodide computation; subsequent slider drags auto-update (300ms debounce). This minimises browser resource consumption.
+- Every card modal on /elegant-code now has a tiny SkillConstellation graph showing where else each of the 3 skills shows up.
+- /connections (equation-to-equation graph) now colors nodes by primary skill — making skill families visually obvious.
+- /resources (skill-to-equation bipartite graph) now colors card nodes by equation family — making equation families visually obvious. The two graphs are complementary views of the same network.
+- /resources also has a Sector → Equations reverse index — readers entering from a specific industry (e.g., Maritime) find all the equations that touch that sector in one place.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
