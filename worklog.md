@@ -4182,3 +4182,59 @@ Stage Summary:
 - AskMeAnything widget now has a dev-mode LLM hook: in 'bun run dev', type a question, click 'Ask the AI expert', get a real LLM response from /api/ask-anything (primed with the platform's content via z-ai-web-dev-sdk). On GitHub Pages (production), the section is invisible — falls back to smart-search + external AI platform links (Gemini, Grok, Qwen AI, MiniMax, ChatGPT, Claude, Perplexity).
 - /resources now has a 'Surprise me' button that picks 3 random outcome tiles from across 60 — for serendipitous discovery.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: skill-constellation-clickable-sector-filter-sector-skills-multiseries-fold
+Agent: Super Z (main)
+Task: Make SkillConstellation nodes clickable. Add filter/search to SectorIndex. Build Sector → Skills cross-reference. Upgrade 5 specific tiles to multi-series. Implement the "fold" pattern (equation family + deeper math) inside the card modal — instead of a separate /equation-family page.
+
+Work Log:
+- Made SkillConstellation nodes clickable (src/app/_components/skill-constellation.tsx):
+  * New onCardClick?: (cardIndex: number) => void prop.
+  * D3 click handler on nodeSel — when user clicks an "other-card" node, extracts the card index from node.id (e.g., "other-12" → 12) and calls onCardClick.
+  * Cursor changes to pointer on "other-card" nodes (visual cue).
+  * Updated hint text: "Click any outer card node to navigate to that card's modal directly — surf the skill-graph by following shared talents."
+  * Wired in DatasetCards: setOpenId(targetCard.id) + setTimeout to scroll modal to top.
+- Added filter/search to SectorIndex (src/app/_components/sector-index.tsx):
+  * New filter state + filteredSectors memo.
+  * Search box with placeholder "Filter sectors — e.g., Lloyd's cargo option, AIS, Black-Scholes, Maritime navigator".
+  * Filter matches: sector name, sub-sector (outcomeSector), card title, science, skill, talent.
+  * Shows "Showing X of Y sectors (Z hidden by filter 'q')." hint.
+  * Clear (X) button when filter is non-empty.
+- Built SectorSkills cross-reference (src/app/_components/sector-skills.tsx, ~190 lines):
+  * For each sector, lists the UNIQUE skills that appear across all its cards — with the count of cards where each skill shows up.
+  * Each skill is followed by deep-link chips to the cards where it appears (color-coded by card accent).
+  * E.g., Maritime requires: Maritime navigator (3 cards), Marine underwriter (2 cards), Maritime analyst (2 cards), Maritime data engineer (1 card), etc.
+  * Inserted on /resources between SectorIndex and the 10-card grid.
+- Upgraded 5 specific outcome tiles to multi-series line charts via scripts/upgrade_to_multi_series.py (~140 lines, idempotent):
+  * Monte Carlo Fintech: MC estimate ± CI vs N (4 series: MC estimate, CI low, CI high, Black-Scholes reference line).
+  * Kalman Maritime: true position / AIS reports / Kalman estimate over 50 steps (3 series).
+  * Kalman Aviation: true altitude / ADS-B reports / Kalman estimate over 100 steps (3 series).
+  * GBM Fintech: 5 sample paths + mean ± 1σ envelope (6 series).
+  * Monte Carlo Genetics: MC p-value vs analytical p-value (2 series).
+  * Each script targets by description marker, searches backwards for the generic single-bar JSON print, replaces with multi-series JSON shaped as [{x, y, series}, ...].
+- Implemented the "fold" pattern in the card modal — equation family + deeper math revealed on demand (instead of a separate /equation-family page).
+  * New component src/app/_components/fold-section.tsx (~230 lines).
+  * FoldSection: a collapsible section with title + description + content. Collapsed by default; expands on click (animated with framer-motion). "Click to expand" hint when collapsed.
+  * EquationFamilyFold: shows the equation family for the current card + siblings in the same family (with deep-link chips to /elegant-code#card-N). 8 equation families defined: Linear Algebra (SVD/FFT/Lloyd's), Deep Learning (Attention/Gradient Descent), Probability (Poisson/Bayes/Entropy), Stochastic Processes (GBM/MC/Black-Scholes/Kalman), Numerical Methods (Verlet/Euler), Networks (PageRank/Markov), Risk Quantification (VaR), Spherical Geometry (Haversine), Fluid Dynamics (Navier-Stokes), Optimization (Kelly).
+  * DeeperMathFold: shows the full mathematical context — brief.why, "X IS Y" insight, computational tools, pointer to the Math tab on the corresponding /living-* page.
+  * Inserted in DatasetCards modal between SkillConstellation and Insight.
+  * The "fold option" leads for further code examples, mathematics (where needed), and desired or expected output — all inside the card modal, revealed only when the user asks (collapsed by default).
+- Lint clean across all 8 modified/new files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (same count). Verified in JS bundle:
+  * "Equation family" + "fold-section" present in 3 chunks (renders in modal when opened).
+  * "Linear Algebra" (4x) + "Stochastic Processes" (2x) in HTML (family names in the equation family data).
+  * 7 multi-series references in chunk 56d6cc002edcd48a.js (the 5 upgraded tiles' series data).
+- Live verification (after deploy workflow):
+  * /resources/ → HTTP 200, page size 429KB (was 422KB). Contains "Sector → Skills" (2x), "Filter sectors" (2x), "which minds each industry" (2x), "unique skills" (4x), "Maritime navigator" (6x), "Marine underwriter" (4x).
+  * /elegant-code/ → HTTP 200.
+  * /living-poisson/ → HTTP 200.
+- Commit a046369 pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- The card modal is now the central hub — fold sections reveal deeper phases of the repository (equation family + deeper math) on demand, keeping the basic content (brief, stats, code, outcomes, constellation, insight) lightweight and immediately visible.
+- SkillConstellation nodes are clickable — users can surf the skill-graph by following shared talents, jumping from one card's modal to another.
+- SectorIndex has a filter — readers can narrow the sector list by sub-sector / card title / skill.
+- SectorSkills cross-reference shows which minds each industry requires.
+- 5 specific outcome tiles now render as multi-series line charts (Monte Carlo convergence, Kalman tracking, GBM paths) — showcasing the chart-upgrade framework's value.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
