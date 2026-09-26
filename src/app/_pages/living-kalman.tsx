@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -384,6 +385,8 @@ print(f"Mean lon velocity: {est_df.lon_vel.mean():.6f} deg/s")
         { id: "living-haversine" as const, reason: "Living Haversine (cousin: port distance)" },
       ]} />
 
+
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Kalman's cousin cards (Markov, Verlet, Bayes)" }, { id: "living-haversine" as const, reason: "Haversine + Kalman = vessel tracking" }, { id: "space-science" as const, reason: "Apollo used Kalman for lunar module navigation" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Kalman card)</Link>
         <span className="text-muted-foreground">·</span>

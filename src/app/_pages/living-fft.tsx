@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -316,6 +317,8 @@ plt.savefig('fft_c_major.png', dpi=150, bbox_inches='tight')
         { id: "living-svd" as const, reason: "Living SVD (cousin: change of basis)" },
       ]} />
 
+
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See FFT's cousin cards (SVD, Poisson, Euler)" }, { id: "living-svd" as const, reason: "SVD IS the same change-of-basis as FFT" }, { id: "cryo-em" as const, reason: "FFT reconstructs 3D protein structures in cryo-EM" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (FFT card)</Link>
         <span className="text-muted-foreground">·</span>

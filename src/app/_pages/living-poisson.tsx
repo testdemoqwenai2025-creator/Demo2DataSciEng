@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend, Line, LineChart, ComposedChart,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -325,6 +326,8 @@ plt.savefig('poisson_chr22.png', dpi=150, bbox_inches='tight')
         { id: "living-entropy" as const, reason: "Living Entropy (cousin: distribution measures)" },
       ]} />
 
+
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Poisson's cousin cards (Bayes, Entropy, Markov)" }, { id: "bioinformatics-pipelines" as const, reason: "GATK uses Poisson for variant calling coverage" }, { id: "living-entropy" as const, reason: "Entropy IS the universal currency of disorder" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Poisson card)</Link>
         <span className="text-muted-foreground">·</span>

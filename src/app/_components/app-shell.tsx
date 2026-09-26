@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
 import { THOUGHT_COUNTS, TOTAL_THOUGHTS } from "../_lib/thought-counts";
 import { PAGE_DATES } from "../_lib/page-dates";
+import { THOUGHT_QUALITY } from "../_lib/thought-quality";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
@@ -152,9 +153,29 @@ const PUBLIC_REPO_URL = "https://github.com/testdemoqwenai2025-creator/Demo2Data
 const PRIVATE_REPO_URL = "https://github.com/testdemoqwenai2025-creator/AppDataSciEng2-Advance";
 
 function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () => void }) {
+  const [sortByFreshness, setSortByFreshness] = useState(false);
+
+  // When sorting by freshness, flatten all pages and sort by date.
+  const sortedGroups = sortByFreshness
+    ? [{
+        title: "Pages by last updated",
+        ids: GROUPS.flatMap(g => g.ids).sort((a, b) => {
+          const da = PAGE_DATES[a] ?? "0000-00-00";
+          const db = PAGE_DATES[b] ?? "0000-00-00";
+          return db.localeCompare(da);
+        }) as PageId[],
+      }]
+    : GROUPS;
+
   return (
     <nav aria-label="Platform sections" className="flex flex-col gap-6">
-      {GROUPS.map((g) => (
+      <button
+        onClick={() => setSortByFreshness(!sortByFreshness)}
+        className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors self-end"
+      >
+        {sortByFreshness ? "↑ Sort by section" : "↓ Sort by freshness"}
+      </button>
+      {sortedGroups.map((g) => (
         <div key={g.title} className="space-y-1">
           <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {g.title}
@@ -181,7 +202,11 @@ function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () =>
                       <span className="leading-tight flex items-center gap-1.5">
                         {page.shortLabel}
                         {THOUGHT_COUNTS[id] && (
-                          <span className="text-[8px] px-1 py-0 rounded-full bg-primary/15 text-primary font-mono shrink-0">
+                          <span className={`text-[8px] px-1 py-0 rounded-full font-mono shrink-0 ${
+                            THOUGHT_QUALITY[id] === "specific"
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                              : "bg-primary/15 text-primary"
+                          }`}>
                             {THOUGHT_COUNTS[id]}
                           </span>
                         )}

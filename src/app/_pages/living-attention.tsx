@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend, Cell,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -348,6 +349,8 @@ plt.savefig('attention_contact_map.png', dpi=150, bbox_inches='tight')
         { id: "boltz" as const, reason: "Boltz — modern protein folding (attention-based)" },
       ]} />
 
+
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Attention's cousin cards (SVD, Gradient Descent, Bayes)" }, { id: "living-svd" as const, reason: "SVD IS the Fourier transform for data (Attention cousin)" }, { id: "transformer-deep-dive" as const, reason: "Full attention architecture + AlphaFold2 evoformer" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Attention card)</Link>
         <span className="text-muted-foreground">·</span>

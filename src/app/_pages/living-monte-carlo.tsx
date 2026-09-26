@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -347,6 +348,8 @@ print(f"SPX 30-day ATM call (Black-Scholes closed-form): \${bs_price:.2f}")
         { id: "living-black-scholes" as const, reason: "Living Black-Scholes — closed-form alternative (cousin)" },
       ]} />
 
+
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Monte Carlo's cousin cards (GBM, VaR, Entropy)" }, { id: "living-gbm" as const, reason: "MC simulates GBM paths for option pricing" }, { id: "living-black-scholes" as const, reason: "MC converges to Black-Scholes closed-form" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Monte Carlo card)</Link>
         <span className="text-muted-foreground">·</span>
