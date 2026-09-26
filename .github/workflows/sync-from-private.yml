@@ -1,0 +1,146 @@
+# ============================================================
+# Sync workflow #2 — runs on the PUBLIC mirror repo (Demo2DataSciEng)
+#
+# WHY THIS EXISTS
+# ---------------
+# The original `sync-to-public.yml` runs on the PRIVATE source
+# repo (AppDataSciEng2-Advance / AppDataSci-Advanced). Free
+# GitHub accounts get 2,000 Actions minutes/month for private
+# repos; when exhausted, jobs fail at provisioning time
+# (runner_id=0, no steps, 4-second duration). Public repos
+# have UNLIMITED Actions minutes, so this workflow reliably
+# runs even when the private repo's minutes are exhausted.
+#
+# DIRECTION
+# ---------
+# This workflow PULLS from the private source repo into the
+# public mirror. It is the inverse of sync-to-public.yml,
+# which PUSHES from private to public. Either one alone is
+# sufficient; running both gives redundancy.
+#
+# SECRET REQUIRED
+# ---------------
+# Add `SYNC_FROM_PRIVATE_PAT` as a repository secret on
+# Demo2DataSciEng. The PAT must be a fine-grained or classic
+# PAT with `repo` (Contents: read) scope on
+# testdemoqwenai2025-creator/AppDataSci-Advanced. It does NOT
+# need write access to Demo2DataSciEng — the workflow uses
+# the built-in GITHUB_TOKEN to push to itself.
+# ============================================================
+name: Sync from private source
+
+on:
+  # Poll every 10 minutes — if the private repo's push-trigger
+  # can't fire (out of Actions minutes), this catches up.
+  schedule:
+    - cron: '*/10 * * * *'
+  # Allow manual trigger from the Actions tab.
+  workflow_dispatch:
+  # Allow external systems / private repo webhooks to fire it.
+  repository_dispatch:
+    types: [private-push]
+
+permissions:
+  contents: write   # push to this (public) repo
+  actions: read     # check for in-flight syncs
+
+# Only one sync at a time. Don't cancel in-flight runs — let
+# them finish so we don't end up with a half-pushed main.
+concurrency:
+  group: sync-from-private
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    # Guard: only run on the public mirror, not on private repos
+    # (where this same file will exist via mirror sync).
+    if: ${{ github.repository == 'testdemoqwenai2025-creator/Demo2DataSciEng' }}
+
+    steps:
+      - name: Sanity-check secret presence
+        env:
+          GH_PAT: ${{ secrets.SYNC_FROM_PRIVATE_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "::error::SYNC_FROM_PRIVATE_PAT secret is not set on Demo2DataSciEng."
+            echo "::error::Add it via: Settings → Secrets and variables → Actions → New repository secret."
+            echo "::error::The PAT needs 'Contents: read' on testdemoqwenai2025-creator/AppDataSci-Advanced."
+            exit 1
+          fi
+          echo "✅ SYNC_FROM_PRIVATE_PAT is set."
+
+      - name: Checkout THIS (public mirror) repo with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # Use the built-in GITHUB_TOKEN for write access to this repo.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch latest from private source
+        env:
+          GH_PAT: ${{ secrets.SYNC_FROM_PRIVATE_PAT }}
+        run: |
+          # Add the private source as a remote. PAT grants read on
+          # AppDataSci-Advanced (the canonical source-of-truth).
+          git remote add private "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/AppDataSci-Advanced.git"
+          git fetch private main --tags --force
+
+      - name: Sync main (fast-forward if possible, force if diverged)
+        run: |
+          # The public repo is a pure mirror — its main should always
+          # equal private/main. Fast-forward is preferred; if the
+          # public main has diverged (e.g. README edits made
+          # directly on public), reset it to private/main.
+          PRIVATE_HASH=$(git rev-parse private/main)
+          PUBLIC_HASH=$(git rev-parse origin/main)
+
+          echo "Private main: $PRIVATE_HASH"
+          echo "Public  main: $PUBLIC_HASH"
+
+          if [ "$PRIVATE_HASH" = "$PUBLIC_HASH" ]; then
+            echo "✅ Already in sync — nothing to do."
+            exit 0
+          fi
+
+          # Check if private/main is ahead of public main (fast-forwardable).
+          if git merge-base --is-ancestor origin/main private/main; then
+            echo "Fast-forwarding public main to private/main..."
+            git checkout -B main private/main
+          else
+            echo "⚠️ Public main has diverged from private/main — force-resetting to private/main."
+            echo "   (Public repo is a pure mirror; any direct public-side edits would be discarded.)"
+            git checkout -B main private/main
+          fi
+
+          git push --force-with-lease origin main
+          git push --tags --force origin || true
+
+      - name: Verify sync landed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Re-fetch origin to pick up the push we just made.
+          git fetch origin main --force
+          PUBLIC_HASH=$(git rev-parse origin/main)
+          PRIVATE_HASH=$(git rev-parse private/main)
+          echo "Public main now: $PUBLIC_HASH"
+          echo "Private main  : $PRIVATE_HASH"
+          if [ "$PUBLIC_HASH" != "$PRIVATE_HASH" ]; then
+            echo "::error::Sync failed — public main does not match private main."
+            exit 1
+          fi
+          echo "✅ Sync verified: public main = private main = $PUBLIC_HASH"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Pull-sync from private source FAILED."
+          echo "::error::Manual fix: from local clone, run:"
+          echo "::error::   git fetch private main && git push --force public2 private/main:main"
+          echo "::error::If 'SYNC_FROM_PRIVATE_PAT' is missing, add it via Settings → Secrets → Actions."

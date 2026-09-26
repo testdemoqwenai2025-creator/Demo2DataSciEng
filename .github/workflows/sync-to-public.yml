@@ -1,10 +1,33 @@
 # ============================================================
-# Sync workflow: AppDataSci-Advanced / AppDataSciEng2-Advance (private) → Demo2DataSciEng (public)
-# On every push to main, mirror the commit to the public preview repo.
+# Sync workflow #1 — runs on the PRIVATE source repos
+# (AppDataSci-Advanced and AppDataSciEng2-Advance)
 #
-# This workflow runs on BOTH private repos (AppDataSci-Advanced and
-# AppDataSciEng2-Advance) so it doesn't matter which one we push to —
-# the sync always fires.
+# On every push to main, mirror the commit to the public
+# preview repo (Demo2DataSciEng).
+#
+# ⚠️ FAILURE MODE
+# ---------------
+# Free GitHub accounts get 2,000 Actions minutes/month for
+# PRIVATE repos. When the quota is exhausted, jobs fail at
+# provisioning time (runner_id=0, no steps, 4-second
+# duration). When that happens, this workflow is silently
+# dead — see sync-from-private.yml for the fallback that
+# runs on the PUBLIC repo (unlimited Actions minutes).
+#
+# WHY PATHS-IGNORE
+# -----------------
+# We ignore commits that touch ONLY .github/workflows/** and
+# the worklog — these are mechanical sync commits that don't
+# change the deployed site, so firing the mirror would just
+# waste Actions minutes on a no-op.
+#
+# SECRET REQUIRED
+# ---------------
+# Add `SYNC_TO_PUBLIC_PAT` as a repository secret on BOTH
+# private repos. The PAT needs 'Contents: write' scope on
+# testdemoqwenai2025-creator/Demo2DataSciEng. We do NOT fall
+# back to GITHUB_TOKEN — that token is scoped to the current
+# repo only and CANNOT push cross-repo.
 # ============================================================
 name: Mirror to public preview repo
 
@@ -12,6 +35,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      # Don't fire on workflow-only commits (avoids sync loops
+      # when this workflow gets updated).
+      - '.github/workflows/**'
+      # Don't fire on pure-worklog commits — they don't affect
+      # the deployed site.
+      - 'worklog.md'
   workflow_dispatch:
 
 permissions:
@@ -20,12 +50,28 @@ permissions:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    # Only run on private repos — not on Demo2DataSciEng (public).
+    # Only run on the private source repos — never on Demo2DataSciEng.
+    # This prevents infinite mirror loops (the public mirror has this
+    # file too, but no SYNC_TO_PUBLIC_PAT secret on the public side).
     if: |
       github.repository == 'testdemoqwenai2025-creator/AppDataSciEng2-Advance' ||
       github.repository == 'testdemoqwenai2025-creator/AppDataSci-Advanced'
+
     steps:
-      - name: Checkout source
+      - name: Sanity-check secret presence (fail fast if missing)
+        env:
+          GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "::error::SYNC_TO_PUBLIC_PAT secret is not set on ${{ github.repository }}."
+            echo "::error::Add it via: Settings → Secrets and variables → Actions → New repository secret."
+            echo "::error::The PAT needs 'Contents: write' on testdemoqwenai2025-creator/Demo2DataSciEng."
+            echo "::error::The GITHUB_TOKEN fallback was removed — it CANNOT push cross-repo."
+            exit 1
+          fi
+          echo "✅ SYNC_TO_PUBLIC_PAT is set."
+
+      - name: Checkout source (full history for tags + force-push)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -40,31 +86,56 @@ jobs:
         env:
           GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
         run: |
-          # Try to push to Demo2DataSciEng using the PAT secret.
-          # If SYNC_TO_PUBLIC_PAT is not set, fall back to GITHUB_TOKEN.
-          TOKEN="${GH_PAT:-${{ secrets.GITHUB_TOKEN }}}"
-          git remote add public "https://x-access-token:${TOKEN}@github.com/testdemoqwenai2025-creator/Demo2DataSciEng.git" || true
-          git fetch public main || true
-          # Force-push main → main (public repo is a pure mirror)
-          git push --force public refs/heads/main:refs/heads/main
-          git push --tags --force public || true
+          # No silent GITHUB_TOKEN fallback — it cannot push cross-repo.
+          # If SYNC_TO_PUBLIC_PAT is missing, the sanity-check step above
+          # already failed the job.
+          git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/Demo2DataSciEng.git" || true
 
-      - name: Verify sync succeeded
-        run: |
-          # Fetch the public repo to verify the push landed
+          # Fetch first so we have a local ref to compare against.
+          # Don't `|| true` — if fetch fails, we want to know.
           git fetch public main
+
+          # If public/main is already at HEAD, no-op (saves Actions minutes).
           PUBLIC_HASH=$(git rev-parse public/main)
           SOURCE_HASH=$(git rev-parse HEAD)
           if [ "$PUBLIC_HASH" = "$SOURCE_HASH" ]; then
-            echo "✅ Sync verified: public main = $PUBLIC_HASH"
-          else
-            echo "⚠️ Sync mismatch: source=$SOURCE_HASH, public=$PUBLIC_HASH"
-            echo "::warning::Sync may have failed — re-check manually."
+            echo "✅ Public main already at $SOURCE_HASH — nothing to push."
+            exit 0
           fi
+
+          # Mirror is one-way: private → public, always overwrite main on public.
+          # Plain --force is intentional — the public repo is a pure preview
+          # mirror; only this workflow is allowed to push to it (enforced via
+          # branch protection on the public repo).
+          git push --force public refs/heads/main:refs/heads/main
+          git push --tags --force public || true
+
+      - name: Verify sync landed (exit 1 on mismatch so failure() triggers)
+        env:
+          GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
+        run: |
+          # Re-fetch public to pick up the push we just made.
+          git fetch public main --force
+          PUBLIC_HASH=$(git rev-parse public/main)
+          SOURCE_HASH=$(git rev-parse HEAD)
+          echo "Public main now: $PUBLIC_HASH"
+          echo "Source head  : $SOURCE_HASH"
+          if [ "$PUBLIC_HASH" != "$SOURCE_HASH" ]; then
+            echo "::error::Sync failed — public main does not match source head."
+            echo "::error::This is the most likely indicator of a stale PAT, expired token,"
+            echo "::error::or branch protection preventing force-push on Demo2DataSciEng."
+            exit 1
+          fi
+          echo "✅ Sync verified: public main = source head = $PUBLIC_HASH"
 
       - name: Notify on failure
         if: failure()
         run: |
           echo "::error::Mirror sync FAILED — the public repo (Demo2DataSciEng) may be out of date."
-          echo "::error::Manual fix: push directly to Demo2DataSciEng from local."
-          echo "::error::  git push public2 main --force"
+          echo "::error::Possible causes:"
+          echo "::error::  1. Actions minutes exhausted on private repo (free quota = 2000 min/month)."
+          echo "::error::     → Fix: use the sync-from-private.yml workflow on Demo2DataSciEng instead."
+          echo "::error::  2. SYNC_TO_PUBLIC_PAT expired or revoked."
+          echo "::error::  3. Branch protection on Demo2DataSciEng prevents force-push."
+          echo "::error::Manual fix: from local, run:"
+          echo "::error::   git push public2 main --force"
