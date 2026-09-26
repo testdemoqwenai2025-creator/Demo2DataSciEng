@@ -5,6 +5,7 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { SkillGraph } from "../_components/skill-graph";
 import { TalentSearch } from "../_components/talent-search";
 import { SectorIndex } from "../_components/sector-index";
+import { SurpriseMe } from "../_components/surprise-me";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -214,6 +215,16 @@ export function ResourcesPage() {
         badge="search 60 tiles"
       >
         <TalentSearch />
+      </SectionCard>
+
+      {/* Surprise me — serendipitous discovery of 3 random outcome tiles */}
+      <SectionCard
+        title="Surprise me — 3 random outcome tiles for serendipitous discovery"
+        description="Don't know what to search for? Press 'Surprise me' to pick 3 random outcome tiles from the platform's 60 (20 cards × 3 outcomes). Each pick is a different science × sector × skill × talent combination. Useful when you're exploring without a specific question — let randomness surface connections you wouldn't have thought to look for. Press 'Reshuffle' for 3 more."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="60 tiles"
+      >
+        <SurpriseMe />
       </SectionCard>
 
       {/* Sector → Equations reverse index */}

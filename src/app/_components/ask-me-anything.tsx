@@ -213,6 +213,12 @@ export function AskMeAnything() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  // Dev-mode LLM hook: only active when NODE_ENV === 'development'
+  // (replaced at build time — production builds tree-shake this branch).
+  const isDev = process.env.NODE_ENV === "development";
+  const [llmAnswer, setLlmAnswer] = useState<string | null>(null);
+  const [llmLoading, setLlmLoading] = useState(false);
+  const [llmError, setLlmError] = useState<string | null>(null);
 
   // Build the search index once (not ref-based to satisfy react-hooks rules).
   const searchIndex = useMemo(() => buildSearchIndex(), []);
@@ -244,6 +250,37 @@ export function AskMeAnything() {
       return () => clearTimeout(t);
     }
   }, [isSearching, query]);
+
+  // Dev-mode LLM call: POST to /api/ask-anything
+  const callLLM = async (question: string) => {
+    if (!isDev || !question.trim()) return;
+    setLlmLoading(true);
+    setLlmError(null);
+    setLlmAnswer(null);
+    try {
+      const res = await fetch("/api/ask-anything", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        setLlmError(`API error ${res.status}: ${txt}`);
+        return;
+      }
+      const data = await res.json() as { answer?: string; error?: string };
+      if (data.error) {
+        setLlmError(data.error);
+      } else {
+        setLlmAnswer(data.answer ?? "(empty response)");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setLlmError(msg);
+    } finally {
+      setLlmLoading(false);
+    }
+  };
 
   return (
     <>
@@ -406,6 +443,49 @@ export function AskMeAnything() {
                         </p>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Dev-mode LLM hook — only renders in development (NODE_ENV === 'development').
+                    On GitHub Pages (production), this branch is tree-shaken at build time,
+                    so the static site doesn't show a section that 404s. */}
+                {isDev && query.trim().length > 1 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                      <Brain className="h-3 w-3 text-primary" />
+                      Ask the platform's AI expert (dev mode — powered by /api/ask-anything)
+                    </p>
+                    <button
+                      onClick={() => callLLM(query)}
+                      disabled={llmLoading}
+                      className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {llmLoading ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Brain className="h-3 w-3" />
+                      )}
+                      {llmLoading ? "Thinking…" : "Ask the AI expert"}
+                    </button>
+                    {llmError && (
+                      <div className="mt-2 rounded-md border border-rose-500/40 bg-rose-500/5 p-2.5 text-[11px] text-rose-700 dark:text-rose-300 font-mono">
+                        <p className="font-semibold">LLM call failed:</p>
+                        <p className="mt-1 whitespace-pre-wrap">{llmError}</p>
+                      </div>
+                    )}
+                    {llmAnswer && !llmLoading && (
+                      <div className="mt-2 rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5 text-[11px] text-foreground/80 leading-relaxed">
+                        <p className="font-semibold text-emerald-700 dark:text-emerald-300 mb-1 flex items-center gap-1">
+                          <Brain className="h-3 w-3" /> AI expert answer (via /api/ask-anything):
+                        </p>
+                        <div className="whitespace-pre-wrap">{llmAnswer}</div>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-muted-foreground italic mt-2">
+                      The LLM is primed with the platform's 20 cards + 60 outcome tiles context.
+                      In production (GitHub Pages), this section is hidden — the API route 404s.
+                      Use the external AI platforms below instead.
+                    </p>
                   </div>
                 )}
 

@@ -196,7 +196,7 @@ function MultiLangCode({ tabs, runnablePython }: { tabs: LangTab[]; runnablePyth
 
 function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: string }) {
   const [chartData, setChartData] = useState<unknown>(null);
-  const [chartType, setChartType] = useState<"bar" | "line" | null>(null);
+  const [chartType, setChartType] = useState<"bar" | "line" | "multi-line" | null>(null);
 
   // Try to parse the stdout as JSON and infer chart type from the structure.
   const handleOutput = (stdout: string) => {
@@ -206,26 +206,41 @@ function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: st
     try {
       const parsed = JSON.parse(lastLine);
       // Detect chart shape:
-      // - Array of {x, y, [label]} objects → bar or line chart
+      // - Array of {x, y, [series]} → if 'series' field exists, multi-line; else single line
+      // - Array of {label, value} → bar chart
       // - Object with "chart_type" field → use that
-      // - Object with array values → multi-series
+      // - Object with "series" field → multi-series line chart
       if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "object") {
         const first = parsed[0];
         const hasXY = "x" in first && "y" in first;
         const hasLabelValue = "label" in first && "value" in first;
+        const hasSeries = "series" in first;
+        if (hasXY && hasSeries) {
+          // Multi-series line: [{x, y, series}, ...] — group by series.
+          setChartData(parsed);
+          setChartType("multi-line");
+          return;
+        }
         if (hasXY || hasLabelValue) {
           setChartData(parsed);
-          setChartType("bar");
+          setChartType(hasLabelValue ? "bar" : "line");
           return;
         }
       }
       if (parsed && typeof parsed === "object" && "chart_type" in parsed) {
         const t = (parsed as { chart_type: string }).chart_type;
-        if (t === "bar" || t === "line") {
+        if (t === "bar" || t === "line" || t === "multi-line") {
           setChartData(parsed);
           setChartType(t);
           return;
         }
+      }
+      // Object with explicit "series" array → multi-series line chart
+      if (parsed && typeof parsed === "object" && "series" in parsed
+          && Array.isArray((parsed as { series: unknown[] }).series)) {
+        setChartData(parsed);
+        setChartType("multi-line");
+        return;
       }
       // Not a recognised chart shape — keep text output.
       setChartData(null);
@@ -288,6 +303,86 @@ function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: st
           </ResponsiveContainer>
         </div>
       )}
+      {/* Multi-series line chart: array of {x, y, series} → group by series */}
+      {chartData !== null && chartType === "multi-line" && Array.isArray(chartData) && (() => {
+        const rows = chartData as Array<{ x: number | string; y: number; series: string }>;
+        // Pivot: rows → {x, [series1]: y1, [series2]: y2, ...}
+        const xValues = Array.from(new Set(rows.map((r) => r.x)));
+        const seriesNames = Array.from(new Set(rows.map((r) => r.series)));
+        const pivotData = xValues.map((x) => {
+          const row: Record<string, number | string> = { x };
+          for (const sn of seriesNames) {
+            const match = rows.find((r) => r.x === x && r.series === sn);
+            row[sn] = match ? match.y : 0;
+          }
+          return row;
+        });
+        // Distinct colors per series (cycle through hues).
+        const seriesColors = ["#2563eb", "#dc2626", "#16a34a", "#ca8a04", "#9333ea", "#0891b2"];
+        return (
+          <div style={{ width: "100%", height: 200 }}>
+            <ResponsiveContainer>
+              <LineChart data={pivotData} margin={{ top: 4, right: 8, bottom: 16, left: 0 }}>
+                <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                <XAxis dataKey="x" stroke="hsl(var(--muted-foreground))" fontSize={9} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={9} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 9 }} />
+                {seriesNames.map((sn, i) => (
+                  <Line
+                    key={sn}
+                    type="monotone"
+                    dataKey={sn}
+                    stroke={seriesColors[i % seriesColors.length]}
+                    strokeWidth={1.5}
+                    dot={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })()}
+      {/* Multi-series line chart: object with explicit "series" array of {name, data: [{x, y}]} */}
+      {chartData !== null && chartType === "multi-line" && !Array.isArray(chartData)
+        && typeof chartData === "object" && "series" in (chartData as Record<string, unknown>)
+        && Array.isArray((chartData as { series: unknown }).series) && (() => {
+        const obj = chartData as { series: Array<{ name: string; color?: string; data: Array<{ x: number | string; y: number }> }> };
+        // Pivot: series[] → {x, [series1.name]: y1, ...}
+        const xValues = Array.from(new Set(obj.series.flatMap((s) => s.data.map((d) => d.x))));
+        const pivotData = xValues.map((x) => {
+          const row: Record<string, number | string | undefined> = { x };
+          for (const s of obj.series) {
+            const match = s.data.find((d) => d.x === x);
+            row[s.name] = match ? match.y : undefined;
+          }
+          return row;
+        });
+        const fallbackColors = ["#2563eb", "#dc2626", "#16a34a", "#ca8a04", "#9333ea", "#0891b2"];
+        return (
+          <div style={{ width: "100%", height: 200 }}>
+            <ResponsiveContainer>
+              <LineChart data={pivotData} margin={{ top: 4, right: 8, bottom: 16, left: 0 }}>
+                <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                <XAxis dataKey="x" stroke="hsl(var(--muted-foreground))" fontSize={9} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={9} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 9 }} />
+                {obj.series.map((s, i) => (
+                  <Line
+                    key={s.name}
+                    type="monotone"
+                    dataKey={s.name}
+                    stroke={s.color ?? fallbackColors[i % fallbackColors.length]}
+                    strokeWidth={1.5}
+                    dot={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })()}
       <p className="text-[10px] text-muted-foreground leading-relaxed">{outcome.description}</p>
     </div>
   );
