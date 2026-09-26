@@ -13,7 +13,7 @@ import {
 import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
 import { SkillConstellation } from "./skill-constellation";
-import { FoldSection, EquationFamilyFold, DeeperMathFold } from "./fold-section";
+import { FoldSection, EquationFamilyFold, DeeperMathFold, ProductionPatternsFold, CitationsFold, ExpectedOutputFold } from "./fold-section";
 
 /**
  * DatasetCards — reusable cards-with-lazy-popups component for showing
@@ -623,7 +623,6 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
                   <EquationFamilyFold
                     cardIndex={openIdx}
                     onCardClick={(targetIdx) => {
-                      // Switch the modal to the clicked sibling card (same as SkillConstellation).
                       const targetCard = examples[targetIdx];
                       if (targetCard) {
                         setOpenId(targetCard.id);
@@ -635,6 +634,9 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
                     }}
                   />
                   <DeeperMathFold cardIndex={openIdx} />
+                  <ProductionPatternsFold cardIndex={openIdx} />
+                  <ExpectedOutputFold cardIndex={openIdx} />
+                  <CitationsFold cardIndex={openIdx} />
                 </div>
               ) : null;
             })()}

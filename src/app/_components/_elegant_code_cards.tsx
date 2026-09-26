@@ -98,7 +98,8 @@ for pop in ['AFR', 'EUR', 'EAS', 'SAS']:
     chart_data.append({"label": pop, "value": round(mean_pc1, 3)})
 print(json.dumps(chart_data))`,
         description: "The top-3 principal components of the 1000-Genomes chr-22 matrix recover the 4-population structure: AFR has positive PC1 (the migration 'signature'), others negative. A computational biologist reads this scatter and sees human migration patterns in linear algebra.",
-      },
+          math: `A = U \\Sigma V^T \\quad \\text{where} \\quad A \\in \\mathbb{R}^{m \\times n}, \\; U \\in \\mathbb{R}^{m \\times m}, \\; \\Sigma \\in \\mathbb{R}^{m \\times n}, \\; V^T \\in \\mathbb{R}^{n \\times n} \\\\ \\Sigma = \\text{diag}(\\sigma_1, \\sigma_2, \\ldots, \\sigma_r), \\quad \\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r \\geq 0 \\\\ U^T U = I, \\quad V^T V = I \\quad \\text{(orthogonal)} \\\\ \\text{Eckart-Young:} \\quad \\min_{\\text{rank}(B) \\leq k} \\|A - B\\|_F = \\|A - U_k \\Sigma_k V_k^T\\|_F = \\sqrt{\\sum_{i=k+1}^{r} \\sigma_i^2}`,
+},
       {
         science: "Audio",
         sector: "C-major chord (C4+E4+G4 at 44.1kHz)",
@@ -502,7 +503,8 @@ print("Top-3 attention partners per position (proxy for contact map):")
 for i in [2, 5, 8, 11]:
     ranked = sorted(range(n_pos), key=lambda j: A[i][j], reverse=True)[:3]
     is_contact = any((i,c) in contacts or (c,i) in contacts for c in ranked)
-    print(f"  pos {i:2d}: top-3 = {ranked}, true contact: {any((i,c) in contacts or (c,i) in contacts for c in ranked)}")
+    print(f"  pos {i:2d}: top-3 = {ranked    ,
+}, true contact: {any((i,c) in contacts or (c,i) in contacts for c in ranked)}")
 print("Insight: Attention rediscovers the 4 contact pairs from co-variation alone")
 
 # Final line: JSON output for chart rendering (bar chart of contact detection rates)
@@ -518,7 +520,8 @@ chart_data = [
 ]
 print(json.dumps(chart_data))`,
         description: "The attention matrix on a protein MSA finds co-evolving residue pairs — positions that mutate together are in physical contact. A structural biologist reads the attention matrix as a contact map: the SAME operation that parses language parses protein folds.",
-      },
+          math: `\\text{Attention}(Q, K, V) = \\text{softmax}\\!\\left(\\frac{Q K^T}{\\sqrt{d_k}}\\right) V \\\\ Q = X W_Q, \\quad K = X W_K, \\quad V = X W_V \\\\ \\text{softmax}(z)_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}} \\\\ \\text{Multi-head:} \\quad \\text{head}_i = \\text{Attention}(Q W_i^Q, K W_i^K, V W_i^V)`,
+},
       {
         science: "NLP",
         sector: "GPT-4 self-attention on English sentences",
@@ -928,7 +931,8 @@ for k in [5, 10, 14, 20, 25]:
     chart_data.append({"label": f"k={k}", "value": round(poisson_pmf(k, lam)*100, 2)})
 print(json.dumps(chart_data))`,
         description: "At λ=14 (mean coverage), P(≥10 reads) = 95% — the threshold GATK uses to confidently call variants. A bioinformatician reads the Poisson tail and sees the trade-off: more reads = more confidence = more cost. The math dictates the experimental design.",
-      },
+          math: `P(k \\mid \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!} \\quad \\text{for} \\; k = 0, 1, 2, \\ldots \\\\ \\mathbb{E}[X] = \\lambda, \\quad \\text{Var}(X) = \\lambda \\\\ F(k) = P(X \\leq k) = \\sum_{i=0}^{k} \\frac{\\lambda^i e^{-\\lambda}}{i!} = \\frac{\\Gamma(k+1, \\lambda)}{k!} \\\\ \\text{Law of rare events:} \\quad \\lim_{\\substack{N \\to \\infty \\\\ p \\to 0 \\\\ Np = \\lambda}} \\binom{N}{k} p^k (1-p)^{N-k} = \\frac{\\lambda^k e^{-\\lambda}}{k!}`,
+},
       {
         science: "Networks",
         sector: "Server load (λ requests/sec)",
@@ -1321,7 +1325,8 @@ for note in notes:
     chart_data.append({"label": f"{int(note)} Hz", "value": 1 if detected else 0})
 print(json.dumps(chart_data))`,
         description: "The DFT of a 1024-sample C-major chord produces a spectrum with 3 sharp peaks at 262, 330, 392 Hz. An audio engineer sees these and recognises C4, E4, G4 — FFT separated the mixed signal into its constituent notes, without prior knowledge of what frequencies to look for.",
-      },
+          math: `X[k] = \\sum_{n=0}^{N-1} x[n] \\, e^{-2\\pi i k n / N} \\quad \\text{for} \\; k = 0, 1, \\ldots, N-1 \\\\ \\text{Cooley-Tukey (radix-2):} \\quad X[k] = X_{\\text{even}}[k] + \\omega_N^k X_{\\text{odd}}[k] \\\\ \\text{where} \\; \\omega_N = e^{-2\\pi i / N} \\quad \\text{(primitive Nth root of unity)} \\\\ \\text{Complexity:} \\quad T(N) = 2T(N/2) + O(N) = O(N \\log N) \\\\ \\text{Parseval:} \\quad \\sum_{n=0}^{N-1} |x[n]|^2 = \\frac{1}{N} \\sum_{k=0}^{N-1} |X[k]|^2`,
+},
       {
         science: "Mass Spectrometry",
         sector: "Compound identification via m/z peaks",
@@ -1774,9 +1779,11 @@ print(f"Min amplitude: {min(positions):.4f} (analytical: ~1.0)")
 print("Insight: Verlet preserves energy (no drift) — symplectic property")
 
 # Final line: JSON output for chart rendering
-print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, float)) else 0}, {"label": "error", "value": float(error) if isinstance(error, (int, float)) else 0}]))`,
+print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, float)) else 0    ,
+}, {"label": "error", "value": float(error) if isinstance(error, (int, float)) else 0}]))`,
         description: "Verlet integration on a harmonic oscillator stays bounded (no energy drift) because of the symplectic property. A computational biologist sees: long MD runs (10⁶ steps) won't accumulate error. The same formula simulates protein folding at AMBER.",
-      },
+          math: `\\mathbf{r}(t + \\Delta t) = 2\\mathbf{r}(t) - \\mathbf{r}(t - \\Delta t) + \\frac{\\mathbf{F}(t)}{m} \\Delta t^2 \\\\ \\text{Verlet is symplectic} \\implies \\text{phase-space volume preserved} \\implies \\Delta H = 0`,
+},
       {
         science: "Game Physics",
         sector: "Havok ragdoll physics (60 FPS)",
@@ -2243,7 +2250,8 @@ print("Insight: tiny perturbation grows ~5x → chaos (butterfly effect)")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "divergence", "value": float(divergence) if isinstance(divergence, (int, float)) else 0}]))`,
         description: "A tiny 0.001 perturbation in initial conditions grows ~5x over 500 steps — the butterfly effect. An atmospheric scientist sees: this is why weather is unpredictable past 10 days. The same non-linear advection term u·∇u makes turbulence beautiful and weather chaotic.",
-      },
+          math: `\\rho \\left( \\frac{\\partial \\mathbf{u}}{\\partial t} + \\mathbf{u} \\cdot \\nabla \\mathbf{u} \\right) = -\\nabla p + \\mu \\nabla^2 \\mathbf{u} + \\mathbf{f} \\\\ \\nabla \\cdot \\mathbf{u} = 0 \\quad \\text{(incompressibility)} \\\\ \\text{Reynolds number:} \\quad Re = \\frac{\\rho v L}{\\mu} \\\\ Re \\ll 1: \\text{laminar} \\quad Re \\gg 1: \\text{turbulent} \\\\ \\text{Clay Millennium Prize: existence and uniqueness of smooth solutions (unsolved)}`,
+},
       {
         science: "Hemodynamics",
         sector: "Patient-specific artery CFD (10⁶ mesh elements)",
@@ -2552,7 +2560,8 @@ print(f"\\\\nGPT-4: same update, 175B params, 300B tokens, 1024 A100 GPUs")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "x", "value": float(x) if isinstance(x, (int, float)) else 0}]))`,
         description: "Gradient descent on a quadratic loss converges exponentially. An ML engineer sees: GPT-4 training is the SAME update rule with 175B parameters and 300B tokens. The loss landscape IS the geometry — same shape as fitness landscapes and energy landscapes.",
-      },
+          math: `\\boldsymbol{\\theta}_{t+1} = \\boldsymbol{\\theta}_t - \\eta \\nabla_{\\theta} \\mathcal{L}(\\boldsymbol{\\theta}_t) \\\\ \\text{Convergence:} \\quad \\mathcal{L}(\\theta_t) - \\mathcal{L}(\\theta^*) \\leq \\frac{\\|\\theta_0 - \\theta^*\\|^2}{2 \\eta t} \\quad \\text{(convex, smooth)} \\\\ \\text{Adam:} \\quad m_t = \\beta_1 m_{t-1} + (1-\\beta_1) g_t \\\\ v_t = \\beta_2 v_{t-1} + (1-\\beta_2) g_t^2 \\\\ \\theta_{t+1} = \\theta_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}`,
+},
       {
         science: "Evolution",
         sector: "Fitness landscape over genotype space",
@@ -2863,7 +2872,8 @@ print("Insight: Bayesian update IS clinical genetics — prior + test → risk")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "BRCA1 test result updates lifetime breast cancer risk from 12.5% (prior) to 250% (impossible!) — wait, that's wrong. Let me redo. With a confirmed pathogenic BRCA1 variant, posterior = 0.02*0.125/0.001 = 2.5 → cap at 100% means ~55-65% lifetime risk (real value). A medical geneticist sees: Bayes turns a population prior into an individual risk.",
-      },
+          math: `P(H \\mid D) = \\frac{P(D \\mid H) \\, P(H)}{P(D)} \\\\ \\text{where:} \\quad P(H) = \\text{prior}, \\; P(D \\mid H) = \\text{likelihood}, \\; P(H \\mid D) = \\text{posterior} \\\\ \\text{Marginal:} \\quad P(D) = \\sum_i P(D \\mid H_i) P(H_i) \\\\ \\text{Odds form:} \\quad \\underbrace{\\frac{P(H_1 \\mid D)}{P(H_0 \\mid D)}}_{\\text{posterior odds}} = \\underbrace{\\frac{P(D \\mid H_1)}{P(D \\mid H_0)}}_{\\text{Bayes factor}} \\times \\underbrace{\\frac{P(H_1)}{P(H_0)}}_{\\text{prior odds}}`,
+},
       {
         science: "Spam Filtering",
         sector: "Gmail spam classifier",
@@ -3162,9 +3172,11 @@ print(f"\\\\nWith dt={dt_unstable} (above stability limit): y diverges to {y:.2e
 print("Insight: Euler has stability limit dt < 2/|lambda|")
 
 # Final line: JSON output for chart rendering
-print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, float)) else 0}, {"label": "y_euler", "value": float(y_euler) if isinstance(y_euler, (int, float)) else 0}, {"label": "analytical", "value": float(analytical) if isinstance(analytical, (int, float)) else 0}, {"label": "dt_unstable", "value": float(dt_unstable) if isinstance(dt_unstable, (int, float)) else 0}, {"label": "y", "value": float(y) if isinstance(y, (int, float)) else 0}]))`,
+print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, float)) else 0    ,
+}, {"label": "y_euler", "value": float(y_euler) if isinstance(y_euler, (int, float)) else 0}, {"label": "analytical", "value": float(analytical) if isinstance(analytical, (int, float)) else 0}, {"label": "dt_unstable", "value": float(dt_unstable) if isinstance(dt_unstable, (int, float)) else 0}, {"label": "y", "value": float(y) if isinstance(y, (int, float)) else 0}]))`,
         description: "Euler integration on dy/dt = -y converges to exp(-t) but accumulates error. With dt > 2/|λ| it blows up. A numerical analyst sees: Euler IS the seed of all integration. Every other method (RK4, Adams-Bashforth, Verlet) is Euler + higher-order corrections.",
-      },
+          math: `y(t + \\Delta t) = y(t) + f(t, y(t)) \\Delta t \\\\ \\text{Stability:} \\quad |1 + \\lambda \\Delta t| \\leq 1 \\implies \\Delta t \\leq 2/|\\lambda|`,
+},
       {
         science: "Game Physics",
         sector: "Unity fixed-step physics (60 FPS)",
@@ -3451,7 +3463,8 @@ sorted_freqs = sorted(freqs.items(), key=lambda x: -x[1])[:6]
 chart_data = [{"label": letter, "value": p} for letter, p in sorted_freqs]
 print(json.dumps(chart_data))`,
         description: "Shannon entropy of English letters is ~4.18 bits/letter (vs 4.70 for uniform). The redundancy (11%) is why zip compresses text by ~50%. An information theorist sees H = -Σp log p as the universal compression limit — the boundary between information and redundancy.",
-      },
+          math: `H(X) = -\\sum_{i=1}^{n} p_i \\log p_i \\quad \\text{(Shannon 1948)} \\\\ S = k_B \\ln W \\quad \\text{(Boltzmann 1877)} \\\\ \\text{Additivity:} \\quad H(X, Y) = H(X) + H(Y \\mid X) \\\\ \\text{Max entropy (uniform):} \\quad H_{\\max} = \\log n \\\\ \\text{KL divergence:} \\quad D_{\\text{KL}}(P \\| Q) = \\sum_i p_i \\log \\frac{p_i}{q_i} \\\\ \\text{Mutual information:} \\quad I(X; Y) = H(X) + H(Y) - H(X, Y)`,
+},
       {
         science: "Thermodynamics",
         sector: "Boltzmann gas (S = k·log W)",
@@ -3755,7 +3768,8 @@ d1 = (math.log(S/K) + (r + 0.5*sigma**2)*T) / (sigma * math.sqrt(T))
 d2 = d1 - sigma * math.sqrt(T)
 C = S * norm_cdf(d1) - K * math.exp(-r*T) * norm_cfd2 if False else S * norm_cdf(d1) - K * math.exp(-r*T) * norm_cdf(d2)
 print(f"SPX 30-day ATM call:")
-print(f"  S=\\\${S}, K=\\\${K}, T={T:.4f}yr, r={r}, sigma={sigma}")
+print(f"  S=\\\${S    ,
+}, K=\\\${K}, T={T:.4f}yr, r={r}, sigma={sigma}")
 print(f"  d1 = {d1:.4f}, d2 = {d2:.4f}")
 print(f"  C = \\\${C:.2f}")
 # ATM approximation: C ≈ S * sigma * sqrt(T) / sqrt(2*pi)
@@ -3766,7 +3780,8 @@ print(f"\\\\nCME: 4M contracts/day × \\\${C}/contract = \\\${C*4e6/1e9:.1f}B da
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "S", "value": float(S) if isinstance(S, (int, float)) else 0}, {"label": "K", "value": float(K) if isinstance(K, (int, float)) else 0}, {"label": "T", "value": float(T) if isinstance(T, (int, float)) else 0}, {"label": "r", "value": float(r) if isinstance(r, (int, float)) else 0}, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "d1", "value": float(d1) if isinstance(d1, (int, float)) else 0}, {"label": "d2", "value": float(d2) if isinstance(d2, (int, float)) else 0}, {"label": "C", "value": float(C) if isinstance(C, (int, float)) else 0}, {"label": "approx", "value": float(approx) if isinstance(approx, (int, float)) else 0}]))`,
         description: "Black-Scholes prices an SPX 30-day ATM call at ~$43. A quant sees: the same formula prices $10B+ daily at CME. Implied volatility (σ) is the only unobservable — traders invert Black-Scholes to find the market's expectation of future volatility.",
-      },
+          math: `C = S N(d_1) - K e^{-rT} N(d_2) \\\\ d_1 = \\frac{\\ln(S/K) + (r + \\sigma^2/2)T}{\\sigma \\sqrt{T}}, \\quad d_2 = d_1 - \\sigma \\sqrt{T} \\\\ \\text{ATM approx:} \\quad C \\approx \\frac{S \\sigma \\sqrt{T}}{\\sqrt{2\\pi}}`,
+},
       {
         science: "Maritime",
         sector: "Lloyd's 90-day cargo-route option (10^4 routes/year)",
@@ -4050,9 +4065,11 @@ print(f"Suez saves: {cape_distance-suez_distance:.0f} km ({(cape_distance-suez_d
 print("Insight: Suez blockage (Ever Given 2021) reroutes 1000s of vessels")
 
 # Final line: JSON output for chart rendering
-print(json.dumps([{"label": "d", "value": float(d) if isinstance(d, (int, float)) else 0}, {"label": "vessel_days", "value": float(vessel_days) if isinstance(vessel_days, (int, float)) else 0}, {"label": "suez_distance", "value": float(suez_distance) if isinstance(suez_distance, (int, float)) else 0}, {"label": "cape_distance", "value": float(cape_distance) if isinstance(cape_distance, (int, float)) else 0}]))`,
+print(json.dumps([{"label": "d", "value": float(d) if isinstance(d, (int, float)) else 0    ,
+}, {"label": "vessel_days", "value": float(vessel_days) if isinstance(vessel_days, (int, float)) else 0}, {"label": "suez_distance", "value": float(suez_distance) if isinstance(suez_distance, (int, float)) else 0}, {"label": "cape_distance", "value": float(cape_distance) if isinstance(cape_distance, (int, float)) else 0}]))`,
         description: "Rotterdam→Singapore is 16,500 km via Suez (vs 21,500 via Cape of Good Hope). A maritime navigator sees: the Suez Canal saves 5,000 km and ~5 days per transit. The 2021 Ever Given blockage rerouted thousands of vessels via the Cape — the same haversine math.",
-      },
+          math: `d = 2R \\arcsin\\!\\left(\\sqrt{\\sin^2\\!\\left(\\frac{\\Delta\\varphi}{2}\\right) + \\cos\\varphi_1 \\cos\\varphi_2 \\sin^2\\!\\left(\\frac{\\Delta\\lambda}{2}\\right)}\\right) \\\\ R = 6371 \\text{ km (Earth)} \\text{ or } 1 \\text{ (unit sphere)}`,
+},
       {
         science: "Aviation",
         sector: "LHR → JFK (polar route in winter, 5,550 km)",
@@ -4336,9 +4353,11 @@ print(f"  → {math.exp(g_half)-1:.2%} annual (less growth, less drawdown)")
 print("Insight: Kelly IS the universal bet-sizing rule — maximises log-wealth")
 
 # Final line: JSON output for chart rendering
-print(json.dumps([{"label": "mu", "value": float(mu) if isinstance(mu, (int, float)) else 0}, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "f_kelly", "value": float(f_kelly) if isinstance(f_kelly, (int, float)) else 0}, {"label": "g_kelly", "value": float(g_kelly) if isinstance(g_kelly, (int, float)) else 0}, {"label": "g_half", "value": float(g_half) if isinstance(g_half, (int, float)) else 0}]))`,
+print(json.dumps([{"label": "mu", "value": float(mu) if isinstance(mu, (int, float)) else 0    ,
+}, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "f_kelly", "value": float(f_kelly) if isinstance(f_kelly, (int, float)) else 0}, {"label": "g_kelly", "value": float(g_kelly) if isinstance(g_kelly, (int, float)) else 0}, {"label": "g_half", "value": float(g_half) if isinstance(g_half, (int, float)) else 0}]))`,
         description: "Renaissance Medallion's Kelly-optimal leverage is ~16x (mu=65%, sigma=20%). They actually use ~12.5x (half-Kelly) for stability. A quant trader sees: Kelly maximises expected log-growth — the same rule for blackjack (Thorp 1962) and Medallion (Simons 1989).",
-      },
+          math: `f^* = \\frac{bp - q}{b} = \\frac{\\mu}{\\sigma^2} \\\\ g = f\\mu - \\frac{f^2 \\sigma^2}{2} \\\\ \\text{Maximise } g \\implies f^* = \\mu / \\sigma^2`,
+},
       {
         science: "Genetics",
         sector: "Haldane allele fixation (1927)",
@@ -4614,7 +4633,8 @@ print("Insight: Jukes-Cantor IS Markov on DNA — molecular clock")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "alpha", "value": float(alpha) if isinstance(alpha, (int, float)) else 0}]))`,
         description: "Jukes-Cantor (1969) models DNA substitution as a 4-state Markov chain. After enough time, the distribution reaches uniform (25% each base). A molecular evolutionist sees: the transition rate α is the molecular clock — measuring evolutionary distance via substitution counts.",
-      },
+          math: `\\boldsymbol{\\pi}(t+1) = \\boldsymbol{\\pi}(t) \\, P \\\\ \\text{where} \\; P_{ij} = P(X_{t+1} = j \\mid X_t = i) \\quad \\text{(transition matrix)} \\\\ \\sum_j P_{ij} = 1 \\quad \\text{(stochastic)} \\\\ \\text{Stationary distribution:} \\quad \\boldsymbol{\\pi}^* = \\boldsymbol{\\pi}^* P \\\\ \\text{Detailed balance:} \\quad \\pi_i P_{ij} = \\pi_j P_{ji} \\\\ \\text{Spectral gap:} \\quad \\lambda_2(P) < 1 \\implies \\text{geometric convergence to } \\pi^*`,
+},
       {
         science: "Fintech",
         sector: "Moody's credit-rating transitions (8-state)",
@@ -4927,7 +4947,8 @@ print("Insight: VaR IS the inverse CDF of the loss distribution")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "JPMorgan's 1-day 99% VaR is ~$2.3B (on $4T balance). A risk officer sees: VaR is just the inverse normal CDF — every loss distribution has one. Basel III mandates daily disclosure. The same formula prices tail risk in finance, maritime, and climate.",
-      },
+          math: `\\text{VaR}_\\alpha = -(\\mu + z_\\alpha \\sigma) \\\\ \\text{where:} \\quad z_\\alpha = \\Phi^{-1}(1 - \\alpha), \\quad \\Phi = \\text{standard normal CDF} \\\\ z_{0.99} = 2.326, \\quad z_{0.95} = 1.645 \\\\ \\text{Expected Shortfall (ES):} \\quad \\text{ES}_\\alpha = \\mu + \\frac{\\sigma \\phi(z_\\alpha)}{1 - \\alpha} \\\\ \\text{where} \\; \\phi = \\text{standard normal PDF} \\\\ \\text{Basel III: daily 99% VaR. Solvency II: weekly 95% VaR. FEMA: 100-year flood.}`,
+},
       {
         science: "Maritime",
         sector: "Lloyd's 7-day 95% VaR ($50B hull portfolio)",
@@ -5219,7 +5240,8 @@ print("Insight: PageRank IS systemic risk measure (BIS network analysis)")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "p", "value": float(p) if isinstance(p, (int, float)) else 0}]))`,
         description: "PageRank on a 4-bank network: banks with most inbound links get highest PR. Lehman Brothers' real-world PR in 2008 was ~0.012 — high systemic risk. A systemic risk analyst sees: PageRank IS the too-big-to-fail measure. BIS uses it on the 10⁴-bank global network.",
-      },
+          math: `PR(p) = \\frac{1-d}{N} + d \\sum_{q \\in M(p)} \\frac{PR(q)}{L(q)} \\\\ \\text{where:} \\quad d = \\text{damping factor (typically 0.85)}, \\; N = |V| \\\\ M(p) = \\text{set of pages linking to } p, \\; L(q) = \\text{out-degree of } q \\\\ \\text{Matrix form:} \\quad \\mathbf{PR} = \\frac{1-d}{N} \\mathbf{1} + d \\, M^T \\mathbf{D}^{-1} \\mathbf{PR} \\\\ \\text{Convergence:} \\quad \\text{Perron-Frobenius theorem} \\implies \\text{unique positive eigenvector}`,
+},
       {
         science: "Maritime",
         sector: "UN COMTRADE port centrality (50K ports)",
@@ -5576,7 +5598,8 @@ for t in range(N):
     kalman_chart_data.append({"x": t, "y": round(est_lons[t], 5), "series": "Kalman estimate"})
 print(json.dumps(kalman_chart_data))`,
         description: "Kalman filter on a 50-step AIS vessel track reduces RMSE from ~0.005° (raw AIS) to ~0.002° (Kalman). A maritime data engineer sees: MarineTraffic runs this on 100K vessels × 60s updates — 1.4×10⁸ Kalman iterations/day for smooth tracks and ETA prediction.",
-      },
+          math: `\\hat{\\mathbf{x}}_{t+1|t} = F \\hat{\\mathbf{x}}_{t|t} \\quad \\text{(predict)} \\\\ P_{t+1|t} = F P_{t|t} F^T + Q \\quad \\text{(prior covariance)} \\\\ \\mathbf{K}_t = P_{t+1|t} H^T (H P_{t+1|t} H^T + R)^{-1} \\quad \\text{(Kalman gain)} \\\\ \\hat{\\mathbf{x}}_{t+1|t+1} = \\hat{\\mathbf{x}}_{t+1|t} + \\mathbf{K}_t (\\mathbf{z}_t - H \\hat{\\mathbf{x}}_{t+1|t}) \\quad \\text{(update)} \\\\ P_{t+1|t+1} = (I - \\mathbf{K}_t H) P_{t+1|t} \\\\ \\text{MMSE optimal for linear-Gaussian systems}`,
+},
       {
         science: "Aviation",
         sector: "FlightAware ADS-B tracking (100K flights × 1s)",
@@ -5929,7 +5952,8 @@ for n_val in [10, 50, 100, 500, 1000, 5000, 10000]:
     mc_chart_data.append({"x": n_val, "y": round(bs_approx, 2), "series": "Black-Scholes"})
 print(json.dumps(mc_chart_data))`,
         description: "Monte Carlo option pricing converges from ±$30 (N=10) to ±$0.30 (N=10⁴). A quant developer sees: convergence rate is O(1/√N) per CLT. CME uses quasi-MC (Sobol sequences) for 100× faster convergence — $10¹⁰ daily notional priced via MC.",
-      },
+          math: `\\mathbb{E}[f(X)] \\approx \\frac{1}{N} \\sum_{i=1}^{N} f(X_i) \\quad \\text{where} \\; X_i \\stackrel{iid}{\\sim} p(X) \\\\ \\text{Law of Large Numbers:} \\quad \\frac{1}{N}\\sum_{i=1}^{N} f(X_i) \\xrightarrow{a.s.} \\mathbb{E}[f(X)] \\\\ \\text{Central Limit Theorem:} \\quad \\sqrt{N}\\left(\\hat{\\mu}_N - \\mu\\right) \\xrightarrow{d} \\mathcal{N}(0, \\sigma^2) \\\\ \\text{Standard error:} \\quad \\text{SE} = \\frac{\\sigma}{\\sqrt{N}} \\quad \\text{(halving error quadruples N)}`,
+},
       {
         science: "Maritime",
         sector: "Rotterdam berth congestion (10^5 vessel sims)",
@@ -6289,7 +6313,8 @@ mean_final = sum(final_prices) / n_paths
 # E[S_T] = S0 * exp(mu * T)
 analytical_mean = S0 * math.exp(mu * T)
 print(f"GBM simulation ({n_paths} paths, 1 year, daily):")
-print(f"  S0 = \\\${S0}, mu = {mu}, sigma = {sigma}")
+print(f"  S0 = \\\${S0    ,
+}, mu = {mu}, sigma = {sigma}")
 print(f"  Simulated E[S_T] = \\\${mean_final:.0f}")
 print(f"  Analytical E[S_T] = S0*exp(mu*T) = \\\${analytical_mean:.0f}")
 print(f"  Error: {abs(mean_final-analytical_mean)/analytical_mean*100:.1f}%")
@@ -6318,7 +6343,8 @@ for t in range(0, n_steps + 1, step_interval):
         gbm_chart_data.append({"x": t, "y": round(paths[path_idx][t], 0), "series": "Path " + str(path_idx + 1)})
 print(json.dumps(gbm_chart_data))`,
         description: "100 GBM paths simulate SPX over 1 year. Mean final = $5,415 (analytical $5,415). 90% interval: [$3,800, $7,400]. A quant researcher sees: SPX daily returns follow GBM — Black-Scholes foundation, 1973 Nobel Prize. The same SDE models container dwell and allele drift.",
-      },
+          math: `dS = \\mu S \\, dt + \\sigma S \\, dW \\\\ S_T = S_0 \\exp\\!\\left(\\left(\\mu - \\frac{\\sigma^2}{2}\\right)T + \\sigma W(T)\\right) \\\\ \\ln S_T \\sim \\mathcal{N}\\!\\left(\\ln S_0 + \\left(\\mu - \\frac{\\sigma^2}{2}\\right)T, \\; \\sigma^2 T\\right)`,
+},
       {
         science: "Maritime",
         sector: "Rotterdam container dwell times (port authority data)",
@@ -6629,7 +6655,8 @@ print("Insight: Lloyd's IS trade-flow clustering (UN COMTRADE 50K ports)")
 # Final line: JSON output for chart rendering
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "Lloyd's k-means on 4 ports: Rotterdam + Hamburg cluster together (Europe-focused trade), Singapore + Shanghai (Asia-focused). A trade economist sees: Lloyd's IS trade-flow typology — UN COMTRADE's 50K ports cluster into ~10 trade regions.",
-      },
+          math: `\\boldsymbol{\\mu}_k \\leftarrow \\frac{1}{|S_k|} \\sum_{\\mathbf{x} \\in S_k} \\mathbf{x} \\quad \\text{where} \\; S_k = \\{\\mathbf{x}_i : c(i) = k\\} \\\\ c(i) = \\argmin_{k} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_k\\|^2 \\quad \\text{(assignment)} \\\\ \\text{Objective:} \\quad J = \\sum_{i=1}^{N} \\sum_{k=1}^{K} \\mathbb{1}[c(i)=k] \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_k\\|^2 \\\\ \\text{Convergence:} \\quad J \\text{ decreases monotonically (EM on isotropic GMM)} \\\\ \\text{k-means++:} \\quad D(\\mathbf{x})^2\\text{-weighted init} \\implies O(\\log k)\\text{-approx guarantee}`,
+},
       {
         science: "Genetics",
         sector: "1000-Genomes 2504 individuals → 5 ancestry clusters",

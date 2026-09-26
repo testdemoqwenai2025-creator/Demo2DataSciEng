@@ -252,6 +252,146 @@ export function DeeperMathFold({ cardIndex }: { cardIndex: number }) {
 }
 
 /**
+ * ProductionPatternsFold — shows additional production code patterns
+ * beyond the 5-language tabs. Uses the card's tools[] field to list
+ * production libraries, plus a generic "how to use in production" note.
+ */
+export function ProductionPatternsFold({ cardIndex }: { cardIndex: number }) {
+  const card = ELEGANT_CODE_CARDS[cardIndex];
+  if (!card) return null;
+  return (
+    <FoldSection
+      title="Production patterns — how to use this equation in industry"
+      description="Beyond the 5-language representational code, these are the production libraries and patterns that implement this equation at scale."
+    >
+      <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1.5">Production libraries</p>
+          <div className="flex flex-wrap gap-1.5">
+            {card.tools.map((t) => (
+              <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1.5">Scale considerations</p>
+          <p>The 5-language code shown above is representational — it shows HOW to think, not HOW to run. In production:</p>
+          <ul className="list-disc list-inside mt-1 space-y-0.5">
+            <li>Use vectorised library calls (NumPy, PyTorch, QuantLib) — not hand-rolled loops.</li>
+            <li>Profile before optimising — the equation is usually O(N log N) or O(N²), dominated by I/O.</li>
+            <li>Cache intermediate results — the same SVD/FFT/attention is often recomputed unnecessarily.</li>
+            <li>Distribute across clusters (Spark, Dask, Ray) when N &gt; 10^6 — the equation is embarrassingly parallel.</li>
+            <li>Use GPU acceleration (CUDA, Metal) for matrix operations — 100× speedup is typical.</li>
+          </ul>
+        </div>
+        {card.outcomes && card.outcomes.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1.5">Expected output — click "Run analytics" on each tile above</p>
+            <p>The 3 outcome tiles above each have a "Run analytics" button that executes the equation on real data (via Pyodide in your browser). The output — whether a bar chart, line chart, or multi-series chart — IS the proof that the equation works. The visual output plays to a different level of the brain than the prose: seeing the 3 spikes of a C-major chord emerge from FFT, or the Out-of-Africa triangle emerge from SVD, communicates the insight in a way no formula can.</p>
+          </div>
+        )}
+      </div>
+    </FoldSection>
+  );
+}
+
+/**
+ * CitationsFold — shows the full bibliography for this card.
+ * Currently uses the card's brief.dataset + tools[] as citation anchors.
+ * Can be extended with a citations: string[] field on DatasetExample.
+ */
+export function CitationsFold({ cardIndex }: { cardIndex: number }) {
+  const card = ELEGANT_CODE_CARDS[cardIndex];
+  if (!card) return null;
+  // Extract dataset/source info from the brief.
+  const datasetText = card.brief.dataset;
+  // Extract paper references from the subtitle (often contains author + year)
+  const subtitleRefs = card.subtitle.match(/\d{4}/g) || [];
+  return (
+    <FoldSection
+      title="Citations — the sources behind this equation"
+      description="The papers, datasets, and libraries that ground this card's claims. Each citation links to the /resources page for the full reference."
+    >
+      <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Dataset sources</p>
+          <p>{datasetText}</p>
+        </div>
+        {subtitleRefs.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Historical references (years cited)</p>
+            <div className="flex flex-wrap gap-1.5">
+              {subtitleRefs.map((year, i) => (
+                <Badge key={i} variant="outline" className="text-[10px]">{year}</Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Production libraries</p>
+          <p className="mb-1">For the full library documentation URLs, see the /resources page (each library has a deep-link to its docs).</p>
+          <div className="flex flex-wrap gap-1.5">
+            {card.tools.map((t) => (
+              <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Living-equation page (if available)</p>
+          <p>For the full mathematical derivation with citations, check the Math tab on the corresponding /living-* page (if this card has a "Run it live" CTA at the top of the modal). The Math tab contains 4-paragraph derivations citing the original papers (e.g., Beltrami 1873, Shannon 1948, Cooley-Tukey 1965).</p>
+        </div>
+        <p className="text-[10px] italic">
+          For the complete bibliography of all 20 cards, visit{" "}
+          <Link href={hrefFor("resources")} className="text-primary hover:underline">/resources</Link>{" "}
+          — the Papers section lists 20 cited papers with DOI/arXiv/JSTOR links.
+        </p>
+      </div>
+    </FoldSection>
+  );
+}
+
+/**
+ * ExpectedOutputFold — shows what the equation produces when it lands
+ * on each science's data. Reminds the user to click "Run analytics"
+ * on the outcome tiles above, and explains what each output reveals.
+ */
+export function ExpectedOutputFold({ cardIndex }: { cardIndex: number }) {
+  const card = ELEGANT_CODE_CARDS[cardIndex];
+  if (!card || !card.outcomes) return null;
+  return (
+    <FoldSection
+      title="Expected output — what each science's chart reveals"
+      description="The 3 outcome tiles above each produce a live chart when you click 'Run analytics'. This fold explains what each chart reveals and why the visual output matters as much as the equation."
+    >
+      <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+        {card.outcomes.map((o, i) => (
+          <div key={i} className="rounded-md border border-border/40 bg-muted/20 p-2">
+            <div className="flex items-start gap-2">
+              <Badge variant="outline" className="text-[9px] shrink-0" style={{ color: o.accent ?? card.accent }}>
+                {o.science}
+              </Badge>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground/80 text-[11px]">{o.sector}</p>
+                <p className="text-[10px] mt-0.5 leading-relaxed">{o.description}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  <Badge variant="outline" className="text-[9px] px-1 py-0">{o.skill}</Badge>
+                  <Badge variant="secondary" className="text-[9px] px-1 py-0 italic">{o.talent}</Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        <p className="text-[10px] italic mt-2">
+          Images play to a different level of expression to the human mind and brain cells.
+          The output of the code and mathematics is always as important as the thought process —
+          click "Run analytics" on any tile above to see the equation work on real data.
+        </p>
+      </div>
+    </FoldSection>
+  );
+}
+
+/**
  * KaTeXRenderer — renders a LaTeX string using KaTeX.
  * Falls back to plain text if KaTeX fails to render.
  */

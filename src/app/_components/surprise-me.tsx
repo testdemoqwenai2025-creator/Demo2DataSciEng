@@ -200,8 +200,42 @@ export function SurpriseMe() {
             </div>
           </div>
           <p className="text-[9px] text-muted-foreground italic">
-            Export the JSON file and upload to Google Drive / Dropbox / etc. for cross-device access.
+            Export the JSON file and upload to your chosen drive for cross-device access.
             Each bookmark records the card, science, sector, skill, talent, and deep-link URL.
+          </p>
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/40">
+            <span className="text-[9px] text-muted-foreground uppercase tracking-wider">Save to your drive:</span>
+            <a
+              href="https://drive.google.com/drive/my-drive"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+              onClick={(e) => { e.preventDefault(); exportBookmarks(); window.open("https://drive.google.com/drive/my-drive", "_blank"); }}
+            >
+              <Download className="h-3 w-3" /> Google Drive
+            </a>
+            <a
+              href="https://www.dropbox.com/home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+              onClick={(e) => { e.preventDefault(); exportBookmarks(); window.open("https://www.dropbox.com/home", "_blank"); }}
+            >
+              <Download className="h-3 w-3" /> Dropbox
+            </a>
+            <a
+              href="https://onedrive.live.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+              onClick={(e) => { e.preventDefault(); exportBookmarks(); window.open("https://onedrive.live.com/", "_blank"); }}
+            >
+              <Download className="h-3 w-3" /> OneDrive
+            </a>
+          </div>
+          <p className="text-[9px] text-muted-foreground italic mt-1">
+            Click any drive button to download the JSON file, then upload it to your chosen drive.
+            No login required — your discoveries stay private in your browser until you export them.
           </p>
         </div>
       )}
