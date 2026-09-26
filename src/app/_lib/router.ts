@@ -129,7 +129,13 @@ export type PageId =
   | "living-attention"
   | "living-fft"
   | "living-poisson"
-  | "living-entropy";
+  | "living-entropy"
+  | "living-black-scholes"
+  | "living-haversine"
+  | "living-kalman"
+  | "living-monte-carlo"
+  | "living-gbm"
+  | "resources";
 
 export interface PageMeta {
   id: PageId;
@@ -1125,6 +1131,54 @@ export const PAGES: PageMeta[] = [
     group: "Living Equations",
     icon: "Sparkles",
     description: "Live Entropy demo: drag n (number of bins) and watch H converge to its asymptote as the discrete distribution approaches the underlying continuous density. Computed on gnomAD BRCA1 allele-frequency data (synthetic). Pyodide computes H = -Σp·log(p) in-browser. Production bridge: scipy.stats.entropy.",
+  },
+  {
+    id: "living-black-scholes",
+    label: "Living Black-Scholes — Run C = S·N(d1) − K·e^(−rT)·N(d2) on SPX",
+    shortLabel: "Living Black-Scholes",
+    group: "Living Equations",
+    icon: "DollarSign",
+    description: "Live Black-Scholes demo: drag σ (volatility) and watch the SPX 30-day call option price curve steepen from $0 to $50+. Pyodide computes C = S·N(d1) − K·e^(−rT)·N(d2) across strikes. Production bridge: QuantLib.",
+  },
+  {
+    id: "living-haversine",
+    label: "Living Haversine — great-circle distance between major ports",
+    shortLabel: "Living Haversine",
+    group: "Living Equations",
+    icon: "Compass",
+    description: "Live Haversine demo: pick source and destination from 10 major ports and watch the great-circle distance update. Pyodide computes d = 2R·arcsin(√(sin²(Δφ/2) + cos(φ1)·cos(φ2)·sin²(Δλ/2))). Production bridge: geopy / PostGIS.",
+  },
+  {
+    id: "living-kalman",
+    label: "Living Kalman — vessel tracking from noisy AIS reports",
+    shortLabel: "Living Kalman",
+    group: "Living Equations",
+    icon: "Activity",
+    description: "Live Kalman demo: drag R (measurement noise variance) and watch the filter's tracking smoothness trade off against responsiveness. Pyodide computes x̂(t+1) = x̂(t) + K·(z − H·x̂(t)) on synthetic AIS positions. Production bridge: filterpy / OpenCV KalmanFilter.",
+  },
+  {
+    id: "living-monte-carlo",
+    label: "Living Monte Carlo — option pricing via GBM paths",
+    shortLabel: "Living Monte Carlo",
+    group: "Living Equations",
+    icon: "Boxes",
+    description: "Live Monte Carlo demo: drag N (number of GBM paths) and watch the option-price MC estimate converge to the closed-form Black-Scholes value. Pyodide simulates N GBM paths and averages payoffs. Production bridge: QuantLib MC engine.",
+  },
+  {
+    id: "living-gbm",
+    label: "Living Geometric Brownian Motion — SPX paths fan out with σ",
+    shortLabel: "Living GBM",
+    group: "Living Equations",
+    icon: "TrendingUp",
+    description: "Live GBM demo: drag σ (volatility) and watch 50 simulated SPX 1-year paths fan out wider (high σ) or narrower (low σ). Pyodide integrates dS = μS·dt + σS·dW via Euler discretization. Production bridge: scipy.stats.lognorm / QuantLib GBM.",
+  },
+  {
+    id: "resources",
+    label: "Resources — every dataset, paper, library cited on the platform",
+    shortLabel: "Resources",
+    group: "Living Equations",
+    icon: "Database",
+    description: "Single hub listing every real public dataset, paper, and library cited across all 10 living-equation pages. Grouped by category: Datasets (1000-Genomes, UniRef50, gnomAD, CME SPX, MarineTraffic AIS, UN COMTRADE, Lloyd's Register, NOAA), Papers (Beltrami 1873, Shannon 1948, Cooley-Tukey 1965, Markov 1906, Kalman 1960, Black-Scholes 1973, Brin & Page 1998), Libraries (NumPy, SciPy, PyTorch, QuantLib, filterpy, geopy, D3.js).",
   },
 ];
 
