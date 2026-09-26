@@ -14,6 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Line, LineChart, ComposedChart,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -299,6 +300,24 @@ plt.savefig('poisson_chr22.png', dpi=150, bbox_inches='tight')
       </SectionCard>
 
       <RelatedElegantCode sourceCard={2} />
+
+      <DeeperThoughtSection pageTitle="Poisson">
+        <DeeperThought title="Poisson IS the law of rare events — a theorem, not an approximation" connectedTo="ADR-037 (genetic materials + variant calling)">
+          <p>{"Poisson emerges whenever events are independent, rare, and constant-rate. This isn't an approximation — it's a theorem (the law of small numbers). Sequencing reads are independent (random DNA shearing). Server requests are independent (no user coordination). Radioactive decays are independent (quantum randomness). Three different physical mechanisms, one mathematical consequence. The Poisson theorem proves that any process with these three properties converges to the SAME distribution. A bioinformatician and a network engineer are solving the SAME equation."}</p>
+        </DeeperThought>
+        <DeeperThought title="GATK's 95% threshold IS Poisson(λ=14) — the math dictates the experiment" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"When you drag λ to 14 on this page, P(≥10×) crosses 95% — GATK's minimum coverage threshold for reliable variant calling. This isn't an arbitrary number; it's dictated by the Poisson CDF. At λ=10, P(≥10×) is only 42% — too many positions would have insufficient reads. At λ=20, P(≥10×) is 99.9% — overkill, wasteful. The math tells you the optimal experimental design: how deep to sequence. The equation IS the business decision."}</p>
+        </DeeperThought>
+        <DeeperThought title="Mean = variance is Poisson's signature — and its limitation" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Poisson's defining property is E[X] = Var(X) = λ. This is both a feature and a bug. It means one parameter (λ) tells you everything — but it also means you can't model over-dispersion (variance &gt; mean), which is common in real data (e.g., sequencing bias, bursty network traffic). When the variance exceeds the mean, you need the Negative Binomial distribution — which is Poisson + a Gamma mixing layer. Understanding Poisson's limitation IS understanding when to upgrade."}</p>
+        </DeeperThought>
+        <DeeperThought title="The histogram overlay IS the proof — the math matches the data" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you click 'Run analytics' on this page, the green bars (observed read-depth histogram) align with the blue line (theoretical Poisson PMF). The match IS the proof: the data follows Poisson. If the bars were wider than the line, you'd see over-dispersion. If they were skewed, you'd see a different distribution. The visual overlay communicates 'fit' in a way no p-value can — the brain's pattern-matching system sees the alignment instantly."}</p>
+        </DeeperThought>
+        <DeeperThought title="The C-14 half-life IS Poisson — radiocarbon dating is counting" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"C-14 decays at ~15 atoms/min/g. That's Poisson(λ=15). A nuclear physicist counts decays for 1 minute and inverts the Poisson to estimate age — radiocarbon dating. The SAME distribution that models sequencing coverage and server load models nuclear decay. The math doesn't know if λ is 'reads per position', 'requests per second', or 'decays per minute'. The equation is domain-agnostic; the application is everything."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "bioinformatics-pipelines" as const, reason: "Bioinformatics Pipelines — GATK uses Poisson" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Poisson card (cross-disciplinary)" },

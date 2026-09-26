@@ -14,6 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Cell,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -322,6 +323,24 @@ plt.savefig('attention_contact_map.png', dpi=150, bbox_inches='tight')
       </SectionCard>
 
       <RelatedElegantCode sourceCard={1} />
+
+      <DeeperThoughtSection pageTitle="Attention">
+        <DeeperThought title="Attention IS natural selection" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
+          <p>{"In evolution, residues that mutate together are in physical contact — natural selection constrains their co-variation to maintain the fold. Attention on a Multiple Sequence Alignment finds these co-evolving pairs: Q_i·K_j measures co-variation, and the attention matrix IS the contact map. A language model finds syntax (which words correlate); a protein folder finds contacts (which residues correlate). The SAME architecture because DNA IS a language — codons are words, gene regulation is grammar, mutations are typos, and co-evolution is syntax."}</p>
+        </DeeperThought>
+        <DeeperThought title="The d_k scaling is what makes attention LEARNABLE" connectedTo="ADR-024 (transformer deep dive)">
+          <p>{"Without dividing by √d_k, the dot product QK^T has variance d_k. For d_k=64 (typical), the softmax input has std ~8, which saturates softmax to one-hot — gradients vanish. Dividing by √d_k keeps the variance at 1, so softmax stays smooth and learnable. This is a numerical detail that determines whether the model trains or not. It's the difference between 'Attention Is All You Need' (Vaswani 2017) and 'Attention Doesn't Work At All.'"}</p>
+        </DeeperThought>
+        <DeeperThought title="AlphaFold2's evoformer IS attention on a 4D tensor" connectedTo="ADR-036 (molecular modelling)">
+          <p>{"AlphaFold2 doesn't just use attention on sequences — it uses attention on (sequence × structure) pairs. The evoformer stack has 48 blocks of attention across rows (which positions matter) AND columns (which sequences matter), plus a triangle attention module for pairwise distance geometry. This is attention GENERALISED from 2D matrices to 4D tensors. The CASP14 result (GDT_TS 92.4) proves the generalisation works: attention on the right representation can solve protein folding."}</p>
+        </DeeperThought>
+        <DeeperThought title="The contact map IS the output — and the output IS the proof" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag d_k on this page, the 32×32 attention matrix sharpens from a smear to a sparse pattern. The bright off-diagonal cells ARE the protein's contact map — positions that co-vary across evolutionary history. This isn't a metaphor; it's a computation. The visual output (the heatmap) proves the math works in a way the equation alone can't. Images play to a different level of the brain — the reader SEES the contacts emerge, and understands attention in a way no prose can teach."}</p>
+        </DeeperThought>
+        <DeeperThought title="DNA IS a language — and attention is the universal parser" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"The claim 'DNA IS a language' isn't a metaphor. Codons (3-base words) map to amino acids (vocabulary). Gene regulation (grammar) controls which genes are expressed (sentences). Mutations (typos) can be silent (synonymous) or devastating (missense). Co-evolution (syntax) constrains which residues can change together. Attention parses both natural language and protein language because both are correlation detection — and correlation IS what attention measures."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "transformer-deep-dive" as const, reason: "Transformer Deep Dive — full attention architecture" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Attention card (cross-disciplinary)" },

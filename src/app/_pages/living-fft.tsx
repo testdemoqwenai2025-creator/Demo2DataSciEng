@@ -14,6 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -290,6 +291,24 @@ plt.savefig('fft_c_major.png', dpi=150, bbox_inches='tight')
       </SectionCard>
 
       <RelatedElegantCode sourceCard={3} />
+
+      <DeeperThoughtSection pageTitle="Fft">
+        <DeeperThought title="FFT IS the change of basis — the universal coordinate rotation" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"In linear algebra, a change of basis rotates your coordinate system. FFT rotates from the 'time' basis (how much signal at time t) to the 'frequency' basis (how much signal at frequency f). This rotation is EXACT — no information is lost, it's a unitary transform. The same rotation that identifies a C-note in audio identifies a molecular mass in spectrometry and reconstructs 3D protein structures in cryo-EM. Music, chemistry, and structural biology are the SAME math because they all deal with periodic phenomena."}</p>
+        </DeeperThought>
+        <DeeperThought title="The uncertainty principle IS the time-frequency trade-off" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag N on this page, you see the frequency resolution Δf = Fs/N change. At N=1024, Δf = 43 Hz — the 3 notes barely separate. At N=4096, Δf = 11 Hz — the notes are sharp spikes. This IS the Heisenberg uncertainty principle: you can't know both the time and frequency of a signal precisely. The window size N trades time resolution for frequency resolution. This isn't just signal processing — it's quantum mechanics. The same trade-off governs particle physics and audio engineering."}</p>
+        </DeeperThought>
+        <DeeperThought title="Gauss invented FFT in 1805 — before Fourier, before computers" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Carl Friedrich Gauss derived the Fast Fourier Transform in an unpublished 1805 note on asteroid orbit computation — 62 years before Fourier's heat equation work and 160 years before Cooley-Tukey's 1965 paper. The algorithm was so far ahead of its time that it couldn't be used until computers existed. The FFT is one of the top-10 algorithms of the 20th century (IEEE 2000) — and it was invented in the 18th century. The math doesn't care about chronology."}</p>
+        </DeeperThought>
+        <DeeperThought title="The 3-spike spectrum IS the proof — not the equation" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you see the FFT output — 3 sharp spikes at 262, 330, 392 Hz — you KNOW the chord is C-major. You don't need to understand the math to see the result. The visual output communicates to the brain's pattern-recognition system directly, bypassing the verbal/analytical pathway. This is why we need outputs alongside equations: different parts of the brain process formulas and images. The reader who sees the 3 spikes UNDERSTANDS FFT in a way the reader who only reads the formula doesn't."}</p>
+        </DeeperThought>
+        <DeeperThought title="FFT and SVD are cousins — both are change-of-basis" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"FFT rotates from time to frequency. SVD rotates from row-space to component-space. Both are unitary transforms (information-preserving). Both expose structure that was invisible in the original basis. The card-to-card adjacency graph on /connections links FFT to SVD because they share the mathematical family of change-of-basis operations. Understanding one helps you understand the other — and understanding both helps you see that 'change of basis' is one of the most powerful ideas in all of mathematics."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "numpy-scipy" as const, reason: "NumPy/SciPy — np.fft.fft in production" },
         { id: "elegant-code" as const, reason: "Elegant Code — the FFT card (cross-disciplinary)" },

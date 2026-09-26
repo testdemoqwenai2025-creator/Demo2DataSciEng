@@ -14,6 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -329,6 +330,24 @@ plt.savefig('gbm_spx.png', dpi=150, bbox_inches='tight')`}
       </SectionCard>
 
       <RelatedElegantCode sourceCard={18} />
+
+      <DeeperThoughtSection pageTitle="Gbm">
+        <DeeperThought title="GBM IS the universal multiplicative-noise equation — stocks, dwell times, and alleles" connectedTo="ADR-054 (Black-Scholes + MC + GNN for fintech)">
+          <p>{"SPX daily returns, Rotterdam container dwell times, and Wright-Fisher allele drift all follow dS = μS·dt + σS·dW. Multiplicative noise (σS·dW) keeps S positive — unlike additive noise (σ·dW, Bachelier 1900), which allows negative prices. Samuelson (1965) fixed Bachelier's negative-price problem by introducing multiplicative noise. Black-Scholes (1973) built on Samuelson's GBM. Fisher (1922) had already used it for allele drift. Three sciences, one SDE — and the math doesn't know the asset class."}</p>
+        </DeeperThought>
+        <DeeperThought title="The log-normal distribution IS the consequence of multiplicative noise" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"GBM's exact solution S_T = S₀·exp((μ-σ²/2)T + σ·W(T)) means log(S_T) is normally distributed → S_T is log-normal. The log-normal distribution is skewed right (a few very high values, many low values) — which matches stock returns, container dwell times, and allele frequencies. The skew is the signature of multiplicative noise. If you see a log-normal distribution, you know the underlying process is GBM. The distribution IS the diagnostic."}</p>
+        </DeeperThought>
+        <DeeperThought title="The fan-out IS the proof — drag σ and watch paths spread" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag σ from 5% to 50% on this page, the 50 simulated SPX paths fan out from a tight cluster to a wide cone. At σ=50% (crisis), final prices range from $2,000 to $13,000. At σ=5% (stable), they're $4,800-$5,200. The visual output — a fan of colored lines spreading from a single point — communicates 'volatility' instantly. The brain sees the fan widen and understands: more σ = more uncertainty = wider outcomes. This is what risk looks like — and seeing it is different from reading 'σ is the annualised standard deviation of returns.'"}</p>
+        </DeeperThought>
+        <DeeperThought title="Bachelier 1900 used additive noise — and got negative prices" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Louis Bachelier's 1900 thesis 'Théorie de la spéculation' was the first application of Brownian motion to finance — 5 years before Einstein's 1905 paper on Brownian motion. But Bachelier used additive noise (dS = μ·dt + σ·dW), which allows S to go negative — impossible for stock prices. Samuelson (1965) fixed this by introducing multiplicative noise (dS = μS·dt + σS·dW), which keeps S positive. The fix seems small (multiply by S), but it's the difference between Bachelier's forgotten thesis and Black-Scholes' Nobel Prize. The right noise model IS the right equation."}</p>
+        </DeeperThought>
+        <DeeperThought title="Wright-Fisher drift IS GBM on the allele-frequency manifold" connectedTo="ADR-037 (genetic materials + variant calling)">
+          <p>{"The Wright-Fisher model describes allele frequency changes as a diffusion on [0,1]: dp = s·p·(1-p)·dt + √(p(1-p)/(2N_e))·dW. This IS a GBM variant — the drift and diffusion coefficients depend on p (bounded between 0 and 1), but the structure (multiplicative noise) is the same. Fisher (1922) derived this 43 years before Samuelson (1965) introduced GBM for finance. The geneticist got there first — but the quant got the Nobel. The math doesn't care about priority."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "fintech" as const, reason: "Fintech — QuantLib + GBM in production" },
         { id: "elegant-code" as const, reason: "Elegant Code — the GBM card (cross-disciplinary)" },

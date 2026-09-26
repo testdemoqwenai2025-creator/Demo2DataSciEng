@@ -14,6 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -321,6 +322,24 @@ print(f"SPX 30-day ATM call (Black-Scholes closed-form): \${bs_price:.2f}")
       </SectionCard>
 
       <RelatedElegantCode sourceCard={17} />
+
+      <DeeperThoughtSection pageTitle="Monte Carlo">
+        <DeeperThought title="Monte Carlo IS the universal estimation engine — from neutron transport to option pricing" connectedTo="ADR-054 (Black-Scholes + MC + GNN for fintech)">
+          <p>{"Metropolis invented Monte Carlo at Los Alamos in 1946 for neutron-transport calculations (Manhattan Project). Boyle applied it to option pricing in 1977. PLINK uses it for rare-variant permutation tests. Port authorities use it for berth-congestion simulation. All four estimate E[f(X)] via random sampling — the SAME averaging. The Law of Large Numbers guarantees convergence; the Central Limit Theorem gives the error bar (σ/√N). Metropolis didn't know he was inventing the method that would price $10B/day in CME options."}</p>
+        </DeeperThought>
+        <DeeperThought title="The O(1/√N) convergence rate IS the cost of randomness" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag N on this page, the MC estimate converges to the Black-Scholes value at rate σ/√N. 100 paths → ±$3. 10,000 paths → ±$0.30. 100,000 paths → ±$0.03. Halving the error requires QUADRUPLING the paths. This is the fundamental cost of Monte Carlo — and it's why quasi-MC (Sobol, Halton) exists: deterministic low-discrepancy sequences converge at O((log N)^d / N) instead of O(1/√N), which is much faster for high-dimensional problems."}</p>
+        </DeeperThought>
+        <DeeperThought title="The convergence curve IS the proof — watch the CI tighten" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"The blue line (MC estimate) converges to the green line (Black-Scholes) as N grows. The red dashed lines (95% CI) tighten around the blue. The visual output — a curve approaching an asymptote with narrowing bands — communicates 'convergence' instantly. The reader SEES the CLT in action: the more samples, the tighter the estimate. This is what 'convergence in probability' looks like — and seeing it is different from reading the formula."}</p>
+        </DeeperThought>
+        <DeeperThought title="Variance reduction IS the art of Monte Carlo — antithetic, control, importance" connectedTo="ADR-054 (Black-Scholes + MC + GNN for fintech)">
+          <p>{"The O(1/√N) rate is slow. Variance reduction techniques can reduce σ by 10-100×, making MC competitive with closed-form. Antithetic variates (use both Z and -Z) double the effective sample size. Control variates (subtract a known-expectation variable) cancel correlated noise. Importance sampling (sample from a different distribution and reweight) concentrates samples in high-impact regions. CME uses Sobol quasi-MC for SPX settlement — 100× faster than pseudo-random MC. The art is in the sampling, not the averaging."}</p>
+        </DeeperThought>
+        <DeeperThought title="Metropolis worked at Los Alamos — the method went nuclear before it went financial" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Nicholas Metropolis coined 'Monte Carlo' (after the casino) in 1949 for neutron-transport calculations at Los Alamos. The method was classified — it was part of the Manhattan Project's hydrogen-bomb work. Stanislaw Ulam and John von Neumann developed it while computing neutron paths for the Teller-Ulam design. Twenty-eight years later, Boyle used the same method to price options. The same averaging that models nuclear explosions prices stock options. The math doesn't care about the domain — or the classification level."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "fintech" as const, reason: "Fintech — QuantLib + MC for option pricing" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Monte Carlo card (cross-disciplinary)" },

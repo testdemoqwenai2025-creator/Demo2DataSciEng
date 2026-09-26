@@ -14,6 +14,7 @@ import {
   ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 const KPIS = [
   { label: "Dataset", value: "1000-Genomes chr-22 (synthetic)", hint: "200 individuals × 500 SNPs from chromosome 22. Real population labels: AFR (African), EUR (European), EAS (East Asian), SAS (South Asian).", deltaTone: "flat" as const },
@@ -321,6 +322,24 @@ plt.savefig('pca_chr22.png', dpi=150, bbox_inches='tight')
       </SectionCard>
 
       <RelatedElegantCode sourceCard={0} />
+
+      <DeeperThoughtSection pageTitle="Svd">
+        <DeeperThought title="SVD IS the Fourier transform for data" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
+          <p>{"In signal processing, the Fourier transform decomposes a signal into sine waves of different frequencies. SVD decomposes a matrix into 'components' of different importance. In genomics, these components are ancestral migrations. In audio, they're frequency tones. In finance, they're risk factors. The SAME equation because all three ask: 'what are the underlying patterns that explain the most variance?' SVD doesn't know it's doing genomics — it's just decomposing a matrix. But the decomposition CAPTURES population genetics because genetic variation IS low-rank (most SNPs are explained by a few migrations). The math found the history."}</p>
+        </DeeperThought>
+        <DeeperThought title="The top-k approximation IS lossy compression — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Truncated SVD (keeping only the top-k singular values) is the BEST rank-k approximation in Frobenius norm (Eckart-Young 1936). This means: when you keep 10 PCs from a 2504×3M matrix, you've thrown away 99.999% of the data — but the 10 PCs capture the meaningful structure. The rest is noise. A geneticist sees this as 'population structure'; a quant sees it as 'factor structure'; an audio engineer sees it as 'frequency content'. The lossy compression IS the insight — what you throw away is noise, what you keep is meaning."}</p>
+        </DeeperThought>
+        <DeeperThought title="Out-of-Africa isn't discovered — it's EMERGENT" connectedTo="ADR-037 (genetic materials + variant calling)">
+          <p>{"When you run SVD on the 1000-Genomes chr-22 matrix, the top principal component separates AFR from non-AFR. Nobody told SVD about human migration. Nobody told it about the 70,000-year-old exodus from Africa. The equation just found the largest axis of variance — and that axis IS the migration. This is what 'emergence' means in computational science: the structure isn't programmed in; it arises from the data when the right equation is applied. SVD is the right equation for genetic variation because migration IS the largest source of allele-frequency variance."}</p>
+        </DeeperThought>
+        <DeeperThought title="The 5-language code is the same because the math is the same" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"SVD in Scala, Rust, Go, Elixir, Zig — five different syntaxes, one identical computation. The equation A = UΣV^T doesn't change when you change the language. The code is REPRESENTATIONAL — it shows HOW to think, not HOW to run. A sound developer can implement any of these in production. What they can't implement is the INSIGHT that SVD in genomics is the same operation as SVD in finance. That insight is what this page exists to give them."}</p>
+        </DeeperThought>
+        <DeeperThought title="The living demo IS the proof — drag k and watch migration emerge" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"The slider on this page lets you drag k from 1 to 10. At k=2, you see a triangle (AFR / EUR+EAS / SAS). At k=3, the triangle becomes a tetrahedron. At k=10, fine sub-populations separate. This is not a simulation — it's a real SVD computation running in your browser via Pyodide on synthetic 1000-Genomes data. The output IS the argument. When you see the 4-population structure emerge from a matrix, you understand SVD in a way no textbook can teach. The visual output plays to a different level of the brain than the prose."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "numpy-scipy" as const, reason: "NumPy/SciPy — np.linalg.svd in production" },
         { id: "elegant-code" as const, reason: "Elegant Code — the SVD card (cross-disciplinary)" },

@@ -6,6 +6,7 @@ import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
 import { RelatedTopics } from "../_components/related-topics";
+import { DiscoveryPath } from "../_components/discovery-path";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Atom, Sparkles, TrendingUp, Boxes, Network, Cpu } from "lucide-react";
@@ -94,6 +95,8 @@ export function ElegantCodePage() {
           </p>
         </div>
       </SectionCard>
+
+      <DiscoveryPath />
 
       <RelatedTopics topics={[
         { id: "numpy-scipy" as const, reason: "NumPy N-D arrays — the computational foundation" },

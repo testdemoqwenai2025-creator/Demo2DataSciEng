@@ -14,6 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Cell,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -363,6 +364,24 @@ print(f"Rotterdam to Singapore: {df.loc['Rotterdam', 'Singapore']:.0f} km")
       </SectionCard>
 
       <RelatedElegantCode sourceCard={11} />
+
+      <DeeperThoughtSection pageTitle="Haversine">
+        <DeeperThought title="Haversine IS the universal great-circle distance — from ports to planets to stars" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"A port captain computing Rotterdam→Singapore, an airline dispatcher computing LHR→JFK, and an astronomer computing Sirius→Canopus all use the SAME formula. Great-circle distance on a sphere doesn't care if the sphere is Earth (radius 6371 km) or the celestial sphere (radius 1, unit sphere). The haversine was invented in 1805 by Bowring to avoid catastrophic cancellation in the spherical law of cosines — a numerical analysis insight that happens to be useful for navigation. The math serves the computation; the computation serves the navigator."}</p>
+        </DeeperThought>
+        <DeeperThought title="The Suez Canal blockage (Ever Given 2021) IS a haversine rerouting" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"When the Ever Given blocked the Suez Canal in March 2021, thousands of vessels rerouted via the Cape of Good Hope — adding ~5,000 km and ~5 days per transit. The haversine formula computed the new great-circle distance for every affected vessel. MarineTraffic's AIS analytics ran millions of these computations per day. The economic impact ($9.6B/day in delayed trade) was measured in haversine kilometers. The math isn't abstract — it's the infrastructure of global trade."}</p>
+        </DeeperThought>
+        <DeeperThought title="Polar routes use haversine + jet stream — the math saves fuel" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"LHR→JFK great-circle is 5,550 km. The polar route via Iceland is 6,000 km — LONGER. But the jet stream tailwind saves ~1 hour eastbound. The haversine gives you the baseline distance; the jet stream gives you the wind correction. Airlines compute BOTH — the fuel savings from the tailwind exceed the extra distance. This is why flight paths look 'curved' on Mercator maps but 'straight' on great-circle maps — and why the haversine is the navigator's most-used equation."}</p>
+        </DeeperThought>
+        <DeeperThought title="The bar chart IS the proof — 9 ports, one source, all distances at once" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you pick Rotterdam as source on this page, the bar chart shows distances to all 9 other major ports — Singapore (16,500 km), Shanghai (11,000 km), Hamburg (400 km), etc. The green bar (selected destination) stands out. The visual comparison — 9 bars side by side — communicates relative distances instantly, in a way no table can. The brain's pattern-matching system processes the bar heights faster than it reads numbers. The output IS the argument: global trade is a network of haversine distances."}</p>
+        </DeeperThought>
+        <DeeperThought title="The haversine avoids catastrophic cancellation — a numerical analysis insight" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"The spherical law of cosines gives cos(Δσ) = sin(φ₁)sin(φ₂) + cos(φ₁)cos(φ₂)cos(Δλ). For nearby points (small Δσ), cos(Δσ) ≈ 1, and the difference 1 - cos(Δσ) loses precision (catastrophic cancellation). The haversine avoids this by computing 1 - cos(Δσ) as 2·sin²(Δσ/2), which is well-conditioned. This numerical analysis insight — from 1805 — is why every GPS device uses haversine, not the spherical law of cosines. The math serves the computation."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "global-shipping" as const, reason: "Global Shipping — maritime analytics hub" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Haversine card (cross-disciplinary)" },

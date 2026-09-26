@@ -14,6 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -358,6 +359,24 @@ print(f"Mean lon velocity: {est_df.lon_vel.mean():.6f} deg/s")
       </SectionCard>
 
       <RelatedElegantCode sourceCard={16} />
+
+      <DeeperThoughtSection pageTitle="Kalman">
+        <DeeperThought title="Kalman IS the universal state estimator — vessels, planes, alleles, and Apollo" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"A port authority tracking 100K vessels from noisy AIS, an ATC controller tracking 100K flights from noisy ADS-B, and a geneticist tracking allele frequencies from noisy sequencing all use the SAME Bayesian update. Kalman 1960 invented this for Apollo's lunar module navigation (1969). The math doesn't know if the state is [lat, lon, SOG, COG] or [allele_freq, drift_rate]. It just fuses a noisy measurement with a state-space model to produce the MMSE estimate. The Kalman gain K = P/(P+R) is universal because it's the optimal linear Bayesian estimator."}</p>
+        </DeeperThought>
+        <DeeperThought title="The Kalman gain IS the trust ratio — model vs measurement" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag R on this page, K changes. Small R (trust AIS) → K≈1 (measurement dominates, track follows reports — responsive but noisy). Large R (trust model) → K≈0 (model dominates, track is smooth but lags). The Kalman gain IS the ratio of how much you trust your measurement vs your model. It's the same trade-off in every Bayesian system: prior vs likelihood. Kalman makes it quantitative — K = P/(P+R) is the optimal weighting. Understanding K IS understanding Bayesian inference."}</p>
+        </DeeperThought>
+        <DeeperThought title="Apollo 11 used Kalman — the filter went to the Moon before it went to production" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Kalman published his filter in 1960. By 1969, it was running on the Apollo Guidance Computer (AGC) — a 2KB-RAM, 32KB-ROM machine with 0.043 MHz clock speed. The AGC ran Kalman to fuse IMU data with radar altimeter measurements during the lunar descent. The filter went to the Moon before it went to automotive GPS, maritime AIS, or financial trading. Nine years from theory to lunar module — one of the fastest theory-to-deployment cycles in engineering history. Every phone GPS uses an extended Kalman filter today."}</p>
+        </DeeperThought>
+        <DeeperThought title="The 3-line time series IS the proof — true / noisy / filtered" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you click 'Run analytics' on this page, you see 3 lines: green (true position, hidden in real life), red dots (noisy AIS reports), blue (Kalman estimate). The blue line tracks the green line more closely than the red dots — the filter DENOISES. The RMSE comparison (Kalman vs raw AIS) quantifies the improvement. The visual output — 3 overlapping lines — communicates 'filtering works' instantly. The brain sees the blue line hugging the green and understands: the math is extracting signal from noise."}</p>
+        </DeeperThought>
+        <DeeperThought title="The Kalman filter IS Bayesian belief updating — same as Bayes' theorem" connectedTo="ADR-007 (Bayesian methods)">
+          <p>{"The Kalman update x̂(t+1) = x̂(t) + K·(z - H·x̂(t)) IS Bayes' theorem in linear-Gaussian form. The prediction step uses the prior (model-based state estimate). The update step uses the likelihood (measurement z). The Kalman gain K IS the posterior weighting. The SAME equation as Bayes — P(H|D) = P(D|H)P(H)/P(D) — just in matrix form with Gaussian distributions. A Bayesian sees Kalman; a controls engineer sees Kalman; a geneticist sees Kalman. They're all doing the same computation."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "global-shipping" as const, reason: "Global Shipping — vessel tracking via AIS + Kalman" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Kalman card (cross-disciplinary)" },

@@ -14,6 +14,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Line, LineChart, ComposedChart,
 } from "recharts";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 type Tab = "math" | "live" | "production";
 
@@ -329,6 +330,24 @@ plt.savefig('gnomad_brca1_entropy.png', dpi=150, bbox_inches='tight')`}
       </SectionCard>
 
       <RelatedElegantCode sourceCard={9} />
+
+      <DeeperThoughtSection pageTitle="Entropy">
+        <DeeperThought title="Entropy IS the universal currency of disorder" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"Shannon measured message information (1948, bits). Boltzmann measured gas disorder (1877, J/K). Haldane measured genetic diversity (1918, heterozygosity). The SAME formula H = -Σ p log p because all three measure how SPREAD OUT a distribution is. A compressed file has high entropy (unpredictable). A hot gas has high entropy (disordered). A diverse population has high entropy (many alleles). The log makes entropy ADDITIVE — H(X,Y) = H(X) + H(Y|X) — which is WHY it's universal: it decomposes across systems."}</p>
+        </DeeperThought>
+        <DeeperThought title="The 2nd law of thermodynamics IS the arrow of time" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"Entropy always increases — in a gas, in a message, in a population. This IS the arrow of time. A broken egg doesn't unbreak. A compressed file doesn't uncompress. A diverse population doesn't become clonal (without a bottleneck). The 2nd law applies to information loss (compression limit) and genetic erosion (loss of diversity) equally. Disorder IS disorder, regardless of domain."}</p>
+        </DeeperThought>
+        <DeeperThought title="The discretization bias IS the bridge between discrete and continuous entropy" connectedTo="ADR-051 (living-equation pages)">
+          <p>{"When you drag n on this page, H grows because the discrete entropy includes a log(bin_width) bias. As n→∞, H_discrete → H_continuous + log(1/n). The bias is the cost of discretization — you're binning a continuous distribution into n bins, and each bin adds log(n) bits of spurious entropy. Understanding this bias IS understanding the relationship between discrete and continuous information — and it's why the demo converges slowly, not instantly."}</p>
+        </DeeperThought>
+        <DeeperThought title="gnomAD's constraint score IS entropy — low H = essential gene" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"gnomAD reports per-gene constraint scores — genes with low allele diversity (low entropy) are 'constrained' (essential). TP53 has H ≈ 0.5 nats (few variants, all rare) — it's the most essential human gene. Olfactory receptors have H ≈ 3 nats (many variants, diverse) — they're dispensable. The entropy IS the constraint score. Conservation biology uses H to assess extinction risk: high-H populations are resilient, low-H populations are vulnerable."}</p>
+        </DeeperThought>
+        <DeeperThought title="Boltzmann's tombstone IS the equation — H = k log W" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Ludwig Boltzmann's tombstone in Vienna has S = k·log(W) carved on it. The SAME equation Shannon derived 71 years later for information theory. The SAME equation Haldane derived for genetic diversity. Three men, three domains, one formula. The tombstone IS the proof that some equations transcend their origin. Boltzmann died in 1906 — he never knew his formula would compress audio, measure genetic diversity, and assess extinction risk. But it does. The math doesn't care about the domain."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedTopics topics={[
         { id: "systems-biology" as const, reason: "Systems Biology — heterozygosity = genetic entropy" },
         { id: "elegant-code" as const, reason: "Elegant Code — the Entropy card (cross-disciplinary)" },
