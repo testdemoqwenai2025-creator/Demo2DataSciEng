@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
 import { THOUGHT_COUNTS, TOTAL_THOUGHTS } from "../_lib/thought-counts";
+import { PAGE_DATES } from "../_lib/page-dates";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
@@ -248,6 +249,11 @@ function TopBar({ active, onOpenSidebar }: { active: PageId; onOpenSidebar?: () 
         <Icon name={page.icon} className="h-4 w-4 text-primary" />
         <p className="text-sm font-medium">{page.label}</p>
         <span className="text-xs text-muted-foreground hidden md:inline">— {page.description}</span>
+        {PAGE_DATES[active] && (
+          <span className="text-[10px] text-muted-foreground ml-auto font-mono shrink-0">
+            Last updated: {PAGE_DATES[active]}
+          </span>
+        )}
       </div>
     </header>
   );
