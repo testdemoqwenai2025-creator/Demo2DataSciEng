@@ -80,6 +80,8 @@ export interface DatasetExample {
   tools: string[];  // computational tools mentioned
   /** Optional: expected outcomes per science the equation bridges (typically 3 tiles). */
   outcomes?: ExpectedOutcome[];
+  /** Optional: LaTeX-formatted mathematical derivation for DeeperMathFold. */
+  math?: string;
 }
 
 interface DatasetCardsProps {

@@ -103,16 +103,55 @@ export async function POST(req: Request) {
   try {
     const zai = await ZAI.create();
 
-    // Build the message list: system prompt + optional history + the new question.
+    // Detect page references in the question (e.g., "what's on /living-svd?").
+    // If found, fetch that page's HTML, strip tags, and include the content
+    // in the LLM context so it can answer with specifics.
+    let pageContext = "";
+    const pageRefMatches = question.match(/\/(living-\w+|elegant-code|connections|resources|global-shipping|computational-\w+|bioinformatics\w*|systems-biology|fintech|space-science|monte-carlo|numpy-scipy|transformer\w*)/gi);
+    if (pageRefMatches) {
+      const uniquePages = Array.from(new Set(pageRefMatches.map(p => p.toLowerCase())));
+      for (const pagePath of uniquePages.slice(0, 3)) { // max 3 pages to keep context manageable
+        try {
+          // In dev mode, fetch from localhost:3000 (the dev server).
+          // The dev server serves all routes at /pagePath.
+          const pageUrl = `http://localhost:3000${pagePath}`;
+          const pageRes = await fetch(pageUrl, { signal: AbortSignal.timeout(5000) });
+          if (pageRes.ok) {
+            const html = await pageRes.text();
+            // Strip HTML tags to get plain text (simplified — keeps text content).
+            const text = html
+              .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+              .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+              .replace(/<[^>]+>/g, " ")
+              .replace(/\s+/g, " ")
+              .trim()
+              .slice(0, 3000); // truncate to 3000 chars for context
+            if (text.length > 100) {
+              pageContext += `\n\n--- Content from ${pagePath} ---\n${text}\n--- End of ${pagePath} ---\n`;
+            }
+          }
+        } catch {
+          // Page fetch failed — skip silently (best-effort).
+        }
+      }
+    }
+
+    // Build the message list: system prompt + optional page context + optional history + the new question.
     const messages: Array<{ role: string; content: string }> = [
       { role: "assistant", content: SYSTEM_PROMPT },
     ];
+
+    // If we fetched page content, prepend it to the user's question.
+    const userContent = pageContext
+      ? `${question}\n\n[The following content was fetched from the platform's pages to help you answer with specifics:]\n${pageContext}`
+      : question;
+
     if (history && Array.isArray(history)) {
       for (const msg of history) {
         messages.push({ role: msg.role, content: msg.content });
       }
     }
-    messages.push({ role: "user", content: question });
+    messages.push({ role: "user", content: userContent });
 
     const completion = await zai.chat.completions.create({
       messages: messages as any,
@@ -123,7 +162,9 @@ export async function POST(req: Request) {
 
     const response: AskAnythingResponse = {
       answer,
-      model: "z-ai-web-dev-sdk (LLM via /api/ask-anything, dev mode)",
+      model: pageContext
+        ? "z-ai-web-dev-sdk (LLM + fetched page content, dev mode)"
+        : "z-ai-web-dev-sdk (LLM via /api/ask-anything, dev mode)",
       inPlatformContext: true,
     };
     return NextResponse.json(response);

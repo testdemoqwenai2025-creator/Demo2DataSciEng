@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Sparkles } from "lucide-react";
@@ -216,6 +216,15 @@ export function DeeperMathFold({ cardIndex }: { cardIndex: number }) {
       description="The full mathematical context for this equation — derivation sketch, key theorems, and why the math is universal."
     >
       <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+        {/* LaTeX derivation (if the card has a math: field) */}
+        {card.math && (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">LaTeX derivation</p>
+            <div className="rounded-md border border-border/40 bg-background p-3 overflow-x-auto">
+              <KaTeXRenderer latex={card.math} />
+            </div>
+          </div>
+        )}
         <div>
           <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Why this equation is universal</p>
           <p>{card.brief.why}</p>
@@ -239,5 +248,50 @@ export function DeeperMathFold({ cardIndex }: { cardIndex: number }) {
         </p>
       </div>
     </FoldSection>
+  );
+}
+
+/**
+ * KaTeXRenderer — renders a LaTeX string using KaTeX.
+ * Falls back to plain text if KaTeX fails to render.
+ */
+
+function KaTeXRenderer({ latex }: { latex: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [rendered, setRendered] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || !latex) return;
+    try {
+      // Dynamic import of katex (client-side only).
+      import("katex").then((katex) => {
+        if (containerRef.current) {
+          try {
+            katex.render(latex, containerRef.current, {
+              throwOnError: false,
+              displayMode: true,
+            });
+            setRendered(true);
+          } catch (e) {
+            setError(e instanceof Error ? e.message : String(e));
+          }
+        }
+      }).catch(() => {
+        setError("KaTeX module not available.");
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }, [latex]);
+
+  if (error) {
+    return <pre className="text-[11px] font-mono text-muted-foreground whitespace-pre-wrap">{latex}</pre>;
+  }
+
+  return (
+    <div ref={containerRef} className={`text-sm ${!rendered ? "opacity-0" : "opacity-100"} transition-opacity`}>
+      {!rendered && <span className="text-[10px] text-muted-foreground italic">Rendering LaTeX…</span>}
+    </div>
   );
 }

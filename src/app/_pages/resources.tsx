@@ -7,6 +7,7 @@ import { TalentSearch } from "../_components/talent-search";
 import { SectorIndex } from "../_components/sector-index";
 import { SectorSkills } from "../_components/sector-skills";
 import { SurpriseMe } from "../_components/surprise-me";
+import { DeeperThoughtsIndex } from "../_components/deeper-thoughts-index";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -246,6 +247,16 @@ export function ResourcesPage() {
         badge="cross-reference"
       >
         <SectorSkills />
+      </SectionCard>
+
+      {/* Deeper thoughts index — all thoughts across the platform, filterable by ADR */}
+      <SectionCard
+        title="Deeper thoughts index — every argument on the platform, filterable by ADR"
+        description="Every page on the platform should have 5+ 'My deeper thought' sections — original arguments (not summaries), each connected to an ADR in the research section. This index collects them all in one place. Filter by ADR (e.g., 'ADR-043' → all thoughts about AlphaMissense) or search by text. Click any thought to navigate to the page where it lives."
+        icon={<TrendingUp className="h-5 w-5" />}
+        badge="growing index"
+      >
+        <DeeperThoughtsIndex />
       </SectionCard>
 
       {/* 10 living pages summary */}
