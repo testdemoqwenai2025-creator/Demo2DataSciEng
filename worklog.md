@@ -3847,3 +3847,90 @@ Stage Summary:
 - The /elegant-code page now shows 'Run it live →' CTAs on 5 of 20 cards (deep-linking to the live demos above).
 - All three repos are in sync at HEAD c162afc: AppDataSci-Advanced (private), AppDataSciEng2-Advance (private), Demo2DataSciEng (public, GitHub Pages).
 - Lint clean, static build clean, all 125 pages deployed live.
+
+---
+Task ID: phase-k-extension-and-phase-m-resources
+Agent: Super Z (main)
+Task: Complete Phase K (Living Equations) by adding 5 more living pages for the Phase K fintech/maritime cards (Black-Scholes, Haversine, Kalman, Monte Carlo, GBM), and add Phase M (/resources hub) listing every dataset, paper, and library cited across the 10 living-equation pages.
+
+Work Log:
+- Registered 5 new PageIds in router.ts: living-black-scholes, living-haversine, living-kalman, living-monte-carlo, living-gbm + resources (the hub page). Total: 6 new pages.
+- Created 6 route stubs (src/app/living-*/page.tsx + src/app/resources/page.tsx).
+- Built src/app/_pages/living-black-scholes.tsx (~340 lines):
+  * Slider: σ (volatility 5-50%). Live chart: call price vs strike, with intrinsic-value reference line and BS closed-form comparison.
+  * Pyodide computes C = S·N(d1) − K·e^(-rT)·N(d2) via Numerical Recipes erf approximation (no numpy needed).
+  * Math tab: full Black-Scholes derivation (Bachelier→Samuelson→Black-Scholes 1973, Merton 1973, Hull 2021).
+  * Production tab: QuantLib BlackScholesMertonProcess + AnalyticEuropeanEngine with Greeks (delta, gamma, vega, theta, rho).
+  * Insight: Black-Scholes IS the universal option-pricing equation — Lloyd's, CME, and Fisher all use it.
+- Built src/app/_pages/living-haversine.tsx (~350 lines):
+  * Slider replaced by two port-picker dropdowns (source + destination) — 10 major global ports (Rotterdam, Singapore, Shanghai, LA, Hamburg, Hong Kong, Dubai, Antwerp, Busan, NYC).
+  * Live chart: horizontal bar chart of distances from selected source to all 9 other ports, with selected destination highlighted in green.
+  * Pyodide computes d = 2R·arcsin(√(sin²(Δφ/2) + cos(φ1)·cos(φ2)·sin²(Δλ/2))) for all port pairs.
+  * Math tab: derivation from spherical law of cosines → haversine (Bowring 1805), avoiding catastrophic cancellation.
+  * Production tab: geopy.distance.great_circle, PostGIS ST_Distance on geography type, MarineTraffic computes millions per day.
+  * Insight: a port captain, flight dispatcher, and astronomer use the SAME formula.
+- Built src/app/_pages/living-kalman.tsx (~340 lines):
+  * Slider: R (measurement noise variance, 1-100 → divided by 1000 to get deg²).
+  * Live chart: time series of true (green), AIS reports (red dots), Kalman estimate (blue) for vessel longitude.
+  * Pyodide simulates 50-step random walk + drift + Gaussian measurement noise; 1D Kalman filter updates per step.
+  * Reports RMSE Kalman vs raw AIS — denoise % quantifies the filter's improvement.
+  * Math tab: derivation from state-space model → 2-step predict/update + Kalman gain optimality (Kalman 1960, Apollo 1969).
+  * Production tab: filterpy.KalmanFilter with 4D state (lat, lat_vel, lon, lon_vel), constant-velocity F matrix.
+  * Insight: Kalman IS the universal state-estimation equation — maritime, aviation, genetics all use it.
+- Built src/app/_pages/living-monte-carlo.tsx (~340 lines):
+  * Slider: N (number of GBM paths, 10-10000).
+  * Live chart: MC estimate ± 95% CI vs N (log scale), with BS closed-form reference line (green).
+  * Pyodide simulates GBM paths using exact S_T = S·exp((r − σ²/2)·T + σ·W(T)) solution.
+  * Reports MC estimate + stderr + CI + BS closed-form (~$32) — convergence rate O(1/√N) per CLT.
+  * Math tab: derivation from Law of Large Numbers + Central Limit Theorem + variance reduction (antithetic, control variates, importance sampling).
+  * Production tab: QuantLib.MCEuropeanEngine with 100k paths, antithetic, Sobol quasi-MC for variance reduction.
+  * Insight: a CME quant, port captain, and geneticist all average the same way.
+- Built src/app/_pages/living-gbm.tsx (~330 lines):
+  * Slider: σ (volatility 5-50%). Live chart: 50 simulated 1-year SPX paths + mean ± 1σ envelope.
+  * Pyodide simulates GBM via exact S(t+dt) = S·exp((μ − σ²/2)·dt + σ·√dt·Z) with 252 daily steps.
+  * Reports E[S_T] simulated vs theoretical (S₀·exp(μT)) + final price 95% range (log-normal: skewed right).
+  * Math tab: derivation from additive Bachelier (1900) → multiplicative Samuelson (1965) → log-normal stationary distribution (Brown 1827, Einstein 1905, Wiener 1923).
+  * Production tab: scipy.stats.lognorm.fit on real SPX returns 1950-2024, QuantLib.BlackScholesProcess with term structures.
+  * Insight: a quant simulating SPX, port captain simulating dwell times, and geneticist simulating allele drift iterate the SAME SDE.
+- Fixed 2 lint errors during the build:
+  * /living-monte-carlo: math text contained "{i=1}^{N}" (interpreted as JSX interpolation). Replaced with "(from i=1 to N) of".
+  * /living-kalman: renderer text used Python f-string "{(1 - r.rmse_kalman / r.rmse_ais) * 100:.1f}%" (interpreted as JSX). Replaced with "{(((1 - r.rmse_kalman / r.rmse_ais) * 100)).toFixed(1)}%".
+- Also fixed a JS syntax error in /living-gbm: I had accidentally written `tab === "production" and false ? null : (` (Python-style "and" instead of JS "&&"). Fixed to `tab === "production" && (`.
+- Escaped ${...} in code blocks (template literals) across all 5 new pages — prevents JS from interpolating at SSR time.
+- Built src/app/_pages/resources.tsx (~330 lines) — Phase M Resources hub:
+  * 4 KPIs: 10 datasets, 20 papers, 10 libraries, 10 living pages.
+  * Datasets section: 10 real public datasets (1000-Genomes, UniRef50, gnomAD, CME SPX, MarineTraffic AIS, UN COMTRADE, Lloyd's Register, NOAA USGS, STRING, ImageNet) — each with description, URL, year, cited_on deep-link.
+  * Papers section: 20 cited papers (Beltrami 1873, Jordan 1874, Eckart-Young 1936, Vaswani 2017, Jumper 2021, Gauss 1805, Cooley-Tukey 1965, Poisson 1837, Shannon 1948, Boltzmann 1877, Haldane 1918, Black-Scholes 1973, Merton 1973, Bowring 1805, Kalman 1960, Metropolis 1949, Boyle 1977, Bachelier 1900, Samuelson 1965, Brin-Page 1998) — each with description, DOI/JSTOR/arXiv URL, year, cited_on deep-link.
+  * Libraries section: 10 production libraries (NumPy, SciPy, PyTorch, QuantLib, filterpy, geopy, networkx, sklearn, PostGIS, D3.js) — each with description, docs URL, cited_on deep-link.
+  * 10-card grid at the bottom linking to all 10 living-equation pages (color-coded by equation family).
+  * Insight: "resources ARE the foundation" — every claim on the platform anchors to a real public dataset, paper, or library.
+- Extended the liveDemoByIndex mapping on /elegant-code:
+  * Old: 5 cards (indices 0, 1, 2, 3, 9) had 'Run it live' CTAs.
+  * New: 10 cards (indices 0, 1, 2, 3, 9, 10, 11, 16, 17, 18) have CTAs.
+  * Updated intro text to reflect 10 CTAs.
+- Lint clean across all 14 new/modified files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (was 125; added 5 living + 1 resources). All 6 new pages verified rendered in out/.
+- Verified all 10 living-equation deep-links rendered on /elegant-code (0=svid, 1=attention, 2=poisson, 3=fft, 9=entropy, 10=black-scholes, 11=haversine, 16=kalman, 17=monte-carlo, 18=gbm).
+- Live verification (curl):
+  * /living-black-scholes/ → HTTP 200, content 230KB.
+  * /living-haversine/ → HTTP 200, content 238KB.
+  * /living-kalman/ → HTTP 200, content 231KB.
+  * /living-monte-carlo/ → HTTP 200, content 232KB.
+  * /living-gbm/ → HTTP 200, content 230KB.
+  * /resources/ → HTTP 200, content 377KB.
+  * /elegant-code/ → HTTP 200, all 10 living-equation CTAs present.
+- Pushed commit d4ef1a0 to BOTH private/main (AppDataSci-Advanced) AND prev-session/main (AppDataSciEng2-Advance). The sync-to-public workflow on AppDataSciEng2-Advance auto-mirrors to Demo2DataSciEng, which triggers deploy-pages workflow → GitHub Pages deployment.
+
+Stage Summary:
+- Phase K (Living Equations) COMPLETE: 10 of 20 elegant-code cards have interactive Pyodide demo pages (SVD, Attention, FFT, Poisson, Entropy + Black-Scholes, Haversine, Kalman, Monte Carlo, GBM).
+- Phase M (Resources hub) COMPLETE: /resources page lists every external resource cited across the 10 living-equation pages (10 datasets, 20 papers, 10 libraries).
+- Platform now has 131 pages (was 125).
+- 10 "Run it live →" CTAs on /elegant-code deep-link to the 10 living-equation pages.
+- Lint clean, static build clean, all pushed to both private repos + auto-mirrored to public Demo2DataSciEng + auto-deployed to GitHub Pages.
+- Live URLs (all HTTP 200):
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-black-scholes/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-haversine/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-kalman/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-monte-carlo/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-gbm/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/resources/
