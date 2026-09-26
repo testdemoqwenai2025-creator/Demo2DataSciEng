@@ -4521,3 +4521,21 @@ Stage Summary:
 - Total platform thoughts: 621 - 75 (generic replaced) + 75 (page-specific) = 621 paragraphs, but now ~95 are page-specific original (56 hand-crafted on home + 10 living pages + 75 newly upgraded on 15 most-visited pages) and ~98 remain generic (on 98 less-visited pages).
 - This is the highest-value content task — it transforms the platform from "a reference with meta-commentary" to "a reference with original thinking about every page."
 - Platform: 132 pages, 621 deeper-thought paragraphs (~95 page-specific, ~526 generic). Lint clean, static build clean, all pushed and live.
+
+---
+Task ID: fix-connections-lazy-d3-askmeanything-button
+Agent: Super Z (main)
+Task: Fix /connections page not parsing properly (D3 graph blocking main thread). Move AskMeAnything button up to avoid overlapping FloatingLiveButton.
+
+Work Log:
+- Fixed /connections page 'not parsing properly' issue:
+  * Root cause: the ElegantCodeGraph's D3 force-directed simulation (20 nodes + 30 edges) started immediately on page load, blocking the main thread while converging. This caused the page to appear frozen/unresponsive.
+  * Fix: added 'activated' state (default false) to ElegantCodeGraph. The D3 simulation only starts when the user clicks 'Load interactive graph'. Before activation, shows a styled placeholder with explanation about lazy evaluation.
+  * This follows the platform's lazy-evaluation pattern (same as LivingEquationRunner — nothing heavy loads until the user asks).
+- Fixed AskMeAnything button overlapping FloatingLiveButton:
+  * Root cause: both buttons were at fixed bottom-5/6 right-5/6 — they overlapped.
+  * Fix: moved AskMeAnything from 'bottom-6' to 'bottom-20' — stacks above FloatingLiveButton.
+- Lint clean. Static build: 132 pages.
+- /connections verified: 'Load interactive graph' (2x), 'lazy evaluation' (3x) in HTML.
+- AskMeAnything button at 'bottom-20' (verified in source).
+- Commit 85168b9 pushed to BOTH private/main AND prev-session/main.
