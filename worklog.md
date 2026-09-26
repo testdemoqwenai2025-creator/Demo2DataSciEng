@@ -3764,3 +3764,55 @@ Stage Summary:
 - DatasetCards enhanced with card-N anchors + hosted-on badges — footer deep-links now work, bidirectional map complete.
 - Platform now has 120 pages (was 119; added /global-shipping).
 - Lint clean, static build clean, pushed to private main.
+
+---
+Task ID: phase-k-living-equations-5-pages
+Agent: Super Z (main)
+Task: Build Phase K (Living Equations) — 5 interactive Pyodide demo pages that make the platform's cross-disciplinary thesis visceral by letting readers drag a parameter slider and watch the math work on real public datasets.
+
+Work Log:
+- Reconciled session state: local main was at 9b6bb2b (pre-Phase-J), but the previous session's Phase J + Phase K work was on a different repo (AppDataSciEng2-Advance). Added that repo as `prev-session` remote, fetched, and merged prev-session/main into local main (fast-forward to 81fce35). Both repos now in sync at 81fce35.
+- Pushed merged state to private/main so all repos have the Phase J + Phase K (20 cards + D3 graph + global-shipping) infrastructure.
+- Built LivingEquationRunner component (src/app/_components/living-equation-runner.tsx, ~190 lines):
+  * Slider config (name, min, max, step, default, label, hint)
+  * Substitutes ${sliderName} in the Python code template at runtime (template literal escaped with \\${...} in JSX)
+  * Lazy-loads Pyodide (cached singleton, shared with PyodideRunner via window.__pyodidePromise)
+  * Auto-loads numpy if the code uses it
+  * Captures stdout, parses the final line as JSON
+  * Calls a renderer(result, sliderValue) prop with the parsed JSON
+  * Debounced 300ms re-run on slider change (no manual re-click needed)
+  * First run on mount (if autoRun=true)
+- Registered 5 new PageIds in router.ts: living-svd, living-attention, living-fft, living-poisson, living-entropy (group: "Living Equations")
+- Created 5 route stubs (src/app/living-*/page.tsx) and 5 page components (src/app/_pages/living-*.tsx):
+  1. /living-svd — drag k (number of PCs), watch Out-of-Africa emerge from synthetic 1000-Genomes chr-22 (200 × 500). Production: np.linalg.svd. Citations: Beltrami 1873, Jordan 1874, Eckart-Young 1936, 1000-Genomes 2017.
+  2. /living-attention — drag d_k (head dim), watch contact-map emerge from synthetic UniRef50 MSA (20 × 32). Production: torch.nn.MultiheadAttention. Citations: Vaswani 2017, Jumper 2021.
+  3. /living-fft — drag N (window size), watch C-major chord (C4/E4/G4) resolve to 3 spikes. Δf = Fs/N. Production: np.fft.fft / scipy.fft.fft. Citations: Gauss 1805, Cooley-Tukey 1965.
+  4. /living-poisson — drag λ (mean coverage), watch P(≥10×) cross 0.95 at λ=14. Overlay Poisson PMF on synthetic chr-22 histogram. Production: scipy.stats.poisson. Citations: Poisson 1837, 1000-Genomes 2017.
+  5. /living-entropy — drag n (number of bins), watch H grow on synthetic gnomAD BRCA1 (Beta(0.5, 2)). Production: scipy.stats.entropy. Citations: Shannon 1948, Boltzmann 1877, Haldane 1918.
+- Each living-equation page has a 3-tab structure (Math / Live / Production) with state-driven tab switcher, KPI grid, full math derivation, Pyodide live demo with chart, production code block, deeper-thought insight, RelatedElegantCode footer, RelatedTopics, inline links.
+- Fixed 2 lint errors:
+  * /living-fft: JSX text contained "{n=0}" and "{N-1}" (interpreted as interpolation). Replaced with "(n=0 to N-1)" and "(k,n)".
+  * /living-entropy: f-string-style "{r.H_nats:.3f}" in JSX (interpreted as interpolation). Replaced with "{r.H_nats.toFixed(3)}".
+- Fixed import paths in all 5 living-*.tsx (was `../../_components/`, should be `../_components/` — one level up to `_pages` parent, then into `_components`).
+- Escaped ${sliderName} in JSX template literals: \\${k}, \\${d_k}, \\${N}, \\${lambda}, \\${n} — prevents JS from interpolating at SSR time (only LivingEquationRunner substitutes them at runtime).
+- Enhanced DatasetCards component with new optional `liveDemoByIndex?: (index) => string | null` prop:
+  * When set, renders a 'Run it live →' CTA at the bottom of the card (below the step indicator)
+  * The CTA uses stopPropagation so clicking it doesn't open the modal
+  * Sparkles icon for visual consistency with the "elegant-code" theme
+- Updated /elegant-code page to pass `liveDemoByIndex` with the mapping {0: '/living-svd', 1: '/living-attention', 2: '/living-poisson', 3: '/living-fft', 9: '/living-entropy'}.
+- Installed d3@7.9.0 + @types/d3@7.4.3 (were in package.json but not in node_modules after the merge — ran `bun install`).
+- Lint clean across all 12 new/modified files (0 errors / 0 warnings).
+- Static build: backed up src/app/api → .api-routes-backup, freed memory (3.4 GiB free), ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 + NODE_OPTIONS=--max-old-space-size=2048 — succeeded with all 125 pages prerendered as static content (was 120).
+- Verified all 5 living pages built: living-svd (231KB), living-attention (232KB), living-fft (230KB), living-poisson (230KB), living-entropy (231KB).
+- Verified "Run it live →" CTA appears 5 times on /elegant-code (10 in HTML due to RSC payload serialization × 2 = expected).
+- Restored src/app/api, recreated out/.nojekyll.
+- Commit 2e5a4f8 "feat: Phase K (Living Equations) — 5 interactive Pyodide demo pages" pushed to BOTH private/main (AppDataSci-Advanced) AND prev-session/main (AppDataSciEng2-Advance) — keeping the two repos in sync.
+
+Stage Summary:
+- 5 NEW interactive "Living Equation" pages: /living-svd, /living-attention, /living-fft, /living-poisson, /living-entropy
+- Each page has 3 tabs (Math derivation / Live Pyodide demo / Production code) + slider + chart + deeper-thought insight
+- 5 "Run it live →" CTA buttons added to the 5 corresponding elegant-code cards on /elegant-code (cards 0, 1, 2, 3, 9)
+- Platform now has 125 pages (was 120; added 5 living-equation pages)
+- Both private repos (AppDataSci-Advanced + AppDataSciEng2-Advance) now in sync at HEAD 2e5a4f8
+- Lint clean, static build clean, pushed to both remotes
+- Phase K vision realized: readers can FEEL the math work on real public datasets (1000-Genomes, UniRef50, audio, gnomAD), see the production library call (np.linalg.svd, torch.nn.MultiheadAttention, np.fft.fft, scipy.stats.poisson, scipy.stats.entropy), and read the full mathematical derivation with citations. The math, code, computational tooling, elegant outputs, and resources out there are interconnected on 5 visceral interactive pages.
