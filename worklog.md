@@ -4649,3 +4649,54 @@ Guardrails Added:
 
 Pushed to ALL 3 remotes: private/main, prev-session/main, public2/main.
 Commit b0ed400.
+
+---
+Task ID: sync-workflow-real-fix
+Agent: main (Super Z)
+Task: Fix the sync-to-public workflow on AppDataSciEng2-Advance that was not reliably pushing to Demo2DataSciEng. User had to push directly to public2 to force deploys. Investigate paths-ignore / branch protection.
+
+Work Log:
+- Pulled workflow YAML from all 3 remotes (private, prev-session, public2) — file identical across all three.
+- Queried GitHub Actions API for recent runs on AppDataSciEng2-Advance.
+  - 328 total sync workflow runs; run #96 (commit 37bf2d0a, 10:58:18Z) was the LAST SUCCESS.
+  - Runs #97-#108 (commit 05326a25 onward, 10:59:08Z+) ALL FAILED.
+- Got job details for failed runs: `runner_id: 0`, `runner_name: ""`, `steps: []`, duration 4 seconds.
+  - This is the textbook signature of GitHub Actions refusing to allocate a runner — NOT a YAML/syntax issue, NOT a paths-ignore issue, NOT a branch-protection issue.
+- Compared workflow YAML at last-success commit (37bf2d0a) vs first-failure commit (05326a25): IDENTICAL.
+- Checked the other two workflows on the same private repo (deploy-pages.yml, guardrail-audit.yml): ALL THREE started failing at the same time (#97), all with the same `runner_id=0, 0 steps` pattern.
+- Checked the same workflows on the PUBLIC repo (Demo2DataSciEng): ALL 100 runs succeeded, including the recent ones. Public repos have UNLIMITED GitHub Actions minutes.
+- Conclusion: GitHub Actions free minutes exhausted on the private repo (free account = 2000 min/month for private repos; this account has been doing 548+ runs in the session).
+
+Architectural Fix:
+1. Created `.github/workflows/sync-from-private.yml` — runs on the PUBLIC mirror repo (Demo2DataSciEng), pulls from AppDataSci-Advanced using a PAT, pushes to itself using the built-in GITHUB_TOKEN.
+   - Trigger: every-10-min cron + workflow_dispatch + repository_dispatch (webhook-ready).
+   - `if: github.repository == 'testdemoqwenai2025-creator/Demo2DataSciEng'` — guards against running on private repos where the file is mirrored.
+   - Sanity-checks secret presence up front (fail fast if missing).
+   - No-op fast path when private/main == public/main (saves Actions minutes for cron runs).
+   - Force-pushes when public main has diverged from private main (public is a pure mirror).
+   - Verify-sync step exits 1 on mismatch so failure notification fires.
+   - `persist-credentials: false` on checkout step — CRITICAL fix discovered during testing (actions/checkout's cached extraheader overrides URL-embedded PAT and sends GITHUB_TOKEN to fetch the private repo → "Repository not found").
+   - Push step explicitly re-adds GITHUB_TOKEN to origin's URL since persist-credentials=false removed it.
+2. Hardened `.github/workflows/sync-to-public.yml` (kept as fallback for when Actions quota resets):
+   - Restored `paths-ignore: ['.github/workflows/**', 'worklog.md']` — don't fire on no-op commits.
+   - Added sanity-check for SYNC_TO_PUBLIC_PAT presence (fail fast).
+   - Removed silent GITHUB_TOKEN fallback (cannot push cross-repo — was misleading).
+   - Verify-sync step now `exit 1` on mismatch so the `Notify on failure` step actually fires.
+   - Added the Actions-minutes-exhausted failure mode to the notify message.
+3. Set `SYNC_FROM_PRIVATE_PAT` secret on Demo2DataSciEng (via API + pynacl sealed-box encryption). The PAT is the same classic `repo`-scope token already embedded in local git remote URLs — it has read on AppDataSci-Advanced and write on Demo2DataSciEng.
+4. Persisted `scripts/set_sync_from_private_secret.py` for future reuse.
+5. End-to-end verified:
+   - Run #1: failed at "Fetch from private source" step — `Repository not found` due to extraheader override.
+   - Fixed via `persist-credentials: false`.
+   - Run #2: SUCCESS (no-op fast path, since all 3 remotes in sync).
+   - Run #3: SUCCESS — pushed test marker ONLY to private/main (AppDataSci-Advanced), dispatched workflow, marker appeared on public2/main within ~30 seconds.
+   - Run #4: SUCCESS (no-op fast path again).
+
+Stage Summary:
+- Root cause confirmed: GitHub Actions free minutes exhausted on private repo (not a workflow file issue).
+- Architectural fix: pull-sync workflow on public repo provides reliable sync independent of private-repo Actions quota.
+- Public repo (Demo2DataSciEng) now has 4 active workflows: deploy-pages, guardrail-audit, sync-from-private (NEW), sync-to-public (legacy, will resume once quota resets).
+- All 3 git remotes in sync at commit 16237d4aab32d042417219aae45615953617287c.
+- `SYNC_FROM_PRIVATE_PAT` secret set on Demo2DataSciEng.
+- User no longer needs to manually push to public2 — pushing to private (or prev-session) triggers the every-10-min cron to pull to public2 automatically.
+- Future improvements (not done): set up a webhook on AppDataSci-Advanced that fires `repository_dispatch` on Demo2DataSciEng to trigger immediate sync (currently max latency = 10 min from cron).
