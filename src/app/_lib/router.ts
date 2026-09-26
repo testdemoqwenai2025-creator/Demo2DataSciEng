@@ -135,7 +135,8 @@ export type PageId =
   | "living-kalman"
   | "living-monte-carlo"
   | "living-gbm"
-  | "resources";
+  | "resources"
+  | "future";
 
 export interface PageMeta {
   id: PageId;
@@ -1179,6 +1180,14 @@ export const PAGES: PageMeta[] = [
     group: "Living Equations",
     icon: "Database",
     description: "Single hub listing every real public dataset, paper, and library cited across all 10 living-equation pages. Grouped by category: Datasets (1000-Genomes, UniRef50, gnomAD, CME SPX, MarineTraffic AIS, UN COMTRADE, Lloyd's Register, NOAA), Papers (Beltrami 1873, Shannon 1948, Cooley-Tukey 1965, Markov 1906, Kalman 1960, Black-Scholes 1973, Brin & Page 1998), Libraries (NumPy, SciPy, PyTorch, QuantLib, filterpy, geopy, D3.js).",
+  },
+  {
+    id: "future",
+    label: "Future Evolution — where this platform goes in 10-20 years",
+    shortLabel: "Future",
+    group: "Living Equations",
+    icon: "TrendingUp",
+    description: "The platform's most ambitious deeper thought: a page ABOUT its own future. Projects each technology forward 10-20 years — what replaces Snowflake, Kafka, PyTorch? — while arguing that the math (SVD, Attention, Poisson, FFT, Bayes, Kalman) stays the same. The tools are the amplifier; the math is the signal. The platform is designed for technology turnover.",
   },
 ];
 

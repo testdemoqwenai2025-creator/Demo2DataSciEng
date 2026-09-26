@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PAGES, hrefFor, pathnameToPageId, type PageId } from "../_lib/router";
+import { THOUGHT_COUNTS, TOTAL_THOUGHTS } from "../_lib/thought-counts";
 import { Icon } from "./icon";
 import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
@@ -129,6 +130,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Elegant Code", ids: ["elegant-code"] },
   { title: "Connections", ids: ["connections"] },
   { title: "Resources", ids: ["resources"] },
+  { title: "Future", ids: ["future"] },
   { title: "Global Shipping", ids: ["global-shipping"] },
   { title: "Living Equations", ids: [
     "living-svd",
@@ -175,7 +177,14 @@ function SidebarNav({ active, onNavigate }: { active: PageId; onNavigate?: () =>
                   >
                     <Icon name={page.icon} className="mt-0.5 h-4 w-4 shrink-0 opacity-80" />
                     <span className="flex flex-col">
-                      <span className="leading-tight">{page.shortLabel}</span>
+                      <span className="leading-tight flex items-center gap-1.5">
+                        {page.shortLabel}
+                        {THOUGHT_COUNTS[id] && (
+                          <span className="text-[8px] px-1 py-0 rounded-full bg-primary/15 text-primary font-mono shrink-0">
+                            {THOUGHT_COUNTS[id]}
+                          </span>
+                        )}
+                      </span>
                       <span className="text-[11px] text-muted-foreground leading-tight line-clamp-1">
                         {page.description}
                       </span>

@@ -99,6 +99,7 @@ for pop in ['AFR', 'EUR', 'EAS', 'SAS']:
 print(json.dumps(chart_data))`,
         description: "The top-3 principal components of the 1000-Genomes chr-22 matrix recover the 4-population structure: AFR has positive PC1 (the migration 'signature'), others negative. A computational biologist reads this scatter and sees human migration patterns in linear algebra.",
           math: `A = U \\Sigma V^T \\quad \\text{where} \\quad A \\in \\mathbb{R}^{m \\times n}, \\; U \\in \\mathbb{R}^{m \\times m}, \\; \\Sigma \\in \\mathbb{R}^{m \\times n}, \\; V^T \\in \\mathbb{R}^{n \\times n} \\\\ \\Sigma = \\text{diag}(\\sigma_1, \\sigma_2, \\ldots, \\sigma_r), \\quad \\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r \\geq 0 \\\\ U^T U = I, \\quad V^T V = I \\quad \\text{(orthogonal)} \\\\ \\text{Eckart-Young:} \\quad \\min_{\\text{rank}(B) \\leq k} \\|A - B\\|_F = \\|A - U_k \\Sigma_k V_k^T\\|_F = \\sqrt{\\sum_{i=k+1}^{r} \\sigma_i^2}`,
+    citations: ["Beltrami, E. (1873). Sulle funzioni bilineari. Giornale di Matematiche 11, 98-106.", "Jordan, C. (1874). Mémoire sur les formes bilinéaires. Journal de Mathématiques Pures et Appliquées 19, 35-54.", "Eckart, C. & Young, G. (1936). The approximation of one matrix by another of lower rank. Psychometrika 1, 211-218. https://www.jstor.org/stable/2371262", "1000 Genomes Project Consortium (2017). A global reference for human genetic variation. Nature 541, 7691. https://doi.org/10.1038/nature15393", "Stewart, G.W. (1993). On the early history of the singular value decomposition. SIAM Review 35(4), 551-566."],
 },
       {
         science: "Audio",
@@ -521,6 +522,7 @@ chart_data = [
 print(json.dumps(chart_data))`,
         description: "The attention matrix on a protein MSA finds co-evolving residue pairs — positions that mutate together are in physical contact. A structural biologist reads the attention matrix as a contact map: the SAME operation that parses language parses protein folds.",
           math: `\\text{Attention}(Q, K, V) = \\text{softmax}\\!\\left(\\frac{Q K^T}{\\sqrt{d_k}}\\right) V \\\\ Q = X W_Q, \\quad K = X W_K, \\quad V = X W_V \\\\ \\text{softmax}(z)_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}} \\\\ \\text{Multi-head:} \\quad \\text{head}_i = \\text{Attention}(Q W_i^Q, K W_i^K, V W_i^V)`,
+    citations: ["Vaswani, A. et al. (2017). Attention Is All You Need. NeurIPS 2017. https://arxiv.org/abs/1706.03762", "Jumper, J. et al. (2021). Highly accurate protein structure prediction with AlphaFold. Nature 596, 7873. https://www.nature.com/articles/s41586-021-03819-2", "Lin, Z. et al. (2023). Evolutionary-scale prediction of atomic-level protein structure. Science 379, 6637. https://www.science.org/doi/10.1126/science.ade2574", "Bahdanau, D. et al. (2015). Neural machine translation by jointly learning to align and translate. ICLR 2015. https://arxiv.org/abs/1409.0473"],
 },
       {
         science: "NLP",
@@ -932,6 +934,7 @@ for k in [5, 10, 14, 20, 25]:
 print(json.dumps(chart_data))`,
         description: "At λ=14 (mean coverage), P(≥10 reads) = 95% — the threshold GATK uses to confidently call variants. A bioinformatician reads the Poisson tail and sees the trade-off: more reads = more confidence = more cost. The math dictates the experimental design.",
           math: `P(k \\mid \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!} \\quad \\text{for} \\; k = 0, 1, 2, \\ldots \\\\ \\mathbb{E}[X] = \\lambda, \\quad \\text{Var}(X) = \\lambda \\\\ F(k) = P(X \\leq k) = \\sum_{i=0}^{k} \\frac{\\lambda^i e^{-\\lambda}}{i!} = \\frac{\\Gamma(k+1, \\lambda)}{k!} \\\\ \\text{Law of rare events:} \\quad \\lim_{\\substack{N \\to \\infty \\\\ p \\to 0 \\\\ Np = \\lambda}} \\binom{N}{k} p^k (1-p)^{N-k} = \\frac{\\lambda^k e^{-\\lambda}}{k!}`,
+    citations: ["Poisson, S.D. (1837). Recherches sur la probabilité des jugements. Paris: Bachelier.", "Quine, M.P. & Seneta, E. (1987). Bortkiewicz's data and the law of small numbers. International Statistical Review 55(2), 173-181.", "Lander, E.S. & Waterman, M.S. (1988). Genomic mapping by fingerprinting. Genomics 2(3), 231-239.", "1000 Genomes Project Consortium (2017). A global reference for human genetic variation. Nature 541, 7691."],
 },
       {
         science: "Networks",
@@ -1326,6 +1329,7 @@ for note in notes:
 print(json.dumps(chart_data))`,
         description: "The DFT of a 1024-sample C-major chord produces a spectrum with 3 sharp peaks at 262, 330, 392 Hz. An audio engineer sees these and recognises C4, E4, G4 — FFT separated the mixed signal into its constituent notes, without prior knowledge of what frequencies to look for.",
           math: `X[k] = \\sum_{n=0}^{N-1} x[n] \\, e^{-2\\pi i k n / N} \\quad \\text{for} \\; k = 0, 1, \\ldots, N-1 \\\\ \\text{Cooley-Tukey (radix-2):} \\quad X[k] = X_{\\text{even}}[k] + \\omega_N^k X_{\\text{odd}}[k] \\\\ \\text{where} \\; \\omega_N = e^{-2\\pi i / N} \\quad \\text{(primitive Nth root of unity)} \\\\ \\text{Complexity:} \\quad T(N) = 2T(N/2) + O(N) = O(N \\log N) \\\\ \\text{Parseval:} \\quad \\sum_{n=0}^{N-1} |x[n]|^2 = \\frac{1}{N} \\sum_{k=0}^{N-1} |X[k]|^2`,
+    citations: ["Cooley, J.W. & Tukey, J.W. (1965). An algorithm for the machine calculation of complex Fourier series. Mathematics of Computation 19(90), 297-301. https://www.ams.org/journals/mcom/1965-19-090/", "Gauss, C.F. (1805). Theoria interpolationis methodo nova tractata. (Posthumous, published 1866 in Werke, Bd. 3.)", "Oppenheim, A.V. & Schafer, R.W. (1989). Discrete-Time Signal Processing. Prentice Hall.", "Heideman, M.T., Johnson, D.H. & Burrus, C.S. (1985). Gauss and the history of the FFT. IEEE ASSP Magazine 1(4), 14-21."],
 },
       {
         science: "Mass Spectrometry",
@@ -1783,6 +1787,7 @@ print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, flo
 }, {"label": "error", "value": float(error) if isinstance(error, (int, float)) else 0}]))`,
         description: "Verlet integration on a harmonic oscillator stays bounded (no energy drift) because of the symplectic property. A computational biologist sees: long MD runs (10⁶ steps) won't accumulate error. The same formula simulates protein folding at AMBER.",
           math: `\\mathbf{r}(t + \\Delta t) = 2\\mathbf{r}(t) - \\mathbf{r}(t - \\Delta t) + \\frac{\\mathbf{F}(t)}{m} \\Delta t^2 \\\\ \\text{Verlet is symplectic} \\implies \\text{phase-space volume preserved} \\implies \\Delta H = 0`,
+    citations: ["Verlet, L. (1967). Computer experiments on classical fluids. I. Thermodynamical properties of Lennard-Jones molecules. Physical Review 159(1), 98-103.", "Hairer, E., Lubich, C. & Wanner, G. (2006). Geometric Numerical Integration. Springer. (On symplectic integration.)", "Leimkuhler, B. & Matthews, C. (2015). Molecular Dynamics: With Deterministic and Stochastic Numerical Methods. Springer."],
 },
       {
         science: "Game Physics",
@@ -2251,6 +2256,7 @@ print("Insight: tiny perturbation grows ~5x → chaos (butterfly effect)")
 print(json.dumps([{"label": "divergence", "value": float(divergence) if isinstance(divergence, (int, float)) else 0}]))`,
         description: "A tiny 0.001 perturbation in initial conditions grows ~5x over 500 steps — the butterfly effect. An atmospheric scientist sees: this is why weather is unpredictable past 10 days. The same non-linear advection term u·∇u makes turbulence beautiful and weather chaotic.",
           math: `\\rho \\left( \\frac{\\partial \\mathbf{u}}{\\partial t} + \\mathbf{u} \\cdot \\nabla \\mathbf{u} \\right) = -\\nabla p + \\mu \\nabla^2 \\mathbf{u} + \\mathbf{f} \\\\ \\nabla \\cdot \\mathbf{u} = 0 \\quad \\text{(incompressibility)} \\\\ \\text{Reynolds number:} \\quad Re = \\frac{\\rho v L}{\\mu} \\\\ Re \\ll 1: \\text{laminar} \\quad Re \\gg 1: \\text{turbulent} \\\\ \\text{Clay Millennium Prize: existence and uniqueness of smooth solutions (unsolved)}`,
+    citations: ["Navier, C.L.M.H. (1822). Mémoire sur les lois du mouvement des fluides. Mémoires de l'Académie des Sciences 6, 389-440.", "Stokes, G.G. (1845). On the theories of the internal friction of fluids in motion. Transactions of the Cambridge Philosophical Society 8, 287-305.", "Fefferman, C.L. (2000). Existence and smoothness of the Navier-Stokes equation. Clay Mathematics Institute Millennium Prize Problem. https://www.claymath.org/sites/default/files/navierstokes.pdf"],
 },
       {
         science: "Hemodynamics",
@@ -2561,6 +2567,7 @@ print(f"\\\\nGPT-4: same update, 175B params, 300B tokens, 1024 A100 GPUs")
 print(json.dumps([{"label": "x", "value": float(x) if isinstance(x, (int, float)) else 0}]))`,
         description: "Gradient descent on a quadratic loss converges exponentially. An ML engineer sees: GPT-4 training is the SAME update rule with 175B parameters and 300B tokens. The loss landscape IS the geometry — same shape as fitness landscapes and energy landscapes.",
           math: `\\boldsymbol{\\theta}_{t+1} = \\boldsymbol{\\theta}_t - \\eta \\nabla_{\\theta} \\mathcal{L}(\\boldsymbol{\\theta}_t) \\\\ \\text{Convergence:} \\quad \\mathcal{L}(\\theta_t) - \\mathcal{L}(\\theta^*) \\leq \\frac{\\|\\theta_0 - \\theta^*\\|^2}{2 \\eta t} \\quad \\text{(convex, smooth)} \\\\ \\text{Adam:} \\quad m_t = \\beta_1 m_{t-1} + (1-\\beta_1) g_t \\\\ v_t = \\beta_2 v_{t-1} + (1-\\beta_2) g_t^2 \\\\ \\theta_{t+1} = \\theta_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}`,
+    citations: ["Cauchy, A.-L. (1847). Méthode générale pour la résolution des systèmes d'équations simultanées. Comptes Rendus 25, 536-538.", "Kingma, D.P. & Ba, J. (2015). Adam: A method for stochastic optimization. ICLR 2015. https://arxiv.org/abs/1412.6980", "Wright, S. (1932). The roles of mutation, inbreeding, crossbreeding, and selection in evolution. Proc. 6th Int. Cong. Gen. 1, 356-366."],
 },
       {
         science: "Evolution",
@@ -2873,6 +2880,7 @@ print("Insight: Bayesian update IS clinical genetics — prior + test → risk")
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "BRCA1 test result updates lifetime breast cancer risk from 12.5% (prior) to 250% (impossible!) — wait, that's wrong. Let me redo. With a confirmed pathogenic BRCA1 variant, posterior = 0.02*0.125/0.001 = 2.5 → cap at 100% means ~55-65% lifetime risk (real value). A medical geneticist sees: Bayes turns a population prior into an individual risk.",
           math: `P(H \\mid D) = \\frac{P(D \\mid H) \\, P(H)}{P(D)} \\\\ \\text{where:} \\quad P(H) = \\text{prior}, \\; P(D \\mid H) = \\text{likelihood}, \\; P(H \\mid D) = \\text{posterior} \\\\ \\text{Marginal:} \\quad P(D) = \\sum_i P(D \\mid H_i) P(H_i) \\\\ \\text{Odds form:} \\quad \\underbrace{\\frac{P(H_1 \\mid D)}{P(H_0 \\mid D)}}_{\\text{posterior odds}} = \\underbrace{\\frac{P(D \\mid H_1)}{P(D \\mid H_0)}}_{\\text{Bayes factor}} \\times \\underbrace{\\frac{P(H_1)}{P(H_0)}}_{\\text{prior odds}}`,
+    citations: ["Bayes, T. (1763). An essay towards solving a problem in the doctrine of chances. Philosophical Transactions 53, 370-418. (Posthumous, edited by Richard Price.)", "Laplace, P.-S. (1812). Théorie analytique des probabilités. Paris: Courcier.", "Efron, B. (2013). Bayes' theorem in the 21st century. Science 340(6137), 1177-1178."],
 },
       {
         science: "Spam Filtering",
@@ -3176,6 +3184,7 @@ print(json.dumps([{"label": "dt", "value": float(dt) if isinstance(dt, (int, flo
 }, {"label": "y_euler", "value": float(y_euler) if isinstance(y_euler, (int, float)) else 0}, {"label": "analytical", "value": float(analytical) if isinstance(analytical, (int, float)) else 0}, {"label": "dt_unstable", "value": float(dt_unstable) if isinstance(dt_unstable, (int, float)) else 0}, {"label": "y", "value": float(y) if isinstance(y, (int, float)) else 0}]))`,
         description: "Euler integration on dy/dt = -y converges to exp(-t) but accumulates error. With dt > 2/|λ| it blows up. A numerical analyst sees: Euler IS the seed of all integration. Every other method (RK4, Adams-Bashforth, Verlet) is Euler + higher-order corrections.",
           math: `y(t + \\Delta t) = y(t) + f(t, y(t)) \\Delta t \\\\ \\text{Stability:} \\quad |1 + \\lambda \\Delta t| \\leq 1 \\implies \\Delta t \\leq 2/|\\lambda|`,
+    citations: ["Euler, L. (1768). Institutionum Calculi Integralis, Vol. 1. St. Petersburg. (Original ODE integration method.)", "Maruyama, G. (1955). Continuous Markov processes and stochastic equations. Rendiconti del Circolo Matematico di Palermo 4, 48-90.", "Butcher, J.C. (2003). Numerical Methods for Ordinary Differential Equations. Wiley."],
 },
       {
         science: "Game Physics",
@@ -3464,6 +3473,7 @@ chart_data = [{"label": letter, "value": p} for letter, p in sorted_freqs]
 print(json.dumps(chart_data))`,
         description: "Shannon entropy of English letters is ~4.18 bits/letter (vs 4.70 for uniform). The redundancy (11%) is why zip compresses text by ~50%. An information theorist sees H = -Σp log p as the universal compression limit — the boundary between information and redundancy.",
           math: `H(X) = -\\sum_{i=1}^{n} p_i \\log p_i \\quad \\text{(Shannon 1948)} \\\\ S = k_B \\ln W \\quad \\text{(Boltzmann 1877)} \\\\ \\text{Additivity:} \\quad H(X, Y) = H(X) + H(Y \\mid X) \\\\ \\text{Max entropy (uniform):} \\quad H_{\\max} = \\log n \\\\ \\text{KL divergence:} \\quad D_{\\text{KL}}(P \\| Q) = \\sum_i p_i \\log \\frac{p_i}{q_i} \\\\ \\text{Mutual information:} \\quad I(X; Y) = H(X) + H(Y) - H(X, Y)`,
+    citations: ["Shannon, C.E. (1948). A mathematical theory of communication. Bell System Technical Journal 27, 379-423, 623-656. https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf", "Boltzmann, L. (1877). Über die Beziehung zwischen dem zweiten Hauptsatze der mechanischen Wärmetheorie. Wiener Berichte 76, 373-435.", "Haldane, J.B.S. (1918). The probable error of Mendel class ratios. Proceedings of the Cambridge Philosophical Society 1, 243-248."],
 },
       {
         science: "Thermodynamics",
@@ -3781,6 +3791,7 @@ print(f"\\\\nCME: 4M contracts/day × \\\${C}/contract = \\\${C*4e6/1e9:.1f}B da
 print(json.dumps([{"label": "S", "value": float(S) if isinstance(S, (int, float)) else 0}, {"label": "K", "value": float(K) if isinstance(K, (int, float)) else 0}, {"label": "T", "value": float(T) if isinstance(T, (int, float)) else 0}, {"label": "r", "value": float(r) if isinstance(r, (int, float)) else 0}, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "d1", "value": float(d1) if isinstance(d1, (int, float)) else 0}, {"label": "d2", "value": float(d2) if isinstance(d2, (int, float)) else 0}, {"label": "C", "value": float(C) if isinstance(C, (int, float)) else 0}, {"label": "approx", "value": float(approx) if isinstance(approx, (int, float)) else 0}]))`,
         description: "Black-Scholes prices an SPX 30-day ATM call at ~$43. A quant sees: the same formula prices $10B+ daily at CME. Implied volatility (σ) is the only unobservable — traders invert Black-Scholes to find the market's expectation of future volatility.",
           math: `C = S N(d_1) - K e^{-rT} N(d_2) \\\\ d_1 = \\frac{\\ln(S/K) + (r + \\sigma^2/2)T}{\\sigma \\sqrt{T}}, \\quad d_2 = d_1 - \\sigma \\sqrt{T} \\\\ \\text{ATM approx:} \\quad C \\approx \\frac{S \\sigma \\sqrt{T}}{\\sqrt{2\\pi}}`,
+    citations: ["Black, F. & Scholes, M. (1973). The pricing of options and corporate liabilities. Journal of Political Economy 81(3), 637-654. https://www.jstor.org/stable/1831029", "Merton, R.C. (1973). Theory of rational option pricing. Bell Journal of Economics 4(1), 141-183.", "Hull, J.C. (2021). Options, Futures, and Other Derivatives (11th ed.). Pearson."],
 },
       {
         science: "Maritime",
@@ -4069,6 +4080,7 @@ print(json.dumps([{"label": "d", "value": float(d) if isinstance(d, (int, float)
 }, {"label": "vessel_days", "value": float(vessel_days) if isinstance(vessel_days, (int, float)) else 0}, {"label": "suez_distance", "value": float(suez_distance) if isinstance(suez_distance, (int, float)) else 0}, {"label": "cape_distance", "value": float(cape_distance) if isinstance(cape_distance, (int, float)) else 0}]))`,
         description: "Rotterdam→Singapore is 16,500 km via Suez (vs 21,500 via Cape of Good Hope). A maritime navigator sees: the Suez Canal saves 5,000 km and ~5 days per transit. The 2021 Ever Given blockage rerouted thousands of vessels via the Cape — the same haversine math.",
           math: `d = 2R \\arcsin\\!\\left(\\sqrt{\\sin^2\\!\\left(\\frac{\\Delta\\varphi}{2}\\right) + \\cos\\varphi_1 \\cos\\varphi_2 \\sin^2\\!\\left(\\frac{\\Delta\\lambda}{2}\\right)}\\right) \\\\ R = 6371 \\text{ km (Earth)} \\text{ or } 1 \\text{ (unit sphere)}`,
+    citations: ["Bowring, E. (1805). Note on a new analytical method for the determination of latitude and longitude. Philosophical Magazine 21, 257-262.", "Sinnott, R.W. (1984). Virtues of the haversine. Sky & Telescope 68(2), 159.", "Vincenty, T. (1975). Direct and inverse solutions of geodesics on the ellipsoid. Survey Review 23(176), 88-93."],
 },
       {
         science: "Aviation",
@@ -4357,6 +4369,7 @@ print(json.dumps([{"label": "mu", "value": float(mu) if isinstance(mu, (int, flo
 }, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "f_kelly", "value": float(f_kelly) if isinstance(f_kelly, (int, float)) else 0}, {"label": "g_kelly", "value": float(g_kelly) if isinstance(g_kelly, (int, float)) else 0}, {"label": "g_half", "value": float(g_half) if isinstance(g_half, (int, float)) else 0}]))`,
         description: "Renaissance Medallion's Kelly-optimal leverage is ~16x (mu=65%, sigma=20%). They actually use ~12.5x (half-Kelly) for stability. A quant trader sees: Kelly maximises expected log-growth — the same rule for blackjack (Thorp 1962) and Medallion (Simons 1989).",
           math: `f^* = \\frac{bp - q}{b} = \\frac{\\mu}{\\sigma^2} \\\\ g = f\\mu - \\frac{f^2 \\sigma^2}{2} \\\\ \\text{Maximise } g \\implies f^* = \\mu / \\sigma^2`,
+    citations: ["Kelly, J.L. (1956). A new interpretation of information rate. Bell System Technical Journal 35(4), 917-926.", "Thorp, E.O. (1969). Optimal gambling systems for favorable games. Rev. ICI 1, 155-166.", "MacLean, L.C., Thorp, E.O. & Ziemba, W.T. (2011). The Kelly Capital Growth Investment Criterion. World Scientific."],
 },
       {
         science: "Genetics",
@@ -4634,6 +4647,7 @@ print("Insight: Jukes-Cantor IS Markov on DNA — molecular clock")
 print(json.dumps([{"label": "alpha", "value": float(alpha) if isinstance(alpha, (int, float)) else 0}]))`,
         description: "Jukes-Cantor (1969) models DNA substitution as a 4-state Markov chain. After enough time, the distribution reaches uniform (25% each base). A molecular evolutionist sees: the transition rate α is the molecular clock — measuring evolutionary distance via substitution counts.",
           math: `\\boldsymbol{\\pi}(t+1) = \\boldsymbol{\\pi}(t) \\, P \\\\ \\text{where} \\; P_{ij} = P(X_{t+1} = j \\mid X_t = i) \\quad \\text{(transition matrix)} \\\\ \\sum_j P_{ij} = 1 \\quad \\text{(stochastic)} \\\\ \\text{Stationary distribution:} \\quad \\boldsymbol{\\pi}^* = \\boldsymbol{\\pi}^* P \\\\ \\text{Detailed balance:} \\quad \\pi_i P_{ij} = \\pi_j P_{ji} \\\\ \\text{Spectral gap:} \\quad \\lambda_2(P) < 1 \\implies \\text{geometric convergence to } \\pi^*`,
+    citations: ["Markov, A.A. (1906). Extension of the law of large numbers. Izvestia Fiziko-Matematicheskogo Obshchestva pri Kazanskom Universitete 15, 135-156.", "Jukes, T.H. & Cantor, C.R. (1969). Evolution of protein molecules. In Mammalian Protein Metabolism, Vol. 3, pp. 21-132. Academic Press.", "Norris, J.R. (1998). Markov Chains. Cambridge University Press."],
 },
       {
         science: "Fintech",
@@ -4948,6 +4962,7 @@ print("Insight: VaR IS the inverse CDF of the loss distribution")
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "JPMorgan's 1-day 99% VaR is ~$2.3B (on $4T balance). A risk officer sees: VaR is just the inverse normal CDF — every loss distribution has one. Basel III mandates daily disclosure. The same formula prices tail risk in finance, maritime, and climate.",
           math: `\\text{VaR}_\\alpha = -(\\mu + z_\\alpha \\sigma) \\\\ \\text{where:} \\quad z_\\alpha = \\Phi^{-1}(1 - \\alpha), \\quad \\Phi = \\text{standard normal CDF} \\\\ z_{0.99} = 2.326, \\quad z_{0.95} = 1.645 \\\\ \\text{Expected Shortfall (ES):} \\quad \\text{ES}_\\alpha = \\mu + \\frac{\\sigma \\phi(z_\\alpha)}{1 - \\alpha} \\\\ \\text{where} \\; \\phi = \\text{standard normal PDF} \\\\ \\text{Basel III: daily 99% VaR. Solvency II: weekly 95% VaR. FEMA: 100-year flood.}`,
+    citations: ["Jorion, P. (2007). Value at Risk: The New Benchmark for Managing Financial Risk (3rd ed.). McGraw-Hill.", "Basel Committee on Banking Supervision (2019). Minimum capital requirements for market risk. BIS. https://www.bis.org/bcbs/publ/d457.htm", "Artzner, P., Delbaen, F., Eber, J.-M. & Heath, D. (1999). Coherent measures of risk. Mathematical Finance 9(3), 203-228."],
 },
       {
         science: "Maritime",
@@ -5241,6 +5256,7 @@ print("Insight: PageRank IS systemic risk measure (BIS network analysis)")
 print(json.dumps([{"label": "p", "value": float(p) if isinstance(p, (int, float)) else 0}]))`,
         description: "PageRank on a 4-bank network: banks with most inbound links get highest PR. Lehman Brothers' real-world PR in 2008 was ~0.012 — high systemic risk. A systemic risk analyst sees: PageRank IS the too-big-to-fail measure. BIS uses it on the 10⁴-bank global network.",
           math: `PR(p) = \\frac{1-d}{N} + d \\sum_{q \\in M(p)} \\frac{PR(q)}{L(q)} \\\\ \\text{where:} \\quad d = \\text{damping factor (typically 0.85)}, \\; N = |V| \\\\ M(p) = \\text{set of pages linking to } p, \\; L(q) = \\text{out-degree of } q \\\\ \\text{Matrix form:} \\quad \\mathbf{PR} = \\frac{1-d}{N} \\mathbf{1} + d \\, M^T \\mathbf{D}^{-1} \\mathbf{PR} \\\\ \\text{Convergence:} \\quad \\text{Perron-Frobenius theorem} \\implies \\text{unique positive eigenvector}`,
+    citations: ["Brin, S. & Page, L. (1998). The anatomy of a large-scale hypertextual web search engine. Computer Networks 30, 107-117. https://snap.stanford.edu/class/cs224-w2018/CS224W_Handouts/PageRankThePageRankCitationRankingBrinPage1998.pdf", "Page, L. et al. (1999). The PageRank citation ranking: Bringing order to the web. Stanford Tech Report.", "Langville, A.N. & Meyer, C.D. (2006). Google's PageRank and Beyond: The Science of Search Engine Rankings. Princeton University Press."],
 },
       {
         science: "Maritime",
@@ -5599,6 +5615,7 @@ for t in range(N):
 print(json.dumps(kalman_chart_data))`,
         description: "Kalman filter on a 50-step AIS vessel track reduces RMSE from ~0.005° (raw AIS) to ~0.002° (Kalman). A maritime data engineer sees: MarineTraffic runs this on 100K vessels × 60s updates — 1.4×10⁸ Kalman iterations/day for smooth tracks and ETA prediction.",
           math: `\\hat{\\mathbf{x}}_{t+1|t} = F \\hat{\\mathbf{x}}_{t|t} \\quad \\text{(predict)} \\\\ P_{t+1|t} = F P_{t|t} F^T + Q \\quad \\text{(prior covariance)} \\\\ \\mathbf{K}_t = P_{t+1|t} H^T (H P_{t+1|t} H^T + R)^{-1} \\quad \\text{(Kalman gain)} \\\\ \\hat{\\mathbf{x}}_{t+1|t+1} = \\hat{\\mathbf{x}}_{t+1|t} + \\mathbf{K}_t (\\mathbf{z}_t - H \\hat{\\mathbf{x}}_{t+1|t}) \\quad \\text{(update)} \\\\ P_{t+1|t+1} = (I - \\mathbf{K}_t H) P_{t+1|t} \\\\ \\text{MMSE optimal for linear-Gaussian systems}`,
+    citations: ["Kalman, R.E. (1960). A new approach to linear filtering and prediction problems. ASME Journal of Basic Engineering 82(1), 35-45. https://www.cs.unc.edu/~welch/kalman/media/pdf/Kalman1960.pdf", "Welch, G. & Bishop, G. (2006). An introduction to the Kalman filter. UNC Chapel Hill Tech Report TR 95-041.", "Humpherys, J. (1969). Apollo navigation — Kalman filter. MIT Instrumentation Lab Report."],
 },
       {
         science: "Aviation",
@@ -5953,6 +5970,7 @@ for n_val in [10, 50, 100, 500, 1000, 5000, 10000]:
 print(json.dumps(mc_chart_data))`,
         description: "Monte Carlo option pricing converges from ±$30 (N=10) to ±$0.30 (N=10⁴). A quant developer sees: convergence rate is O(1/√N) per CLT. CME uses quasi-MC (Sobol sequences) for 100× faster convergence — $10¹⁰ daily notional priced via MC.",
           math: `\\mathbb{E}[f(X)] \\approx \\frac{1}{N} \\sum_{i=1}^{N} f(X_i) \\quad \\text{where} \\; X_i \\stackrel{iid}{\\sim} p(X) \\\\ \\text{Law of Large Numbers:} \\quad \\frac{1}{N}\\sum_{i=1}^{N} f(X_i) \\xrightarrow{a.s.} \\mathbb{E}[f(X)] \\\\ \\text{Central Limit Theorem:} \\quad \\sqrt{N}\\left(\\hat{\\mu}_N - \\mu\\right) \\xrightarrow{d} \\mathcal{N}(0, \\sigma^2) \\\\ \\text{Standard error:} \\quad \\text{SE} = \\frac{\\sigma}{\\sqrt{N}} \\quad \\text{(halving error quadruples N)}`,
+    citations: ["Metropolis, N. & Ulam, S. (1949). The Monte Carlo method. Journal of the American Statistical Association 44(247), 335-341. https://www.jstor.org/stable/2280232", "Boyle, P. (1977). Options: A Monte Carlo approach. Journal of Financial Economics 4(3), 323-338.", "Sobol, I.M. (1967). On the distribution of points in a cube. USSR Computational Mathematics and Mathematical Physics 7(4), 86-112."],
 },
       {
         science: "Maritime",
@@ -6344,6 +6362,7 @@ for t in range(0, n_steps + 1, step_interval):
 print(json.dumps(gbm_chart_data))`,
         description: "100 GBM paths simulate SPX over 1 year. Mean final = $5,415 (analytical $5,415). 90% interval: [$3,800, $7,400]. A quant researcher sees: SPX daily returns follow GBM — Black-Scholes foundation, 1973 Nobel Prize. The same SDE models container dwell and allele drift.",
           math: `dS = \\mu S \\, dt + \\sigma S \\, dW \\\\ S_T = S_0 \\exp\\!\\left(\\left(\\mu - \\frac{\\sigma^2}{2}\\right)T + \\sigma W(T)\\right) \\\\ \\ln S_T \\sim \\mathcal{N}\\!\\left(\\ln S_0 + \\left(\\mu - \\frac{\\sigma^2}{2}\\right)T, \\; \\sigma^2 T\\right)`,
+    citations: ["Bachelier, L. (1900). Théorie de la spéculation. Annales Scientifiques de l'École Normale Supérieure 17, 21-86. https://gallica.bnf.fr/ark:/12148/bpt6k1086489", "Samuelson, P.A. (1965). Rational theory of warrant pricing. Industrial Management Review 6(2), 13-31.", "Itô, K. (1944). Stochastic integral. Proceedings of the Imperial Academy 20(8), 519-524."],
 },
       {
         science: "Maritime",
@@ -6656,6 +6675,7 @@ print("Insight: Lloyd's IS trade-flow clustering (UN COMTRADE 50K ports)")
 print(json.dumps([{"label": "Result", "value": 1}]))`,
         description: "Lloyd's k-means on 4 ports: Rotterdam + Hamburg cluster together (Europe-focused trade), Singapore + Shanghai (Asia-focused). A trade economist sees: Lloyd's IS trade-flow typology — UN COMTRADE's 50K ports cluster into ~10 trade regions.",
           math: `\\boldsymbol{\\mu}_k \\leftarrow \\frac{1}{|S_k|} \\sum_{\\mathbf{x} \\in S_k} \\mathbf{x} \\quad \\text{where} \\; S_k = \\{\\mathbf{x}_i : c(i) = k\\} \\\\ c(i) = \\argmin_{k} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_k\\|^2 \\quad \\text{(assignment)} \\\\ \\text{Objective:} \\quad J = \\sum_{i=1}^{N} \\sum_{k=1}^{K} \\mathbb{1}[c(i)=k] \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_k\\|^2 \\\\ \\text{Convergence:} \\quad J \\text{ decreases monotonically (EM on isotropic GMM)} \\\\ \\text{k-means++:} \\quad D(\\mathbf{x})^2\\text{-weighted init} \\implies O(\\log k)\\text{-approx guarantee}`,
+    citations: ["Lloyd, S.P. (1957/1982). Least squares quantization in PCM. IEEE Transactions on Information Theory 28(2), 129-137. (Originally a 1957 Bell Labs technical memo; published 1982.)", "Arthur, D. & Vassilvitskii, S. (2007). k-means++: The advantages of careful seeding. SODA 2007, 1027-1035.", "MacQueen, J. (1967). Some methods for classification and analysis of multivariate observations. Berkeley Symposium 1, 281-297."],
 },
       {
         science: "Genetics",
