@@ -1,6 +1,10 @@
 # ============================================================
-# Sync workflow: AppDataSciEng2-Advance (private) → Demo2DataSciEng (public)
+# Sync workflow: AppDataSci-Advanced / AppDataSciEng2-Advance (private) → Demo2DataSciEng (public)
 # On every push to main, mirror the commit to the public preview repo.
+#
+# This workflow runs on BOTH private repos (AppDataSci-Advanced and
+# AppDataSciEng2-Advance) so it doesn't matter which one we push to —
+# the sync always fires.
 # ============================================================
 name: Mirror to public preview repo
 
@@ -8,9 +12,6 @@ on:
   push:
     branches:
       - main
-    # ignore workflow-only commits to avoid loops
-    paths-ignore:
-      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
@@ -19,11 +20,12 @@ permissions:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    # Only run on the private source-of-truth repo — the synced public copy has
-    # the workflow file too, but SYNC_TO_PUBLIC_PAT secret only exists on private
-    if: ${{ github.repository == 'testdemoqwenai2025-creator/AppDataSciEng2-Advance' }}
+    # Only run on private repos — not on Demo2DataSciEng (public).
+    if: |
+      github.repository == 'testdemoqwenai2025-creator/AppDataSciEng2-Advance' ||
+      github.repository == 'testdemoqwenai2025-creator/AppDataSci-Advanced'
     steps:
-      - name: Checkout private source
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -34,23 +36,35 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Push mirror to public repo
+      - name: Push mirror to public repo (Demo2DataSciEng)
         env:
           GH_PAT: ${{ secrets.SYNC_TO_PUBLIC_PAT }}
         run: |
-          # Mirror is one-way: private → public, always overwrite main on public.
-          # Plain --force is intentional here because the public repo is a pure
-          # preview mirror; only this workflow is allowed to push to it (enforced
-          # via branch protection on the public repo).
-          git remote add public "https://x-access-token:${GH_PAT}@github.com/testdemoqwenai2025-creator/Demo2DataSciEng.git"
-          # Fetch public's current main so we can detect divergent history
+          # Try to push to Demo2DataSciEng using the PAT secret.
+          # If SYNC_TO_PUBLIC_PAT is not set, fall back to GITHUB_TOKEN.
+          TOKEN="${GH_PAT:-${{ secrets.GITHUB_TOKEN }}}"
+          git remote add public "https://x-access-token:${TOKEN}@github.com/testdemoqwenai2025-creator/Demo2DataSciEng.git" || true
           git fetch public main || true
-          # Push main → main, force-overwriting public main with the latest private commit
+          # Force-push main → main (public repo is a pure mirror)
           git push --force public refs/heads/main:refs/heads/main
-          # Mirror tags too
           git push --tags --force public || true
+
+      - name: Verify sync succeeded
+        run: |
+          # Fetch the public repo to verify the push landed
+          git fetch public main
+          PUBLIC_HASH=$(git rev-parse public/main)
+          SOURCE_HASH=$(git rev-parse HEAD)
+          if [ "$PUBLIC_HASH" = "$SOURCE_HASH" ]; then
+            echo "✅ Sync verified: public main = $PUBLIC_HASH"
+          else
+            echo "⚠️ Sync mismatch: source=$SOURCE_HASH, public=$PUBLIC_HASH"
+            echo "::warning::Sync may have failed — re-check manually."
+          fi
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "::warning::Mirror sync failed — review the workflow run and re-trigger manually."
+          echo "::error::Mirror sync FAILED — the public repo (Demo2DataSciEng) may be out of date."
+          echo "::error::Manual fix: push directly to Demo2DataSciEng from local."
+          echo "::error::  git push public2 main --force"

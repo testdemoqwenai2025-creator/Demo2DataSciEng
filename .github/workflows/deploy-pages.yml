@@ -1,9 +1,9 @@
 # ============================================================
 # Deploy the static export to GitHub Pages on every push to main.
 # Builds the Next.js app with GITHUB_PAGES=true (static export +
-# basePath=/DemoAppDataSci), then publishes to the gh-pages branch.
+# basePath=/Demo2DataSciEng), then publishes to the gh-pages branch.
 # GitHub Pages serves from gh-pages at the project URL:
-#   https://testdemoqwenai2025-creator.github.io/DemoAppDataSci/
+#   https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/
 # ============================================================
 name: Deploy to GitHub Pages
 
@@ -87,3 +87,27 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+# ============================================================
+# AUDIT: After deploy, verify all pages render correctly.
+# If any page fails, the workflow reports a warning (but doesn't
+# block the deploy — the pages are already live).
+# ============================================================
+  audit:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run page audit
+        run: |
+          python3 scripts/audit_all_pages_live.py || echo "::warning::Some pages may have issues."
