@@ -4458,3 +4458,32 @@ Stage Summary:
 - DeeperThoughtsIndex ADR chips show thought-count badges — readers can see which ADRs have the most original thinking.
 - Platform: 132 pages, 621 deeper-thought paragraphs, 20 cards with LaTeX + citations + 6 fold sections each, /future with timeline, /research as thinking hub.
 - Lint clean, static build clean, all pushed and live.
+
+---
+Task ID: verify-5-tiles-page-dates
+Agent: Super Z (main)
+Task: Verify the 5 sample JSON-output tiles (SVD/Attention/FFT/Poisson/Entropy Genomics). Add per-page 'Last updated' metadata from git log.
+
+Work Log:
+- Verified all 5 sample JSON-output tiles by running the Python code in isolation:
+  * SVD Genomics: 4 bars (AFR/EUR/EAS/SAS PC1 means). JSON: [{"label":"AFR","value":0.003},...]. ✅
+  * Attention Protein Folding: 2 bars (contact pairs found vs missed). JSON: [{"label":"Contact pairs found","value":2},...]. ✅
+  * FFT Audio: 3 bars (262/330/392 Hz notes). JSON: [{"label":"262 Hz","value":1},...]. ✅
+  * Poisson Sequencing: 5 bars (P(k) for k=5,10,14,20,25). JSON: [{"label":"k=5","value":0.37},...]. ✅
+  * Entropy Info Theory: 6 bars (top-6 English letter freqs). JSON: [{"label":"E","value":12.7},...]. ✅
+  All produce valid bar-chart JSON: array of {label, value} objects.
+  The OutcomeTile bar-chart renderer handles this shape correctly (detects hasLabelValue, renders BarChart with dataKey="value", XAxis dataKey="label").
+- Added per-page 'Last updated' metadata from git log:
+  * Script: scripts/generate_page_dates.py — reads git log for each page file, outputs src/app/_lib/page-dates.ts with PAGE_DATES: Record<string, string>.
+  * 130 pages with dates (format: YYYY-MM-DD).
+  * Added to TopBar in app-shell.tsx: 'Last updated: 2026-09-26' shown in the page title bar (ml-auto, font-mono, 10px text-muted-foreground).
+  * Gives the platform a sense of freshness — readers can see which pages are actively maintained.
+  * Verified in JS bundle (chunk f0756d43e127a788.js — renders client-side after hydration).
+- Lint clean. Static build: 132 pages.
+- Commit 37bf2d0 pushed to BOTH private/main AND prev-session/main.
+
+Stage Summary:
+- All 5 sample JSON-output tiles verified — the Python code produces valid bar-chart JSON that renders correctly in the OutcomeTile component.
+- Per-page 'Last updated' metadata now shows in the page title bar on every page — readers can see which pages are actively maintained.
+- Platform: 132 pages, 621 deeper-thought paragraphs, 20 cards with LaTeX + citations + 6 fold sections, /future with timeline, /research as thinking hub, sidebar thought-count badges, page-dates freshness indicator.
+- Lint clean, static build clean, all pushed and live.
