@@ -4422,3 +4422,39 @@ Stage Summary:
 - DeeperThoughtsIndex now shows thought-count badges — readers can see which pages have the most original thinking.
 - Platform: 132 pages, 621 deeper-thought paragraphs, 20 cards with LaTeX + citations + 6 fold sections each.
 - Lint clean, static build clean, all pushed and live.
+
+---
+Task ID: future-timeline-research-hub-adr-badges
+Agent: Super Z (main)
+Task: Build Technology evolution timeline on /future (1800-2050). Connect /future to /research (Future projections section). Add thought-count badges to DeeperThoughtsIndex ADR chips.
+
+Work Log:
+- Built Technology evolution timeline on /future page:
+  * New SectionCard with 3 horizontal timeline rows:
+    - Equations (1763-2017, green, 20 entries): Bayes 1763, Euler 1768, Haversine 1805, Navier-Stokes 1822, Gradient Descent 1847, SVD 1873, Boltzmann 1877, GBM 1900, Markov 1906, MC method 1946, Shannon H 1948, Kelly 1956, Kalman 1960, FFT 1965, Verlet 1967, Lloyd's 1957, B-S 1973, VaR 1994, PageRank 1998, Attention 2017.
+    - Tools (2001-2023, blue, 10 entries): SciPy 2001, QuantLib 2003, NumPy 2005, geopy 2011, D3.js 2011, filterpy 2015, PyTorch 2016, Pyodide 2018, AlphaFold2 2021, ESM-2 2023.
+    - Future replacements (~2030-2038, orange, 10 entries): from the PROJECTIONS array.
+  * Each entry: year label (font-mono) + colored bar + name (font-semibold).
+  * Horizontally scrollable (overflow-x-auto).
+  * Summary: 'The equations span 254 years (1763-2017). The tools span 22 years (2001-2023). The math outlasts the tools by 10× or more.'
+- Connected /future to /research:
+  * New 'Future projections' SectionCard on /research (badge: 'future hub').
+  * Lists: Past (ADRs), Present (Deeper thoughts), Future (Projections).
+  * Styled call-out box: 'Timeline: 1800-2050' + summary text.
+  * Links to /future + /elegant-code.
+  * The research page is now the platform's thinking hub — past + present + future.
+- Added thought-count badges to DeeperThoughtsIndex ADR chips:
+  * New ADR_COUNTS map: counts thoughts per ADR.
+  * Each ADR chip now shows a count badge (8px pill, bg-primary/15, text-primary, font-mono) next to the ADR name.
+  * E.g., 'ADR-043 [3]' means 3 thoughts reference ADR-043.
+  * 57 ADR count badges rendered in /resources HTML.
+- Lint clean. Static build: 132 pages.
+- Verified: /future timeline ('Technology evolution timeline' 2x, 'SURVIVE' 22x, '254 years' 4x). /research future hub ('Future projections' 2x, 'future hub' 2x, 'thinking hub' 6x). ADR count badges (57 in /resources HTML).
+- Commit 5de6e4c pushed to BOTH private/main AND prev-session/main.
+
+Stage Summary:
+- /future page now has a visual 3-row timeline (equations vs tools vs future replacements) making the "math survives, tools turnover" thesis visceral.
+- /research is now the platform's thinking hub — connecting past (ADRs), present (deeper thoughts), and future (projections).
+- DeeperThoughtsIndex ADR chips show thought-count badges — readers can see which ADRs have the most original thinking.
+- Platform: 132 pages, 621 deeper-thought paragraphs, 20 cards with LaTeX + citations + 6 fold sections each, /future with timeline, /research as thinking hub.
+- Lint clean, static build clean, all pushed and live.
