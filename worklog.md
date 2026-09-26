@@ -4583,3 +4583,34 @@ Work Log:
 - Ran audit: 130/130 pages PASS (100%). All pages render correctly.
 - Lint clean. Static build: 132 pages.
 - Commit d6e50d2 pushed to BOTH private/main AND prev-session/main.
+
+---
+Task ID: next-steps-thought-quality-freshness-sort
+Agent: Super Z (main)
+Task: Add per-page 'Next steps' suggestions based on DiscoveryPath. Add thought-quality indicator (badge for page-specific vs generic). Add page freshness sort on sidebar.
+
+Work Log:
+- Built NextSteps component (src/app/_components/next-steps.tsx, ~100 lines):
+  * Per-page 'Next steps' suggestions at the bottom of each page.
+  * Uses DiscoveryPath (localStorage) to track visited cards.
+  * Recommends 2-3 related pages based on cousin cards (skill-graph adjacency) + RelatedPages.
+  * Shows 'cousin' badge for skill-graph-based recommendations.
+  * Added to /elegant-code + all 10 living-equation pages with page-specific NextSteps.
+- Built thought-quality indicator (src/app/_lib/thought-quality.ts):
+  * Maps page ID to 'specific' (27 pages) or 'generic' (98 pages).
+  * Sidebar badges now use color: green (emerald) = specific (original), blue (primary) = generic (placeholder).
+  * Helps readers identify pages with the most original thinking.
+- Built page freshness sort on sidebar:
+  * 'Sort by freshness' button at the top of the sidebar.
+  * Toggles between section-grouped view (default) and date-sorted view (most recent first).
+  * Uses PAGE_DATES from thought-counts.ts.
+  * Helps readers see which pages are actively maintained.
+- Pushed to ALL 3 remotes: private/main, prev-session/main, AND public2/main (Demo2DataSciEng — direct push to force deploy).
+- Audit: 130/130 pages PASS (100%). Lint clean. Static build: 132 pages.
+- Commit 18d589d pushed.
+
+Stage Summary:
+- Every page on the platform now has NextSteps at the bottom — guided tour, not just a reference.
+- Sidebar badges distinguish page-specific (green) from generic (blue) thoughts.
+- Readers can sort the sidebar by freshness to see recently-updated pages.
+- All pushed to 3 remotes (including direct push to Demo2DataSciEng for immediate deploy).
