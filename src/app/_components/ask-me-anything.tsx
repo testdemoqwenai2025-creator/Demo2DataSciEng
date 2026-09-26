@@ -344,7 +344,7 @@ export function AskMeAnything() {
       {/* Floating button (bottom-right) */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        className="fixed bottom-24 right-5 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all"
         aria-label="Ask me anything — AI expert"
       >
         <Brain className="h-5 w-5" />

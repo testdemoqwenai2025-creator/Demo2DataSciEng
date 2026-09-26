@@ -35,6 +35,8 @@ export function SkillGraph({ height = 600 }: { height?: number }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(900);
   const [hovered, setHovered] = useState<GraphNode | null>(null);
+  // Lazy evaluation: don't start the D3 simulation until the user clicks.
+  const [activated, setActivated] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -48,7 +50,7 @@ export function SkillGraph({ height = 600 }: { height?: number }) {
   }, []);
 
   useEffect(() => {
-    if (!svgRef.current || width < 360) return;
+    if (!svgRef.current || width < 360 || !activated) return;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -195,7 +197,7 @@ export function SkillGraph({ height = 600 }: { height?: number }) {
     return () => {
       sim.stop();
     };
-  }, [width, height]);
+  }, [width, height, activated]);
 
   // Compute the hovered node's connections for the info panel.
   const hoveredConnections = hovered
@@ -206,16 +208,32 @@ export function SkillGraph({ height = 600 }: { height?: number }) {
 
   return (
     <div ref={containerRef} className="space-y-3">
-      <div className="rounded-md border border-border/60 bg-muted/20 p-2">
-        <svg
-          ref={svgRef}
-          width={width}
-          height={height}
-          className="block"
-          style={{ color: "var(--foreground)" }}
-          aria-label="Skill graph showing which skills/talents each equation rewards"
-        />
-      </div>
+      {!activated ? (
+        <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+          <p className="text-sm font-semibold text-primary mb-2">Skill graph — which minds are shared across equations</p>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+            The bipartite force-directed graph (skill nodes + card nodes + edges) is computationally expensive.
+            It's not loaded until you click, to keep the page fast (lazy evaluation).
+          </p>
+          <button
+            onClick={() => setActivated(true)}
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            Load skill graph
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-md border border-border/60 bg-muted/20 p-2">
+          <svg
+            ref={svgRef}
+            width={width}
+            height={height}
+            className="block"
+            style={{ color: "var(--foreground)" }}
+            aria-label="Skill graph showing which skills/talents each equation rewards"
+          />
+        </div>
+      )}
       <div className="text-xs text-muted-foreground">
         {hovered ? (
           <div>
