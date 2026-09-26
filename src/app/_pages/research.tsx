@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
 import { LiveResearchDrawer } from "../_components/live-research-drawer";
+import { DeeperThoughtsIndex } from "../_components/deeper-thoughts-index";
 import { PAPERS, type Paper } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import {
   ArrowRight,
   Filter,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
 
 const TOPIC_LABELS: Record<Paper["topic"], string> = {
@@ -309,6 +311,16 @@ export function ResearchPage() {
           write, new patterns to try). The platform is never finished — it's an ongoing conversation between
           theory and production.
         </p>
+      </SectionCard>
+
+      {/* Deeper thoughts index — connected to the research section */}
+      <SectionCard
+        title="Deeper thoughts index — every argument on the platform, filterable by ADR"
+        description="Every page on the platform should have 5+ 'My deeper thought' sections — original arguments connected to the ADRs in this research section. This index collects them all. Filter by ADR to see all thoughts connected to a specific decision record. The research page IS the thinking hub — where ADRs live + the thoughts that reference them."
+        icon={<TrendingUp className="h-5 w-5" />}
+        badge="thinking hub"
+      >
+        <DeeperThoughtsIndex />
       </SectionCard>
 
       <div className="flex flex-wrap gap-2">

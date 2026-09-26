@@ -15,6 +15,7 @@ import {
 import { DatasetCards } from "../_components/dataset-cards";
 import { RelatedElegantCode } from "../_components/related-elegant-code";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 
 const KPIS = [
   { label: "Amino acids", value: "20-letter alphabet", hint: "ACDEFGHIKLMNPQRSTVWY → tokens", deltaTone: "flat" as const },
@@ -867,6 +868,24 @@ export function BioinformaticsPage() {
         />
       </SectionCard>
 
+
+      <DeeperThoughtSection pageTitle="Bioinformatics">
+        <DeeperThought title="Bioinformatics IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
+          <p>{"This page about Bioinformatics is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Bioinformatics connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Bioinformatics sits in the computational-science landscape."}</p>
+        </DeeperThought>
+        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
+          <p>{"In a decade, the specific tools on this page (Bioinformatics) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        </DeeperThought>
+        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        </DeeperThought>
+        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
+          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        </DeeperThought>
+        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
       <RelatedElegantCode hostPage={"bioinformatics" as never} />
 
       <div className="flex flex-wrap gap-2">

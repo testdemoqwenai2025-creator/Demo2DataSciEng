@@ -237,6 +237,15 @@ export function SurpriseMe() {
             Click any drive button to download the JSON file, then upload it to your chosen drive.
             No login required — your discoveries stay private in your browser until you export them.
           </p>
+          <div className="flex items-center gap-2 mt-1.5 pt-1.5 border-t border-border/30">
+            <a
+              href={`mailto:?subject=My%20SurpriseMe%20discoveries%20from%20ModernDataSciEng&body=${encodeURIComponent("Here are my bookmarked discoveries from the ModernDataSciEng Platform:\n\n" + JSON.stringify(bookmarks.map(b => ({card: b.cardTitle.split(" — ")[0], science: b.outcome.science, skill: b.outcome.skill, url: `https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/elegant-code/#card-${b.cardIndex}`})), null, 2))}`}
+              className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            >
+              <Sparkles className="h-3 w-3" /> Email my discoveries
+            </a>
+            <span className="text-[9px] text-muted-foreground italic">Opens your email client with bookmarks pre-filled — forward to any inbox or drive.</span>
+          </div>
         </div>
       )}
 
