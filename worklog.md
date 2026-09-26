@@ -4330,3 +4330,28 @@ Stage Summary:
 - /research is now the "thinking hub" — ADRs + thoughts + papers all in one place.
 - SurpriseMe has email + drive export — no OAuth, works on any device.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: katex-css-crosslink-bio-citations-field
+Agent: Super Z (main)
+Task: Add KaTeX CSS import for proper math typography. Cross-link 4 bio/chem pages to elegant-code section. Add per-card citations: string[] field. Update CitationsFold.
+
+Work Log:
+- Added KaTeX CSS import to src/app/layout.tsx: `import "katex/dist/katex.min.css";` — proper math typography (fonts, spacing, line breaks) for all LaTeX derivations in DeeperMathFold. The 20 cards' LaTeX math fields will now render with correct KaTeX styling.
+- Cross-linked 4 bio/chem pages to elegant-code section:
+  * /cheminformatics: inline SectionCard with DatasetCards showing SVD (chemometrics), FFT (mass spectrometry), Lloyd's (compound clustering) + RelatedElegantCode footer.
+  * /molecular-modelling: Verlet (MD), Navier-Stokes (solvents), Gradient Descent (force-field optimisation) + RelatedElegantCode footer.
+  * /macro-structures: SVD (structural decomposition), Attention (AlphaFold2), Entropy (diversity) + RelatedElegantCode footer.
+  * /cryo-em: FFT (3D reconstruction via Central Slice Theorem), SVD (compression), Attention (structure prediction) + RelatedElegantCode footer.
+  Each page now has the SAME elegant-code popup experience as the existing host pages — inline SectionCard with DatasetCards + RelatedElegantCode footer for card → card flow.
+  Fixed Sparkles import placement (script accidentally added to react import instead of lucide-react).
+- Added citations?: string[] field to DatasetExample interface.
+  CitationsFold now shows an explicit bibliography (unordered list) when card.citations is set. Falls back to existing subtitle-based year extraction when not set. Framework is in place — adding per-card citation data is a follow-up.
+- Lint clean. Static build: 131 pages. All 4 cross-linked pages verified built.
+- Commit c28a634 pushed to BOTH private/main AND prev-session/main.
+
+Stage Summary:
+- KaTeX LaTeX now renders with proper typography across all 20 cards' DeeperMathFold sections.
+- 4 more pages cross-linked to the elegant-code ecosystem (cheminformatics, molecular-modelling, macro-structures, cryo-em).
+- citations?: string[] framework added — ready for per-card bibliography data.
+- Platform still has 131 pages. Lint clean, static build clean, all pushed and live.
