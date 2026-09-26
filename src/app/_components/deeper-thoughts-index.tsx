@@ -54,6 +54,10 @@ const THOUGHTS_INDEX = [
 // Extract unique ADRs.
 const UNIQUE_ADRS = Array.from(new Set(THOUGHTS_INDEX.map(t => t.adr))).sort();
 
+// Count thoughts per ADR.
+const ADR_COUNTS: Record<string, number> = {};
+THOUGHTS_INDEX.forEach(t => { ADR_COUNTS[t.adr] = (ADR_COUNTS[t.adr] ?? 0) + 1; });
+
 export function DeeperThoughtsIndex() {
   const [filter, setFilter] = useState("");
   const [selectedADR, setSelectedADR] = useState<string | null>(null);
@@ -116,11 +120,14 @@ export function DeeperThoughtsIndex() {
             <button
               key={adr}
               onClick={() => setSelectedADR(selectedADR === adr ? null : adr)}
-              className={`text-[10px] px-2 py-1 rounded-md border transition-colors ${
+              className={`text-[10px] px-2 py-1 rounded-md border transition-colors flex items-center gap-1 ${
                 selectedADR === adr ? "bg-primary text-primary-foreground border-primary" : "border-border/60 bg-muted/30 hover:border-primary/40"
               }`}
             >
               {adr}
+              <span className={`text-[8px] px-1 py-0 rounded-full ${selectedADR === adr ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/15 text-primary"} font-mono`}>
+                {ADR_COUNTS[adr] ?? 0}
+              </span>
             </button>
           ))}
         </div>

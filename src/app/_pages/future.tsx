@@ -89,6 +89,115 @@ export function FuturePage() {
         </div>
       </SectionCard>
 
+      {/* Technology evolution timeline — 1800-2050 */}
+      <SectionCard
+        title="Technology evolution timeline — equations (1800s-1960s) vs tools (2000s-2030s) vs future (2030-2050)"
+        description="A visual timeline showing when each equation was invented (top row, green — these survive) vs when each tool was created (middle row, blue — these turnover) vs when each tool will be replaced (bottom row, orange — projected). The math persists; the tools don't. The timeline makes this visceral — the equations span 150+ years while the tools span 10-20."
+        icon={<Activity className="h-5 w-5" />}
+        badge="1800-2050"
+      >
+        <div className="space-y-4">
+          {/* Equations row — survives */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-semibold mb-2 flex items-center gap-1">
+              <Atom className="h-3 w-3" /> Equations (invented 1800s-1960s — SURVIVE)
+            </p>
+            <div className="relative h-20 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2 overflow-x-auto">
+              <div className="flex items-end gap-1 min-w-max">
+                {[
+                  { name: "Haversine", year: 1805, color: "#16a34a" },
+                  { name: "Bayes", year: 1763, color: "#16a34a" },
+                  { name: "SVD", year: 1873, color: "#16a34a" },
+                  { name: "Boltzmann S", year: 1877, color: "#16a34a" },
+                  { name: "Euler method", year: 1768, color: "#16a34a" },
+                  { name: "GBM", year: 1900, color: "#16a34a" },
+                  { name: "Markov", year: 1906, color: "#16a34a" },
+                  { name: "Kelly", year: 1956, color: "#16a34a" },
+                  { name: "Kalman", year: 1960, color: "#16a34a" },
+                  { name: "FFT", year: 1965, color: "#16a34a" },
+                  { name: "MC method", year: 1946, color: "#16a34a" },
+                  { name: "Shannon H", year: 1948, color: "#16a34a" },
+                  { name: "B-S", year: 1973, color: "#16a34a" },
+                  { name: "Verlet", year: 1967, color: "#16a34a" },
+                  { name: "PageRank", year: 1998, color: "#16a34a" },
+                  { name: "Lloyd's", year: 1957, color: "#16a34a" },
+                  { name: "Navier-Stokes", year: 1822, color: "#16a34a" },
+                  { name: "Gradient Descent", year: 1847, color: "#16a34a" },
+                  { name: "VaR", year: 1994, color: "#16a34a" },
+                  { name: "Attention", year: 2017, color: "#16a34a" },
+                ].map(eq => (
+                  <div key={eq.name} className="flex flex-col items-center shrink-0" style={{ minWidth: 45 }}>
+                    <span className="text-[8px] text-muted-foreground font-mono">{eq.year}</span>
+                    <div className="w-1 h-8 rounded-full my-0.5" style={{ backgroundColor: eq.color }} />
+                    <span className="text-[8px] text-foreground/80 font-semibold text-center leading-tight">{eq.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-[9px] text-muted-foreground italic mt-1">Span: 1763-2017 (254 years). All still in active use. All will still be used in 2050.</p>
+          </div>
+
+          {/* Tools row — turnover */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-2 flex items-center gap-1">
+              <Cpu className="h-3 w-3" /> Tools (created 2000s-2020s — TURNOVER)
+            </p>
+            <div className="relative h-20 rounded-md border border-blue-500/30 bg-blue-500/5 p-2 overflow-x-auto">
+              <div className="flex items-end gap-1 min-w-max">
+                {[
+                  { name: "NumPy", year: 2005, color: "#2563eb" },
+                  { name: "SciPy", year: 2001, color: "#2563eb" },
+                  { name: "PyTorch", year: 2016, color: "#2563eb" },
+                  { name: "QuantLib", year: 2003, color: "#2563eb" },
+                  { name: "filterpy", year: 2015, color: "#2563eb" },
+                  { name: "geopy", year: 2011, color: "#2563eb" },
+                  { name: "D3.js", year: 2011, color: "#2563eb" },
+                  { name: "Pyodide", year: 2018, color: "#2563eb" },
+                  { name: "AlphaFold2", year: 2021, color: "#2563eb" },
+                  { name: "ESM-2", year: 2023, color: "#2563eb" },
+                ].map(tool => (
+                  <div key={tool.name} className="flex flex-col items-center shrink-0" style={{ minWidth: 50 }}>
+                    <span className="text-[8px] text-muted-foreground font-mono">{tool.year}</span>
+                    <div className="w-1 h-6 rounded-full my-0.5" style={{ backgroundColor: tool.color }} />
+                    <span className="text-[8px] text-foreground/80 font-semibold text-center leading-tight">{tool.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-[9px] text-muted-foreground italic mt-1">Span: 2001-2023 (22 years). Most will be replaced by 2030-2040. The math they implement won't change.</p>
+          </div>
+
+          {/* Future projections row */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-orange-600 dark:text-orange-400 font-semibold mb-2 flex items-center gap-1">
+              <TrendingUp className="h-3 w-3" /> Future replacements (projected 2030-2050)
+            </p>
+            <div className="relative h-20 rounded-md border border-orange-500/30 bg-orange-500/5 p-2 overflow-x-auto">
+              <div className="flex items-end gap-1 min-w-max">
+                {PROJECTIONS.map(p => (
+                  <div key={p.current} className="flex flex-col items-center shrink-0" style={{ minWidth: 55 }}>
+                    <span className="text-[8px] text-muted-foreground font-mono">{p.year}</span>
+                    <div className="w-1 h-6 rounded-full my-0.5" style={{ backgroundColor: p.accent }} />
+                    <span className="text-[8px] text-foreground/80 font-semibold text-center leading-tight line-clamp-2">{p.current} → {p.future.split("(")[0].trim()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-[9px] text-muted-foreground italic mt-1">Span: ~2030-2038. Each replacement implements the SAME math — just faster/different.</p>
+          </div>
+
+          {/* Summary insight */}
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <strong className="text-foreground/80">The equations span 254 years (1763-2017).</strong> The tools span 22 years (2001-2023).
+              The replacements are projected within 15 years (~2030-2038). The ratio is visceral: the math outlasts the tools
+              by <strong className="text-primary">10× or more</strong>. That's why this platform invests in the math, not the tools.
+              When the tools are replaced, the pages' fold sections are updated — but the equations stay.
+            </p>
+          </div>
+        </div>
+      </SectionCard>
+
       {/* Deeper thoughts about the future */}
       <DeeperThoughtSection pageTitle="Future Evolution">
         <DeeperThought title="The math is the anchor; the tools are the amplifier" connectedTo="ADR-001 (platform architecture)">

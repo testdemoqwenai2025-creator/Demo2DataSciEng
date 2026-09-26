@@ -323,6 +323,43 @@ export function ResearchPage() {
         <DeeperThoughtsIndex />
       </SectionCard>
 
+      {/* Future projections — connects research (past: ADRs) to future (projections) */}
+      <SectionCard
+        title="Future projections — where this platform goes in 10-20 years"
+        description="The research section documents the platform's PAST decisions (ADRs). The /future page projects the platform's FUTURE evolution — what replaces Snowflake, Kafka, PyTorch? The math (SVD, Attention, Poisson, FFT, Bayes, Kalman) stays the same. The tools are the amplifier; the math is the signal. The platform is designed for technology turnover. Visit /future for 10 technology projections + 6 deeper thoughts about the platform's own evolution."
+        icon={<TrendingUp className="h-5 w-5" />}
+        badge="future hub"
+      >
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            The research page is now the platform's <strong className="text-foreground/80">thinking hub</strong> — it connects:
+          </p>
+          <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+            <li><strong className="text-foreground/80">Past</strong>: ADRs (Architecture Decision Records) — why each decision was made</li>
+            <li><strong className="text-foreground/80">Present</strong>: Deeper thoughts — original arguments on every page, connected to ADRs</li>
+            <li><strong className="text-foreground/80">Future</strong>: Projections — what replaces each tool, while the math stays</li>
+          </ul>
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="text-sm font-semibold text-primary mb-1">Timeline: 1800-2050</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Beltrami invented SVD in 1873. Shannon defined entropy in 1948. Kalman published his filter in 1960.
+              NumPy was created in 2005. PyTorch in 2016. In 2035, NumPy may be replaced by WebGPU-native arrays.
+              But SVD will still decompose matrices. Attention will still measure correlation. The math survives.
+              The /future page has a visual timeline showing this — equations vs tools, 1800-2050.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href={hrefFor("future")} className="text-sm text-primary hover:underline font-semibold">
+              → Visit /future — technology evolution timeline + projections
+            </Link>
+            <span className="text-muted-foreground">·</span>
+            <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">
+              → Elegant Code (the 20 equations that survive)
+            </Link>
+          </div>
+        </div>
+      </SectionCard>
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("knowledge")} className="text-sm text-primary hover:underline">
           → Patterns & decisions (Knowledge Hub)
