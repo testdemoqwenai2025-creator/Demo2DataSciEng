@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { SkillGraph } from "../_components/skill-graph";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -191,6 +192,16 @@ export function ResourcesPage() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+      {/* Skill graph — which skills/talents are shared across equations */}
+      <SectionCard
+        title="Skill graph — which minds are shared across equations"
+        description="A D3.js force-directed graph of the skills/talents each equation rewards. Orange nodes = skills (e.g., 'Computational biologist'); colored nodes = the 20 equation cards. Lines connect each skill to every card where it appears. Drag any node to reposition. Hover any node to see its connection count. Skills that appear on multiple cards = intersections — they reward the same kind of mind across different equations. A reader can surf from a skill to all the equations that reward it, discovering where their own talent fits."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="interactive D3"
+      >
+        <SkillGraph height={620} />
       </SectionCard>
 
       {/* 10 living pages summary */}

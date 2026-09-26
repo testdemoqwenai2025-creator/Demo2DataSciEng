@@ -126,6 +126,21 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Comp Physics", ids: ["computational-physics"] },
   { title: "Bio Pipelines", ids: ["bioinformatics-pipelines"] },
   { title: "Elegant Code", ids: ["elegant-code"] },
+  { title: "Connections", ids: ["connections"] },
+  { title: "Resources", ids: ["resources"] },
+  { title: "Global Shipping", ids: ["global-shipping"] },
+  { title: "Living Equations", ids: [
+    "living-svd",
+    "living-attention",
+    "living-fft",
+    "living-poisson",
+    "living-entropy",
+    "living-black-scholes",
+    "living-haversine",
+    "living-kalman",
+    "living-monte-carlo",
+    "living-gbm",
+  ] },
 ];
 
 const CONTACT_EMAIL = "testdemoqwenai2025@gmail.com";
