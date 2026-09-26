@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { SkillGraph } from "../_components/skill-graph";
+import { TalentSearch } from "../_components/talent-search";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -202,6 +203,16 @@ export function ResourcesPage() {
         badge="interactive D3"
       >
         <SkillGraph height={620} />
+      </SectionCard>
+
+      {/* Talent search — find which equations reward your mind */}
+      <SectionCard
+        title="Talent search — type a skill or talent, find your equations"
+        description="Type any phrase — a skill (e.g., 'Computational biologist'), a talent (e.g., 'sees population structure'), a science (e.g., 'Maritime'), or a sector (e.g., 'Lloyd's'). The search returns every elegant-code card where that phrase appears in any of its 3 outcome tiles. Click any result to open the full card on /elegant-code#card-N — where you'll see the math, the 5-language code, and the 'Expected outcomes' tiles for that card."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="search 60 tiles"
+      >
+        <TalentSearch />
       </SectionCard>
 
       {/* 10 living pages summary */}

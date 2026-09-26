@@ -8,6 +8,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { LoginButton } from "./login-button";
 import { ContextualBandit } from "./contextual-bandit";
 import { FloatingLiveButton } from "./floating-live-button";
+import { AskMeAnything } from "./ask-me-anything";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -403,6 +404,11 @@ export function AppShell({ children }: AppShellProps) {
       {/* Floating live-data button — appears on every non-home page,
           opens the LiveResourcesDrawer with topic pre-set per page */}
       <FloatingLiveButton />
+
+      {/* Floating "Ask me anything" AI expert — searches platform content
+          first, then offers one-click deep-links to external AI platforms
+          (Gemini, Grok, Qwenai, MiniMax, ChatGPT, Claude, Perplexity). */}
+      <AskMeAnything />
     </div>
   );
 }

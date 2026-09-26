@@ -6,6 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import {
   X, Cpu, Database, Atom, Sparkles, TrendingUp, Boxes, Zap,
 } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, Legend, Cell,
+} from "recharts";
 import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
 
@@ -190,6 +194,48 @@ function MultiLangCode({ tabs, runnablePython }: { tabs: LangTab[]; runnablePyth
 // ============================================================
 
 function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: string }) {
+  const [chartData, setChartData] = useState<unknown>(null);
+  const [chartType, setChartType] = useState<"bar" | "line" | null>(null);
+
+  // Try to parse the stdout as JSON and infer chart type from the structure.
+  const handleOutput = (stdout: string) => {
+    const nonEmptyLines = stdout.split("\n").filter((l) => l.trim().length > 0);
+    if (nonEmptyLines.length === 0) return;
+    const lastLine = nonEmptyLines[nonEmptyLines.length - 1];
+    try {
+      const parsed = JSON.parse(lastLine);
+      // Detect chart shape:
+      // - Array of {x, y, [label]} objects → bar or line chart
+      // - Object with "chart_type" field → use that
+      // - Object with array values → multi-series
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "object") {
+        const first = parsed[0];
+        const hasXY = "x" in first && "y" in first;
+        const hasLabelValue = "label" in first && "value" in first;
+        if (hasXY || hasLabelValue) {
+          setChartData(parsed);
+          setChartType("bar");
+          return;
+        }
+      }
+      if (parsed && typeof parsed === "object" && "chart_type" in parsed) {
+        const t = (parsed as { chart_type: string }).chart_type;
+        if (t === "bar" || t === "line") {
+          setChartData(parsed);
+          setChartType(t);
+          return;
+        }
+      }
+      // Not a recognised chart shape — keep text output.
+      setChartData(null);
+      setChartType(null);
+    } catch {
+      setChartData(null);
+      setChartType(null);
+    }
+  };
+
+  // Auto-load PyodideRunner; only show the chart once we have chartData.
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 p-2.5 space-y-2">
       <div className="flex items-center justify-between gap-2">
@@ -206,7 +252,41 @@ function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: st
         code={outcome.code}
         buttonLabel="Run analytics"
         compact
+        onOutput={handleOutput}
+        // Only hide text output if we successfully parsed a chart.
+        hideTextOutput={chartData !== null && chartType !== null}
       />
+      {/* Real chart (if JSON output was parsed) */}
+      {chartData !== null && chartType === "bar" && Array.isArray(chartData) && (
+        <div style={{ width: "100%", height: 180 }}>
+          <ResponsiveContainer>
+            <BarChart data={chartData as Array<Record<string, unknown>>} margin={{ top: 4, right: 8, bottom: 16, left: 0 }}>
+              <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
+              <XAxis dataKey="label" stroke="hsl(var(--muted-foreground))" fontSize={9} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={9} />
+              <Tooltip />
+              <Bar dataKey="value" fill={accent}>
+                {(chartData as Array<Record<string, unknown>>).map((_, i) => (
+                  <Cell key={i} fill={accent} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {chartData !== null && chartType === "line" && Array.isArray(chartData) && (
+        <div style={{ width: "100%", height: 180 }}>
+          <ResponsiveContainer>
+            <LineChart data={chartData as Array<Record<string, unknown>>} margin={{ top: 4, right: 8, bottom: 16, left: 0 }}>
+              <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.4} />
+              <XAxis dataKey="x" stroke="hsl(var(--muted-foreground))" fontSize={9} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={9} />
+              <Tooltip />
+              <Line type="monotone" dataKey="y" stroke={accent} strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
       <p className="text-[10px] text-muted-foreground leading-relaxed">{outcome.description}</p>
     </div>
   );

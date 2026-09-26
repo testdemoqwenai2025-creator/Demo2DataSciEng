@@ -87,7 +87,16 @@ for pop in ['AFR', 'EUR', 'EAS', 'SAS']:
     idxs = [i for i, p in enumerate(pops) if p == pop]
     mean_pc1 = sum(U[0][i] for i in idxs) / len(idxs)
     print(f"  {pop}: PC1 mean = {mean_pc1:+.3f}")
-print("Insight: AFR has PC1 ≈ +0.5, others ≈ -0.3 → SVD finds Out-of-Africa")`,
+print("Insight: AFR has PC1 ≈ +0.5, others ≈ -0.3 → SVD finds Out-of-Africa")
+
+# Final line: JSON output for chart rendering (bar chart of PC1 means per population)
+import json
+chart_data = []
+for pop in ['AFR', 'EUR', 'EAS', 'SAS']:
+    idxs = [i for i, p in enumerate(pops) if p == pop]
+    mean_pc1 = sum(U[0][i] for i in idxs) / len(idxs)
+    chart_data.append({"label": pop, "value": round(mean_pc1, 3)})
+print(json.dumps(chart_data))`,
         description: "The top-3 principal components of the 1000-Genomes chr-22 matrix recover the 4-population structure: AFR has positive PC1 (the migration 'signature'), others negative. A computational biologist reads this scatter and sees human migration patterns in linear algebra.",
       },
       {
@@ -486,7 +495,20 @@ for i in [2, 5, 8, 11]:
     ranked = sorted(range(n_pos), key=lambda j: A[i][j], reverse=True)[:3]
     is_contact = any((i,c) in contacts or (c,i) in contacts for c in ranked)
     print(f"  pos {i:2d}: top-3 = {ranked}, true contact: {any((i,c) in contacts or (c,i) in contacts for c in ranked)}")
-print("Insight: Attention rediscovers the 4 contact pairs from co-variation alone")`,
+print("Insight: Attention rediscovers the 4 contact pairs from co-variation alone")
+
+# Final line: JSON output for chart rendering (bar chart of contact detection rates)
+import json
+contact_correct = 0
+for i in [2, 5, 8, 11]:
+    ranked = sorted(range(n_pos), key=lambda j: A[i][j], reverse=True)[:3]
+    if any((i,c) in contacts or (c,i) in contacts for c in ranked):
+        contact_correct += 1
+chart_data = [
+    {"label": "Contact pairs found", "value": contact_correct},
+    {"label": "Contact pairs missed", "value": 4 - contact_correct},
+]
+print(json.dumps(chart_data))`,
         description: "The attention matrix on a protein MSA finds co-evolving residue pairs — positions that mutate together are in physical contact. A structural biologist reads the attention matrix as a contact map: the SAME operation that parses language parses protein folds.",
       },
       {
@@ -881,7 +903,14 @@ print(f"GATK threshold: P>=95% → λ>=14 needed for reliable calling")
 print("\\nDistribution P(k):")
 for k in [5, 10, 14, 20, 25]:
     print(f"  P({k:2d}) = {poisson_pmf(k, lam)*100:5.2f}%")
-print("Insight: GATK uses Poisson(λ=14) for the 95% variant-calling threshold")`,
+print("Insight: GATK uses Poisson(λ=14) for the 95% variant-calling threshold")
+
+# Final line: JSON output for chart rendering (bar chart of P(k) for k=5..25)
+import json
+chart_data = []
+for k in [5, 10, 14, 20, 25]:
+    chart_data.append({"label": f"k={k}", "value": round(poisson_pmf(k, lam)*100, 2)})
+print(json.dumps(chart_data))`,
         description: "At λ=14 (mean coverage), P(≥10 reads) = 95% — the threshold GATK uses to confidently call variants. A bioinformatician reads the Poisson tail and sees the trade-off: more reads = more confidence = more cost. The math dictates the experimental design.",
       },
       {
@@ -1258,7 +1287,15 @@ freqs = [k*Fs/N for k in top_k]
 print("Top-3 frequency peaks (Hz):", [round(f, 1) for f in freqs])
 print("Expected notes: C4=262, E4=330, G4=392")
 print("Match:", all(any(abs(f-exp)<5 for f in freqs) for exp in notes))
-print("Insight: FFT separates 3 sine waves without being told what to look for")`,
+print("Insight: FFT separates 3 sine waves without being told what to look for")
+
+# Final line: JSON output for chart rendering (bar chart of detected vs expected notes)
+import json
+chart_data = []
+for note in notes:
+    detected = any(any(abs(f - note) < 5 for f in freqs) for _ in [1])
+    chart_data.append({"label": f"{int(note)} Hz", "value": 1 if detected else 0})
+print(json.dumps(chart_data))`,
         description: "The DFT of a 1024-sample C-major chord produces a spectrum with 3 sharp peaks at 262, 330, 392 Hz. An audio engineer sees these and recognises C4, E4, G4 — FFT separated the mixed signal into its constituent notes, without prior knowledge of what frequencies to look for.",
       },
       {
@@ -3314,7 +3351,13 @@ print(f"Shannon entropy of English: H = {H_bits:.3f} bits/letter")
 print(f"Uniform (max): 26 → {math.log2(26):.3f} bits")
 print(f"Redundancy: {(1 - H_bits/math.log2(26))*100:.1f}%")
 print(f"\\nCompression limit: zip achieves ~{H_bits/math.log2(26)*100:.0f}% of uniform")
-print("Insight: H = -Σ p log p IS the compression limit (Shannon 1948)")`,
+print("Insight: H = -Σ p log p IS the compression limit (Shannon 1948)")
+
+# Final line: JSON output for chart rendering (bar chart of top-6 English letter freqs)
+import json
+sorted_freqs = sorted(freqs.items(), key=lambda x: -x[1])[:6]
+chart_data = [{"label": letter, "value": p} for letter, p in sorted_freqs]
+print(json.dumps(chart_data))`,
         description: "Shannon entropy of English letters is ~4.18 bits/letter (vs 4.70 for uniform). The redundancy (11%) is why zip compresses text by ~50%. An information theorist sees H = -Σp log p as the universal compression limit — the boundary between information and redundancy.",
       },
       {

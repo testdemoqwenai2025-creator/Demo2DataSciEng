@@ -61,6 +61,14 @@ interface PyodideRunnerProps {
   preamble?: string;
   /** Compact mode — smaller button, no badge */
   compact?: boolean;
+  /**
+   * Optional callback invoked when the run completes with the full stdout
+   * string. The parent can parse this (e.g., as JSON) and render a chart
+   * alongside or instead of the text output.
+   */
+  onOutput?: (stdout: string) => void;
+  /** If true, hide the text-output panel (useful when the parent renders a chart). */
+  hideTextOutput?: boolean;
 }
 
 export function PyodideRunner({
@@ -68,6 +76,8 @@ export function PyodideRunner({
   buttonLabel = "Run in browser",
   preamble,
   compact = false,
+  onOutput,
+  hideTextOutput = false,
 }: PyodideRunnerProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "running" | "done" | "error">("idle");
   const [output, setOutput] = useState<string>("");
@@ -138,13 +148,15 @@ export function PyodideRunner({
       const finalOutput = lines.join("");
       setOutput(prev => prev + (finalOutput || "(no output)"));
       setStatus("done");
+      // Notify parent of the final stdout (for chart rendering, etc.)
+      if (onOutput) onOutput(finalOutput);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
       setStatus("error");
       setOutput(prev => prev + `\nError: ${msg}`);
     }
-  }, [code, preamble]);
+  }, [code, preamble, onOutput]);
 
   // Auto-scroll output to bottom on update
   useEffect(() => {
@@ -188,7 +200,7 @@ export function PyodideRunner({
       </div>
 
       <AnimatePresence>
-        {(status !== "idle" || output) && (
+        {(status !== "idle" || output) && !hideTextOutput && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
