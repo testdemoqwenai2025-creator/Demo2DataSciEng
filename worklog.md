@@ -3816,3 +3816,34 @@ Stage Summary:
 - Both private repos (AppDataSci-Advanced + AppDataSciEng2-Advance) now in sync at HEAD 2e5a4f8
 - Lint clean, static build clean, pushed to both remotes
 - Phase K vision realized: readers can FEEL the math work on real public datasets (1000-Genomes, UniRef50, audio, gnomAD), see the production library call (np.linalg.svd, torch.nn.MultiheadAttention, np.fft.fft, scipy.stats.poisson, scipy.stats.entropy), and read the full mathematical derivation with citations. The math, code, computational tooling, elegant outputs, and resources out there are interconnected on 5 visceral interactive pages.
+
+---
+Task ID: phase-k-verify-live-deployment
+Agent: Super Z (main)
+Task: Verify Phase K (Living Equations) is deployed and live at the GitHub Pages URL https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/. Add the public2 remote (Demo2DataSciEng) and confirm both private and public repos are in sync.
+
+Work Log:
+- Added Demo2DataSciEng as the public2 remote (the existing 'public' remote points to DemoAppDataSci, but the user's URL references Demo2DataSciEng).
+- Fetched public2 — main is at c162afc (in sync with private/main and prev-session/main).
+- Verified the next.config.ts is correctly configured with repoName='Demo2DataSciEng' (basePath=/Demo2DataSciEng when GITHUB_PAGES=true).
+- Verified the sync-to-public.yml workflow on AppDataSciEng2-Advance (prev-session remote) auto-mirrors to Demo2DataSciEng on push.
+- Verified the deploy-pages.yml workflow on Demo2DataSciEng builds the static export and deploys to GitHub Pages.
+- All commits pushed to all three remotes (private, prev-session, public2).
+- Live verification (curl):
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/elegant-code/ → HTTP 200, contains 'Run it live →', '20 cards × 5 langs', 'Hosted on'
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-svd/ → HTTP 200, contains 'Living SVD', 'drag k', 'Out-of-Africa', 'np.linalg.svd'
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-attention/ → HTTP 200
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-fft/ → HTTP 200
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-poisson/ → HTTP 200
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-entropy/ → HTTP 200
+
+Stage Summary:
+- All 5 Living Equation pages are live and accessible at:
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-svd/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-attention/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-fft/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-poisson/
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-entropy/
+- The /elegant-code page now shows 'Run it live →' CTAs on 5 of 20 cards (deep-linking to the live demos above).
+- All three repos are in sync at HEAD c162afc: AppDataSci-Advanced (private), AppDataSciEng2-Advance (private), Demo2DataSciEng (public, GitHub Pages).
+- Lint clean, static build clean, all 125 pages deployed live.
