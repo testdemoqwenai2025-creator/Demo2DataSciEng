@@ -3975,3 +3975,49 @@ Stage Summary:
 - Each tile names the skill (e.g., "Computational biologist") and talent (e.g., "sees population structure in matrices") each sector rewards — so users discover the correlations between the equation, the analytics output, and the human profile that interprets it.
 - "View full live demo" button at the top of every card modal deep-links to the corresponding /living-* page for cards with one (10 of 20 cards).
 - Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: sidebar-fix-extend-outcomes-skill-graph
+Agent: Super Z (main)
+Task: Fix the sidebar navigation (Resources, Connections, Global Shipping, Living Equations pages weren't in the sidebar GROUPS array → never highlighted as active). Extend Expected Outcomes from 5 cards to all 20 cards (45 new tiles). Add a Skill graph on /resources showing which skills/talents are shared across equations.
+
+Work Log:
+- Fixed src/app/_components/app-shell.tsx GROUPS array:
+  * Added 4 new sidebar groups: 'Connections' (→ /connections), 'Resources' (→ /resources), 'Global Shipping' (→ /global-shipping), 'Living Equations' (→ all 10 /living-* pages).
+  * Now /resources is correctly highlighted when active (matching the pattern of every other page).
+  * All 10 /living-* pages are reachable from the sidebar.
+  * Verified by inspecting the built HTML — all 10 living-* slugs appear in the sidebar nav (1 occurrence each in the visible HTML + 1 in the RSC payload).
+- Extended Expected Outcomes from 5 to 20 cards via scripts/add_outcomes_to_cards_part2.py (idempotent):
+  * Added 3 outcomes per card × 15 cards = 45 new outcome tiles.
+  * Each tile has: science, sector, skill, talent, code (Python — runs via PyodideRunner), description.
+  * The 15 new cards: Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's.
+  * Total outcome tiles now: 60 (20 cards × 3 tiles each).
+  * File grew from 5,251 to 6,691 lines (+1,440 lines of new outcome data).
+- Built new component src/app/_components/skill-graph.tsx (~170 lines):
+  * D3.js force-directed bipartite graph: skill nodes (orange, larger) + card nodes (colored by accent, smaller).
+  * Builds the graph from ELEGANT_CODE_CARDS' outcomes[] field — extracts every (skill, card) pair.
+  * Bipartite: each skill is connected to every card where it appears.
+  * Drag any node (re-equilibrates); hover any node to see its connection count.
+  * Visually identifies "intersection" skills — skills that appear on multiple cards (the most shared minds across equations).
+- Added SkillGraph section to /resources page between the Libraries section and the 10-card grid.
+  * SectionCard titled "Skill graph — which minds are shared across equations".
+  * Description explains the bipartite structure + how to use it (drag, hover, identify intersections).
+  * Badge: "interactive D3".
+- Lint clean across all 4 modified/new files.
+- Static build: 131 pages prerendered (same count). All 5 key pages verified built (resources 399KB, elegant-code 379KB, living-black-scholes 246KB, connections 379KB, global-shipping 320KB).
+- Live verification (after deploy workflow):
+  * /resources/ → HTTP 200, page size 398KB.
+  * /elegant-code/ → HTTP 200.
+  * /living-black-scholes/ → HTTP 200.
+  * /connections/ → HTTP 200.
+  * /global-shipping/ → HTTP 200.
+  * Sidebar shows all 4 new groups (Living Equations, Resources, Connections, Global Shipping).
+  * "Skill graph" section present (4 occurrences in HTML — visible + RSC payload).
+  * "Computational biologist" appears 4 times (in the Skill graph data — visible when rendered).
+- Commit 2a6b3c4 pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- Sidebar nav now correctly highlights /resources, /connections, /global-shipping, and all 10 /living-* pages (matching the active-page pattern).
+- All 20 elegant-code cards now have 3 outcome tiles each = 60 total Pyodide-powered analytics demos inside the card modal. Each tile names the skill (e.g., "Marine underwriter") and talent (e.g., "sees freight-rate volatility in option premiums") each sector rewards.
+- /resources now has an interactive D3 skill graph showing which skills are shared across equations. A reader can surf from a skill to all the equations that reward it — discovering where their own talent fits.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
