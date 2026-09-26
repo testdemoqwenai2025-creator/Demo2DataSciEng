@@ -76,6 +76,12 @@ jobs:
           fetch-depth: 0
           # Use the built-in GITHUB_TOKEN for write access to this repo.
           token: ${{ secrets.GITHUB_TOKEN }}
+          # CRITICAL: persist-credentials=false prevents actions/checkout
+          # from setting http.https://github.com/.extraheader, which would
+          # override the URL-embedded PAT on the `git fetch private` step
+          # below and cause "Repository not found" (GITHUB_TOKEN can't
+          # read a different private repo).
+          persist-credentials: false
 
       - name: Configure Git
         run: |
@@ -92,7 +98,13 @@ jobs:
           git fetch private main --tags --force
 
       - name: Sync main (fast-forward if possible, force if diverged)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # persist-credentials=false above means origin's URL no longer
+          # has the GITHUB_TOKEN cached — re-add it explicitly for the push.
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+
           # The public repo is a pure mirror — its main should always
           # equal private/main. Fast-forward is preferred; if the
           # public main has diverged (e.g. README edits made
@@ -125,7 +137,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Re-fetch origin to pick up the push we just made.
+          # Re-fetch origin (using the explicit token URL set above).
           git fetch origin main --force
           PUBLIC_HASH=$(git rev-parse origin/main)
           PRIVATE_HASH=$(git rev-parse private/main)
