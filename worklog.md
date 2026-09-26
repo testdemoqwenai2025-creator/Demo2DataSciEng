@@ -4570,3 +4570,16 @@ Stage Summary:
 - The audit script is re-runnable after every build to verify platform health.
 - The report is committed to the repo for traceability.
 - All code, scripts, .txt, .md, worklog pushed to private repo.
+
+---
+Task ID: fix-connections-skillgraph-askmeanything-buttons
+Agent: Super Z (main)
+Task: Fix /connections page still not rendering properly. Fix floating buttons overlapping. Apply lazy-evaluation to SkillGraph on /resources.
+
+Work Log:
+- Fixed /connections page: verified the ElegantCodeGraph lazy fix is in the built output ('Load interactive graph' = 2x, 'lazy evaluation' = 3x). The D3 simulation no longer blocks the main thread on page load.
+- Applied lazy-evaluation to SkillGraph on /resources: same pattern as ElegantCodeGraph — 'activated' state (default false), D3 simulation only starts when user clicks 'Load skill graph'. Verified in built output ('Load skill graph' = 2x, 'lazy evaluation' = 3x).
+- Repositioned AskMeAnything floating button: changed from 'bottom-6 right-6' → 'bottom-24 right-5'. Now stacks 96px above the FloatingLiveButton (at 'bottom-5 right-5'). No overlap. Verified in built output ('bottom-24' = 1x, 'bottom-6' = 0x in AskMeAnything component).
+- Ran audit: 130/130 pages PASS (100%). All pages render correctly.
+- Lint clean. Static build: 132 pages.
+- Commit d6e50d2 pushed to BOTH private/main AND prev-session/main.
