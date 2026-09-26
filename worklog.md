@@ -4614,3 +4614,38 @@ Stage Summary:
 - Sidebar badges distinguish page-specific (green) from generic (blue) thoughts.
 - Readers can sort the sidebar by freshness to see recently-updated pages.
 - All pushed to 3 remotes (including direct push to Demo2DataSciEng for immediate deploy).
+
+---
+Task ID: fix-sync-workflow-guardrails
+Agent: Super Z (main)
+Task: Fix the sync-to-public workflow that was failing to push from private repos to Demo2DataSciEng. Add guardrails to prevent future sync failures. Add audit to deploy workflow.
+
+Root Cause Analysis:
+- The sync-to-public workflow had `if: github.repository == 'testdemoqwenai2025-creator/AppDataSciEng2-Advance'`.
+- We push to TWO private repos: AppDataSci-Advanced (private remote) and AppDataSciEng2-Advance (prev-session remote).
+- When pushing to AppDataSci-Advanced, the sync workflow's `if` condition was FALSE → sync didn't run → Demo2DataSciEng never got the code.
+- This caused the 3x '/connections not rendering properly' issue — the live site was stuck at an old commit while the source had the fix.
+- Additional issue: `paths-ignore: '.github/workflows/**'` was too aggressive — ignored all .github/ changes.
+
+Fix Applied:
+1. Rewrote .github/workflows/sync-to-public.yml:
+   - `if` condition now matches BOTH private repos: AppDataSciEng2-Advance OR AppDataSci-Advanced.
+   - Removed `paths-ignore` (was too aggressive).
+   - Added fallback: if SYNC_TO_PUBLIC_PAT secret is not set, uses GITHUB_TOKEN.
+   - Added verification step: fetches public repo to confirm the push landed.
+   - Added failure notification with manual fix instructions.
+2. Added audit step to .github/workflows/deploy-pages.yml:
+   - Runs scripts/audit_all_pages_live.py after deploy.
+   - Checks all deployed GitHub Pages URLs for HTTP 200.
+3. Created scripts/audit_all_pages_live.py — checks deployed URLs for HTTP 200 + content.
+4. Fixed deploy-pages.yml comment: 'DemoAppDataSci' → 'Demo2DataSciEng'.
+
+Guardrails Added:
+- Sync workflow runs on BOTH private repos (can't miss a push to either one).
+- Audit runs after every deploy (catches broken pages).
+- Verification step confirms the sync landed (detects mismatches).
+- Failure notification includes manual fix instructions.
+- YAML validated: both workflows are valid YAML.
+
+Pushed to ALL 3 remotes: private/main, prev-session/main, public2/main.
+Commit b0ed400.
