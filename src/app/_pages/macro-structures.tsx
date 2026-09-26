@@ -10,9 +10,13 @@ import { ImageModal } from "../_components/image-modal";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
+import { DatasetCards } from "../_components/dataset-cards";
+import { RelatedElegantCode } from "../_components/related-elegant-code";
+import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import {
   Cpu, Layers, Zap, TrendingUp, Terminal, Brain,
   Activity, Boxes, Atom, FlaskConical,
+  Sparkles,
 } from "lucide-react";
 
 const KPIS = [
@@ -939,6 +943,21 @@ export function MacroStructuresPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+
+      {/* Cross-disciplinary elegant-code cards — same math, different sciences */}
+      <SectionCard
+        title="Cross-disciplinary elegant-code cards — the math behind macro structures"
+        description="SVD (structural decomposition), Attention (AlphaFold2 structure prediction), and Entropy (structural diversity) all apply to macro-structure analysis. Each card shows the same math applied across 3+ sciences."
+        icon={<Sparkles className="h-5 w-5" />}
+        badge="elegant code"
+      >
+        <DatasetCards
+          examples={ELEGANT_CODE_CARDS.filter((_, i) => [0, 1, 9].includes(i))}
+          intro="SVD (structural decomposition), Attention (AlphaFold2 structure prediction), and Entropy (structural diversity) all apply to macro-structure analysis. Each card shows the same math applied across 3+ sciences."
+        />
+      </SectionCard>
+
+      <RelatedElegantCode cardIndices={[0, 1, 9]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (ESM-2 protein encoder)</Link>
         <span className="text-muted-foreground">·</span>

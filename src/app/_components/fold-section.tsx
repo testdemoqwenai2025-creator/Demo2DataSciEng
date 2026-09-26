@@ -303,9 +303,7 @@ export function ProductionPatternsFold({ cardIndex }: { cardIndex: number }) {
 export function CitationsFold({ cardIndex }: { cardIndex: number }) {
   const card = ELEGANT_CODE_CARDS[cardIndex];
   if (!card) return null;
-  // Extract dataset/source info from the brief.
   const datasetText = card.brief.dataset;
-  // Extract paper references from the subtitle (often contains author + year)
   const subtitleRefs = card.subtitle.match(/\d{4}/g) || [];
   return (
     <FoldSection
@@ -313,6 +311,17 @@ export function CitationsFold({ cardIndex }: { cardIndex: number }) {
       description="The papers, datasets, and libraries that ground this card's claims. Each citation links to the /resources page for the full reference."
     >
       <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+        {/* Explicit citations (if the card has a citations: field) */}
+        {card.citations && card.citations.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Bibliography</p>
+            <ul className="list-disc list-inside space-y-1">
+              {card.citations.map((cite, i) => (
+                <li key={i} className="text-[11px] leading-relaxed">{cite}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div>
           <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Dataset sources</p>
           <p>{datasetText}</p>
@@ -338,7 +347,7 @@ export function CitationsFold({ cardIndex }: { cardIndex: number }) {
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-wider text-foreground/80 font-semibold mb-1">Living-equation page (if available)</p>
-          <p>For the full mathematical derivation with citations, check the Math tab on the corresponding /living-* page (if this card has a "Run it live" CTA at the top of the modal). The Math tab contains 4-paragraph derivations citing the original papers (e.g., Beltrami 1873, Shannon 1948, Cooley-Tukey 1965).</p>
+          <p>For the full mathematical derivation with citations, check the Math tab on the corresponding /living-* page (if this card has a "Run it live" CTA at the top of the modal).</p>
         </div>
         <p className="text-[10px] italic">
           For the complete bibliography of all 20 cards, visit{" "}

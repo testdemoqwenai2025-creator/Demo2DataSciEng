@@ -82,6 +82,8 @@ export interface DatasetExample {
   outcomes?: ExpectedOutcome[];
   /** Optional: LaTeX-formatted mathematical derivation for DeeperMathFold. */
   math?: string;
+  /** Optional: explicit citations per card (author, year, title, URL). */
+  citations?: string[];
 }
 
 interface DatasetCardsProps {
