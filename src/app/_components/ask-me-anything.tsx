@@ -219,6 +219,9 @@ export function AskMeAnything() {
   const [llmAnswer, setLlmAnswer] = useState<string | null>(null);
   const [llmLoading, setLlmLoading] = useState(false);
   const [llmError, setLlmError] = useState<string | null>(null);
+  // Conversation memory — store question + answer in localStorage so the user
+  // can ask follow-ups with context from the previous question.
+  const [conversation, setConversation] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
 
   // Build the search index once (not ref-based to satisfy react-hooks rules).
   const searchIndex = useMemo(() => buildSearchIndex(), []);
@@ -252,16 +255,19 @@ export function AskMeAnything() {
   }, [isSearching, query]);
 
   // Dev-mode LLM call: POST to /api/ask-anything
+  // Includes conversation history so the user can ask follow-ups with context.
   const callLLM = async (question: string) => {
     if (!isDev || !question.trim()) return;
     setLlmLoading(true);
     setLlmError(null);
     setLlmAnswer(null);
     try {
+      // Send conversation history (up to 10 messages) for multi-turn context.
+      const history = conversation.slice(-10);
       const res = await fetch("/api/ask-anything", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, history }),
       });
       if (!res.ok) {
         const txt = await res.text();
@@ -272,13 +278,64 @@ export function AskMeAnything() {
       if (data.error) {
         setLlmError(data.error);
       } else {
-        setLlmAnswer(data.answer ?? "(empty response)");
+        const answer = data.answer ?? "(empty response)";
+        setLlmAnswer(answer);
+        // Store in conversation history (in state + localStorage).
+        const newConversation = [
+          ...conversation,
+          { role: "user" as const, content: question },
+          { role: "assistant" as const, content: answer },
+        ];
+        setConversation(newConversation);
+        // Persist to localStorage (keyed by page URL so each page has its own history).
+        if (typeof window !== "undefined") {
+          try {
+            const key = "ask-me-anything-history";
+            const allHistory = JSON.parse(localStorage.getItem(key) || "{}");
+            allHistory[window.location.pathname] = newConversation.slice(-20); // keep last 20
+            localStorage.setItem(key, JSON.stringify(allHistory));
+          } catch {
+            // localStorage may be unavailable (private browsing) — best-effort only.
+          }
+        }
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setLlmError(msg);
     } finally {
       setLlmLoading(false);
+    }
+  };
+
+  // Load conversation history from localStorage on mount.
+  useEffect(() => {
+    if (!isDev || typeof window === "undefined") return;
+    try {
+      const key = "ask-me-anything-history";
+      const allHistory = JSON.parse(localStorage.getItem(key) || "{}");
+      const pageHistory = allHistory[window.location.pathname];
+      if (pageHistory && Array.isArray(pageHistory)) {
+        setConversation(pageHistory);
+      }
+    } catch {
+      // best-effort
+    }
+  }, [isDev]);
+
+  // Clear conversation history.
+  const clearConversation = () => {
+    setConversation([]);
+    setLlmAnswer(null);
+    setLlmError(null);
+    if (typeof window !== "undefined") {
+      try {
+        const key = "ask-me-anything-history";
+        const allHistory = JSON.parse(localStorage.getItem(key) || "{}");
+        delete allHistory[window.location.pathname];
+        localStorage.setItem(key, JSON.stringify(allHistory));
+      } catch {
+        // best-effort
+      }
     }
   };
 
@@ -481,10 +538,37 @@ export function AskMeAnything() {
                         <div className="whitespace-pre-wrap">{llmAnswer}</div>
                       </div>
                     )}
+                    {/* Conversation history (multi-turn context) */}
+                    {conversation.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-border/40">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                            Conversation history ({conversation.length} messages — stored in localStorage)
+                          </p>
+                          <button
+                            onClick={clearConversation}
+                            className="text-[10px] text-rose-600 dark:text-rose-400 hover:underline"
+                          >
+                            Clear history
+                          </button>
+                        </div>
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {conversation.slice(-6).map((msg, i) => (
+                            <div key={i} className={`text-[10px] leading-relaxed ${msg.role === "user" ? "text-primary/80" : "text-muted-foreground"}`}>
+                              <span className="font-semibold uppercase mr-1">{msg.role}:</span>
+                              <span className="line-clamp-2">{msg.content}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-[9px] text-muted-foreground italic mt-1">
+                          Ask a follow-up question (e.g., "tell me more about that") — the AI will use this context.
+                        </p>
+                      </div>
+                    )}
                     <p className="text-[10px] text-muted-foreground italic mt-2">
                       The LLM is primed with the platform's 20 cards + 60 outcome tiles context.
-                      In production (GitHub Pages), this section is hidden — the API route 404s.
-                      Use the external AI platforms below instead.
+                      Conversation history is stored in localStorage — ask follow-ups like "tell me more about SVD" and the AI retains context.
+                      In production (GitHub Pages), this section is hidden — use the external AI platforms below instead.
                     </p>
                   </div>
                 )}

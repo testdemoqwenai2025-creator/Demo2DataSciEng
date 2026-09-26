@@ -136,7 +136,7 @@ const EQUATION_FAMILIES: Record<number, { family: string; color: string; descrip
   12: { family: "Optimization", color: "oklch(0.65 0.16 100)", description: "Bet sizing + learning rates — the family of maximisation equations." },
 };
 
-export function EquationFamilyFold({ cardIndex }: { cardIndex: number }) {
+export function EquationFamilyFold({ cardIndex, onCardClick }: { cardIndex: number; onCardClick?: (cardIndex: number) => void }) {
   const family = EQUATION_FAMILIES[cardIndex];
   if (!family) return null;
   // Find all sibling cards in the same family.
@@ -155,14 +155,19 @@ export function EquationFamilyFold({ cardIndex }: { cardIndex: number }) {
         </p>
         {siblings.length > 0 && (
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Sibling cards in this family</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Sibling cards in this family — click any to open its modal</p>
             <div className="grid gap-2">
               {siblings.map((sibIdx) => {
                 const sibCard = ELEGANT_CODE_CARDS[sibIdx];
                 if (!sibCard) return null;
                 const sibFamily = EQUATION_FAMILIES[sibIdx];
                 return (
-                  <div key={sibIdx} className="rounded-md border border-border/60 bg-muted/20 p-2">
+                  <button
+                    key={sibIdx}
+                    type="button"
+                    onClick={() => onCardClick?.(sibIdx)}
+                    className="rounded-md border border-border/60 bg-muted/20 p-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors w-full cursor-pointer"
+                  >
                     <div className="flex items-start gap-2">
                       <span
                         className="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
@@ -180,7 +185,7 @@ export function EquationFamilyFold({ cardIndex }: { cardIndex: number }) {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

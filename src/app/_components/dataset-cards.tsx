@@ -618,7 +618,20 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
               const openIdx = examples.findIndex((e) => e.id === openCard.id);
               return openIdx >= 0 ? (
                 <div className="space-y-2">
-                  <EquationFamilyFold cardIndex={openIdx} />
+                  <EquationFamilyFold
+                    cardIndex={openIdx}
+                    onCardClick={(targetIdx) => {
+                      // Switch the modal to the clicked sibling card (same as SkillConstellation).
+                      const targetCard = examples[targetIdx];
+                      if (targetCard) {
+                        setOpenId(targetCard.id);
+                        setTimeout(() => {
+                          const modal = document.querySelector(".max-h-\\[85vh\\]");
+                          if (modal) modal.scrollTop = 0;
+                        }, 50);
+                      }
+                    }}
+                  />
                   <DeeperMathFold cardIndex={openIdx} />
                 </div>
               ) : null;

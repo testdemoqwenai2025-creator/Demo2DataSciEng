@@ -6,7 +6,7 @@ import { ELEGANT_CODE_CARDS } from "./_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, RefreshCw, Dice5, ArrowRight } from "lucide-react";
+import { Sparkles, RefreshCw, Dice5, ArrowRight, Bookmark, Download, Trash2 } from "lucide-react";
 
 /**
  * SurpriseMe — picks 3 random outcome tiles across all 60 (20 cards × 3
@@ -83,11 +83,70 @@ export function SurpriseMe() {
 
   const [picked, setPicked] = useState<RandomTile[]>([]);
   const [clickCount, setClickCount] = useState(0);
+  // Bookmarked discoveries — lazy-initialized from localStorage (avoids setState-in-effect).
+  const [bookmarks, setBookmarks] = useState<RandomTile[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("surprise-me-bookmarks");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const reshuffle = useCallback(() => {
     setPicked(pickThree(allTiles));
     setClickCount((c) => c + 1);
   }, [allTiles]);
+
+  // Bookmark the current 3 tiles.
+  const bookmarkCurrent = useCallback(() => {
+    if (picked.length === 0) return;
+    const newBookmarks = [...bookmarks, ...picked];
+    setBookmarks(newBookmarks);
+    try {
+      localStorage.setItem("surprise-me-bookmarks", JSON.stringify(newBookmarks));
+    } catch {
+      // best-effort
+    }
+  }, [picked, bookmarks]);
+
+  // Export bookmarks to a downloadable JSON file (for Google Drive upload etc.).
+  const exportBookmarks = useCallback(() => {
+    if (bookmarks.length === 0) return;
+    const data = JSON.stringify({
+      exportedAt: new Date().toISOString(),
+      source: "ModernDataSciEng Platform — SurpriseMe discoveries",
+      count: bookmarks.length,
+      bookmarks: bookmarks.map((b) => ({
+        card: b.cardTitle,
+        cardIndex: b.cardIndex,
+        science: b.outcome.science,
+        sector: b.outcome.sector,
+        skill: b.outcome.skill,
+        talent: b.outcome.talent,
+        description: b.outcome.description,
+        url: `https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/elegant-code/#card-${b.cardIndex}`,
+      })),
+    }, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `surprise-me-discoveries-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [bookmarks]);
+
+  // Clear all bookmarks.
+  const clearBookmarks = useCallback(() => {
+    setBookmarks([]);
+    try {
+      localStorage.removeItem("surprise-me-bookmarks");
+    } catch {
+      // best-effort
+    }
+  }, []);
 
   return (
     <div className="space-y-3">
@@ -104,12 +163,48 @@ export function SurpriseMe() {
           )}
           {clickCount > 0 ? "Reshuffle" : "Surprise me"}
         </Button>
+        {picked.length > 0 && (
+          <Button
+            onClick={bookmarkCurrent}
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+          >
+            <Bookmark className="h-3.5 w-3.5" />
+            Bookmark these 3
+          </Button>
+        )}
         {clickCount > 0 && (
           <span className="text-[10px] text-muted-foreground">
             Pick #{clickCount} · {allTiles.length} tiles in the pool
+            {bookmarks.length > 0 && ` · ${bookmarks.length} saved`}
           </span>
         )}
       </div>
+
+      {/* Saved discoveries (bookmarks) */}
+      {bookmarks.length > 0 && (
+        <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+              <Bookmark className="h-3 w-3 text-primary" />
+              Saved discoveries ({bookmarks.length} tiles bookmarked — stored in localStorage)
+            </p>
+            <div className="flex items-center gap-1.5">
+              <Button onClick={exportBookmarks} size="sm" variant="ghost" className="h-6 text-[10px] gap-1">
+                <Download className="h-3 w-3" /> Export JSON
+              </Button>
+              <Button onClick={clearBookmarks} size="sm" variant="ghost" className="h-6 text-[10px] gap-1 text-rose-600 dark:text-rose-400">
+                <Trash2 className="h-3 w-3" /> Clear
+              </Button>
+            </div>
+          </div>
+          <p className="text-[9px] text-muted-foreground italic">
+            Export the JSON file and upload to Google Drive / Dropbox / etc. for cross-device access.
+            Each bookmark records the card, science, sector, skill, talent, and deep-link URL.
+          </p>
+        </div>
+      )}
 
       {picked.length === 0 && (
         <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 p-4 text-xs text-muted-foreground italic">

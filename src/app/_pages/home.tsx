@@ -6,6 +6,7 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { ArchBox, ArchLayer, ArchArrow } from "../_components/arch-diagram";
 import { HomeSearch } from "../_components/home-search";
 import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
+import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
 import { hrefFor } from "../_lib/router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -613,6 +614,28 @@ export function HomePage() {
           </SectionCard>
         </div>
       </section>
+
+      {/* My deeper thoughts — 5+ arguments (not summaries) connected to the research section */}
+      <DeeperThoughtSection pageTitle="Modern Data Science Engineering">
+        <DeeperThought title="The platform IS the graph, not the tree" connectedTo="ADR-001 (platform architecture)">
+          <p>Most reference architectures are TREES — a homepage → categories → subcategories → articles. The reader drills down and never sees the connections. This platform's elegant-code thesis is a GRAPH: any card connects to any other card via shared mathematics. SVD connects to FFT (both are change-of-basis) and to Entropy (both compress distributions). The /connections page makes this tangible — a force-directed graph where the reader SURFS the edges rather than drilling the tree. The platform's architecture IS its content model: the data is a graph, the navigation is a graph, the thinking is a graph.</p>
+        </DeeperThought>
+        <DeeperThought title="Specialisation is cheap; intersections are rare" connectedTo="ADR-054 (Black-Scholes + MC + GNN for fintech)">
+          <p>The next century of computational science belongs to those who refuse to stay in their lane. A quant who sees SVD in a genome, a biologist who sees attention in a language model, a port captain who sees Poisson in a server cluster — they're the ones who'll make the unexpected connections. The platform's 20 elegant-code cards are NOT a curriculum (you can't learn SVD from a card). They're a set of LANTERNS — each one illuminates a different corner of the same mathematical landscape, and the reader who walks between them sees the shape of the whole.</p>
+        </DeeperThought>
+        <DeeperThought title="The code is REPRESENTATIONAL — the math is the signal, the tool is the amplifier" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
+          <p>Every card shows the same equation in 5 languages (Scala/Rust/Go/Elixir/Zig) — not because the reader needs to learn 5 languages, but because the equation is the SAME in all 5. The code doesn't CREATE the elegance; it ENABLES it. Without NumPy, the SVD that rediscovers human migration from DNA would take weeks instead of seconds. Without AlphaFold, the attention that parses protein language would require supercomputers instead of GPUs. The tools are the amplifier — the math is the signal. A sound software developer can fill in the implementation details. What they can't fill in is the UNEXPECTED CONNECTION — the insight that SVD is the Fourier transform for data.</p>
+        </DeeperThought>
+        <DeeperThought title="The 'X IS Y' insight IS the platform's product" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>The platform doesn't sell code snippets. It sells RECOGNITION — the small shock of seeing the same math in two places you never expected. 'Attention IS natural selection.' 'Poisson IS the law of rare events.' 'Haversine IS the universal great-circle distance.' These aren't metaphors; they're identities. The same equation, applied to different data, produces different results — but the equation is identical. That identity is what no single PhD sees alone, and what this platform exists to reveal. The product is the 'aha' — the moment when a bioinformatician and a quant realise they're computing the same numbers.</p>
+        </DeeperThought>
+        <DeeperThought title="Every equation has a hidden life — and a human profile" connectedTo="ADR-037 (genetic materials + variant calling)">
+          <p>Each of the 20 elegant-code cards has 3 outcome tiles — one per science the equation bridges. Each tile names the SKILL (what you'd be called: 'Computational biologist', 'Marine underwriter', 'Quant analyst') and the TALENT (what you'd be good at: 'sees population structure in matrices', 'sees freight-rate volatility in option premiums'). This isn't decoration — it's career guidance. A reader who sees their own talent described on 3 different tiles has just discovered that their mind fits 3 different industries. The platform's 60 outcome tiles are a hidden aptitude test: type your talent into the TalentSearch on /resources, and the platform tells you which equations reward your mind — and which sectors would hire you for it.</p>
+        </DeeperThought>
+        <DeeperThought title="The fold pattern IS progressive disclosure — the right UX for serious thinkers" connectedTo="ADR-050 (fold-section architecture)">
+          <p>The card modal shows brief, stats, code, outcomes, constellation, and insight by default — that's 6 sections of immediately-visible content. The fold sections (Equation family, Deeper mathematics, and more to come) are collapsed by default, revealed on click. This isn't laziness — it's respect for the reader's attention. A serious thinker doesn't want 20 sections dumped on them at once. They want the SUMMARY first, then the OPTION to go deeper. The fold pattern gives them that option — and the deeper phases (further code examples, mathematics where needed, desired or expected output) are there when they're ready. Progressive disclosure isn't just a UX pattern; it's an epistemological one.</p>
+        </DeeperThought>
+      </DeeperThoughtSection>
     </div>
   );
 }
