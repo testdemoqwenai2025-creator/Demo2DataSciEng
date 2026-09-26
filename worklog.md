@@ -4238,3 +4238,56 @@ Stage Summary:
 - SectorSkills cross-reference shows which minds each industry requires.
 - 5 specific outcome tiles now render as multi-series line charts (Monte Carlo convergence, Kalman tracking, GBM paths) — showcasing the chart-upgrade framework's value.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: equation-fold-clickable-conversation-memory-deeper-thought-bookmark
+Agent: Super Z (main)
+Task: Wire EquationFamilyFold sibling chips to open modals. Add conversation memory to AskMeAnything (localStorage). Build DeeperThought reusable component + add 5+ thoughts to the home page (connected to research/ADRs). Add SurpriseMe bookmark (localStorage + export to JSON for Google Drive upload).
+
+Work Log:
+- Wired EquationFamilyFold sibling chips to open modals directly (fold-section.tsx):
+  * Added onCardClick prop to EquationFamilyFold.
+  * Changed sibling items from <div> to <button onClick={onCardClick?.(sibIdx)}>.
+  * Wired in DatasetCards: setOpenId(targetCard.id) + setTimeout scroll to top (same as SkillConstellation).
+  * Updated hint: 'Sibling cards in this family — click any to open its modal'.
+- Added conversation memory to AskMeAnything (src/app/_components/ask-me-anything.tsx):
+  * New 'conversation' state: Array<{role: 'user' | 'assistant', content: string}>.
+  * callLLM now sends 'history' (last 10 messages) to /api/ask-anything for multi-turn context.
+  * Conversation stored in localStorage (key: 'ask-me-anything-history', keyed by page URL — each page has its own history).
+  * 'Conversation history' panel shows last 6 messages with role labels (user vs assistant).
+  * 'Clear history' button — clears state + localStorage for the current page.
+  * Loads on mount from localStorage (useEffect + isDev guard).
+  * Only in dev mode (production tree-shaken — isDev is false at build time).
+- Built DeeperThought reusable component (src/app/_components/deeper-thought.tsx, ~80 lines):
+  * DeeperThought: a thought-card with title + 'Connected to: ADR-XXX' badge (links to /research) + paragraph content.
+  * DeeperThoughtSection: wrapper grouping 5+ thoughts under a heading 'My deeper thoughts — {pageTitle}'.
+  * Each thought is 5-8 sentences of original ARGUMENT (not summary).
+  * Each connects to an ADR in the research section — making the thoughts traceable, not opinionated.
+  * The framework is ready for rollout to all 131 pages (the content generation is a separate task).
+- Added 6 deeper thoughts to the home page:
+  a. 'The platform IS the graph, not the tree' (ADR-001 — platform architecture)
+  b. 'Specialisation is cheap; intersections are rare' (ADR-054 — Black-Scholes + MC + GNN for fintech)
+  c. 'The code is REPRESENTATIONAL — the math is the signal, the tool is the amplifier' (ADR-034 — ESM-2 + AlphaFold2)
+  d. 'The X IS Y insight IS the platform's product' (ADR-043 — AlphaMissense adoption)
+  e. 'Every equation has a hidden life — and a human profile' (ADR-037 — genetic materials + variant calling)
+  f. 'The fold pattern IS progressive disclosure — the right UX for serious thinkers' (ADR-050 — fold-section architecture)
+- Added SurpriseMe bookmark (src/app/_components/surprise-me.tsx):
+  * 'Bookmark these 3' button — saves current 3 tiles to localStorage (key: 'surprise-me-bookmarks').
+  * 'Saved discoveries' panel: shows count + 'Export JSON' + 'Clear' buttons.
+  * Export downloads a JSON file with card/science/sector/skill/talent/URL per bookmark.
+  * User can upload the JSON to Google Drive / Dropbox for cross-device access (no OAuth needed).
+  * Lazy-initialized from localStorage (avoids setState-in-effect lint error).
+- Lint clean across all 6 modified/new files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (same count). Home page grew from 442KB to 486KB (+44KB from the 6 deeper thoughts).
+- Live verification (after deploy workflow):
+  * Home page → HTTP 200, 486KB. Contains 'My deeper thoughts' (2x), 'The platform IS the graph' (2x), 'Specialisation is cheap' (2x), 'X IS Y' (3x), 'progressive disclosure' (4x), 'Connected to:' (12x), 'ADR-001' (2x), 'ADR-054' (2x).
+  * /resources/ → HTTP 200 (SurpriseMe bookmark code in JS bundle, renders when user clicks Surprise me + Bookmark).
+  * /elegant-code/ → HTTP 200 (EquationFamilyFold + DeeperMathFold in JS bundle, renders in modal when opened).
+- Commit 3f1600a pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- EquationFamilyFold sibling chips now switch modals directly (same UX as SkillConstellation).
+- AskMeAnything in dev mode now has conversation memory — ask follow-ups with context, stored in localStorage per page.
+- DeeperThought framework is built — 6 sample thoughts on the home page, each connected to an ADR in the research section. The framework is ready for rollout to all 131 pages.
+- SurpriseMe now has bookmark + export — users can save discoveries locally and export to JSON for Google Drive / Dropbox upload.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
