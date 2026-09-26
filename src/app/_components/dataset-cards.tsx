@@ -30,6 +30,30 @@ interface LangTab {
   code: string;
 }
 
+/**
+ * ExpectedOutcome — one science the equation bridges, with the chart/analytics
+ * it produces, the skill needed to read it, and the talent the sector rewards.
+ *
+ * Rendered as a 3-tile grid in the modal. Each tile has a compact PyodideRunner
+ * that produces the analytics output (numbers, ASCII chart, etc.).
+ */
+export interface ExpectedOutcome {
+  /** Science name (e.g., "Genomics") */
+  science: string;
+  /** Real-world sector / dataset (e.g., "1000-Genomes Project") */
+  sector: string;
+  /** Skill needed to interpret the output (e.g., "Computational biologist") */
+  skill: string;
+  /** Talent the sector rewards (e.g., "sees population structure in matrices") */
+  talent: string;
+  /** Python code that produces the analytics output (ASCII chart or numbers) */
+  code: string;
+  /** What the output reveals — the insight that comes from reading it */
+  description: string;
+  /** Optional accent color (defaults to card accent) */
+  accent?: string;
+}
+
 export interface DatasetExample {
   id: string;
   step: string;
@@ -48,6 +72,8 @@ export interface DatasetExample {
   runnablePython?: string;
   insight: string;
   tools: string[];  // computational tools mentioned
+  /** Optional: expected outcomes per science the equation bridges (typically 3 tiles). */
+  outcomes?: ExpectedOutcome[];
 }
 
 interface DatasetCardsProps {
@@ -160,6 +186,33 @@ function MultiLangCode({ tabs, runnablePython }: { tabs: LangTab[]; runnablePyth
 }
 
 // ============================================================
+// OutcomeTile — one science's expected outcome (chart + skill + talent)
+// ============================================================
+
+function OutcomeTile({ outcome, accent }: { outcome: ExpectedOutcome; accent: string }) {
+  return (
+    <div className="rounded-md border border-border/60 bg-muted/30 p-2.5 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: accent }}>
+          {outcome.science}
+        </p>
+      </div>
+      <p className="text-[10px] text-muted-foreground leading-snug">{outcome.sector}</p>
+      <div className="flex flex-wrap gap-1">
+        <Badge variant="outline" className="text-[9px] px-1 py-0">{outcome.skill}</Badge>
+        <Badge variant="secondary" className="text-[9px] px-1 py-0 italic">{outcome.talent}</Badge>
+      </div>
+      <PyodideRunner
+        code={outcome.code}
+        buttonLabel="Run analytics"
+        compact
+      />
+      <p className="text-[10px] text-muted-foreground leading-relaxed">{outcome.description}</p>
+    </div>
+  );
+}
+
+// ============================================================
 // Main component
 // ============================================================
 
@@ -264,6 +317,26 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
       >
         {openCard && (
           <div className="space-y-5">
+            {/* View full live demo — deep-link to /living-* page */}
+            {(() => {
+              const openIdx = examples.findIndex((e) => e.id === openCard.id);
+              const liveHref = liveDemoByIndex && openIdx >= 0 ? liveDemoByIndex(openIdx) : null;
+              return liveHref ? (
+                <a
+                  href={liveHref}
+                  className="block rounded-md border border-primary/40 bg-primary/5 p-3 hover:bg-primary/10 transition-colors"
+                >
+                  <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    View full live demo →
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Open {liveHref} in a new tab — drag sliders and watch the math work on real data, with full charts and 3-tab (Math / Live / Production) context.
+                  </p>
+                </a>
+              ) : null;
+            })()}
+
             {/* Brief */}
             <div className="rounded-md border border-border/60 bg-muted/30 p-3 space-y-2 text-xs">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Scenario brief</p>
@@ -311,6 +384,25 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
               </p>
               <MultiLangCode tabs={openCard.codeTabs} runnablePython={openCard.runnablePython} />
             </div>
+
+            {/* Expected outcomes — what this equation produces in each science */}
+            {openCard.outcomes && openCard.outcomes.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Expected outcomes — what this equation produces in each science (click "Run analytics" on any tile)
+                </p>
+                <div className="grid md:grid-cols-3 gap-2">
+                  {openCard.outcomes.map((o, i) => (
+                    <OutcomeTile key={i} outcome={o} accent={o.accent ?? openCard.accent} />
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground italic mt-2 leading-relaxed">
+                  Each tile shows the analytics output when this equation lands on a different science's data.
+                  The skill and talent badges name what each sector rewards — so you can see, at a glance,
+                  what kind of mind this equation belongs to in each world it walks across.
+                </p>
+              </div>
+            )}
 
             {/* Insight */}
             <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">

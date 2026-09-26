@@ -21,13 +21,13 @@ export function ElegantCodePage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Multi-disciplinary elegance · math → code → science → unexpected connections"
-        title="Elegant Code — where mathematics meets life sciences meets software"
-        description="This page demonstrates the multi-disciplinary intersection that defines modern computational science. Each card shows ONE mathematical equation that bridges MULTIPLE sciences — the same math applied to genomics, NLP, audio, chemistry, physics, games, and aerospace. The code is not executable — it is REPRESENTATIONAL, showing how mathematics becomes code becomes science. The 'X IS Y' insights reveal unexpected connections that no single PhD sees alone. This is what the platform is building: the thinking process that creates unexpected elegance across disciplines."
+        eyebrow="Where equations refuse to stay in their lane"
+        title="Elegant Code — the mathematics that walks across disciplines"
+        description="There is a kind of mathematics that refuses to stay where it was born. The Fourier transform that pulls a C-note out of an audio sample is the same operation that pulls a molecular mass out of a mass spectrometer and a 3D structure out of a cryo-EM micrograph. The same SVD that recovers Out-of-Africa migration from 1000-Genomes data is the same SVD that finds Fama-French risk factors in stock returns. The math doesn't know what it's doing — it just keeps showing up, identical, in places no one expected it. This page collects twenty of those moments. Each card holds one equation and three sciences it walks across. Click any card to see the math, the code in five languages (Scala, Rust, Go, Elixir, Zig), the 'X IS Y' that names the connection no single field would surface on its own, and — when you press 'View expected outcomes' — the actual chart, image, or analytics each science produces when the equation lands on its data. Drag the sliders on the live demos and watch the math work on real datasets: gnomAD alleles, 1000-Genomes PCA, SPX option chains, AIS vessel tracks, MarineTraffic port distances, NOAA flood gauges. Specialisation is cheap. Intersections are rare. The next century of computational science belongs to those who refuse to stay in their lane — who see SVD in a genome and the same SVD in a stock portfolio and know, with a small shock of recognition, that it is the same SVD. That seeing is what this platform builds."
         right={
           <div className="flex gap-2">
-            <Badge variant="outline" className="gap-1.5"><Brain className="h-3 w-3" /> 5 equations</Badge>
-            <Badge variant="outline" className="gap-1.5"><Atom className="h-3 w-3" /> 12+ sciences</Badge>
+            <Badge variant="outline" className="gap-1.5"><Brain className="h-3 w-3" /> 20 equations</Badge>
+            <Badge variant="outline" className="gap-1.5"><Atom className="h-3 w-3" /> 20+ sciences</Badge>
           </div>
         }
       />
