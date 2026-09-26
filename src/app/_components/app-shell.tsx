@@ -133,6 +133,7 @@ const GROUPS: Array<{ title: string; ids: PageId[] }> = [
   { title: "Connections", ids: ["connections"] },
   { title: "Resources", ids: ["resources"] },
   { title: "Future", ids: ["future"] },
+  { title: "Genealogy", ids: ["genealogy"] },
   { title: "Global Shipping", ids: ["global-shipping"] },
   { title: "Living Equations", ids: [
     "living-svd",

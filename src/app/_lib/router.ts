@@ -136,7 +136,8 @@ export type PageId =
   | "living-monte-carlo"
   | "living-gbm"
   | "resources"
-  | "future";
+  | "future"
+  | "genealogy";
 
 export interface PageMeta {
   id: PageId;
@@ -1188,6 +1189,14 @@ export const PAGES: PageMeta[] = [
     group: "Living Equations",
     icon: "TrendingUp",
     description: "The platform's most ambitious deeper thought: a page ABOUT its own future. Projects each technology forward 10-20 years — what replaces Snowflake, Kafka, PyTorch? — while arguing that the math (SVD, Attention, Poisson, FFT, Bayes, Kalman) stays the same. The tools are the amplifier; the math is the signal. The platform is designed for technology turnover.",
+  },
+  {
+    id: "genealogy",
+    label: "Genealogy of Mathematical Discoveries — 325 years of equations that survived",
+    shortLabel: "Genealogy",
+    group: "Living Equations",
+    icon: "History",
+    description: "Interactive D3.js vertical timeline of the math discoveries that power this platform — from Bernoulli 1713 (probability) through Beltrami 1873 (SVD) and Kalman 1960 (filter) to Vaswani 2017 (Attention) and Jumper 2021 (AlphaFold2). Each milestone links to the platform page that builds on it. Hover any milestone for context; click to navigate. Makes visceral that the math outlasts the tools by 10× or more.",
   },
 ];
 

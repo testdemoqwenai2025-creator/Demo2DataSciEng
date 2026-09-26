@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -977,7 +978,6 @@ export function ClickhousePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="ClickHouse">
         <DeeperThought title="ClickHouse IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about ClickHouse is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. ClickHouse connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where ClickHouse sits in the computational-science landscape."}</p>
@@ -1005,6 +1005,7 @@ export function ClickhousePage() {
         { id: "kafka" as const, reason: "Kafka table engine for real-time ingest" },
         { id: "pinot" as const, reason: "Sibling real-time OLAP (LinkedIn origin)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bigquery" as const, reason: "Sibling cloud warehouse (Google)" }, { id: "redshift" as const, reason: "Sibling cloud warehouse (AWS)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bigquery")} className="text-sm text-primary hover:underline">

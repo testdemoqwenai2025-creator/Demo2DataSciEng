@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -728,7 +729,6 @@ export function DruidPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Apache Druid">
         <DeeperThought title="Apache Druid IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Apache Druid is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Apache Druid connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Apache Druid sits in the computational-science landscape."}</p>
@@ -754,6 +754,7 @@ export function DruidPage() {
         { id: "arrow" as const, reason: "Columnar format underneath Druid segments" },
         { id: "databricks" as const, reason: "Spark as Druid batch segment builder" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "pinot" as const, reason: "Sibling real-time OLAP (LinkedIn origin)" }, { id: "iceberg" as const, reason: "Open table format — Druid segment vs Iceberg manifest" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("pinot")} className="text-sm text-primary hover:underline">

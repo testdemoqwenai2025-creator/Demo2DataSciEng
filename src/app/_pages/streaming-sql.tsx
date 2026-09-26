@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -885,7 +886,6 @@ GROUP BY sequencer_id, window_start, window_end;
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Streaming SQL">
         <DeeperThought title="Streaming SQL IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Streaming SQL is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Streaming SQL connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Streaming SQL sits in the computational-science landscape."}</p>
@@ -913,6 +913,7 @@ GROUP BY sequencer_id, window_start, window_end;
         { id: "clickhouse" as const, reason: "ClickHouse for sub-second OLAP on streaming sinks" },
         { id: "iceberg" as const, reason: "Iceberg as the lakehouse sink for streaming pipelines" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "flink" as const, reason: "Apache Flink — the underlying runtime for Flink SQL" }, { id: "spark-streaming" as const, reason: "Spark Structured Streaming — the underlying runtime" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("flink")} className="text-sm text-primary hover:underline">

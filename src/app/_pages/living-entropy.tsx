@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { LivingEquationRunner } from "../_components/living-equation-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer, Legend, Line, LineChart, ComposedChart,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
-import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -355,9 +355,8 @@ plt.savefig('gnomad_brca1_entropy.png', dpi=150, bbox_inches='tight')`}
         { id: "alphamissense" as const, reason: "AlphaMissense — variant entropy on gnomAD" },
         { id: "living-svd" as const, reason: "Living SVD (cousin: compression)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "systems-biology" as const, reason: "Systems Biology — heterozygosity = genetic entropy" }, { id: "elegant-code" as const, reason: "Elegant Code — the Entropy card (cross-disciplinary)" }]} />
 
-
-      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Entropy's cousin cards (SVD, Poisson, Lloyd's)" }, { id: "systems-biology" as const, reason: "Heterozygosity IS genetic entropy" }, { id: "living-poisson" as const, reason: "Poisson IS the law of rare events" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Entropy card)</Link>
         <span className="text-muted-foreground">·</span>

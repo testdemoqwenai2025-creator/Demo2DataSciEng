@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -989,7 +990,6 @@ export function LineagePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Lineage">
         <DeeperThought title="Lineage IS the dependency graph — and it's git blame for data" connectedTo="ADR-001 (platform architecture)">
           <p>{"Data lineage tracks: table A depends on table B depends on table C. When table C breaks, lineage tells you all downstream tables affected. This IS the SAME pattern as git blame (which file caused this bug?) and Make's dependency graph (which targets depend on this source?). The lineage graph IS a DAG (directed acyclic graph) — the SAME structure as dbt's DAG, Airflow's DAG, and Make's dependency tree. Lineage IS git blame for data."}</p>
@@ -1017,6 +1017,7 @@ export function LineagePage() {
         { id: "kafka-connect" as const, reason: "Kafka Connect — CDC producer feeding lineage edges" },
         { id: "data-lakehouse" as const, reason: "Lakehouse — lineage tracks Bronze→Silver→Gold hops" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "data-contracts" as const, reason: "Data contracts — schema + SLA + ownership (lineage as compliance substrate)" }, { id: "governance" as const, reason: "Governance — Unity Catalog integrates lineage + RLS + tagging" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("data-contracts")} className="text-sm text-primary hover:underline">

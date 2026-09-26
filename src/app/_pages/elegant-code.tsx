@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { DatasetCards } from "../_components/dataset-cards";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
 import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
 import { RelatedTopics } from "../_components/related-topics";
 import { DiscoveryPath } from "../_components/discovery-path";
-import { NextSteps } from "../_components/next-steps";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Atom, Sparkles, TrendingUp, Boxes, Network, Cpu } from "lucide-react";
@@ -109,12 +109,7 @@ export function ElegantCodePage() {
         { id: "fintech" as const, reason: "SVD in finance = risk factors (Fama-French)" },
         { id: "modern-big-data" as const, reason: "Big data stack — tools for multi-disciplinary work" },
       ]} />
-
-      <NextSteps relatedPages={[
-        { id: "connections" as const, reason: "See the card → card cousin graph" },
-        { id: "resources" as const, reason: "Browse datasets, papers, libraries" },
-        { id: "numpy-scipy" as const, reason: "NumPy/SciPy — the computational foundation" },
-      ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "numpy-scipy" as const, reason: "NumPy N-D arrays — the computational foundation" }, { id: "transformer-deep-dive" as const, reason: "Attention = the universal correlation detector" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("numpy-scipy")} className="text-sm text-primary hover:underline">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -415,7 +416,6 @@ def setup_telemetry(service_name: str, otlp_endpoint: str = "http://otel-collect
     trace.set_tracer_provider(provider)
     return trace.get_tracer(service_name)
 
-
 # ============================================================
 # 2. Manual span creation — explicit instrumentation
 # ============================================================
@@ -473,7 +473,6 @@ def train_step(model, batch, optimizer, step_num):
             step_span.set_status(Status(StatusCode.ERROR, "NaN loss detected"))
             step_span.set_attribute("error.type", "nan_loss")
 
-
 # ============================================================
 # 3. Custom AllReduce span (for distributed training)
 # ============================================================
@@ -501,7 +500,6 @@ def trace_allreduce(tensor_size_bytes: int):
         achieved_gbps = (tensor_size_bytes * 2) / (duration_ms / 1000) / 1e9  # 2x for send+recv
         ar_span.set_attribute("ml.allreduce.duration_ms", duration_ms)
         ar_span.set_attribute("ml.allreduce.achieved_gbps", achieved_gbps)
-
 
 # ============================================================
 # 4. Context propagation across services
@@ -533,7 +531,6 @@ def call_data_pipeline(dataset_id: str):
         http_span.set_attribute("http.status_code", response.status_code)
         if response.status_code != 200:
             http_span.set_status(Status(StatusCode.ERROR, f"HTTP {response.status_code}"))
-
 
 # ============================================================
 # 5. Critical path computation (post-hoc analysis on stored traces)
@@ -597,7 +594,6 @@ def compute_critical_path(spans: list[dict]) -> tuple[list[str], float]:
     path.reverse()
     return path, dist[end_node]
 
-
 # ============================================================
 # 6. SLO computation (error budget, burn rate)
 # ============================================================
@@ -621,7 +617,6 @@ def slo_status(observed_p99_ms: float, target_p99_ms: float = 2000) -> dict:
         "status": "PASS" if burn_rate < 1.0 else "FAIL",
         "alert_threshold": burn_rate > 2.0,  # page SRE if > 2x for 1h
     }
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -802,7 +797,6 @@ export function MlopsTracingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="MLOps & Tracing">
         <DeeperThought title="MLOps & Tracing IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about MLOps & Tracing is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. MLOps & Tracing connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where MLOps & Tracing sits in the computational-science landscape."}</p>
@@ -820,6 +814,8 @@ export function MlopsTracingPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "distributed-training" as const, reason: "Continue to distributed training — see also from this page" }, { id: "model-monitoring" as const, reason: "Continue to model monitoring — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("distributed-training")} className="text-sm text-primary hover:underline">→ Distributed Training (FSDP — what we trace)</Link>
         <span className="text-muted-foreground">·</span>

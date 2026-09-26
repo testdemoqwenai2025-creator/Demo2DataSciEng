@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -498,7 +499,6 @@ class AMBERForceField(nn.Module):
         # Use 1/(4πε) = 1 in arbitrary units
         return (q_prod / (r + 1e-8)).sum()
 
-
 # ============================================================
 # 2. Verlet integration — symplectic integrator
 # ============================================================
@@ -529,7 +529,6 @@ def verlet_integrate(positions: torch.Tensor, prev_positions: torch.Tensor,
     # Verlet update: x(t+dt) = 2x(t) - x(t-dt) + a*dt²
     new_positions = 2 * positions - prev_positions + a * dt ** 2
     return new_positions
-
 
 def velocity_verlet(positions: torch.Tensor, velocities: torch.Tensor,
                     force_fn, dt: float = 0.001,
@@ -562,7 +561,6 @@ def velocity_verlet(positions: torch.Tensor, velocities: torch.Tensor,
     new_velocities = v_half + 0.5 * a_new * dt
     
     return new_positions, new_velocities, a_new
-
 
 # ============================================================
 # 3. E(n)-Equivariant Graph Neural Network (Satorras 2022)
@@ -649,7 +647,6 @@ class EquivariantGraphConvolutionLayer(nn.Module):
         
         return x_new, h_new
 
-
 class EquivariantGNN(nn.Module):
     """Full E(n)-equivariant GNN for property prediction.
     
@@ -712,7 +709,6 @@ class EquivariantGNN(nn.Module):
         # ... (omitted for brevity, but is the production approach)
         
         return {'energy': energy, 'positions': x, 'features': h}
-
 
 # ============================================================
 # 4. AlphaFold3-style diffusion structure module (extends ADR-027)
@@ -819,7 +815,6 @@ class AlphaFold3DiffusionModule(nn.Module):
             x = torch.sqrt(alpha_bar_prev) * x0_pred + torch.sqrt(1 - alpha_bar_prev) * eps
         
         return x  # predicted structure
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1032,7 +1027,6 @@ export function MolecularModellingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Molecular Modelling">
         <DeeperThought title="Molecular Modelling IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Molecular Modelling is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Molecular Modelling connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Molecular Modelling sits in the computational-science landscape."}</p>
@@ -1065,6 +1059,8 @@ export function MolecularModellingPage() {
       </SectionCard>
 
       <RelatedElegantCode cardIndices={[4, 5, 6]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }, { id: "cheminformatics" as const, reason: "Continue to cheminformatics — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (AlphaFold2 → AlphaFold3 upgrade path)</Link>
         <span className="text-muted-foreground">·</span>

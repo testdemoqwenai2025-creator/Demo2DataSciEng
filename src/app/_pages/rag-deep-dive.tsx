@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -425,7 +426,6 @@ class TextSplitter:
         
         return chunks
 
-
 # ============================================================
 # 2. BM25 — sparse exact-match scoring
 # ============================================================
@@ -485,7 +485,6 @@ class BM25:
         scores.sort(key=lambda x: -x[1])
         return scores[:top_k]
 
-
 # ============================================================
 # 3. Reciprocal Rank Fusion (RRF)
 # ============================================================
@@ -503,7 +502,6 @@ def reciprocal_rank_fusion(rankings: List[List[int]], k: int = 60) -> List[Tuple
             scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
     # Sort by RRF score descending
     return sorted(scores.items(), key=lambda x: -x[1])
-
 
 # ============================================================
 # 4. Cross-encoder re-rank
@@ -554,7 +552,6 @@ class CrossEncoder(nn.Module):
         score = self.linear(cls_output).squeeze(-1)
         return score
 
-
 def rerank_with_cross_encoder(query: str, documents: List[str],
                               cross_encoder: CrossEncoder,
                               tokenizer, top_k: int = 5) -> List[Tuple[int, float]]:
@@ -582,7 +579,6 @@ def rerank_with_cross_encoder(query: str, documents: List[str],
     
     scores.sort(key=lambda x: -x[1])
     return scores[:top_k]
-
 
 # ============================================================
 # 5. Full hybrid RAG pipeline
@@ -641,7 +637,6 @@ class HybridRAGRetriever:
         #                                    self.cross_encoder, self.tokenizer, top_k)
         # For demo: return RRF results
         return [(self.vector_store.docs[i], score) for i, score in rrf_results[:top_k]]
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -812,7 +807,6 @@ export function RagDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="RAG Deep Dive">
         <DeeperThought title="RAG Deep Dive IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about RAG Deep Dive is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. RAG Deep Dive connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where RAG Deep Dive sits in the computational-science landscape."}</p>
@@ -830,6 +824,8 @@ export function RagDeepDivePage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "rag-llms" as const, reason: "Continue to rag llms — see also from this page" }, { id: "vector-db" as const, reason: "Continue to vector db — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("rag-llms")} className="text-sm text-primary hover:underline">→ RAG & LLMs (the original naive RAG page)</Link>
         <span className="text-muted-foreground">·</span>

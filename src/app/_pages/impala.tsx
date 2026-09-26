@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -702,7 +703,6 @@ export function ImpalaPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Apache Impala">
         <DeeperThought title="Apache Impala IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Apache Impala is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Apache Impala connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Apache Impala sits in the computational-science landscape."}</p>
@@ -728,6 +728,7 @@ export function ImpalaPage() {
         { id: "databricks" as const, reason: "Spark SQL as Impala's Hadoop SQL competitor" },
         { id: "hudi" as const, reason: "Apache Hudi — upsert specialist on HDFS (similar to Kudu role)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "pinot" as const, reason: "Real-time OLAP — Impala is the Hadoop-era equivalent" }, { id: "starrocks" as const, reason: "Modern lakehouse query — successor to Impala's BI role" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("pinot")} className="text-sm text-primary hover:underline">

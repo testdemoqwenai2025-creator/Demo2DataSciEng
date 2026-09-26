@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -571,7 +572,6 @@ export function ComputationalChemistryPage() {
         </div>
       </Foldable>
 
-
       <DeeperThoughtSection pageTitle="Computational Chemistry">
         <DeeperThought title="Computational Chemistry IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Computational Chemistry is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Computational Chemistry connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Computational Chemistry sits in the computational-science landscape."}</p>
@@ -599,6 +599,7 @@ export function ComputationalChemistryPage() {
         { id: "quantum-computing" as const, reason: "Quantum Computing (exact Schrödinger)" },
         { id: "numpy-scipy" as const, reason: "NumPy/SciPy (eigenvalue solvers)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "computational-biology" as const, reason: "Computational Biology (MD + force fields from DFT)" }, { id: "molecular-modelling" as const, reason: "Molecular Modelling (AMBER + force fields)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("computational-biology")} className="text-sm text-primary hover:underline">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { LivingEquationRunner } from "../_components/living-equation-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer, Legend,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
-import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -355,9 +355,8 @@ plt.savefig('gbm_spx.png', dpi=150, bbox_inches='tight')`}
         { id: "living-black-scholes" as const, reason: "Living Black-Scholes — derives from GBM (cousin)" },
         { id: "living-monte-carlo" as const, reason: "Living Monte Carlo — simulates GBM paths (cousin)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "fintech" as const, reason: "Fintech — QuantLib + GBM in production" }, { id: "elegant-code" as const, reason: "Elegant Code — the GBM card (cross-disciplinary)" }]} />
 
-
-      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See GBM's cousin cards (Black-Scholes, Euler, Monte Carlo)" }, { id: "living-black-scholes" as const, reason: "Black-Scholes derives from GBM" }, { id: "living-monte-carlo" as const, reason: "MC simulates GBM paths" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (GBM card)</Link>
         <span className="text-muted-foreground">·</span>

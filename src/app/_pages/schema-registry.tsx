@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -365,7 +366,6 @@ class AvroSchema:
     def __repr__(self):
         return f"AvroSchema({self.name}, {len(self.fields)} fields)"
 
-
 # --- Compatibility rules ---
 def is_backward_compatible(old, new):
     """New schema can read OLD data (backward compatibility).
@@ -394,7 +394,6 @@ def is_backward_compatible(old, new):
             return False, f"new field '{name}' has no default — old data would fail to parse"
     return True, f"backward compatible: {len(old_set & new_set)} preserved, {len(added)} added (all have defaults)"
 
-
 def is_forward_compatible(old, new):
     """Old schema can read NEW data (forward compatibility).
        Rule: old reader ignores new fields; old fields can be missing from new
@@ -419,7 +418,6 @@ def is_forward_compatible(old, new):
 
     new_fields_ignored = len(new_set - old_set - set(new_aliases.values()))
     return True, f"forward compatible: {bridged}/{len(old_set)} old fields reachable, {new_fields_ignored} new ignored by old reader"
-
 
 # --- Test chain: v1 -> v2 -> v3 ---
 v1 = AvroSchema("Order", [
@@ -446,7 +444,6 @@ v3 = AvroSchema("Order", v2.fields + [
 v4_bad = AvroSchema("Order", v3.fields + [
     {"name": "shipping_cost_usd", "type": "double"},  # NO default — bad!
 ])
-
 
 # --- Run the checker ---
 print("=== Schema Registry compatibility checker ===\\n")
@@ -935,7 +932,6 @@ export function SchemaRegistryPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Schema Registry">
         <DeeperThought title="Schema Registry IS the data contract — and it's the API for data" connectedTo="ADR-001 (platform architecture)">
           <p>{"Schema Registry stores Avro/Protobuf/JSON schemas for Kafka topics. Producers register schemas before writing; consumers fetch schemas before reading. This IS the API for data: the schema IS the interface, the topic IS the endpoint, the message IS the payload. The pattern (schema + endpoint + payload) IS identical to REST (OpenAPI + URL + body). Schema Registry IS OpenAPI for streaming data."}</p>
@@ -963,6 +959,7 @@ export function SchemaRegistryPage() {
         { id: "data-lakehouse" as const, reason: "Lakehouse — typed storage layer" },
         { id: "cicd" as const, reason: "CI/CD — schema compatibility check in deploy pipeline" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "kafka-connect" as const, reason: "Kafka Connect — uses Schema Registry for Avro/Protobuf/JSON converters" }, { id: "iceberg" as const, reason: "Iceberg — own schema evolution (column IDs stable across renames)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("kafka-connect")} className="text-sm text-primary hover:underline">

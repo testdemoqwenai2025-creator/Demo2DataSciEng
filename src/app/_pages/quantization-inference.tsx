@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -547,7 +548,6 @@ def build_nf4_grid() -> torch.Tensor:
 
 NF4_GRID = build_nf4_grid()  # 16 levels in [-1, 1]
 
-
 def quantize_nf4(weight: torch.Tensor, group_size: int = 64) -> Tuple[torch.Tensor, torch.Tensor]:
     """Quantise a weight tensor to NF4.
     
@@ -577,7 +577,6 @@ def quantize_nf4(weight: torch.Tensor, group_size: int = 64) -> Tuple[torch.Tens
     
     return codes.reshape(weight.shape), scales.squeeze(-1)
 
-
 def dequantize_nf4(codes: torch.Tensor, scales: torch.Tensor, group_size: int = 64) -> torch.Tensor:
     """Dequantise NF4 codes back to FP16.
     
@@ -593,7 +592,6 @@ def dequantize_nf4(codes: torch.Tensor, scales: torch.Tensor, group_size: int = 
     
     # Multiply by scale
     return (w_norm * s).reshape(codes.shape).to(torch.float16)
-
 
 # ============================================================
 # AWQ (Activation-aware Weight Quantisation) — for inference
@@ -700,7 +698,6 @@ class AWQLinear(nn.Module):
             out = out + self.bias.float()
         return out.to(x.dtype)
 
-
 # ============================================================
 # llama.cpp GGUF Q4_K_M — super-block quantisation for CPU/edge
 # ============================================================
@@ -751,7 +748,6 @@ class Q4_K_M:
         # Reshape back
         return w.reshape(-1)
 
-
 # ============================================================
 # Comparing quantisation methods on a Linear layer
 # ============================================================
@@ -786,7 +782,6 @@ def benchmark_quantization(in_features=4096, out_features=4096):
     print(f"    NF4 / AWQ:    {70 * 2 / 8:.1f} GB (fits 1× A100 80GB ✓)")
     print(f"    Q4_K_M:       {70 * 2 / 8:.1f} GB (fits 1× A100 80GB ✓)")
     print(f"    FP8 (H100):   {70 * 1:.1f} GB (best, but H100 only)")
-
 
 if __name__ == "__main__":
     # Test NF4 grid
@@ -933,7 +928,6 @@ export function QuantizationPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Quantization & Inference">
         <DeeperThought title="Quantization & Inference IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Quantization & Inference is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Quantization & Inference connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Quantization & Inference sits in the computational-science landscape."}</p>
@@ -951,6 +945,8 @@ export function QuantizationPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "fine-tuning" as const, reason: "Continue to fine tuning — see also from this page" }, { id: "distributed-training" as const, reason: "Continue to distributed training — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("fine-tuning")} className="text-sm text-primary hover:underline">→ Fine-Tuning (QLoRA + NF4 for backward pass)</Link>
         <span className="text-muted-foreground">·</span>

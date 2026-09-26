@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { SkillGraph } from "../_components/skill-graph";
 import { TalentSearch } from "../_components/talent-search";
 import { SectorIndex } from "../_components/sector-index";
@@ -313,6 +314,7 @@ export function ResourcesPage() {
         { id: "living-svd" as const, reason: "Living SVD (sample living-equation page)" },
         { id: "numpy-scipy" as const, reason: "NumPy/SciPy — production library reference" },
       ]} />
+      <NextSteps relatedPages={[{ id: "elegant-code" as const, reason: "Elegant Code — 20 cross-disciplinary cards (the thesis)" }, { id: "connections" as const, reason: "Connections — interactive D3 graph of card → card edges" }, { id: "living-svd" as const, reason: "Living SVD (sample living-equation page)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (20 cards)</Link>

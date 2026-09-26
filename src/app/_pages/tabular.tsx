@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -981,7 +982,6 @@ export function TabularPage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"tabular" as never} />
 
-
       <DeeperThoughtSection pageTitle="Tabular">
         <DeeperThought title="Tabular IS the Iceberg-native cloud warehouse — and Snowflake bought it" connectedTo="ADR-013 (Delta Lake)">
           <p>{"Tabular (founded 2021 by Iceberg creators Ryan Blue and Daniel Weeks) built a managed Iceberg catalog + compute. Snowflake acquired Tabular in 2024 (outbidding Databricks). The acquisition IS the 'catalog war' — Iceberg won the format, Snowflake won the catalog. Tabular's insight: you don't need to own the format (Apache does) to build a business on it. The pattern (open format + managed catalog) IS the same as Confluent on Kafka: open protocol, managed service. The math (open + managed) stays; the format (Iceberg vs Delta vs Hudi) was the battleground."}</p>
@@ -1009,6 +1009,7 @@ export function TabularPage() {
         { id: "data-lakehouse" as const, reason: "Anchor concept — lake→lakehouse evolution" },
         { id: "duckdb" as const, reason: "Laptop-scale read engine — reads Tabular-managed Iceberg via REST" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Gradient Descent's cousin cards in the cross-disciplinary graph" }, { id: "alphamissense" as const, reason: "Bayes (Bayes IS the belief updater) — same math, genetics domain" }, { id: "fintech" as const, reason: "Kelly Criterion (Kelly IS the universal bet-sizing equation) — same math, fintech domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("iceberg")} className="text-sm text-primary hover:underline">

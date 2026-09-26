@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
+import { NextSteps } from "../_components/next-steps";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { DBT_PROJECT, DBT_LAYERS } from "../_data/synthetic";
@@ -484,6 +485,8 @@ export function DbtPage() {
           <p>{"dbt tests + Great Expectations suites ARE the type system for data. A column with not_null + unique + accepted_values IS a typed column. A column without tests IS an untyped column (any value accepted). The typed vs untyped debate IS the SAME as TypeScript vs JavaScript: types catch errors early, enable better tooling, and prevent the 'wrong format' bug. dbt + GE IS TypeScript for data pipelines."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "tableau" as const, reason: "Continue to tableau — see also from this page" }, { id: "orchestration" as const, reason: "Continue to orchestration — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("tableau")} className="text-sm text-primary hover:underline">
           → Continue to Tableau &amp; analytics

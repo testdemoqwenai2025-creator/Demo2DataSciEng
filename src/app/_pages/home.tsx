@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { EXEC_KPIS, COMPANY, REVENUE_TREND, CHANNEL_MIX, DAILY_INGEST } from "../_data/synthetic";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { ArchBox, ArchLayer, ArchArrow } from "../_components/arch-diagram";
 import { HomeSearch } from "../_components/home-search";
 import { ELEGANT_CODE_MAP } from "../_lib/elegant-code-map";
@@ -636,6 +637,8 @@ export function HomePage() {
           <p>The card modal shows brief, stats, code, outcomes, constellation, and insight by default — that's 6 sections of immediately-visible content. The fold sections (Equation family, Deeper mathematics, and more to come) are collapsed by default, revealed on click. This isn't laziness — it's respect for the reader's attention. A serious thinker doesn't want 20 sections dumped on them at once. They want the SUMMARY first, then the OPTION to go deeper. The fold pattern gives them that option — and the deeper phases (further code examples, mathematics where needed, desired or expected output) are there when they're ready. Progressive disclosure isn't just a UX pattern; it's an epistemological one.</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "elegant-code" as const, reason: "Start with the 20 elegant-code cards — the platform's cross-disciplinary math" }, { id: "resources" as const, reason: "Browse the curated datasets, papers, and libraries" }]} />
+
     </div>
   );
 }

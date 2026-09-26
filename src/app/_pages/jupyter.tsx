@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1056,7 +1057,6 @@ sc.pl.umap(adata, color='leiden', save='_clusters.pdf')`}
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Jupyter">
         <DeeperThought title="Jupyter IS the REPL for data science — and it's the right UX" connectedTo="ADR-001 (platform architecture)">
           <p>{"Jupyter notebooks let you write code, see output, write more code — iteratively. This IS the REPL (Read-Eval-Print Loop) pattern, extended with rich output (plots, tables, HTML). The REPL IS the right UX for exploratory data analysis: you don't know what you're looking for until you see it. Jupyter IS the REPL that matches the exploratory nature of data science — you explore, find, then productionize."}</p>
@@ -1084,6 +1084,7 @@ sc.pl.umap(adata, color='leiden', save='_clusters.pdf')`}
         { id: "research" as const, reason: "Academic papers ship with reproducible notebooks" },
         { id: "data-mesh-deep-dive" as const, reason: "Notebooks consume data products via catalogs" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "numpy-scipy" as const, reason: "Notebooks run NumPy/SciPy code in cells" }, { id: "gpu-computing" as const, reason: "Notebooks with GPU kernels (Colab, Saturn)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("numpy-scipy")} className="text-sm text-primary hover:underline">

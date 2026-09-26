@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -883,7 +884,6 @@ export function NumpyScipyPage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"numpy-scipy" as never} />
 
-
       <DeeperThoughtSection pageTitle="Numpy Scipy">
         <DeeperThought title="NumPy IS the lingua franca of computational science" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"Every ML framework, every scientific library, every living-equation page on this platform calls NumPy under the hood. PyTorch tensors are NumPy arrays with autograd. TensorFlow tensors are NumPy arrays with GPU dispatch. AlphaFold2's evoformer operates on NumPy-shaped tensors. The ndarray IS the universal data structure of computational science — and NumPy IS its reference implementation. When NumPy is replaced by WebGPU-native arrays in 2030, the ndarray abstraction will survive because it's the RIGHT abstraction for N-dimensional data."}</p>
@@ -911,6 +911,7 @@ export function NumpyScipyPage() {
         { id: "mlflow-deep-dive" as const, reason: "MLflow — track NumPy-based model experiments" },
         { id: "neural-networks" as const, reason: "Neural networks — weight matrices are NumPy arrays" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See SVD · FFT's cousin cards in the cross-disciplinary graph" }, { id: "systems-biology" as const, reason: "Entropy (Entropy IS the universal currency of disorder) — same math, information domain" }, { id: "global-shipping" as const, reason: "Lloyd's Algorithm (Lloyd IS the universal clustering equation) — same math, maritime domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("dask-ray")} className="text-sm text-primary hover:underline">

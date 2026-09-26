@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -954,7 +955,6 @@ export function AwsLakeFormationPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="AWS Lake Formation">
         <DeeperThought title="AWS Lake Formation IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about AWS Lake Formation is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. AWS Lake Formation connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where AWS Lake Formation sits in the computational-science landscape."}</p>
@@ -982,6 +982,7 @@ export function AwsLakeFormationPage() {
         { id: "data-lakehouse" as const, reason: "Anchor concept — lake→lakehouse evolution" },
         { id: "governance" as const, reason: "Governance page — Unity + LF + Ranger overview" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "glue" as const, reason: "AWS Glue Data Catalog — table metadata layer that LF integrates with" }, { id: "iceberg" as const, reason: "Apache Iceberg — LF supports Iceberg tables registered in Glue Catalog" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("glue")} className="text-sm text-primary hover:underline">

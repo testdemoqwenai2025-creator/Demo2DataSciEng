@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
+import { NextSteps } from "../_components/next-steps";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { SNOWFLAKE_WAREHOUSES, SNOWFLAKE_RBAC } from "../_data/synthetic";
@@ -382,7 +383,6 @@ print("=" * 60)`}
         />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Snowflake">
         <DeeperThought title="Snowflake IS the cloud-native data warehouse — and it's APD, not shared-nothing" connectedTo="ADR-001 (platform architecture)">
           <p>{"Traditional data warehouses (Teradata, Oracle Exadata) use shared-nothing architecture (each node has its own disk + CPU). Snowflake separates compute from storage: S3 for storage, elastic warehouses for compute. This IS the APD (Asymmetric Processing Domain) model — storage is cheap and shared, compute is expensive and elastic. The separation IS the insight: you don't need to co-locate data with compute if the network is fast enough (AWS's 25 Gbps ENIs). Snowflake IS the cloud-native answer to 'how do you scale a database in the cloud?'"}</p>
@@ -400,6 +400,8 @@ print("=" * 60)`}
           <p>{"Snowflake's Time Travel (query historical data as of a past timestamp) works because S3 is immutable — every UPDATE creates a new micro-partition, and the old one is kept for the retention period. This IS copy-on-write (COW) — the SAME pattern that BTRFS, ZFS, and Git use. The old data ISN'T copied — the new data is written to a new location, and the old location is preserved. Time Travel IS COW for databases. The 90-day retention is free because the cost is just S3 storage (cheap). The math (COW) stays; the application (filesystem vs database vs version control) changes."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "dbt" as const, reason: "Continue to dbt — see also from this page" }, { id: "tableau" as const, reason: "Continue to tableau — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("dbt")} className="text-sm text-primary hover:underline">
           → Continue to dbt &amp; dimensional modelling

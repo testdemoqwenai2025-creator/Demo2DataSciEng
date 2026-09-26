@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -426,7 +427,6 @@ class SigLIPModel(nn.Module):
         loss = -F.logsigmoid(labels * logits).mean()
         return loss
 
-
 # ============================================================
 # 2. Vision encoder (ViT) — simplified from computer-vision page
 # ============================================================
@@ -461,7 +461,6 @@ class VisionEncoder(nn.Module):
         # Use CLS token as image embedding
         return x[:, 0]  # (B, embed_dim)
 
-
 # ============================================================
 # 3. Text encoder — simplified from transformer page
 # ============================================================
@@ -488,7 +487,6 @@ class TextEncoder(nn.Module):
         x = self.norm(x)
         # Use first token (typically [CLS]) as text embedding
         return x[:, 0]  # (B, embed_dim)
-
 
 # ============================================================
 # 4. Multi-modal RAG retriever (extends ADR-032 hybrid)
@@ -589,7 +587,6 @@ class MultiModalRAGRetriever:
         
         return results[:top_k]
 
-
 # ============================================================
 # 5. Multi-modal LLM (LLaVA-style) for cross-encoder re-rank
 # ============================================================
@@ -621,7 +618,6 @@ class MultiModalLLM(nn.Module):
         outputs = self.llm(inputs_embeds=full_input)
         # Use last hidden state at [CLS] position for scoring
         return outputs.last_hidden_state[:, 0]  # (B, hidden_size)
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -773,7 +769,6 @@ export function MultiModalRagPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Multi-modal RAG">
         <DeeperThought title="Multi-modal RAG IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Multi-modal RAG is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Multi-modal RAG connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Multi-modal RAG sits in the computational-science landscape."}</p>
@@ -791,6 +786,8 @@ export function MultiModalRagPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "rag-deep-dive" as const, reason: "Continue to rag deep dive — see also from this page" }, { id: "computer-vision" as const, reason: "Continue to computer vision — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("rag-deep-dive")} className="text-sm text-primary hover:underline">→ RAG Deep Dive (the text-only baseline this extends)</Link>
         <span className="text-muted-foreground">·</span>

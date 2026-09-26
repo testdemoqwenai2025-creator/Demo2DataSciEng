@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -948,7 +949,6 @@ export function GreatExpectationsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Great Expectations">
         <DeeperThought title="Great Expectations IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Great Expectations is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Great Expectations connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Great Expectations sits in the computational-science landscape."}</p>
@@ -976,6 +976,7 @@ export function GreatExpectationsPage() {
         { id: "iceberg" as const, reason: "Bronze Iceberg tables — the data GE validates" },
         { id: "governance" as const, reason: "Data quality is a core pillar of data governance" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "monte-carlo" as const, reason: "ML anomaly detection — always-on data observability (complementary to GE)" }, { id: "elementary" as const, reason: "dbt-native anomaly detection — ML + dbt tests together" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("monte-carlo")} className="text-sm text-primary hover:underline">

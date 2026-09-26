@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -729,7 +730,6 @@ export function CatalogsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Catalogs">
         <DeeperThought title="Catalogs IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Catalogs is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Catalogs connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Catalogs sits in the computational-science landscape."}</p>
@@ -757,6 +757,7 @@ export function CatalogsPage() {
         { id: "snowflake" as const, reason: "Polaris is Snowflake's catalog — competes with Unity" },
         { id: "modern-big-data" as const, reason: "Big-picture context for the catalog layer" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "iceberg" as const, reason: "Open table format — all 6 catalogs serve Iceberg tables via REST" }, { id: "delta-lake" as const, reason: "Databricks table format — Unity Catalog is the catalog for Delta" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("iceberg")} className="text-sm text-primary hover:underline">

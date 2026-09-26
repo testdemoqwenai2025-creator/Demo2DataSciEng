@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { LivingEquationRunner } from "../_components/living-equation-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer, Legend, Line, LineChart, ComposedChart,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
-import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -325,9 +325,8 @@ plt.savefig('poisson_chr22.png', dpi=150, bbox_inches='tight')
         { id: "monte-carlo" as const, reason: "Monte Carlo — rare-event permutation testing" },
         { id: "living-entropy" as const, reason: "Living Entropy (cousin: distribution measures)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics-pipelines" as const, reason: "Bioinformatics Pipelines — GATK uses Poisson" }, { id: "elegant-code" as const, reason: "Elegant Code — the Poisson card (cross-disciplinary)" }]} />
 
-
-      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Poisson's cousin cards (Bayes, Entropy, Markov)" }, { id: "bioinformatics-pipelines" as const, reason: "GATK uses Poisson for variant calling coverage" }, { id: "living-entropy" as const, reason: "Entropy IS the universal currency of disorder" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Poisson card)</Link>
         <span className="text-muted-foreground">·</span>

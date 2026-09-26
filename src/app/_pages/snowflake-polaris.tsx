@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -962,7 +963,6 @@ export function SnowflakePolarisPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Snowflake Polaris">
         <DeeperThought title="Snowflake Polaris IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Snowflake Polaris is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Snowflake Polaris connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Snowflake Polaris sits in the computational-science landscape."}</p>
@@ -990,6 +990,7 @@ export function SnowflakePolarisPage() {
         { id: "data-lakehouse" as const, reason: "Anchor concept — lake→lakehouse evolution" },
         { id: "snowflake" as const, reason: "Snowflake platform page — Polaris is Snowflake's catalog" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "tabular" as const, reason: "Tabular SaaS — Snowflake-acquired June 2024, founded by Iceberg spec authors" }, { id: "iceberg" as const, reason: "Apache Iceberg — the table format Polaris catalogs" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("tabular")} className="text-sm text-primary hover:underline">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { LiveResearchDrawer } from "../_components/live-research-drawer";
 import { DeeperThoughtsIndex } from "../_components/deeper-thoughts-index";
 import { PAPERS, type Paper } from "../_data/synthetic";
@@ -226,6 +227,8 @@ export function ResearchPage() {
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Implemented in</p>
                 <p className="text-xs text-foreground/80">{selectedPaper.implemented_in}</p>
               </div>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "elegant-code" as const, reason: "Start with the 20 elegant-code cards — the platform's cross-disciplinary math" }, { id: "resources" as const, reason: "Browse the curated datasets, papers, and libraries" }]} />
+
               <div className="flex flex-wrap gap-2">
                 <Button asChild size="sm" variant="outline" className="gap-1.5">
                   <a href={selectedPaper.url} target="_blank" rel="noopener noreferrer">

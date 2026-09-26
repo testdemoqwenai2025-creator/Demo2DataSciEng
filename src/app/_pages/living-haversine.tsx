@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { LivingEquationRunner } from "../_components/living-equation-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer, Legend, Cell,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
-import { NextSteps } from "../_components/next-steps";
 
 type Tab = "math" | "live" | "production";
 
@@ -389,9 +389,8 @@ print(f"Rotterdam to Singapore: {df.loc['Rotterdam', 'Singapore']:.0f} km")
         { id: "living-kalman" as const, reason: "Living Kalman (cousin: vessel tracking)" },
         { id: "space-science" as const, reason: "Space Science — haversine on the celestial sphere" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "global-shipping" as const, reason: "Global Shipping — maritime analytics hub" }, { id: "elegant-code" as const, reason: "Elegant Code — the Haversine card (cross-disciplinary)" }]} />
 
-
-      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Haversine's cousin cards (PageRank, Kalman, Monte Carlo)" }, { id: "global-shipping" as const, reason: "Maritime analytics hub — AIS, ports, Lloyd's" }, { id: "living-kalman" as const, reason: "Kalman tracks vessels via Haversine distances" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (Haversine card)</Link>
         <span className="text-muted-foreground">·</span>

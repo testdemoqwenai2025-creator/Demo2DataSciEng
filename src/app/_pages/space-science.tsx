@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -504,7 +505,6 @@ class LightCurveAugmentation(nn.Module):
         sinusoid = amp * torch.sin(2 * math.pi * freq * t.unsqueeze(0))
         return flux + noise + sinusoid
 
-
 class TransitCNN(nn.Module):
     """1D CNN to detect exoplanet transits in light curves.
     
@@ -562,7 +562,6 @@ class TransitCNN(nn.Module):
             flux[b, max(0, c-dur//2):c+dur//2] -= depth
         return flux
 
-
 # ============================================================
 # 2. GravitationalWaveClassifier — 2D CNN on Q-transform spectrograms
 # ============================================================
@@ -599,7 +598,6 @@ class QTransform(nn.Module):
         spec = F.interpolate(spec.unsqueeze(1), size=(self.n_freq, self.n_time),
                             mode='bilinear', align_corners=False)
         return spec  # (B, 1, F, T)
-
 
 class GravitationalWaveClassifier(nn.Module):
     """2D CNN to classify GW events: BBH / BNS / NSBH / Noise.
@@ -657,7 +655,6 @@ class GravitationalWaveClassifier(nn.Module):
         amp = t / (T / sr)  # amplitude grows linearly (very rough approx)
         return 1e-21 * amp * torch.sin(phase).expand(B, -1).contiguous()
 
-
 # ============================================================
 # 3. JetGNN — graph neural network for jet classification
 # ============================================================
@@ -687,7 +684,6 @@ class ParticleEmbedding(nn.Module):
         h_pdg = self.pdg_embed(pdg_id)         # (B, N, d)
         h = torch.cat([h_kin, h_pdg], dim=-1)  # (B, N, 2d)
         return F.relu(self.combine(h))         # (B, N, d)
-
 
 class EdgeConvLayer(nn.Module):
     """EdgeConv layer — graph conv with messages as functions of edge features.
@@ -732,7 +728,6 @@ class EdgeConvLayer(nn.Module):
         h_new, _ = m.max(dim=2)                             # (B, N, d_out)
         return h_new, dR
 
-
 class JetGNN(nn.Module):
     """Graph neural network for jet classification (quark/gluon/W/top).
     
@@ -775,7 +770,6 @@ class JetGNN(nn.Module):
         h = h.mean(dim=1)                                    # (B, d) — global mean pool
         return self.head(h)                                  # (B, num_classes)
 
-
 # ============================================================
 # 4. End-to-end inference examples
 # ============================================================
@@ -797,7 +791,6 @@ def demo_transit_cnn() -> TransitCNN:
     print(f"TransitCNN: transit prob = {probs[0, 1].item():.3f}")
     return model
 
-
 def demo_gw_classifier() -> GravitationalWaveClassifier:
     """Classify a synthetic BBH chirp."""
     torch.manual_seed(0)
@@ -809,7 +802,6 @@ def demo_gw_classifier() -> GravitationalWaveClassifier:
     print(f"GWClassifier: BBH prob = {probs[0, 0].item():.3f}  "
           f"BNS = {probs[0, 1].item():.3f}  noise = {probs[0, 3].item():.3f}")
     return model
-
 
 def demo_jet_gnn() -> JetGNN:
     """Classify a synthetic 10-particle jet."""
@@ -826,7 +818,6 @@ def demo_jet_gnn() -> JetGNN:
     print(f"JetGNN: quark = {probs[0, 0].item():.3f}  gluon = {probs[0, 1].item():.3f}  "
           f"W = {probs[0, 2].item():.3f}  top = {probs[0, 3].item():.3f}")
     return model
-
 
 if __name__ == "__main__":
     transit_model = demo_transit_cnn()
@@ -929,7 +920,6 @@ export function SpaceSciencePage() {
       >
         <SpaceShortsCarousel />
       </SectionCard>
-
 
       <SectionCard title="Transit detection short — star → planet transit → light-curve dip → exoplanet confirmed → JWST follow-up (loop)" icon={<Atom className="h-5 w-5" />} badge="short">
         <TransitDetectionShort />
@@ -1137,7 +1127,6 @@ export function SpaceSciencePage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"space-science" as never} />
 
-
       <DeeperThoughtSection pageTitle="Space Science">
         <DeeperThought title="Space science IS the ultimate big-data problem — and it's multi-disciplinary by definition" connectedTo="ADR-055 (cross-disciplinary scope)">
           <p>{"JWST generates 50 GB/day of raw images. LHC produces 1 PB/second of collision data (reduced to 1 PB/year after filtering). Gaia DR3 has 1.8 billion stars × 30 parameters. Kepler/TESS found 5,000+ exoplanets from light curves. Each dataset requires a different mathematical tool: FFT (period detection in light curves), SVD (dimensionality reduction in spectra), Kalman (orbit estimation from noisy radar), Haversine (angular separation on the celestial sphere). Space science IS the platform's thesis in miniature: ONE dataset, MANY equations, ALL needed."}</p>
@@ -1161,6 +1150,7 @@ export function SpaceSciencePage() {
         { id: "quantum-computing" as const, reason: "LHC jet substructure + QEC" },
         { id: "arrow" as const, reason: "Columnar format for telescope data" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Euler's Method's cousin cards in the cross-disciplinary graph" }, { id: "computational-biology" as const, reason: "Verlet (Verlet IS time-reversal symmetry) — same math, MD domain" }, { id: "fintech" as const, reason: "Geometric Brownian Motion (GBM IS the universal multiplicative-noise equation) — same math, fintech domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("neural-network-potentials")} className="text-sm text-primary hover:underline">→ Neural Network Potentials (SO(3) irreps — same symmetry as orbital mechanics)</Link>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -449,7 +450,6 @@ class MultiModalGraphConvolution(nn.Module):
         
         return h_out
 
-
 # ============================================================
 # 2. Multi-modal STAGATE autoencoder
 # ============================================================
@@ -561,7 +561,6 @@ class MultiModalSTAGATE(nn.Module):
         
         return recon_rna + recon_chrom + recon_protein + 1e-4 * kl
 
-
 # ============================================================
 # 3. Spatial WNN — extends WNN (ADR-042) to spatial context
 # ============================================================
@@ -632,7 +631,6 @@ class SpatialWNN(nn.Module):
         wnn_spatial = wnn * adj  # only spatial neighbours contribute
         
         return {'wnn_graph': wnn_spatial, 'modality_weights': weights}
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -879,7 +877,6 @@ export function SpatialMultiOmicsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Spatial Multi-omics">
         <DeeperThought title="Spatial Multi-omics IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Spatial Multi-omics is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Spatial Multi-omics connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Spatial Multi-omics sits in the computational-science landscape."}</p>
@@ -897,6 +894,8 @@ export function SpatialMultiOmicsPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "spatial-transcriptomics" as const, reason: "Continue to spatial transcriptomics — see also from this page" }, { id: "singlecell-multiomics" as const, reason: "Continue to singlecell multiomics — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("spatial-transcriptomics")} className="text-sm text-primary hover:underline">→ Spatial Transcriptomics (RNA-only, the precursor)</Link>
         <span className="text-muted-foreground">·</span>

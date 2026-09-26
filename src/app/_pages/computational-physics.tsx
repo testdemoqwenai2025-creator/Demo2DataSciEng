@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -648,7 +649,6 @@ export function ComputationalPhysicsPage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"computational-physics" as never} />
 
-
       <DeeperThoughtSection pageTitle="Computational Physics">
         <DeeperThought title="Computational Physics IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Computational Physics is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Computational Physics connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Computational Physics sits in the computational-science landscape."}</p>
@@ -676,6 +676,7 @@ export function ComputationalPhysicsPage() {
         { id: "molecular-modelling" as const, reason: "Molecular Modelling (LAMMPS + GROMACS)" },
         { id: "enhanced-sampling" as const, reason: "Enhanced Sampling (Monte Carlo + MD hybrid)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Navier-Stokes's cousin cards in the cross-disciplinary graph" }, { id: "computational-biology" as const, reason: "Verlet (Verlet IS time-reversal symmetry) — same math, MD domain" }, { id: "fintech" as const, reason: "Geometric Brownian Motion (GBM IS the universal multiplicative-noise equation) — same math, fintech domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("quantum-computing")} className="text-sm text-primary hover:underline">

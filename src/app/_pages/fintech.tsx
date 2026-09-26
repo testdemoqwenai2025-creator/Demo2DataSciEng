@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -524,7 +525,6 @@ class BlackScholesModel(nn.Module):
             "rho": rho / 100.0,               # per 1% rate move
         }
 
-
 # ============================================================
 # 2. MonteCarloPricer — GBM simulation + path-dependent options
 #    dS_t = μ·S_t·dt + σ·S_t·dW_t
@@ -585,7 +585,6 @@ class MonteCarloPricer(nn.Module):
         payoff = payoff * (~knocked).float()
         return torch.exp(-r * T) * payoff.mean()
 
-
 # ============================================================
 # 3. LSTMPredictor — next-period price-direction prediction
 #    Input  : (batch, seq_len, n_features)  e.g. 60 days × 5 features
@@ -621,7 +620,6 @@ class LSTMPredictor(nn.Module):
         """Return 0/1 (down/up) prediction."""
         with torch.no_grad():
             return (self.forward(x).squeeze(-1) > 0).long()
-
 
 # ============================================================
 # 4. FraudGNN — GraphSAGE-style GNN over a transaction graph
@@ -666,7 +664,6 @@ class FraudGNN(nn.Module):
             h = F.relu(layer(h + agg))
             h = self.dropout(h)
         return self.classifier(h)
-
 
 # ============================================================
 # Demo — exercise every module
@@ -728,7 +725,6 @@ def _demo() -> None:
     print(f"  Predicted fraudulent: {(preds == 1).sum().item()} / 100")
     print("=" * 60)
 
-
 if __name__ == "__main__":
     _demo()`;
 
@@ -778,7 +774,6 @@ export function FintechPage() {
       >
         <FintechShortsCarousel />
       </SectionCard>
-
 
       {/* Looping "short" */}
       <SectionCard
@@ -1114,7 +1109,6 @@ export function FintechPage() {
 
       <RelatedElegantCode hostPage={"fintech" as never} />
 
-
       <DeeperThoughtSection pageTitle="Fintech">
         <DeeperThought title="The market IS a stochastic process that ML tries to predict — and trading IS stochastic control" connectedTo="ADR-054 (Black-Scholes + MC + GNN)">
           <p>{"The market is a stochastic process (a probability measure on price paths). ML models (LSTM, transformer, GNN) learn features of that measure to predict next-period returns. But prediction is not alpha — alpha requires taking actions (positions) that exploit the prediction under risk and transaction costs. Trading is therefore a stochastic optimal control problem: choose position π_t to maximise E[Σ γ^t · r(π_t, S_t)] subject to constraints. The Bellman equation from RL-agentic IS the HJB equation of stochastic control. Deep hedging (Buehler 2019) IS the policy-network solution. Finance IS stochastic control, just with a Sharpe-ratio reward."}</p>
@@ -1138,6 +1132,7 @@ export function FintechPage() {
         { id: "neural-networks" as const, reason: "LSTM for price prediction" },
         { id: "quantum-computing" as const, reason: "QEC for Shor on RSA" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Black-Scholes · Kelly Criterion's cousin cards in the cross-disciplinary graph" }, { id: "global-shipping" as const, reason: "Geometric Brownian Motion (GBM IS the universal multiplicative-noise equation) — same math, fintech domain" }, { id: "tabular" as const, reason: "Gradient Descent (Gradient Descent IS the learning rule) — same math, ML domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("rag-deep-dive")} className="text-sm text-primary hover:underline">

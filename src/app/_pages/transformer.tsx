@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -528,7 +529,6 @@ GPT-3 175B: 96 blocks × 96 heads × d_model=12288 × d_ff=49152
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Transformer Architecture Deep Dive">
         <DeeperThought title="Transformer Architecture Deep Dive IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Transformer Architecture Deep Dive is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Transformer Architecture Deep Dive connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Transformer Architecture Deep Dive sits in the computational-science landscape."}</p>
@@ -546,6 +546,8 @@ GPT-3 175B: 96 blocks × 96 heads × d_model=12288 × d_ff=49152
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "neural-networks" as const, reason: "Continue to neural networks — see also from this page" }, { id: "fine-tuning" as const, reason: "Continue to fine tuning — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("neural-networks")} className="text-sm text-primary hover:underline">→ Neural Networks (activation functions + backprop)</Link>
         <span className="text-muted-foreground">·</span>

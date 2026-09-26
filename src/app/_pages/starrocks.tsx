@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -693,7 +694,6 @@ export function StarRocksPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Starrocks">
         <DeeperThought title="StarRocks IS the real-time data warehouse — and it's the right design" connectedTo="ADR-001 (platform architecture)">
           <p>{"StarRocks combines: columnar storage (fast scans), vectorized execution (SIMD), real-time ingestion (from Kafka/Flink), and sub-second queries. This IS the SAME pattern as Pinot (real-time analytics) but with full SQL (JOIN, subquery, CTE). StarRocks IS Pinot + full SQL — the pattern (columnar + real-time + SQL) IS the same. The difference: Pinot is OLAP-only (analytics); StarRocks also supports OLTP-like workloads (point queries)."}</p>
@@ -719,6 +719,7 @@ export function StarRocksPage() {
         { id: "pinot" as const, reason: "Real-time OLAP — StarRocks external reads from Pinot segments" },
         { id: "duckdb" as const, reason: "Laptop-scale analytics — StarRocks for cluster-scale" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "iceberg" as const, reason: "Open table format — StarRocks external catalog reads Iceberg" }, { id: "delta-lake" as const, reason: "Sibling open table format — StarRocks reads Delta" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("iceberg")} className="text-sm text-primary hover:underline">

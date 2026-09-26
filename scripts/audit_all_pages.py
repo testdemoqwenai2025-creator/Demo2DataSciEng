@@ -49,7 +49,7 @@ PAGES = [
     "diffusion-models-deep-dive", "fine-tuning-deep-dive", "agent-frameworks",
     "computational-biology", "computational-chemistry", "computational-physics",
     "bioinformatics-pipelines", "elegant-code", "connections", "resources",
-    "global-shipping", "future",
+    "global-shipping", "future", "genealogy",
     "living-svd", "living-attention", "living-fft", "living-poisson",
     "living-entropy", "living-black-scholes", "living-haversine", "living-kalman",
     "living-monte-carlo", "living-gbm",
@@ -62,6 +62,7 @@ CONTENT_CHECKS = {
     "connections": ["connection", "graph", "card"],
     "resources": ["resource", "dataset", "paper"],
     "future": ["future", "projection", "timeline"],
+    "genealogy": ["genealogy", "milestone", "Bayes"],
     "living-": ["living", "equation", "slider"],
 }
 

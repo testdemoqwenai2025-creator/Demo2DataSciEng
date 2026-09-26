@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -515,7 +516,6 @@ class FBASolver:
             results[gene_idx] = biomass
         return results
 
-
 # ============================================================
 # 2. PPI Network — Graph Neural Network
 # ============================================================
@@ -576,7 +576,6 @@ class PPINetwork(nn.Module):
         
         return self.head(h)  # (N, num_classes)
 
-
 def pagerank(adj: Dict[int, Dict[int, float]],
              d: float = 0.85, iters: int = 100) -> Dict[int, float]:
     """PageRank on PPI network.
@@ -599,7 +598,6 @@ def pagerank(adj: Dict[int, Dict[int, float]],
         pr = new_pr
     
     return pr
-
 
 # ============================================================
 # 3. Multi-omics integration — MOFA+ style factor analysis
@@ -668,7 +666,6 @@ class MultiOmicsFactorAnalysis(nn.Module):
             opt.step()
         
         return Z.detach()
-
 
 # ============================================================
 # 4. Whole-cell simulation (Karr 2012 pattern)
@@ -751,7 +748,6 @@ class WholeCellModel:
                     'total_protein': self.protein.sum().item(),
                 })
         return history
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1021,6 +1017,7 @@ export function SystemsBiologyPage() {
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedElegantCode hostPage={"systems-biology" as never} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Entropy · PageRank's cousin cards in the cross-disciplinary graph" }, { id: "numpy-scipy" as const, reason: "SVD (SVD IS the Fourier transform for data) — same math, genomics domain" }, { id: "bioinformatics-pipelines" as const, reason: "Poisson (Poisson IS the law of rare events) — same math, sequencing domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("genetic-materials")} className="text-sm text-primary hover:underline">→ Genetic Materials (variant → protein input)</Link>

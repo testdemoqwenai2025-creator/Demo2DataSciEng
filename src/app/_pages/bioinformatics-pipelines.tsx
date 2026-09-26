@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -626,7 +627,6 @@ export function BioinformaticsPipelinesPage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"bioinformatics-pipelines" as never} />
 
-
       <DeeperThoughtSection pageTitle="Bioinformatics Pipelines">
         <DeeperThought title="GATK IS the clinical genomics standard — and it IS Poisson + Bayesian" connectedTo="ADR-043 (AlphaMissense adoption)">
           <p>{"GATK's variant-calling pipeline (BWA → MarkDuplicates → BQSR → HaplotypeCaller → GenotypeGVCFs → VEP) uses Poisson for read-depth modelling (P(≥10×) = 1 - CDF(9, λ)) and Bayesian genotype likelihoods (P(genotype | reads) ∝ P(reads | genotype) · P(genotype)). The SAME equations that model server load (Poisson) and spam filtering (Bayes) call genetic variants. The pipeline IS 6 tools, each implementing a different mathematical model: BWA (Burrows-Wheeler Transform + Smith-Waterman alignment), MarkDuplicates (hash-based dedup), BQSR (logistic regression on quality scores), HaplotypeCaller (HMM + Bayesian), GenotypeGVCFs (Bayesian), VEP (database lookup)."}</p>
@@ -654,6 +654,7 @@ export function BioinformaticsPipelinesPage() {
         { id: "ai-drug-discovery" as const, reason: "AI Drug Discovery (Foundation Medicine variant data)" },
         { id: "numpy-scipy" as const, reason: "NumPy/SciPy (matrix ops for variant data)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Poisson's cousin cards in the cross-disciplinary graph" }, { id: "alphamissense" as const, reason: "Bayes (Bayes IS the belief updater) — same math, genetics domain" }, { id: "systems-biology" as const, reason: "Entropy (Entropy IS the universal currency of disorder) — same math, information domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">

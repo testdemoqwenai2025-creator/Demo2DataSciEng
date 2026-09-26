@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -490,7 +491,6 @@ class QuantumGate(nn.Module):
         identity = torch.eye(n, dtype=U.dtype, device=U.device)
         return torch.allclose(prod, identity, atol=tol)
 
-
 # ============================================================
 # 2. QuantumCircuit — sequential gate application
 # ============================================================
@@ -587,7 +587,6 @@ class QuantumCircuit(nn.Module):
             counts[o] = counts.get(o, 0) + 1
         return counts
 
-
 # ============================================================
 # 3. Bell state circuit — entanglement generator
 # ============================================================
@@ -608,7 +607,6 @@ def bell_state_circuit() -> QuantumCircuit:
     qc.add_gate('H', QuantumGate.hadamard(), [0])
     qc.add_gate('CNOT', QuantumGate.cnot(), [0, 1])
     return qc
-
 
 # ============================================================
 # 4. VQE — Variational Quantum Eigensolver (hybrid QC)
@@ -726,7 +724,6 @@ class VQE(nn.Module):
                 print(f"  VQE step {step:3d}: E(θ) = {loss.item():+.4f} Ha")
         return history
 
-
 # ============================================================
 # 5. GroverCircuit — quantum amplitude amplification
 # ============================================================
@@ -812,7 +809,6 @@ class GroverCircuit(nn.Module):
             'marked_probability': probs[self.marked],
             'iterations': self.optimal_iter,
         }
-
 
 # ============================================================
 # Sanity check — Bell state, VQE, Grover
@@ -1702,7 +1698,6 @@ print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via s
         <QuantumInteractives />
       </SectionCard>
 
-
       <SectionCard title="My deeper thought: quantum computing IS the variational principle made computational" icon={<TrendingUp className="h-5 w-5" />} badge="Insight">
         <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
           <p>
@@ -1716,7 +1711,6 @@ print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via s
           </p>
         </div>
       </SectionCard>
-
 
       <DeeperThoughtSection pageTitle="Quantum Computing">
         <DeeperThought title="Quantum Computing IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
@@ -1741,6 +1735,7 @@ print(f"  → Microsoft's bet: scale Δ via topoconductor engineering, NOT via s
         { id: "diffusion-models" as const, reason: "Variational lower bound — same family" },
         { id: "knowledge" as const, reason: "ADR-052: VQE adoption" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "neural-network-potentials" as const, reason: "MACE — variational energy on SO(3)" }, { id: "molecular-modelling" as const, reason: "AMBER — the hand-crafted precursor" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("neural-network-potentials")} className="text-sm text-primary hover:underline">→ Neural Network Potentials (MACE — variational energy on SO(3) irreps)</Link>

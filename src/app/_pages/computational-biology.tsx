@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -537,7 +538,6 @@ export function ComputationalBiologyPage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"computational-biology" as never} />
 
-
       <DeeperThoughtSection pageTitle="Computational Biology">
         <DeeperThought title="MD IS the N-body problem — and it's been solved since Verlet 1967" connectedTo="ADR-051 (living-equation pages)">
           <p>{"Molecular Dynamics solves Newton's equations of motion for N interacting particles (atoms). The force calculation is O(N^2) — every atom interacts with every other. Verlet integration (1967) makes the time-stepping stable and energy-conserving. The SAME Verlet formula runs AMBER (protein folding), Havok (game physics), and NASA JPL (spacecraft trajectories). Three sciences, one integrator, same energy conservation. The math IS the bridge between biology and physics."}</p>
@@ -565,6 +565,7 @@ export function ComputationalBiologyPage() {
         { id: "boltz" as const, reason: "Boltz (multi-chain diffusion)" },
         { id: "ai-drug-discovery" as const, reason: "AI drug discovery (Insilico + Recursion)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Verlet's cousin cards in the cross-disciplinary graph" }, { id: "space-science" as const, reason: "Euler's Method (Euler IS the seed of all simulation) — same math, orbital mechanics domain" }, { id: "computational-physics" as const, reason: "Navier-Stokes (Navier-Stokes IS the universe's flow equation) — same math, weather domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("numpy-scipy")} className="text-sm text-primary hover:underline">

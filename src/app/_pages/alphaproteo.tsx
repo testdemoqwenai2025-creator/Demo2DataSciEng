@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -543,11 +544,9 @@ class SE3EquivariantDenoiseLayer(nn.Module):
         
         return msa_feat, pair_feat, coords
 
-
 def pair_proj_dist(dist):
     """Project distance to pair features (simplified)."""
     return dist.expand(-1, -1, -1, 64) * 0.1  # broadcast
-
 
 # ============================================================
 # 2. RFdiffusion — full denoising model
@@ -684,7 +683,6 @@ class RFdiffusion(nn.Module):
             return x, torch.stack(intermediate)
         return x
 
-
 # ============================================================
 # 3. ProteinMPNN — inverse folding (backbone → sequence)
 # ============================================================
@@ -781,7 +779,6 @@ class ProteinMPNN(nn.Module):
                 sequences.append(seq)
             return sequences
 
-
 # ============================================================
 # 4. AlphaFold2 self-consistency evaluation
 # ============================================================
@@ -855,7 +852,6 @@ class AlphaFold2SelfConsistency(nn.Module):
             'self_consistency': self_consistency.item(),
             'pass': self_consistency > 0.7,
         }
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1101,7 +1097,6 @@ export function AlphaProteoPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="AlphaProteo">
         <DeeperThought title="AlphaProteo IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about AlphaProteo is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. AlphaProteo connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where AlphaProteo sits in the computational-science landscape."}</p>
@@ -1119,6 +1114,8 @@ export function AlphaProteoPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "diffusion-models" as const, reason: "Continue to diffusion models — see also from this page" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("diffusion-models")} className="text-sm text-primary hover:underline">→ Diffusion Models (same DDPM math)</Link>
         <span className="text-muted-foreground">·</span>

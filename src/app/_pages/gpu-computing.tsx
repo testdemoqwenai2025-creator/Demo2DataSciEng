@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1032,7 +1033,6 @@ print(f"Distance matrix: {D.shape}, max: {D.max():.2f}")
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Gpu Computing">
         <DeeperThought title="GPU computing IS SIMD at massive scale — and it's the right hardware" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"A GPU has 10,000+ cores that execute the SAME instruction on DIFFERENT data (SIMD). A CPU has 8-64 cores that execute DIFFERENT instructions (MIMD). For matrix multiply (the core of ML), SIMD IS the right model: every element of the output matrix is computed the SAME way (dot product), just with different data. The GPU's 10,000 cores compute 10,000 dot products simultaneously. GPU IS the hardware that matches the math of matrix multiplication."}</p>
@@ -1060,6 +1060,7 @@ print(f"Distance matrix: {D.shape}, max: {D.max():.2f}")
         { id: "alphaproteo" as const, reason: "Protein design on GPU (AlphaFold-style)" },
         { id: "llmops" as const, reason: "LLM training/inference on GPU" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "numpy-scipy" as const, reason: "CuPy = GPU NumPy (drop-in API)" }, { id: "dask-ray" as const, reason: "Ray Train scales to multi-GPU clusters" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("numpy-scipy")} className="text-sm text-primary hover:underline">

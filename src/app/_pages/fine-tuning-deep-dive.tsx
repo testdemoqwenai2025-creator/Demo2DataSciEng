@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
@@ -594,7 +595,6 @@ export function FineTuningDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Fine Tuning Deep Dive">
         <DeeperThought title="Fine-tuning IS transfer learning — and it's the right pattern" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"Fine-tuning takes a pre-trained model (trained on general data) and adapts it to a specific task (trained on task-specific data). This IS transfer learning: the general features (learned during pre-training) transfer to the specific task. The math (gradient descent on the task-specific loss, starting from pre-trained weights) IS the SAME as gradient descent from random initialization — just with a better starting point. Fine-tuning IS gradient descent with a head start."}</p>
@@ -622,6 +622,7 @@ export function FineTuningDeepDivePage() {
         { id: "mlflow-deep-dive" as const, reason: "Track fine-tuning experiments" },
         { id: "agent-frameworks" as const, reason: "Agents built on fine-tuned LLMs" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "fine-tuning" as const, reason: "Fine-tuning overview page" }, { id: "transformer-deep-dive" as const, reason: "The model being fine-tuned" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("fine-tuning")} className="text-sm text-primary hover:underline">&rarr; Fine-tuning overview</Link>

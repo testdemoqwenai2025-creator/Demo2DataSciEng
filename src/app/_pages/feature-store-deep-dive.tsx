@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -986,7 +987,6 @@ export function FeatureStoreDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Feature Store Deep Dive">
         <DeeperThought title="Feature Store Deep Dive IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Feature Store Deep Dive is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Feature Store Deep Dive connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Feature Store Deep Dive sits in the computational-science landscape."}</p>
@@ -1014,6 +1014,7 @@ export function FeatureStoreDeepDivePage() {
         { id: "streaming" as const, reason: "Kafka + Flink streaming features" },
         { id: "rag-deep-dive" as const, reason: "RAG deep dive (uses feature-store patterns)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "feature-store" as const, reason: "Anchor concept page — feature store evolution" }, { id: "mlflow-deep-dive" as const, reason: "MLflow logs feature-store-trained models" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("feature-store")} className="text-sm text-primary hover:underline">

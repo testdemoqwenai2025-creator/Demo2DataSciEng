@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -462,7 +463,6 @@ class ESM2Tokenizer:
         labels[~mask] = -100
         return masked_tokens, labels
 
-
 class ESM2Model(nn.Module):
     """ESM-2 (Lin et al. 2023) — protein language model.
     
@@ -516,7 +516,6 @@ class ESM2Model(nn.Module):
         residue_embs, _ = self.forward(input_ids)
         return self.lm_head(residue_embs)
 
-
 class RotaryPositionalEmbedding(nn.Module):
     """Rotary Positional Embedding (RoPE, Su et al. 2021).
     
@@ -543,7 +542,6 @@ class RotaryPositionalEmbedding(nn.Module):
         x_rot = torch.stack([x1 * cos.squeeze(-1) - x2 * sin.squeeze(-1),
                              x1 * sin.squeeze(-1) + x2 * cos.squeeze(-1)], dim=-1)
         return x_rot.flatten(-2)
-
 
 # ============================================================
 # 2. AlphaFold2 structure head (Jumper et al. 2021)
@@ -594,7 +592,6 @@ class StructureModule(nn.Module):
             # positions = positions + delta_from_attention(x)
         
         return positions
-
 
 class InvariantPointAttention(nn.Module):
     """Invariant Point Attention (IPA) — AlphaFold2's key innovation.
@@ -655,7 +652,6 @@ class InvariantPointAttention(nn.Module):
         # Combine standard + geometric
         return out + pt_out[:, :, :D]  # truncate to D dims (simplification)
 
-
 # ============================================================
 # 3. Full protein → function RAG pipeline
 # ============================================================
@@ -671,7 +667,6 @@ def embed_protein_sequence(sequence: str, esm_model: ESM2Model,
     
     # L2-normalise for cosine similarity (same as ADR-033 SigLIP)
     return F.normalize(pooled.squeeze(0), dim=-1)
-
 
 def rag_protein_function(query_sequence: str, esm_model: ESM2Model,
                          tokenizer: ESM2Tokenizer, vector_store, top_k: int = 5):
@@ -690,7 +685,6 @@ def rag_protein_function(query_sequence: str, esm_model: ESM2Model,
     # Cross-encoder re-rank (could use a domain-specific model here)
     # For demo: just return top-k
     return results[:top_k]
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -868,7 +862,6 @@ export function BioinformaticsPage() {
         />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Bioinformatics">
         <DeeperThought title="Evolution IS contrastive learning on the world's largest dataset" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"ESM-2's training objective (masked-LM on 250M UniProt sequences) is structurally identical to SigLIP's contrastive learning on (image, caption) pairs. The 'training data' is the evolutionary tree itself — descent with modification produces (sequence, function) pairs that are 'positive' for contrastive learning. 4 billion years of evolution IS the world's largest contrastive-learning run. ESM-2 just distills it. The masked-LM objective IS the evolutionary fitness function, computed retroactively."}</p>
@@ -887,6 +880,7 @@ export function BioinformaticsPage() {
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedElegantCode hostPage={"bioinformatics" as never} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Markov Chain's cousin cards in the cross-disciplinary graph" }, { id: "bioinformatics-pipelines" as const, reason: "Poisson (Poisson IS the law of rare events) — same math, sequencing domain" }, { id: "global-shipping" as const, reason: "Kalman Filter (Kalman IS the universal state-estimation equation) — same math, maritime domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("multimodal-rag")} className="text-sm text-primary hover:underline">→ Multi-modal RAG (same shared embedding space, different modality)</Link>

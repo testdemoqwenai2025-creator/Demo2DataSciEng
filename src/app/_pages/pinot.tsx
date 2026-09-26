@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -683,7 +684,6 @@ export function PinotPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Pinot">
         <DeeperThought title="Pinot IS the real-time analytics database — and it's columnar + pre-aggregated" connectedTo="ADR-001 (platform architecture)">
           <p>{"Pinot combines columnar storage (fast scans) with pre-aggregated star-tree indexes (fast GROUP BY). The star-tree pre-computes aggregations at ingestion time — so a COUNT(*) GROUP BY city query that would scan 1B rows scans only 100 pre-aggregated segments. This IS the SAME trade-off as materialized views in databases: pay the cost at write time to save at query time. Pinot IS materialized views for real-time analytics."}</p>
@@ -710,6 +710,7 @@ export function PinotPage() {
         { id: "databricks" as const, reason: "Spark as Pinot batch segment builder" },
         { id: "arrow" as const, reason: "Columnar format underneath Pinot segments" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "druid" as const, reason: "Sibling real-time OLAP (Metamarkets origin)" }, { id: "paimon" as const, reason: "Streaming-native table format (Flink-first)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("druid")} className="text-sm text-primary hover:underline">

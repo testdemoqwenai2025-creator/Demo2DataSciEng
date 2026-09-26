@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -652,7 +653,6 @@ export function MlflowDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="MLflow Deep Dive">
         <DeeperThought title="MLflow Deep Dive IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about MLflow Deep Dive is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. MLflow Deep Dive connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where MLflow Deep Dive sits in the computational-science landscape."}</p>
@@ -680,6 +680,7 @@ export function MlflowDeepDivePage() {
         { id: "llmops" as const, reason: "LLM operations extends MLflow to foundation models" },
         { id: "fine-tuning" as const, reason: "Track fine-tuning runs in MLflow" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "feature-store-deep-dive" as const, reason: "Feature stores feed MLflow-tracked models" }, { id: "model-registry" as const, reason: "Existing overview page — this is the deep-dive extension" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("feature-store-deep-dive")} className="text-sm text-primary hover:underline">

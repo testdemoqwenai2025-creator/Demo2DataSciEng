@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
@@ -559,7 +560,6 @@ int vectorised_email_hash(
         />
       </SectionCard>
 
-
       {/* Pyodide — Delta MERGE syntax validator */}
       <SectionCard
         title="Try it: Delta MERGE syntax validator (Pyodide)"
@@ -572,7 +572,6 @@ int vectorised_email_hash(
           buttonLabel="Run MERGE validator (Pyodide)"
         />
       </SectionCard>
-
 
       {/* WasmRunner — Rust/C compiled to Wasm (executable) */}
       <SectionCard
@@ -587,7 +586,6 @@ int vectorised_email_hash(
           description="In production: compile the Rust UDF above with `cargo build --target wasm32-wasi` and host the .wasm binary. The WasmRunner loads it via WebAssembly.instantiate() and calls the exported function — same pattern regardless of source language (Rust, C, Go, Elixir all compile to Wasm)."
         />
       </SectionCard>
-
 
       <DeeperThoughtSection pageTitle="Databricks">
         <DeeperThought title="Databricks IS Spark-as-a-service — and Spark IS functional programming at scale" connectedTo="ADR-001 (platform architecture)">
@@ -606,6 +604,8 @@ int vectorised_email_hash(
           <p>{"Unity Catalog centralises governance (ACLs, column-level masking, row-level filters) across all Databricks workspaces. This IS the same pattern as Snowflake's GRANT/REVOKE — but for Delta tables instead of Snowflake tables. The governance model IS RBAC (role-based access control) — the same model that every database since Oracle 7 (1992) has used. Unity Catalog IS the 'Production patterns' fold for governance — the pattern (RBAC) stays, the implementation (Unity vs Snowflake vs Lake Formation) changes."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "snowflake" as const, reason: "Continue to snowflake — see also from this page" }, { id: "orchestration" as const, reason: "Continue to orchestration — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("snowflake")} className="text-sm text-primary hover:underline">
           → Continue to Snowflake serving

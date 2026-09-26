@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -970,7 +971,6 @@ export function VectorDbDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Vector DB Deep Dive">
         <DeeperThought title="Vector DB Deep Dive IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Vector DB Deep Dive is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Vector DB Deep Dive connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Vector DB Deep Dive sits in the computational-science landscape."}</p>
@@ -998,6 +998,7 @@ export function VectorDbDeepDivePage() {
         { id: "multimodal-rag" as const, reason: "Multimodal RAG (image + text embeddings)" },
         { id: "arrow" as const, reason: "Apache Arrow (vector serialization format)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "vector-db" as const, reason: "Anchor concept page — vector DB evolution" }, { id: "rag-deep-dive" as const, reason: "RAG deep dive (uses vector DB for retrieval)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("vector-db")} className="text-sm text-primary hover:underline">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -391,10 +392,8 @@ def setup_distributed(rank, world_size, port=29500):
         torch.cuda.set_device(rank)
     print(f"[rank {rank}] Initialised with backend={backend}, world_size={world_size}")
 
-
 def cleanup():
     dist.destroy_process_group()
-
 
 # ============================================================
 # DDP: DistributedDataParallel — the baseline
@@ -445,7 +444,6 @@ def train_ddp(rank, world_size):
             optim.zero_grad()
     
     cleanup()
-
 
 # ============================================================
 # FSDP: Fully Sharded Data Parallel — for big models
@@ -519,7 +517,6 @@ def train_fsdp(rank, world_size):
     
     cleanup()
 
-
 # ============================================================
 # Gradient accumulation — fake a bigger batch
 # ============================================================
@@ -548,7 +545,6 @@ def train_with_accumulation(model, loader, optim, accum_steps=8):
             optim.step()
             optim.zero_grad()
 
-
 # ============================================================
 # Checkpointing — save/load sharded state
 # ============================================================
@@ -566,12 +562,10 @@ def save_fsdp_checkpoint(model, path, rank):
         'state': state,
     }, f"{path}.rank{rank}.pt")
 
-
 def load_fsdp_checkpoint(model, path, rank, world_size):
     """Load FSDP checkpoint — each rank loads its own shard."""
     state = torch.load(f"{path}.rank{rank}.pt")
     model.load_state_dict(state['state'])
-
 
 # ============================================================
 # Activation checkpointing — trade compute for memory
@@ -598,7 +592,6 @@ class CheckpointedTransformerBlock(nn.Module):
             self.block, x, *args,
             use_reentrant=False,  # PyTorch 2.0+ recommended
         )
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -795,7 +788,6 @@ export function DistributedTrainingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Distributed Training">
         <DeeperThought title="Distributed Training IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Distributed Training is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Distributed Training connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Distributed Training sits in the computational-science landscape."}</p>
@@ -813,6 +805,8 @@ export function DistributedTrainingPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "comp-sci-materials" as const, reason: "Continue to comp sci materials — see also from this page" }, { id: "fine-tuning" as const, reason: "Continue to fine tuning — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("comp-sci-materials")} className="text-sm text-primary hover:underline">→ Comp Sci & Materials (the hardware)</Link>
         <span className="text-muted-foreground">·</span>

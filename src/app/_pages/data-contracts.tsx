@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1024,7 +1025,6 @@ export function DataContractsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Data Contracts">
         <DeeperThought title="Data contracts ARE API contracts — and they should be treated as such" connectedTo="ADR-001 (platform architecture)">
           <p>{"A data contract specifies: schema (fields, types, constraints), SLA (freshness, completeness), ownership (who produces, who consumes), and change management (how to evolve). This IS the SAME pattern as an API contract (OpenAPI spec: endpoints, request/response types, SLAs, versioning). Data contracts ARE API contracts for data. The pattern (typed contract + ownership + SLA) IS the same. The implementation (SQL assertions vs HTTP schemas) differs."}</p>
@@ -1052,6 +1052,7 @@ export function DataContractsPage() {
         { id: "data-lakehouse" as const, reason: "Lakehouse — Bronze→Silver→Gold contract hops" },
         { id: "orchestration" as const, reason: "Airflow — emits OpenLineage events for contract compliance" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "lineage" as const, reason: "Lineage — OpenLineage compliance monitoring (the substrate for contracts)" }, { id: "schema-registry" as const, reason: "Schema Registry — schema enforcement at register time" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("lineage")} className="text-sm text-primary hover:underline">

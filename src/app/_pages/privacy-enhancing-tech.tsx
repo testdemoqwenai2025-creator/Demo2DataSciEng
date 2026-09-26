@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -954,7 +955,6 @@ print(f"CKKS supports multiplication too: Enc(a) * Enc(b) = Enc(a*b) -> encrypte
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Privacy Enhancing Tech">
         <DeeperThought title="Differential privacy IS the mathematical guarantee — and it's the right abstraction" connectedTo="ADR-001 (platform architecture)">
           <p>{"Differential privacy (DP) guarantees: the output of a query changes by at most ε when any single record is added/removed. This IS a mathematical theorem, not a heuristic. The ε (epsilon) parameter controls the privacy-utility trade-off: small ε = strong privacy but noisy results; large ε = weak privacy but accurate results. DP IS the only privacy definition with a PROVABLE guarantee. Everything else (anonymization, pseudonymization) is a heuristic that can be defeated."}</p>
@@ -982,6 +982,7 @@ print(f"CKKS supports multiplication too: Enc(a) * Enc(b) = Enc(a*b) -> encrypte
         { id: "aws-lake-formation" as const, reason: "Lake Formation tags + PETs for column-level privacy" },
         { id: "fintech" as const, reason: "Fintech uses PETs for cross-bank fraud detection" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "governance" as const, reason: "Governance: PETs are part of the federated computational governance stack" }, { id: "data-mesh-deep-dive" as const, reason: "Mesh enables federated PETs — each domain can apply its own PET" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("governance")} className="text-sm text-primary hover:underline">

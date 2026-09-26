@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -507,7 +508,6 @@ class Conv2d(nn.Module):
         # dx = conv2d_input_grad(grad_output, weight)  ← transpose conv
         pass
 
-
 # ============================================================
 # A small CNN — LeNet-style, the architecture that started it all
 # ============================================================
@@ -548,7 +548,6 @@ class LeNet5(nn.Module):
         x = F.relu(self.fc2(x))
         return self.fc3(x)
 
-
 # ============================================================
 # ViT — Vision Transformer (modern alternative)
 # ============================================================
@@ -571,7 +570,6 @@ class PatchEmbedding(nn.Module):
         x = self.proj(x)  # conv2d: stride=patch_size means non-overlapping
         x = x.flatten(2).transpose(1, 2)  # (N, embed_dim, num_patches) -> (N, num_patches, embed_dim)
         return x
-
 
 class ViTBlock(nn.Module):
     """One ViT block = LayerNorm -> MultiHeadAttention -> residual
@@ -597,7 +595,6 @@ class ViTBlock(nn.Module):
         h = self.norm2(x)
         x = x + self.mlp(h)
         return x
-
 
 class VisionTransformer(nn.Module):
     """Full ViT: patch embed + positional enc + N blocks + head."""
@@ -628,7 +625,6 @@ class VisionTransformer(nn.Module):
         x = self.norm(x)
         # CLS token output → classification head
         return self.head(x[:, 0])  # (N, num_classes)
-
 
 # ============================================================
 # Hybrid architecture (ADR-026): CNN stem + ViT body
@@ -667,7 +663,6 @@ class HybridViT(nn.Module):
     def forward(self, x):
         x = self.stem(x)  # (N, 256, 14, 14)
         return self.vit(x)
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -823,7 +818,6 @@ export function ComputerVisionPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Computer Vision">
         <DeeperThought title="Computer Vision IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Computer Vision is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Computer Vision connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Computer Vision sits in the computational-science landscape."}</p>
@@ -841,6 +835,8 @@ export function ComputerVisionPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "transformer" as const, reason: "Continue to transformer — see also from this page" }, { id: "comp-sci-materials" as const, reason: "Continue to comp sci materials — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("transformer")} className="text-sm text-primary hover:underline">→ Transformer (ViT IS a Transformer)</Link>
         <span className="text-muted-foreground">·</span>

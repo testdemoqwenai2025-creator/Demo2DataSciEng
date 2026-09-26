@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -947,7 +948,6 @@ export function ElementaryPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Elementary">
         <DeeperThought title="Elementary IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Elementary is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Elementary connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Elementary sits in the computational-science landscape."}</p>
@@ -975,6 +975,7 @@ export function ElementaryPage() {
         { id: "iceberg" as const, reason: "Iceberg Bronze tables — the data Elementary monitors" },
         { id: "governance" as const, reason: "Data observability is a core pillar of data governance" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "great-expectations" as const, reason: "Open-source expectation suites — declarative rules (complementary to Elementary)" }, { id: "monte-carlo" as const, reason: "SaaS always-on observability — the closed-source alternative" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("great-expectations")} className="text-sm text-primary hover:underline">

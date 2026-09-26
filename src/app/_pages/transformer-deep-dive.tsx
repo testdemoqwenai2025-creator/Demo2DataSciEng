@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -454,7 +455,6 @@ export function TransformerDeepDivePage() {
       {/* Related elegant-code — card → card adjacency footer */}
       <RelatedElegantCode hostPage={"transformer-deep-dive" as never} />
 
-
       <DeeperThoughtSection pageTitle="Transformer Deep Dive">
         <DeeperThought title="The transformer IS the universal correlation detector" connectedTo="ADR-024 (transformer deep dive)">
           <p>{"Before 2017, NLP used RNNs/LSTMs — sequential models that couldn't see long-range dependencies. Vaswani's insight: replace recurrence with ATTENTION — a single matrix operation (QK^T) that computes ALL pairwise correlations in parallel. The transformer IS the equation 'compute every correlation at once' — and that's why it scales: GPU matrix multiply is O(N^2) but embarrassingly parallel. The transformer didn't invent new math; it identified that correlation detection IS the bottleneck, and matrix multiply IS the solution."}</p>
@@ -482,6 +482,7 @@ export function TransformerDeepDivePage() {
         { id: "inference-serving" as const, reason: "Serve transformer models via vLLM" },
         { id: "numpy-scipy" as const, reason: "NumPy arrays power attention matmuls" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Attention's cousin cards in the cross-disciplinary graph" }, { id: "numpy-scipy" as const, reason: "SVD (SVD IS the Fourier transform for data) — same math, genomics domain" }, { id: "tabular" as const, reason: "Gradient Descent (Gradient Descent IS the learning rule) — same math, ML domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("transformer")} className="text-sm text-primary hover:underline">&rarr; Transformer overview</Link>

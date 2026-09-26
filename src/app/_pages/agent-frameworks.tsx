@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
@@ -645,7 +646,6 @@ export function AgentFrameworksPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Agent Frameworks">
         <DeeperThought title="Agent frameworks IS the LLM-as-controller pattern — and it's the right abstraction" connectedTo="ADR-001 (platform architecture)">
           <p>{"LangGraph/LangChain/CrewAI/AutoGen all implement: LLM decides action → tool executes → result feeds back → LLM decides next action. This IS the agent loop (ReAct: Reason + Act). The LLM IS the controller; the tools ARE the effectors; the results ARE the observations. This IS the SAME pattern as a PID controller in engineering (sense → compute → act → sense). Agent frameworks ARE PID controllers for LLMs — the pattern (feedback loop) IS the same."}</p>
@@ -673,6 +673,7 @@ export function AgentFrameworksPage() {
         { id: "inference-serving" as const, reason: "vLLM for fast agent loops" },
         { id: "diffusion-models-deep-dive" as const, reason: "Agents can call diffusion tools" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "rag-llms" as const, reason: "RAG = agent's retrieval tool" }, { id: "rag-deep-dive" as const, reason: "Deep RAG for agent memory" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("rag-llms")} className="text-sm text-primary hover:underline">&rarr; RAG + LLMs</Link>

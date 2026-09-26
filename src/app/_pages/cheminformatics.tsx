@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -462,7 +463,6 @@ class ECFPFingerprinter:
             fp[bit] = 1
         return fp
 
-
 # ============================================================
 # 2. Tanimoto similarity (Jaccard on bit vectors)
 # ============================================================
@@ -477,7 +477,6 @@ def tanimoto(fp_a: List[int], fp_b: List[int]) -> float:
     intersection = sum(1 for a, b in zip(fp_a, fp_b) if a == 1 and b == 1)
     union = sum(1 for a, b in zip(fp_a, fp_b) if a == 1 or b == 1)
     return intersection / union if union > 0 else 0.0
-
 
 # ============================================================
 # 3. ChemBERTa — SMILES as text (Chithrananda 2020)
@@ -495,7 +494,6 @@ SMILES_VOCAB = [
     # ... real vocab has ~600 tokens
 ]
 SMILES_VOCAB_SIZE = len(SMILES_VOCAB)
-
 
 class SmilesTokenizer:
     """Tokenise SMILES strings for ChemBERTa.
@@ -535,7 +533,6 @@ class SmilesTokenizer:
         masked[mask] = self.MASK
         labels[~mask] = -100
         return masked, labels
-
 
 class ChemBERTa(nn.Module):
     """ChemBERTa-77M (Chithrananda 2020).
@@ -584,7 +581,6 @@ class ChemBERTa(nn.Module):
         with torch.no_grad():
             _, pooled = self.forward(tokens)
         return F.normalize(pooled.squeeze(0), dim=-1)  # L2-normalised
-
 
 # ============================================================
 # 4. Molecular RAG retriever (extends ADR-032 hybrid)
@@ -648,7 +644,6 @@ class MolecularRAGRetriever:
         bonds = [[] for _ in smiles]
         return atoms, bonds
 
-
 # ============================================================
 # 5. Lipinski's Rule of 5 — drug-likeness filter
 # ============================================================
@@ -681,7 +676,6 @@ def lipinski_rule_of_5(mw: float, logp: float, hbd: int, hba: int) -> dict:
             'HBA < 10': hba < 10,
         }
     }
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -882,7 +876,6 @@ export function CheminformaticsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Cheminformatics">
         <DeeperThought title="Cheminformatics IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Cheminformatics is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Cheminformatics connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Cheminformatics sits in the computational-science landscape."}</p>
@@ -915,6 +908,8 @@ export function CheminformaticsPage() {
       </SectionCard>
 
       <RelatedElegantCode cardIndices={[0, 3, 19]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }, { id: "rag-deep-dive" as const, reason: "Continue to rag deep dive — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (proteins — the other half of drug-target interaction)</Link>
         <span className="text-muted-foreground">·</span>

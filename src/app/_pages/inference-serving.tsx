@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -361,7 +362,6 @@ class KVCache:
             V=torch.empty(batch, num_kv_heads, 0, head_dim, dtype=dtype, device=device),
         )
 
-
 # ============================================================
 # 2. Paged KV Cache — vLLM's PagedAttention
 # ============================================================
@@ -479,7 +479,6 @@ class PagedKVCache:
         
         return K, V
 
-
 # ============================================================
 # 3. Continuous Batching Scheduler
 # ============================================================
@@ -496,7 +495,6 @@ class SequenceRequest:
     @property
     def context_len(self) -> int:
         return len(self.prompt_token_ids) + len(self.output_token_ids)
-
 
 class ContinuousBatchingScheduler:
     """vLLM-style continuous batching scheduler.
@@ -558,7 +556,6 @@ class ContinuousBatchingScheduler:
                     or token == 2):  # EOS
                     req.is_finished = True
 
-
 # ============================================================
 # 4. Single-step decode with KV cache (vLLM-style)
 # ============================================================
@@ -587,7 +584,6 @@ def decode_step(model, scheduler: ContinuousBatchingScheduler,
     
     scheduler.step(next_tokens)
     return next_tokens
-
 
 # ============================================================
 # 5. OpenAI-compatible API (production server)
@@ -634,7 +630,6 @@ class VLLMServer:
                     yield self.tokenizer.decode([req.output_token_ids[-1]])
                     if req.is_finished:
                         return
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -769,7 +764,6 @@ export function InferenceServingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Inference Serving">
         <DeeperThought title="Inference Serving IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Inference Serving is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Inference Serving connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Inference Serving sits in the computational-science landscape."}</p>
@@ -787,6 +781,8 @@ export function InferenceServingPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "quantization-inference" as const, reason: "Continue to quantization inference — see also from this page" }, { id: "transformer" as const, reason: "Continue to transformer — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("quantization-inference")} className="text-sm text-primary hover:underline">→ Quantization (AWQ + Marlin kernel)</Link>
         <span className="text-muted-foreground">·</span>

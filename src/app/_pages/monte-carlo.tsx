@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -969,7 +970,6 @@ export function MonteCarloPage() {
 
       <RelatedElegantCode hostPage={"monte-carlo" as never} />
 
-
       <DeeperThoughtSection pageTitle="Monte Carlo">
         <DeeperThought title="Monte Carlo IS data observability — and it's the right name" connectedTo="ADR-001 (platform architecture)">
           <p>{"Monte Carlo (the company) monitors data pipelines for freshness, volume, schema, and distribution anomalies. The name IS a reference to the Monte Carlo method (Metropolis 1949) — because the monitoring IS statistical: you don't know the 'true' data distribution, but you can estimate it from samples and detect when new data deviates. The anomaly detection IS a hypothesis test: H0 = new data follows the historical distribution. P(reject H0 | H0 true) = false alarm rate. The math (statistical hypothesis testing) stays; the implementation (Monte Carlo vs Great Expectations vs Elementary) changes."}</p>
@@ -997,6 +997,7 @@ export function MonteCarloPage() {
         { id: "iceberg" as const, reason: "Iceberg Bronze tables — the data MC monitors" },
         { id: "governance" as const, reason: "Data observability is a core pillar of data governance" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Monte Carlo's cousin cards in the cross-disciplinary graph" }, { id: "fintech" as const, reason: "Geometric Brownian Motion (GBM IS the universal multiplicative-noise equation) — same math, fintech domain" }, { id: "global-shipping" as const, reason: "Value at Risk (VaR IS the universal tail-risk equation) — same math, fintech domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("great-expectations")} className="text-sm text-primary hover:underline">

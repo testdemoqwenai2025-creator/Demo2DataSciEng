@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -504,7 +505,6 @@ class HMM:
         
         return alpha[L-1].sum().item()
 
-
 # ============================================================
 # 2. CRISPR guide RNA design — Doench 2016 on-target score
 # ============================================================
@@ -612,7 +612,6 @@ class CRISPRGuideDesigner:
         guides.sort(key=lambda g: -g['on_score'])
         return guides[:top_k]
 
-
 # ============================================================
 # 3. GWAS — logistic regression for SNP-trait association
 # ============================================================
@@ -705,7 +704,6 @@ class GWAS:
             })
         
         return results
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -954,7 +952,6 @@ export function GeneticMaterialsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Genetic Materials">
         <DeeperThought title="Genetic Materials IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Genetic Materials is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Genetic Materials connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Genetic Materials sits in the computational-science landscape."}</p>
@@ -972,6 +969,8 @@ export function GeneticMaterialsPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }, { id: "cheminformatics" as const, reason: "Continue to cheminformatics — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (the precursor page)</Link>
         <span className="text-muted-foreground">·</span>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LiveResourcesDrawer } from "../_components/live-resources-drawer";
+import { NextSteps } from "../_components/next-steps";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
@@ -653,7 +654,6 @@ int main(int argc, char** argv) {
         />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Git, CI/CD & DevOps">
         <DeeperThought title="Git, CI/CD & DevOps IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Git, CI/CD & DevOps is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Git, CI/CD & DevOps connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Git, CI/CD & DevOps sits in the computational-science landscape."}</p>
@@ -671,6 +671,8 @@ int main(int argc, char** argv) {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "home" as const, reason: "Continue to home — see also from this page" }, { id: "architecture" as const, reason: "Continue to architecture — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("home")} className="text-sm text-primary hover:underline">
           → Back to overview

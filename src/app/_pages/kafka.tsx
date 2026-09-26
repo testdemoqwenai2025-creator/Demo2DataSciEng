@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -851,7 +852,6 @@ export function KafkaPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Kafka">
         <DeeperThought title="Kafka IS the append-only log — and it's 50 years old" connectedTo="ADR-001 (platform architecture)">
           <p>{"Kafka's core abstraction IS the append-only log — a sequence of immutable events ordered by offset. This IS the SAME data structure as the database WAL (write-ahead log, IBM 1970s), the Git object log, and the Delta Lake transaction log. The log IS the universal data structure for event sourcing. Kafka's insight: expose the log AS the API (not hide it behind a query engine). The consumer reads the log at its own pace (pull, not push). The math (append + read by offset) stays; the implementation (Kafka vs Pulsar vs Kinesis) changes."}</p>
@@ -879,6 +879,7 @@ export function KafkaPage() {
         { id: "modern-big-data" as const, reason: "Modern Big Data page — Kafka in the lakehouse stack" },
         { id: "data-lakehouse" as const, reason: "Data Lakehouse — Bronze tier starts at Kafka topics" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "streaming" as const, reason: "Streaming overview — Kafka in the broader streaming ecosystem" }, { id: "flink" as const, reason: "Apache Flink — primary stream processor on Kafka topics" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("streaming")} className="text-sm text-primary hover:underline">

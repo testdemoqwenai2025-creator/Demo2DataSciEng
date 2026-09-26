@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -390,7 +391,6 @@ def fftshift(x: torch.Tensor) -> torch.Tensor:
     """Shift zero-frequency to center (for visualisation)."""
     return torch.fft.fftshift(x)
 
-
 # ============================================================
 # 2. CTF — Contrast Transfer Function
 # ============================================================
@@ -464,7 +464,6 @@ class CTFCorrection(nn.Module):
         # Back to real space
         return ifft2(F_corrected).real
 
-
 # ============================================================
 # 3. Radon transform — 2D projection from 3D object
 # ============================================================
@@ -514,7 +513,6 @@ def radon_transform(volume: torch.Tensor, angles: torch.Tensor) -> torch.Tensor:
         projections.append(projection.flatten())
     
     return torch.stack(projections)
-
 
 # ============================================================
 # 4. Maximum-likelihood 2D classification (RELION-style)
@@ -578,7 +576,6 @@ class CryoEM2DClassifier(nn.Module):
         recon = (class_probs.unsqueeze(-1).unsqueeze(-1) * self.class_averages.unsqueeze(0)).sum(dim=1)
         
         return {'class_probs': class_probs, 'recon': recon}
-
 
 # ============================================================
 # 5. cryoDRGN — VAE for heterogeneous reconstruction
@@ -696,7 +693,6 @@ class CryoDRGN(nn.Module):
         kl_loss /= image.shape[0]  # per-batch
         
         return recon_loss + 1e-4 * kl_loss
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -946,7 +942,6 @@ export function CryoEMPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Cryo Em">
         <DeeperThought title="Cryo-EM IS the 3D FFT reconstruction — and it's the Central Slice Theorem" connectedTo="ADR-027 (diffusion models)">
           <p>{"Cryo-EM reconstructs 3D protein structures from 2D projection images. The math IS the Central Slice Theorem: the 1D Fourier transform of a 2D projection = a 2D slice through the 3D Fourier transform of the object. Collect enough 2D projections at different angles → fill the 3D Fourier space → inverse FFT → 3D structure. Cryo-EM IS the inverse FFT applied to noisy 2D images. The SAME FFT that separates C-major chord notes reconstructs protein structures."}</p>
@@ -979,6 +974,8 @@ export function CryoEMPage() {
       </SectionCard>
 
       <RelatedElegantCode cardIndices={[3, 0, 1]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "macro-structures" as const, reason: "Continue to macro structures — see also from this page" }, { id: "molecular-modelling" as const, reason: "Continue to molecular modelling — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("macro-structures")} className="text-sm text-primary hover:underline">→ Macro Structures (AlphaFold DB predictions)</Link>
         <span className="text-muted-foreground">·</span>

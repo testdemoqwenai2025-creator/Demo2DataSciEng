@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -558,7 +559,6 @@ class MoleculeVAE(nn.Module):
         tokens = logits.argmax(dim=-1)  # (n_samples, max_len)
         return F.one_hot(tokens, self.vocab_size).float()
 
-
 # ============================================================
 # 2. Phenomics — CellProfiler feature extraction (Recursion)
 # ============================================================
@@ -608,7 +608,6 @@ class PhenomicsEncoder(nn.Module):
         h = self.backbone(images)
         emb = self.proj(h)
         return F.normalize(emb, dim=-1)  # L2-normalise for cosine similarity
-
 
 # ============================================================
 # 3. ADMET prediction — multi-task regression
@@ -670,7 +669,6 @@ class ADMETPredictor(nn.Module):
                 else:
                     loss += F.mse_loss(preds[prop], targets[prop])
         return loss / len(self.PROPERTIES)
-
 
 # ============================================================
 # 4. Full AI drug discovery pipeline
@@ -756,7 +754,6 @@ class AIDrugDiscoveryPipeline:
         sims = (pheno_embs * disease_phenotype.unsqueeze(0)).sum(dim=-1)
         mask = sims > threshold
         return candidates[mask]
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1001,7 +998,6 @@ export function AIDrugDiscoveryPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="AI-Driven Drug Discovery">
         <DeeperThought title="AI-Driven Drug Discovery IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about AI-Driven Drug Discovery is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. AI-Driven Drug Discovery connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where AI-Driven Drug Discovery sits in the computational-science landscape."}</p>
@@ -1019,6 +1015,8 @@ export function AIDrugDiscoveryPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "cheminformatics" as const, reason: "Continue to cheminformatics — see also from this page" }, { id: "alphaproteo" as const, reason: "Continue to alphaproteo — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("cheminformatics")} className="text-sm text-primary hover:underline">→ Cheminformatics (ECFP + ChemBERTa)</Link>
         <span className="text-muted-foreground">·</span>

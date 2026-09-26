@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { ElegantCodeGraph } from "../_components/elegant-code-graph";
 import { ELEGANT_CODE_MAP, cardsOnHostPage, recommendedCards } from "../_lib/elegant-code-map";
 import { ELEGANT_CODE_CARDS } from "../_components/_elegant_code_cards";
@@ -197,6 +198,7 @@ export function ConnectionsPage() {
           </p>
         </div>
       </SectionCard>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "elegant-code" as const, reason: "Continue to elegant code — see also from this page" }, { id: "home" as const, reason: "Continue to home — see also from this page" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { PyodideRunner } from "../_components/pyodide-runner";
@@ -393,7 +394,6 @@ client.close()`,
         <StreamingCaseStudy />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Real-Time Streaming">
         <DeeperThought title="Real-Time Streaming IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Real-Time Streaming is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Real-Time Streaming connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Real-Time Streaming sits in the computational-science landscape."}</p>
@@ -417,6 +417,7 @@ client.close()`,
         { id: "modern-big-data" as const, reason: "Kafka + Flink + Pulsar stack" },
         { id: "orchestration" as const, reason: "Airflow triggers for streams" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "fivetran-hightouch" as const, reason: "ELT + reverse-ETL ingestion" }, { id: "databricks" as const, reason: "Spark Structured Streaming" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("modern-big-data")} className="text-sm text-primary hover:underline">

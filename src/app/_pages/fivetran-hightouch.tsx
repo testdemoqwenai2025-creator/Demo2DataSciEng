@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { SOURCE_SYSTEMS, REVERSE_ETL_AUDIENCES } from "../_data/synthetic";
 import { LHCIngestion } from "../_components/lhc-ingestion";
@@ -301,7 +302,6 @@ export function FivetranHightouchPage() {
         <LHCIngestion />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Fivetran & Hightouch">
         <DeeperThought title="Fivetran & Hightouch IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Fivetran & Hightouch is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Fivetran & Hightouch connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Fivetran & Hightouch sits in the computational-science landscape."}</p>
@@ -327,6 +327,7 @@ export function FivetranHightouchPage() {
         { id: "arrow" as const, reason: "Columnar format for zero-copy" },
         { id: "patterns" as const, reason: "Medallion + SCD2 patterns" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "streaming" as const, reason: "Kafka for real-time CDC" }, { id: "databricks" as const, reason: "Spark for transforms" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("orchestration")} className="text-sm text-primary hover:underline">

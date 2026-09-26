@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PIPELINE_RUNS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
@@ -325,7 +326,6 @@ export function OrchestrationPage() {
         <OrchestrationCaseStudy />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Airflow & Dagster">
         <DeeperThought title="Airflow & Dagster IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Airflow & Dagster is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Airflow & Dagster connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Airflow & Dagster sits in the computational-science landscape."}</p>
@@ -349,6 +349,7 @@ export function OrchestrationPage() {
         { id: "governance" as const, reason: "DQ checks + lineage" },
         { id: "databricks" as const, reason: "Spark job orchestration" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "fivetran-hightouch" as const, reason: "Pipeline for ELT ingestion" }, { id: "cicd" as const, reason: "CI/CD for DAG deployment" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("governance")} className="text-sm text-primary hover:underline">

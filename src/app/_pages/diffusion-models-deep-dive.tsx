@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
@@ -536,7 +537,6 @@ export function DiffusionModelsDeepDivePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Diffusion Models Deep Dive">
         <DeeperThought title="Diffusion IS the reverse SDE — and it's the right math for generation" connectedTo="ADR-027 (diffusion models)">
           <p>{"Diffusion models learn to reverse a stochastic differential equation (SDE). Forward: add noise to data (x₀ → x_T). Reverse: denoise (x_T → x₀). The forward SDE is dx = -β(t)x dt + √(2β(t)) dW. The reverse SDE is dx = [-β(t)x - β(t)∇log p(x)] dt + √(2β(t)) dW. The score function ∇log p(x) IS what the neural network learns. Diffusion IS the reverse SDE — the SAME math as Brownian motion, just reversed in time."}</p>
@@ -564,6 +564,7 @@ export function DiffusionModelsDeepDivePage() {
         { id: "gpu-computing" as const, reason: "GPU acceleration for U-Net" },
         { id: "agent-frameworks" as const, reason: "Agents generate via diffusion" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "diffusion-models" as const, reason: "Diffusion overview page" }, { id: "transformer-deep-dive" as const, reason: "Diffusion U-Nets use attention" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("diffusion-models")} className="text-sm text-primary hover:underline">&rarr; Diffusion overview</Link>

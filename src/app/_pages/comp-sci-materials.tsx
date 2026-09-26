@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -297,7 +298,6 @@ export function CompSciMaterialsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Comp Sci Materials">
         <DeeperThought title="Materials science IS the multi-scale problem — and it's the right framing" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"Materials science spans 12 orders of magnitude: quantum (10^-11 m, DFT) → atomistic (10^-9 m, MD) → mesoscale (10^-6 m, phase field) → continuum (10^-3 m, FEM) → structural (1 m, engineering). Each scale needs a different equation: Schrödinger (quantum), Newton (MD), Cahn-Hilliard (phase field), Navier-Stokes (FEM). The platform's thesis applies: the SAME math (PDEs) appears at every scale — just with different parameters and dimensions."}</p>
@@ -315,6 +315,8 @@ export function CompSciMaterialsPage() {
           <p>{"The Materials Project (Berkeley 2011) computed 150,000+ materials via DFT and made the results open. Researchers query the database (not run DFT) to find materials with desired properties. This IS the SAME pattern as UniProt (computed protein structures, open database) and gnomAD (genetic variants, open database). The pattern (compute once → store → query → discover) IS the pattern of modern computational science. The Materials Project IS UniProt for materials."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "transformer" as const, reason: "Continue to transformer — see also from this page" }, { id: "neural-networks" as const, reason: "Continue to neural networks — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("transformer")} className="text-sm text-primary hover:underline">→ Transformer (attention = matmul + softmax)</Link>
         <span className="text-muted-foreground">·</span>

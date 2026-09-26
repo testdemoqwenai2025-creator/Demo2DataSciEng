@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { LivingEquationRunner } from "../_components/living-equation-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -15,7 +16,6 @@ import {
   ResponsiveContainer, Legend,
 } from "recharts";
 import { DeeperThought, DeeperThoughtSection } from "../_components/deeper-thought";
-import { NextSteps } from "../_components/next-steps";
 
 const KPIS = [
   { label: "Dataset", value: "1000-Genomes chr-22 (synthetic)", hint: "200 individuals × 500 SNPs from chromosome 22. Real population labels: AFR (African), EUR (European), EAS (East Asian), SAS (South Asian).", deltaTone: "flat" as const },
@@ -347,9 +347,8 @@ plt.savefig('pca_chr22.png', dpi=150, bbox_inches='tight')
         { id: "bioinformatics" as const, reason: "Bioinformatics — ESM-2 uses SVD on protein embeddings" },
         { id: "connections" as const, reason: "Connections — SVD's cousins (FFT, Entropy, Attention)" },
       ]} />
+      <NextSteps relatedPages={[{ id: "numpy-scipy" as const, reason: "NumPy/SciPy — np.linalg.svd in production" }, { id: "elegant-code" as const, reason: "Elegant Code — the SVD card (cross-disciplinary)" }, { id: "bioinformatics" as const, reason: "Bioinformatics — ESM-2 uses SVD on protein embeddings" }]} />
 
-
-      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See SVD's cousin cards (FFT, Entropy, Attention)" }, { id: "living-fft" as const, reason: "FFT IS the same change-of-basis as SVD" }, { id: "bioinformatics" as const, reason: "ESM-2 uses SVD on protein embeddings" }]} />
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("elegant-code")} className="text-sm text-primary hover:underline">→ Elegant Code (SVD card)</Link>
         <span className="text-muted-foreground">·</span>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -394,7 +395,6 @@ class SecondaryStructurePredictor(nn.Module):
         x = self.head(x)
         return x.transpose(1, 2)  # back to (B, L, 3)
 
-
 # ============================================================
 # 2. Ramachandran plot validation
 # ============================================================
@@ -470,7 +470,6 @@ class RamachandranValidator:
             'percentage_allowed': allowed_count / total * 100 if total > 0 else 0,
         }
 
-
 # ============================================================
 # 3. Enzyme kinetics — Michaelis-Menten + Hill
 # ============================================================
@@ -536,7 +535,6 @@ class EnzymeKinetics:
         
         return vmax.item(), kd.item(), abs(n).item()
 
-
 # ============================================================
 # 4. Glycomics — glycan graph + WURCS canonicalisation
 # ============================================================
@@ -601,7 +599,6 @@ class GlycanGraph:
             bit = hash(f'{a}{pp}{cp}') % n_bits
             fp[bit] = 1
         return fp
-
 
 # ============================================================
 # 5. Lipid class fingerprints
@@ -669,7 +666,6 @@ class LipidFingerprinter:
         intersection = sum(1 for a, b in zip(fp_a, fp_b) if a == 1 and b == 1)
         union = sum(1 for a, b in zip(fp_a, fp_b) if a == 1 or b == 1)
         return intersection / union if union > 0 else 0.0
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -925,7 +921,6 @@ export function MacroStructuresPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Macro Structures">
         <DeeperThought title="Macro Structures IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Macro Structures is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Macro Structures connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Macro Structures sits in the computational-science landscape."}</p>
@@ -958,6 +953,8 @@ export function MacroStructuresPage() {
       </SectionCard>
 
       <RelatedElegantCode cardIndices={[0, 1, 9]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }, { id: "cheminformatics" as const, reason: "Continue to cheminformatics — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (ESM-2 protein encoder)</Link>
         <span className="text-muted-foreground">·</span>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -871,7 +872,6 @@ export function FlinkPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Flink">
         <DeeperThought title="Flink IS event-time processing — and it's the right abstraction" connectedTo="ADR-001 (platform architecture)">
           <p>{"Flink's event-time processing (using the event's timestamp, not the processing time) IS the correct abstraction for streaming. If a Kafka message was produced at 10:00 but processed at 10:05, the 5-minute delay should NOT affect the computation. Event-time + watermarks handle this correctly: process the event AS IF it arrived at 10:00. Processing-time would produce wrong results when backpressure delays messages. Event-time IS to streaming what ACID is to databases — a correctness guarantee."}</p>
@@ -899,6 +899,7 @@ export function FlinkPage() {
         { id: "schema-registry" as const, reason: "Schema Registry — Avro schema evolution for Flink sources" },
         { id: "modern-big-data" as const, reason: "Modern Big Data page — Flink in the broader lakehouse stack" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "streaming" as const, reason: "Streaming overview — Flink vs Spark Streaming vs Kafka Streams" }, { id: "kafka" as const, reason: "Apache Kafka — primary source/sink for Flink pipelines" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("streaming")} className="text-sm text-primary hover:underline">

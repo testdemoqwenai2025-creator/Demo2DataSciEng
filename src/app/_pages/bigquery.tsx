@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -902,7 +903,6 @@ export function BigQueryPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Google BigQuery">
         <DeeperThought title="Google BigQuery IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Google BigQuery is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Google BigQuery connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Google BigQuery sits in the computational-science landscape."}</p>
@@ -930,6 +930,7 @@ export function BigQueryPage() {
         { id: "databricks" as const, reason: "BigQuery vs Databricks + Unity" },
         { id: "tableau" as const, reason: "BI Engine accelerates Looker/Tableau dashboards" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "redshift" as const, reason: "Sibling cloud warehouse (AWS)" }, { id: "clickhouse" as const, reason: "Self-hosted OLAP (open-source)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("redshift")} className="text-sm text-primary hover:underline">

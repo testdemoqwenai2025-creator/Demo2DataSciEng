@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -427,7 +428,6 @@ class ProteinEncoder(nn.Module):
         pooled = x[:, 0]
         return x, pooled
 
-
 # ============================================================
 # 2. AlphaFold2-derived structure module (simplified from ADR-036)
 # ============================================================
@@ -457,7 +457,6 @@ class StructureAwareFeatures(nn.Module):
     def forward(self, residue_embeddings: torch.Tensor) -> torch.Tensor:
         """Predict structure features from per-residue embeddings."""
         return self.head(residue_embeddings)
-
 
 # ============================================================
 # 3. Variant representation — wild-type + mutant embedding pair
@@ -508,7 +507,6 @@ class VariantEmbedder(nn.Module):
             'delta_at_position': delta_at_position,
         }
 
-
 # ============================================================
 # 4. AlphaMissense classifier head
 # ============================================================
@@ -553,7 +551,6 @@ class AlphaMissenseHead(nn.Module):
         x = torch.cat([wild_emb_at_pos, mut_emb_at_pos, delta_at_pos, structure_features], dim=-1)
         logit = self.head(x).squeeze(-1)
         return torch.sigmoid(logit)
-
 
 # ============================================================
 # 5. Full AlphaMissense model
@@ -633,7 +630,6 @@ class AlphaMissense(nn.Module):
         
         return scores
 
-
 # ============================================================
 # 6. ACMG classification + ClinVar calibration
 # ============================================================
@@ -651,7 +647,6 @@ def classify_variant(score: float) -> str:
         return "Likely Benign"
     else:
         return "VUS (Uncertain Significance)"
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -928,6 +923,7 @@ export function AlphaMissensePage() {
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedElegantCode hostPage={"alphamissense" as never} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "See Bayes's cousin cards in the cross-disciplinary graph" }, { id: "tabular" as const, reason: "Gradient Descent (Gradient Descent IS the learning rule) — same math, ML domain" }, { id: "bioinformatics-pipelines" as const, reason: "Poisson (Poisson IS the law of rare events) — same math, sequencing domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("genetic-materials")} className="text-sm text-primary hover:underline">→ Genetic Materials (variant calling)</Link>

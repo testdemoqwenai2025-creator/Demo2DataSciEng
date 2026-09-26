@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -220,7 +221,6 @@ def real_spherical_harmonics(pos: torch.Tensor, max_l: int = 3) -> Dict[int, tor
         harmonics[l] = Y
     return harmonics
 
-
 # ============================================================
 # 2. Clebsch-Gordan tensor product layer (MACE-style)
 # ============================================================
@@ -290,7 +290,6 @@ class CGTensorProduct(nn.Module):
         
         return results
 
-
 # ============================================================
 # 3. SchNet interaction block (baseline)
 # ============================================================
@@ -343,7 +342,6 @@ class SchNetInteraction(nn.Module):
         out = torch.zeros_like(h)
         out.index_add_(0, dst, msg)
         return h + self.lin(out)
-
 
 # ============================================================
 # 4. NequIP equivariant layer (E(3)-equivariant)
@@ -406,7 +404,6 @@ class NequIPLayer(nn.Module):
                 msg.index_add_(0, dst, scalar_msg)
         
         return h + self.scalar_mix(msg)
-
 
 # ============================================================
 # 5. MACE model (higher-order CG, body-order 4)
@@ -492,7 +489,6 @@ class MACEModel(nn.Module):
         forces = -torch.autograd.grad(e2, positions, create_graph=True)[0]
         
         return {'energy': energy, 'forces': forces}
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -646,7 +642,6 @@ export function NeuralNetworkPotentialsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Neural Network Potentials">
         <DeeperThought title="Neural Network Potentials IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Neural Network Potentials is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Neural Network Potentials connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Neural Network Potentials sits in the computational-science landscape."}</p>
@@ -664,6 +659,8 @@ export function NeuralNetworkPotentialsPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "molecular-modelling" as const, reason: "Continue to molecular modelling — see also from this page" }, { id: "alphaproteo" as const, reason: "Continue to alphaproteo — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("molecular-modelling")} className="text-sm text-primary hover:underline">→ Molecular Modelling (AMBER — the hand-crafted precursor)</Link>
         <span className="text-muted-foreground">·</span>

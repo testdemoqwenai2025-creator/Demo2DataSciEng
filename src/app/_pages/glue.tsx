@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -775,7 +776,6 @@ export function GluePage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="AWS Glue">
         <DeeperThought title="AWS Glue IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about AWS Glue is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. AWS Glue connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where AWS Glue sits in the computational-science landscape."}</p>
@@ -803,6 +803,7 @@ export function GluePage() {
         { id: "streaming" as const, reason: "Glue Schema Registry + MSK + Kinesis for streaming" },
         { id: "snowflake" as const, reason: "Snowflake Polar Federation can query Glue catalog" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "iceberg" as const, reason: "Open table format — Glue serves as Iceberg catalog" }, { id: "data-lakehouse" as const, reason: "Anchor concept page — lake→lakehouse evolution" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("iceberg")} className="text-sm text-primary hover:underline">

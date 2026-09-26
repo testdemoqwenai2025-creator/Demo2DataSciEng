@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -245,7 +246,6 @@ class NeuralODE(nn.Module):
         pred = self.integrate(x0, t_span, n_steps=x_true.shape[1]-1)
         return F.mse_loss(pred, x_true)
 
-
 # ============================================================
 # 2. Metadynamics simulator
 # ============================================================
@@ -296,7 +296,6 @@ class MetadynamicsSimulator:
         bias = torch.tensor([self.compute_bias(cv.unsqueeze(0) if cv.dim()==0 else cv).item() 
                             for cv in cv_values])
         return -bias / (1 - 1/self.gamma)
-
 
 # ============================================================
 # 3. MSM estimator
@@ -364,7 +363,6 @@ class MSMEstimator:
             v = v / v.sum()
         return v
 
-
 # ============================================================
 # 4. TICA — Time-lagged Independent Component Analysis
 # ============================================================
@@ -430,7 +428,6 @@ class TICA:
         if self.eigenvectors is None:
             raise ValueError("Must call fit() first")
         return trajectory @ self.eigenvectors
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -563,7 +560,6 @@ export function EnhancedSamplingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Enhanced Sampling">
         <DeeperThought title="Enhanced sampling IS the explore-exploit trade-off — and it's multi-armed bandit" connectedTo="ADR-006 (RL agentic)">
           <p>{"MD simulations get stuck in local minima (exploit). Enhanced sampling methods (metadynamics, replica exchange, umbrella sampling) push the simulation to explore new minima. This IS the explore-exploit trade-off from RL. Replica exchange (run N simulations at different temperatures, swap) IS the multi-armed bandit: high-T replicas explore, low-T replicas exploit. Thompson sampling IS Bayesian enhanced sampling. The math (explore vs exploit) IS the same."}</p>
@@ -581,6 +577,8 @@ export function EnhancedSamplingPage() {
           <p>{"Enhanced sampling generates the trajectories (exploration). MSMs analyse the trajectories (understanding). Together, they form the complete picture: explore the free-energy landscape, then model the kinetics. This IS the fold pattern: enhanced sampling IS the 'brief' (generate data), MSMs ARE the 'deeper thought' (understand the data). The two are complementary — one generates, one analyses. The pattern (generate + analyse) IS the same as ML training (forward pass) + evaluation (metrics)."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "molecular-modelling" as const, reason: "Continue to molecular modelling — see also from this page" }, { id: "neural-network-potentials" as const, reason: "Continue to neural network potentials — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("molecular-modelling")} className="text-sm text-primary hover:underline">→ Molecular Modelling (AMBER + Verlet — the base)</Link>
         <span className="text-muted-foreground">·</span>

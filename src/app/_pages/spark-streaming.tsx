@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -963,7 +964,6 @@ export function SparkStreamingPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Spark Structured Streaming">
         <DeeperThought title="Spark Structured Streaming IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Spark Structured Streaming is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Spark Structured Streaming connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Spark Structured Streaming sits in the computational-science landscape."}</p>
@@ -991,6 +991,7 @@ export function SparkStreamingPage() {
         { id: "modern-big-data" as const, reason: "Modern Big Data — Spark Streaming in the lakehouse stack" },
         { id: "data-lakehouse" as const, reason: "Data Lakehouse — Bronze tier via Structured Streaming" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "streaming" as const, reason: "Streaming overview — Spark Streaming in the broader ecosystem" }, { id: "flink" as const, reason: "Apache Flink — sibling streaming engine (true streaming)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("streaming")} className="text-sm text-primary hover:underline">

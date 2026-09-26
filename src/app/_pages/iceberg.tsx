@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -946,7 +947,6 @@ export function IcebergPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Iceberg">
         <DeeperThought title="Iceberg IS the open table format — and it won the catalog war" connectedTo="ADR-013 (Delta Lake)">
           <p>{"Apache Iceberg (Netflix 2017) is an open table format that brings ACID transactions, schema evolution, and time travel to S3/ADLS/GCS. Unlike Delta Lake (Databricks-controlled) or Hudi (LinkedIn-controlled), Iceberg is community-governed (Apache). The catalog war (2024): Tabular (founded by Iceberg creators) was acquired by Snowflake. Databricks lost the bidding. Unity Catalog now supports Iceberg. The format IS open; the catalogs are competitive. The pattern (open format + closed catalog) IS the same as Kafka (open protocol + Confluent Cloud)."}</p>
@@ -974,6 +974,7 @@ export function IcebergPage() {
         { id: "arrow" as const, reason: "Parquet = columnar file format underneath Iceberg" },
         { id: "streaming" as const, reason: "Flink + Kafka CDC → Iceberg streaming writes" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "data-lakehouse" as const, reason: "Anchor concept page — lake→lakehouse evolution" }, { id: "delta-lake" as const, reason: "Sibling open table format (Databricks)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("data-lakehouse")} className="text-sm text-primary hover:underline">

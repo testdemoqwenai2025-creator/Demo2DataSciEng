@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { Terminal } from "lucide-react";
 import { InlineCode } from "../_components/code-block";
@@ -219,7 +220,6 @@ export function EvolutionPage() {
         </p>
       </SectionCard>
 
-
       {/* Pyodide — version-diff simulator */}
       <SectionCard
         title="Try it: Platform version-diff simulator (Pyodide)"
@@ -232,7 +232,6 @@ export function EvolutionPage() {
           buttonLabel="Run version-diff simulator (Pyodide)"
         />
       </SectionCard>
-
 
       <DeeperThoughtSection pageTitle="Evolution Timeline">
         <DeeperThought title="Evolution Timeline IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
@@ -251,6 +250,8 @@ export function EvolutionPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "research" as const, reason: "Continue to research — see also from this page" }, { id: "dashboard" as const, reason: "Continue to dashboard — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("research")} className="text-sm text-primary hover:underline">
           → Academic foundations (Research)

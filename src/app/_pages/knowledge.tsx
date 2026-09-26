@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SectionCard, PageHeader } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { InlineCode } from "../_components/code-block";
 import { ADRS, PATTERNS, TRADEOFFS } from "../_data/synthetic";
 import { hrefFor } from "../_lib/router";
@@ -268,7 +269,6 @@ export function KnowledgePage() {
         </div>
       </SectionCard>
 
-
       {/* Pyodide — ADR structure validator */}
       <SectionCard
         title="Try it: ADR structure validator (Pyodide)"
@@ -343,7 +343,6 @@ print("=" * 60)`}
         </p>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Knowledge Hub">
         <DeeperThought title="Knowledge Hub IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Knowledge Hub is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Knowledge Hub connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Knowledge Hub sits in the computational-science landscape."}</p>
@@ -361,6 +360,8 @@ print("=" * 60)`}
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "research" as const, reason: "Continue to research — see also from this page" }, { id: "evolution" as const, reason: "Continue to evolution — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("research")} className="text-sm text-primary hover:underline">
           → See the academic foundations (Research page)

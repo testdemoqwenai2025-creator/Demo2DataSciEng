@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -284,6 +285,7 @@ print("(ADS-B, 1s updates) and allele frequencies (1000-Genomes, per-gen updates
         { id: "space-science" as const, reason: "Space Science — Euler satellite propagation ↔ maritime Kalman tracking" },
         { id: "systems-biology" as const, reason: "Systems Biology — PageRank for gene essentiality ↔ port centrality" },
       ]} />
+      <NextSteps relatedPages={[{ id: "systems-biology" as const, reason: "PageRank (PageRank IS the universal centrality equation) — same math, fintech domain" }, { id: "fintech" as const, reason: "Monte Carlo (Monte Carlo IS the universal estimation equation) — same math, fintech domain" }, { id: "bioinformatics-pipelines" as const, reason: "Poisson (Poisson IS the law of rare events) — same math, sequencing domain" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("fintech")} className="text-sm text-primary hover:underline">→ Fintech (Black-Scholes, Kelly, VaR, GBM, Monte Carlo)</Link>

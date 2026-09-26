@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -580,7 +581,6 @@ class MSAParser:
                     one_hot[i, j, self.aa_to_idx[aa]] = 1.0
         return one_hot
 
-
 # ============================================================
 # 2. Frequency Computation Layer
 # ============================================================
@@ -622,7 +622,6 @@ class FrequencyLayer(nn.Module):
         
         return f_i, f_ij
 
-
 # ============================================================
 # 3. Mutual Information Computation
 # ============================================================
@@ -658,7 +657,6 @@ class MutualInformationLayer(nn.Module):
         mi = mi - torch.diag_embed(torch.diagonal(mi))
         
         return mi
-
 
 # ============================================================
 # 4. Mean-field DCA — J = -(C^{-1})
@@ -787,7 +785,6 @@ class MeanFieldDCA(nn.Module):
         apc_scores = self.apply_apc(scores)
         return apc_scores
 
-
 # ============================================================
 # 5. Contact Predictor — extract top-k contacts from DCA scores
 # ============================================================
@@ -851,7 +848,6 @@ class ContactPredictor(nn.Module):
         f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
         
         return {'precision': precision, 'recall': recall, 'f1': f1}
-
 
 # ============================================================
 # 6. Attention-as-DCA Comparison
@@ -945,7 +941,6 @@ class AttentionAsDCA(nn.Module):
             'attention_scores': attn,
             'comparison': comparison,
         }
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1279,7 +1274,6 @@ export function CoevolutionDCAPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Coevolution Dca">
         <DeeperThought title="Co-evolution IS the correlation matrix — and DCA finds the contacts" connectedTo="ADR-024 (transformer deep dive)">
           <p>{"Direct Coupling Analysis (DCA) computes a correlation matrix from a Multiple Sequence Alignment (MSA). Co-evolving residues (positions that mutate together) are in physical contact. DCA's insight: the direct correlation (contact) is hidden behind indirect correlations (transitive chains). DCA uses the inverse covariance matrix (precision matrix) to find DIRECT contacts — the SAME math as Gaussian graphical models. DCA IS the precision matrix for protein contacts."}</p>
@@ -1297,6 +1291,8 @@ export function CoevolutionDCAPage() {
           <p>{"DCA estimates the precision matrix using pseudo-likelihood maximization (PLM). PLM is a regularized estimator that avoids the N >> M problem (more positions than sequences). This IS the SAME pattern as Lasso regression (L1 regularization for high-dimensional problems). PLM IS Lasso for precision matrices — the math (regularized maximum likelihood) IS the same. DCA IS regularized estimation for contact prediction."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "bioinformatics" as const, reason: "Continue to bioinformatics — see also from this page" }, { id: "macro-structures" as const, reason: "Continue to macro structures — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("bioinformatics")} className="text-sm text-primary hover:underline">→ Bioinformatics (ESM-2 — uses the same MSA)</Link>
         <span className="text-muted-foreground">·</span>

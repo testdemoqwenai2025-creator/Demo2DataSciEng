@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1018,7 +1019,6 @@ print(f"Best val_acc: {results.best_metrics['val_acc']:.4f}")`}
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Dask Ray">
         <DeeperThought title="Dask IS pandas at scale — and it's the right abstraction" connectedTo="ADR-001 (platform architecture)">
           <p>{"Dask's DataFrame API mirrors Pandas — groupby, merge, join, filter. The difference: Dask partitions the DataFrame into chunks and processes them in parallel across a cluster. A 100GB DataFrame that doesn't fit in memory becomes 100 1GB partitions that fit. The user writes the SAME Pandas code; Dask handles the parallelism. Dask IS Pandas with a distributed backend — the same pattern as NumPy with a GPU backend."}</p>
@@ -1046,6 +1046,7 @@ print(f"Best val_acc: {results.best_metrics['val_acc']:.4f}")`}
         { id: "mlflow-deep-dive" as const, reason: "Ray Tune integrates with MLflow for HPO tracking" },
         { id: "spark-streaming" as const, reason: "Spark vs Dask for streaming workloads" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "numpy-scipy" as const, reason: "Dask.array = distributed NumPy" }, { id: "gpu-computing" as const, reason: "Ray Train scales to multi-GPU clusters" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("numpy-scipy")} className="text-sm text-primary hover:underline">

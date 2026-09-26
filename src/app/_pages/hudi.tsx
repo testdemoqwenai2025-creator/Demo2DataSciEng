@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -846,7 +847,6 @@ export function HudiPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Apache Hudi">
         <DeeperThought title="Apache Hudi IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Apache Hudi is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Apache Hudi connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Apache Hudi sits in the computational-science landscape."}</p>
@@ -874,6 +874,7 @@ export function HudiPage() {
         { id: "databricks" as const, reason: "Spark as a compute engine for Hudi" },
         { id: "arrow" as const, reason: "Parquet = columnar file format underneath Hudi" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "iceberg" as const, reason: "Sibling open table format (Netflix origin, analytics-first)" }, { id: "delta-lake" as const, reason: "Sibling open table format (Databricks origin)" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("iceberg")} className="text-sm text-primary hover:underline">

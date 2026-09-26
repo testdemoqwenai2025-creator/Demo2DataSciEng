@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -306,7 +307,6 @@ class SinkhornDistance(nn.Module):
             return W.mean()
         return W
 
-
 # ============================================================
 # 2. Equivariant Diffusion Model (EDM) for 3D molecule generation
 # ============================================================
@@ -436,7 +436,6 @@ class EDMDenoiser(nn.Module):
         
         return x
 
-
 # ============================================================
 # 3. GFlowNet — reward-matched molecular design
 # ============================================================
@@ -524,7 +523,6 @@ class GFlowNet(nn.Module):
                 state = torch.cat([state, action.unsqueeze(0)], dim=1)
             samples.append(state)
         return torch.nn.utils.rnn.pad_sequence(samples, batch_first=True)
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -658,7 +656,6 @@ export function GenerativeChemistry2Page() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Generative Chemistry 2.0">
         <DeeperThought title="Generative Chemistry 2.0 IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Generative Chemistry 2.0 is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Generative Chemistry 2.0 connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Generative Chemistry 2.0 sits in the computational-science landscape."}</p>
@@ -676,6 +673,8 @@ export function GenerativeChemistry2Page() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "cheminformatics" as const, reason: "Continue to cheminformatics — see also from this page" }, { id: "ai-drug-discovery" as const, reason: "Continue to ai drug discovery — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("cheminformatics")} className="text-sm text-primary hover:underline">→ Cheminformatics (ECFP + Tanimoto — the 2D baseline)</Link>
         <span className="text-muted-foreground">·</span>

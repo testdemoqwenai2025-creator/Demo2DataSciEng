@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -486,7 +487,6 @@ class AtomTypeEmbedding(nn.Module):
         """
         return self.embedding(atom_types)
 
-
 # ============================================================
 # 2. MSA encoder — per-residue features from alignment
 # ============================================================
@@ -534,7 +534,6 @@ class MSAEncoder(nn.Module):
         x = x.reshape(B, M, L, -1).mean(dim=1)  # (B, L, hidden)
         return x
 
-
 # ============================================================
 # 3. Pair representation — residue-residue features
 # ============================================================
@@ -567,7 +566,6 @@ class PairRepresentation(nn.Module):
         outer = torch.einsum('bid,bjc->bijd', proj, proj)  # (B, L, L, H/2 * H/2)
         # Project back to hidden_dim
         return outer.reshape(B, L, L, -1)
-
 
 # ============================================================
 # 4. Diffusion structure module — SE(3)-equivariant
@@ -687,7 +685,6 @@ class BoltzStructureModule(nn.Module):
             return x, torch.stack(intermediate)
         return x
 
-
 class IPALayer(nn.Module):
     """Invariant Point Attention layer (AlphaFold2/Boltz-1).
     
@@ -754,7 +751,6 @@ class IPALayer(nn.Module):
         
         return h, coords
 
-
 # ============================================================
 # 5. Confidence head — pLDDT + ipTM
 # ============================================================
@@ -798,7 +794,6 @@ class ConfidenceHead(nn.Module):
         contact = self.contact_head(pair_h).squeeze(-1)  # (B, N, N)
         
         return {'plddt': plddt, 'contact': contact}
-
 
 # ============================================================
 # 6. Full Boltz-1 model
@@ -870,7 +865,6 @@ class Boltz1(nn.Module):
         if save_intermediate:
             out['intermediate'] = intermediate
         return out
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -1088,7 +1082,6 @@ export function BoltzPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Boltz">
         <DeeperThought title="Boltz IS the open-source protein structure predictor — and it's the right model" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
           <p>{"Boltz (2024) is an open-source protein structure predictor that rivals AlphaFold2. It uses the SAME attention + diffusion architecture — but with open weights and MIT license. The math (Attention + diffusion + SE(3)-equivariance) IS the same. The difference: AlphaFold2 is proprietary (DeepMind); Boltz is open (community). The fold absorbs the implementation; the math stays. Boltz IS the open AlphaFold2."}</p>
@@ -1106,6 +1099,8 @@ export function BoltzPage() {
           <p>{"AlphaFold2's license restricts commercial use. Boltz's MIT license allows everything. This IS the SAME pattern as open-source vs proprietary software: open enables innovation (researchers build on it), proprietary captures revenue (the owner monetizes). The pattern (open format + paid service) IS the same as Iceberg (open format) + Tabular (paid catalog). Boltz's MIT license IS the open-format strategy for protein structure prediction."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "molecular-modelling" as const, reason: "Continue to molecular modelling — see also from this page" }, { id: "macro-structures" as const, reason: "Continue to macro structures — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("molecular-modelling")} className="text-sm text-primary hover:underline">→ Molecular Modelling (AlphaFold3 SE(3)-equivariance)</Link>
         <span className="text-muted-foreground">·</span>

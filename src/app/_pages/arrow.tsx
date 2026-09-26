@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { MultiLangSamples } from "../_components/multi-lang-samples";
 import { PyodideRunner } from "../_components/pyodide-runner";
@@ -395,7 +396,6 @@ print(f"Received {total_rows} rows via Arrow Flight (columnar binary, 10x faster
         />
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Arrow">
         <DeeperThought title="Arrow IS the columnar memory format — and it's the universal data interchange" connectedTo="ADR-022 (pgvector for variant embeddings)">
           <p>{"Apache Arrow's columnar format IS the lingua franca of data engineering. Every modern analytics engine (Spark, Databricks, Snowflake, DuckDB, Pandas) reads/writes Arrow in-memory. The columnar layout (values stored contiguously per column, not per row) enables vectorized SIMD execution — 10x faster than row-oriented processing. Arrow IS to data what UTF-8 is to text: a universal interchange format that eliminates serialization overhead between systems."}</p>
@@ -413,6 +413,8 @@ print(f"Received {total_rows} rows via Arrow Flight (columnar binary, 10x faster
           <p>{"NumPy defined the N-dimensional array (ndarray) as the universal data structure for ML. Arrow defines the columnar table (RecordBatch) as the universal data structure for analytics. Both are: (1) memory-contiguous, (2) language-agnostic, (3) zero-copy, (4) SIMD-vectorized. NumPy IS for tensors; Arrow IS for tables. The pattern (define the in-memory format → every tool adopts it → zero-copy between tools) IS the same. Arrow IS NumPy for data engineering."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "duckdb" as const, reason: "Continue to duckdb — see also from this page" }, { id: "modern-big-data" as const, reason: "Continue to modern big data — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("duckdb")} className="text-sm text-primary hover:underline">
           → DuckDB (Arrow-native OLAP)

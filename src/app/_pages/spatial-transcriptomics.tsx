@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { ImageModal } from "../_components/image-modal";
@@ -467,7 +468,6 @@ class MERFISHDecoder:
         best_dist = dist.gather(1, best_gene.unsqueeze(1)).squeeze(1)  # (B,)
         return best_gene, best_dist
 
-
 # ============================================================
 # 2. U-Net — cell segmentation
 # ============================================================
@@ -488,7 +488,6 @@ class DoubleConv(nn.Module):
     def forward(self, x):
         return self.conv(x)
 
-
 class DownBlock(nn.Module):
     """MaxPool → DoubleConv (encoder path)."""
     def __init__(self, in_ch: int, out_ch: int):
@@ -498,7 +497,6 @@ class DownBlock(nn.Module):
     
     def forward(self, x):
         return self.conv(self.pool(x))
-
 
 class UpBlock(nn.Module):
     """ConvTranspose2d → concat skip → DoubleConv (decoder path)."""
@@ -516,7 +514,6 @@ class UpBlock(nn.Module):
         # Concat along channel dim (skip connection — the U in U-Net)
         x = torch.cat([skip, x], dim=1)
         return self.conv(x)
-
 
 class UNet(nn.Module):
     """U-Net for cell segmentation on DAPI-stained nuclei images.
@@ -564,7 +561,6 @@ class UNet(nn.Module):
         # Output: per-pixel logits
         return self.outc(x)
 
-
 # ============================================================
 # 3. STAGATE — Spatial domain detection via graph attention autoencoder
 # ============================================================
@@ -609,7 +605,6 @@ class SpatialGraphConvolution(nn.Module):
         out.index_add_(0, dst, msg)
         out = out.mean(dim=1)  # average over heads: (N, out_dim)
         return out
-
 
 class STAGATE(nn.Module):
     """STAGATE (Dong 2022) — Spatial Transcriptomics graph ATtention AutoEncoder.
@@ -656,7 +651,6 @@ class STAGATE(nn.Module):
             x_prev = latent
         recon = self.decoder(latent)
         return {'latent': latent, 'recon': recon}
-
 
 # ============================================================
 # 4. NicheNet — ligand-receptor cell-cell communication
@@ -714,7 +708,6 @@ class NicheNet(nn.Module):
         score = (pred_norm * obs_norm).mean()
         
         return {'predicted_change': predicted_change, 'score': score}
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -960,7 +953,6 @@ export function SpatialTranscriptomicsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Spatial Transcriptomics">
         <DeeperThought title="Spatial Transcriptomics IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Spatial Transcriptomics is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Spatial Transcriptomics connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Spatial Transcriptomics sits in the computational-science landscape."}</p>
@@ -978,6 +970,8 @@ export function SpatialTranscriptomicsPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "systems-biology" as const, reason: "Continue to systems biology — see also from this page" }, { id: "genetic-materials" as const, reason: "Continue to genetic materials — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("systems-biology")} className="text-sm text-primary hover:underline">→ Systems Biology (multi-omics integration)</Link>
         <span className="text-muted-foreground">·</span>

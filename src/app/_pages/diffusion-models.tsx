@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { hrefFor } from "../_lib/router";
@@ -426,7 +427,6 @@ class SinusoidalTimeEmbedding(nn.Module):
         emb = torch.cat([torch.sin(args), torch.cos(args)], dim=-1)  # (B, dim)
         return emb
 
-
 class ConvBlock(nn.Module):
     """Conv → GroupNorm → SiLU → Conv → GroupNorm → SiLU.
     Time embedding injected via a linear projection added to the norm.
@@ -457,7 +457,6 @@ class ConvBlock(nn.Module):
         h = F.silu(h)
         return h + self.skip(x)
 
-
 class DownBlock(nn.Module):
     """ConvBlock → ConvBlock → MaxPool (downsample by 2)."""
     def __init__(self, in_ch, out_ch, time_dim):
@@ -470,7 +469,6 @@ class DownBlock(nn.Module):
         h = self.block1(x, t_emb)
         h = self.block2(h, t_emb)
         return self.down(h), h  # return pre-pool for skip connection
-
 
 class UpBlock(nn.Module):
     """Upsample → ConvBlock(skip + up) → ConvBlock."""
@@ -492,7 +490,6 @@ class UpBlock(nn.Module):
         x = self.block1(x, t_emb)
         x = self.block2(x, t_emb)
         return x
-
 
 class UNet(nn.Module):
     """U-Net for DDPM noise prediction.
@@ -552,7 +549,6 @@ class UNet(nn.Module):
         x = self.up3(x, skip2, t_emb)  # 64ch, 32×32
         x = self.up4(x, skip1, t_emb)  # 64ch, 64×64
         return self.out(x)  # (B, in_channels, H, W) — predicted noise
-
 
 # ============================================================
 # DDPM: forward process, training, and sampling
@@ -630,7 +626,6 @@ class DDPM:
                     x = mean
             return x  # x_0 — the generated sample
 
-
 # ============================================================
 # DDIM: 10-50x faster sampling (deterministic + non-Markovian)
 # ============================================================
@@ -678,7 +673,6 @@ class DDIM:
                     x = x + sigma * torch.randn_like(x)
             return x
 
-
 # ============================================================
 # Classifier-free guidance — conditional generation
 # ============================================================
@@ -696,7 +690,6 @@ def classifier_free_guidance(model, x, t, cond, uncond, w=7.5):
     eps_uncond = model(x, t, uncond)
     eps_cond = model(x, t, cond)
     return eps_uncond + w * (eps_cond - eps_uncond)
-
 
 # Sanity check
 if __name__ == "__main__":
@@ -892,7 +885,6 @@ export function DiffusionModelsPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Diffusion Models">
         <DeeperThought title="Diffusion Models IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Diffusion Models is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Diffusion Models connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Diffusion Models sits in the computational-science landscape."}</p>
@@ -910,6 +902,8 @@ export function DiffusionModelsPage() {
           <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "computer-vision" as const, reason: "Continue to computer vision — see also from this page" }, { id: "transformer" as const, reason: "Continue to transformer — see also from this page" }]} />
+
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("computer-vision")} className="text-sm text-primary hover:underline">→ Computer Vision (ViT for encoding generated images)</Link>
         <span className="text-muted-foreground">·</span>

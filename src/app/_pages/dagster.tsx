@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -1243,7 +1244,6 @@ export function DagsterPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Dagster">
         <DeeperThought title="Dagster IS typed data orchestration — and types ARE the insight" connectedTo="ADR-001 (platform architecture)">
           <p>{"Dagster's core abstraction IS the software-defined asset (SDA) — a typed, versioned, lineage-tracked data artifact. Unlike Airflow's DAG (which is just a task graph), Dagster's SDA knows its type (DataFrame, Table, ML model), its upstream dependencies, and its materialisation history. This IS the SAME insight as TypeScript: types catch errors at compile time instead of runtime. Dagster IS TypeScript for data pipelines — the type system prevents the 'wrong data format' bug that costs data teams 20% of their time."}</p>
@@ -1271,6 +1271,7 @@ export function DagsterPage() {
         { id: "iceberg" as const, reason: "Iceberg snapshots + Dagster partitions are both versioning models" },
         { id: "data-mesh" as const, reason: "Dagster's asset graph enables data-mesh domain ownership" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "orchestration" as const, reason: "Anchor concept page — orchestration layer overview" }, { id: "airflow" as const, reason: "DAG-oriented predecessor — same pipeline in Airflow" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("orchestration")} className="text-sm text-primary hover:underline">

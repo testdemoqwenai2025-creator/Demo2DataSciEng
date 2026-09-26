@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
+import { NextSteps } from "../_components/next-steps";
 import { CodeBlock, InlineCode } from "../_components/code-block";
 import { PyodideRunner } from "../_components/pyodide-runner";
 import { RelatedTopics } from "../_components/related-topics";
@@ -957,7 +958,6 @@ export function KafkaConnectPage() {
         </div>
       </SectionCard>
 
-
       <DeeperThoughtSection pageTitle="Kafka Connect + Debezium">
         <DeeperThought title="Kafka Connect + Debezium IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
           <p>{"This page about Kafka Connect + Debezium is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Kafka Connect + Debezium connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Kafka Connect + Debezium sits in the computational-science landscape."}</p>
@@ -985,6 +985,7 @@ export function KafkaConnectPage() {
         { id: "data-lakehouse" as const, reason: "Lakehouse as the sink layer" },
         { id: "databricks" as const, reason: "Spark Structured Streaming + Kafka" },
       ]} />
+      <NextSteps relatedPages={[{ id: "connections" as const, reason: "Trace this topic's connections across the platform's math graph" }, { id: "streaming" as const, reason: "Kafka as the lakehouse CDC bus" }, { id: "schema-registry" as const, reason: "Schema Registry — the type system for CDC" }]} />
 
       <div className="flex flex-wrap gap-2">
         <Link href={hrefFor("streaming")} className="text-sm text-primary hover:underline">
