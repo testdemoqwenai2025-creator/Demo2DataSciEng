@@ -14,6 +14,7 @@ import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
 import { SkillConstellation } from "./skill-constellation";
 import { FoldSection, EquationFamilyFold, DeeperMathFold, ProductionPatternsFold, CitationsFold, ExpectedOutputFold } from "./fold-section";
+import { CardComparisonFold } from "./card-comparison-fold";
 
 /**
  * DatasetCards — reusable cards-with-lazy-popups component for showing
@@ -639,6 +640,7 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
                   <ProductionPatternsFold cardIndex={openIdx} />
                   <ExpectedOutputFold cardIndex={openIdx} />
                   <CitationsFold cardIndex={openIdx} />
+                  <CardComparisonFold cardIndex={openIdx} />
                 </div>
               ) : null;
             })()}

@@ -6,6 +6,7 @@ import { ELEGANT_CODE_CARDS } from "./_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, BookOpen, Search, X } from "lucide-react";
+import { THOUGHT_COUNTS } from "../_lib/thought-counts";
 
 /**
  * DeeperThoughtsIndex — collects ALL deeper thoughts across the platform's
@@ -152,6 +153,16 @@ export function DeeperThoughtsIndex() {
                 </div>
                 <p className="text-[10px] text-muted-foreground mb-1">
                   On: <span className="font-mono">{thought.pageUrl}</span> ({thought.page})
+                  {(() => {
+                    // Look up thought count from the THOUGHT_COUNTS map.
+                    const pageId = thought.pageUrl === "/" ? "home" : thought.pageUrl.replace(/^\//, "");
+                    const count = THOUGHT_COUNTS[pageId];
+                    return count ? (
+                      <span className="ml-1.5 inline-flex items-center gap-0.5 text-[8px] px-1 py-0 rounded-full bg-primary/15 text-primary font-mono">
+                        {count} thoughts
+                      </span>
+                    ) : null;
+                  })()}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
                   {thought.content}
