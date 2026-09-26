@@ -990,21 +990,21 @@ export function LineagePage() {
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Data Lineage">
-        <DeeperThought title="Data Lineage IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Data Lineage is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Data Lineage connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Data Lineage sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Lineage">
+        <DeeperThought title="Lineage IS the dependency graph — and it's git blame for data" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Data lineage tracks: table A depends on table B depends on table C. When table C breaks, lineage tells you all downstream tables affected. This IS the SAME pattern as git blame (which file caused this bug?) and Make's dependency graph (which targets depend on this source?). The lineage graph IS a DAG (directed acyclic graph) — the SAME structure as dbt's DAG, Airflow's DAG, and Make's dependency tree. Lineage IS git blame for data."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Data Lineage) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="OpenLineage IS the open standard — and it's the right design" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"OpenLineage (open standard for lineage) defines events: job started, job completed, dataset created, dataset read. Each event has metadata (run ID, inputs, outputs, facets). This IS the SAME pattern as OpenTelemetry for distributed tracing (span started, span completed, attributes). OpenLineage IS OpenTelemetry for data — the same event-driven, vendor-neutral, standards-based approach. The pattern (events + metadata + open API) IS the same."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Column-level lineage IS field-level dependency — and it's more useful than table-level" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Table-level lineage says 'dashboard depends on table A.' Column-level lineage says 'dashboard's revenue column depends on table A's price column and table B's quantity column.' When price changes, you know exactly which dashboard cells are affected. This IS the SAME upgrade as git diff (file-level → line-level). Column-level lineage IS git diff for data."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Lineage + impact analysis IS the blast radius — and it's the right question" connectedTo="ADR-013 (Delta Lake)">
+          <p>{"When a source table changes schema, the blast radius IS the set of all downstream tables/dashboards/ML models that depend on it. Lineage + impact analysis computes this set. This IS the SAME question as 'what services depend on this microservice?' in service mesh. The blast radius IS the dependency fanout. The math (graph reachability from a node) IS the same. Impact analysis IS reachability for data graphs."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Lineage IS the audit trail — and it's the compliance requirement" connectedTo="ADR-001 (platform architecture)">
+          <p>{"GDPR Article 30 requires data processing records. Lineage IS the processing record: this PII column came from source X, was transformed by job Y, and feeds dashboard Z. When a user requests data deletion (Article 17), lineage tells you exactly which tables to purge. Lineage IS the compliance API for data — the audit trail that proves you know where every column came from and where it goes."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[

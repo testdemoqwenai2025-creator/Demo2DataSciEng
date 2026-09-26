@@ -396,21 +396,21 @@ print(f"Received {total_rows} rows via Arrow Flight (columnar binary, 10x faster
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Apache Arrow">
-        <DeeperThought title="Apache Arrow IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Apache Arrow is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Apache Arrow connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Apache Arrow sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Arrow">
+        <DeeperThought title="Arrow IS the columnar memory format — and it's the universal data interchange" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Apache Arrow's columnar format IS the lingua franca of data engineering. Every modern analytics engine (Spark, Databricks, Snowflake, DuckDB, Pandas) reads/writes Arrow in-memory. The columnar layout (values stored contiguously per column, not per row) enables vectorized SIMD execution — 10x faster than row-oriented processing. Arrow IS to data what UTF-8 is to text: a universal interchange format that eliminates serialization overhead between systems."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Apache Arrow) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="Arrow's zero-copy IPC IS the end of serialization" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Arrow's Inter-Process Communication (IPC) protocol enables zero-copy data transfer between processes. If Spark writes Arrow data to shared memory, DuckDB can read it without deserialization — no CPU spent on copying or parsing. This IS the same principle as memory-mapped files (mmap) — the data IS the message. The serialization tax (JSON → parse → object → serialize → parse) IS eliminated. Arrow IS the post-serialization era."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Arrow Flight IS gRPC for data — and it's the right transport" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"Arrow Flight uses gRPC (HTTP/2 + Protocol Buffers) for columnar data transport. Unlike ODBC/JDBC (which add 3-5x overhead from row-oriented wire format + deserialization), Flight streams Arrow batches directly — zero-copy from sender to receiver. The 10Gbps+ throughput IS because the wire format IS the in-memory format. Arrow Flight IS to data what HTTP/2 is to web — a transport that doesn't tax the payload."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Arrow's C++ kernel IS the universal compute engine" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"Arrow's C++ kernel (Gandiva, compute functions, expression evaluation) is shared across all Arrow-compatible engines (Acero in Spark, DuckDB's execution engine, Polars' Rust bindings). When you call df.filter() in Pandas, Polars, or DuckDB — the SAME C++ code runs. The kernel IS the universal compute engine. Python/R/Java are just bindings. The math (columnar scan + predicate pushdown + vectorized execution) stays; the language binding changes."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Arrow IS to data what NumPy is to ML — the universal array format" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"NumPy defined the N-dimensional array (ndarray) as the universal data structure for ML. Arrow defines the columnar table (RecordBatch) as the universal data structure for analytics. Both are: (1) memory-contiguous, (2) language-agnostic, (3) zero-copy, (4) SIMD-vectorized. NumPy IS for tensors; Arrow IS for tables. The pattern (define the in-memory format → every tool adopts it → zero-copy between tools) IS the same. Arrow IS NumPy for data engineering."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <div className="flex flex-wrap gap-2">

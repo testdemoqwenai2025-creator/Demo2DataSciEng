@@ -910,21 +910,21 @@ export function AlphaMissensePage() {
 
       {/* Related elegant-code — card → card adjacency footer */}
 
-      <DeeperThoughtSection pageTitle="AlphaMissense">
-        <DeeperThought title="AlphaMissense IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about AlphaMissense is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. AlphaMissense connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where AlphaMissense sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Alphamissense">
+        <DeeperThought title="AlphaMissense IS evolution's experimental log — queried via ML" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"AlphaMissense predicts pathogenicity of 71M missense variants by learning from evolution. The 250M sequences in UniProt ARE the training data — 4 billion years of natural selection ARE the experiment. Variants that survived (common in gnomAD) are benign; variants that were selected against (absent) are pathogenic. AlphaMissense IS the lookup table for evolution's experimental results — distilled into a 650M-parameter transformer."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (AlphaMissense) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="AlphaMissense's 94% accuracy IS the evolutionary signal" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"PolyPhen-2 (75%) used rule-based features. CADD (80%) ensembled 63 annotations. AlphaMissense (94%) uses a deep-learning model on 250M sequences. The 94% IS the upper bound of what's possible from sequence + structure alone — the remaining 6% requires functional assay data. The accuracy improvement (75 → 80 → 94) IS the deep-learning signal: the model discovers the SAME patterns evolution used, without explicit rules."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Precision medicine IS multi-modal RAG on the human genome" connectedTo="ADR-043 (AlphaMissense adoption)">
+          <p>{"A clinical variant report combines: VCF (genetic modality) + ClinVar (clinical modality) + AlphaFold structure (3D modality) + ESM-2 embedding (protein modality) + LLM summary (natural language). This IS multi-modal RAG: query the genome (VCF), retrieve from multiple knowledge bases, generate a summary. Precision medicine IS multi-modal RAG on the human genome — the platform's GenAI stack applied to clinical genomics."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="AlphaMissense + gnomAD IS the variant-to-phenotype pipeline" connectedTo="ADR-037 (genetic materials + variant calling)">
+          <p>{"The pipeline: sequence genome → call variants (GATK + Poisson) → annotate pathogenicity (AlphaMissense) → classify (ClinVar) → report (LLM). Each step uses a different mathematical tool: Poisson (coverage), Bayes (genotype likelihood), Attention (AlphaMissense), Entropy (constraint), Shannon (compression). The pipeline IS a chain of equations — each one from a different elegant-code card. AlphaMissense IS the Attention card in the clinical genomics pipeline."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="The 71M variant lookup table IS the pre-computation pattern" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"AlphaMissense pre-computes all 71M possible missense variants and stores them in a lookup table. Instead of running the model per patient (slow), the clinician queries the table (instant). This IS the SAME pattern as the Materials Project (pre-compute DFT, store, query) and UniProt (pre-compute protein clusters, store, query). The pattern (compute once → store → query) IS the pattern of modern computational science. AlphaMissense IS the pre-computation pattern for clinical genomics."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedElegantCode hostPage={"alphamissense" as never} />

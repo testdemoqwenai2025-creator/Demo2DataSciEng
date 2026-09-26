@@ -1,5 +1,4 @@
-// Auto-generated: thought counts per page (from DeeperThought components).
-// Updated by scripts/generate_thought_counts.py
+// Auto-generated: thought counts per page.
 export const THOUGHT_COUNTS: Record<string, number> = {
   "about": 5,
   "agent-frameworks": 5,
@@ -53,6 +52,7 @@ export const THOUGHT_COUNTS: Record<string, number> = {
   "fintech": 5,
   "fivetran-hightouch": 5,
   "flink": 5,
+  "future": 6,
   "gen-ai-patterns": 5,
   "generative-chemistry-2": 5,
   "genetic-materials": 5,
@@ -126,6 +126,5 @@ export const THOUGHT_COUNTS: Record<string, number> = {
   "vector-db": 5,
   "vector-db-deep-dive": 5,
 };
-
-export const TOTAL_THOUGHTS = 621;
-export const PAGES_WITH_THOUGHTS = 124;
+export const TOTAL_THOUGHTS = 627;
+export const PAGES_WITH_THOUGHTS = 125;

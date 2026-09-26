@@ -1057,21 +1057,21 @@ sc.pl.umap(adata, color='leiden', save='_clusters.pdf')`}
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Jupyter Ecosystem">
-        <DeeperThought title="Jupyter Ecosystem IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Jupyter Ecosystem is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Jupyter Ecosystem connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Jupyter Ecosystem sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Jupyter">
+        <DeeperThought title="Jupyter IS the REPL for data science — and it's the right UX" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Jupyter notebooks let you write code, see output, write more code — iteratively. This IS the REPL (Read-Eval-Print Loop) pattern, extended with rich output (plots, tables, HTML). The REPL IS the right UX for exploratory data analysis: you don't know what you're looking for until you see it. Jupyter IS the REPL that matches the exploratory nature of data science — you explore, find, then productionize."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Jupyter Ecosystem) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="Jupyter's cell model IS the state machine — and it's the source of bugs" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"Jupyter notebooks execute cells in order — but the state (variables, imports) persists between cells. If you re-run cell 3 after changing cell 1, the state from the previous run persists. This IS the hidden-state problem: the notebook's state IS NOT a function of its code (it depends on execution history). This is why notebooks are hard to reproduce. The fix: 'Restart kernel and run all' — which makes the state a function of the code. The cell model IS the state machine; 'run all' IS the deterministic execution."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="JupyterHub IS the multi-user Jupyter — and it's the right pattern" connectedTo="ADR-001 (platform architecture)">
+          <p>{"JupyterHub runs a Jupyter server per user (spawned on demand). Each user gets their own kernel, filesystem, and environment. This IS the SAME pattern as Kubernetes pods (one pod per user) and Jupyter IS the container. JupyterHub IS Kubernetes for notebooks — the pattern (multi-tenant + on-demand spawning) IS the same."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Jupyter IS the lab notebook — and that's the right metaphor" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"A Jupyter notebook IS a digital lab notebook: code (method), output (result), markdown (observation). The sequence of cells IS the experimental record. This IS the SAME pattern as a scientist's lab notebook — where you write what you did, what you saw, and what you think. Jupyter IS the lab notebook for computational science. The reproducibility issue (hidden state) IS the same as a lab notebook that says 'I added reagent X' but doesn't specify the concentration."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Jupyter → production IS the gap — and nbconvert is the bridge" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Notebooks are for exploration; production needs scripts. The gap: how to turn exploratory code into production code. nbconvert (convert notebook to .py script) IS the bridge. The pattern (exploration → production) IS the same as the fold pattern (summary → deeper). The notebook IS the 'brief' (exploratory); the script IS the 'production patterns' (deterministic). nbconvert IS the fold between exploration and production."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[

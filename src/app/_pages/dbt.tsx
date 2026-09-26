@@ -467,21 +467,21 @@ export function DbtPage() {
         </SectionCard>
       </div>
 
-      <DeeperThoughtSection pageTitle="dbt & Dimensional Modelling">
-        <DeeperThought title="dbt & Dimensional Modelling IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about dbt & Dimensional Modelling is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. dbt & Dimensional Modelling connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where dbt & Dimensional Modelling sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Dbt">
+        <DeeperThought title="dbt IS the transformation layer — and it's SQL all the way down" connectedTo="ADR-001 (platform architecture)">
+          <p>{"dbt doesn't invent a new language — it uses SQL. The .sql files ARE the transformation logic. The YAML files ARE the tests. The manifest.json IS the lineage. dbt IS the answer to 'how do you version-control your data transformations?' — by making them SQL files in a Git repo. The pattern (SQL + tests + lineage in Git) IS the same as application code (Python + tests + CI in Git). dbt IS Git for data transformations."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (dbt & Dimensional Modelling) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="dbt tests ARE assertions — and they prevent the 'wrong data' bug" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"dbt tests (not_null, unique, accepted_values, relationships) ARE assertions about data quality. They're the data equivalent of unit tests in software. A not_null test on user_id IS like a type check: if user_id is null, the test fails, the pipeline stops. This prevents the 'wrong data in the dashboard' bug that costs data teams 20% of their time. The pattern (assertions + CI) IS the same as software testing — just for data instead of code."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="The Medallion architecture (Bronze→Silver→Gold) IS progressive disclosure for data" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"The Medallion pattern (Bronze = raw, Silver = cleaned, Gold = business-aligned) IS the fold pattern applied to data. Bronze IS the 'brief' — raw data, immediately available. Silver IS the 'production patterns' — cleaned, conformed, tested. Gold IS the 'deeper thought' — business-aligned marts that serve specific use cases. Each layer adds value without rewriting the previous. Progressive disclosure for data = Medallion for code."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="dbt's ref() function IS the dependency graph — same as Make" connectedTo="ADR-001 (platform architecture)">
+          <p>{"dbt's ref('model_name') resolves at compile time to the actual table/view name — and it tracks dependencies. If model B refs model A, dbt knows to run A before B. This IS the SAME pattern as Make's dependency resolution (Makefile: target depends on source). The DAG (directed acyclic graph) of dbt models IS a Makefile for data. The math (topological sort) IS the same. dbt IS Make for SQL."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="dbt + Great Expectations IS typed data — and types win" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"dbt tests + Great Expectations suites ARE the type system for data. A column with not_null + unique + accepted_values IS a typed column. A column without tests IS an untyped column (any value accepted). The typed vs untyped debate IS the SAME as TypeScript vs JavaScript: types catch errors early, enable better tooling, and prevent the 'wrong format' bug. dbt + GE IS TypeScript for data pipelines."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <div className="flex flex-wrap gap-2">

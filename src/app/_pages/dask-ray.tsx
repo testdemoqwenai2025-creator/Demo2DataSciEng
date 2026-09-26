@@ -1019,21 +1019,21 @@ print(f"Best val_acc: {results.best_metrics['val_acc']:.4f}")`}
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Dask + Ray">
-        <DeeperThought title="Dask + Ray IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Dask + Ray is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Dask + Ray connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Dask + Ray sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Dask Ray">
+        <DeeperThought title="Dask IS pandas at scale — and it's the right abstraction" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Dask's DataFrame API mirrors Pandas — groupby, merge, join, filter. The difference: Dask partitions the DataFrame into chunks and processes them in parallel across a cluster. A 100GB DataFrame that doesn't fit in memory becomes 100 1GB partitions that fit. The user writes the SAME Pandas code; Dask handles the parallelism. Dask IS Pandas with a distributed backend — the same pattern as NumPy with a GPU backend."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Dask + Ray) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="Ray IS the universal distributed computing framework — and it's the right design" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"Ray provides: task parallelism (remote functions), actor model (stateful workers), and object store (distributed shared memory). The SAME framework runs: RL training (RLlib), hyperparameter tuning (Tune), model serving (Serve), and data processing (Datasets). Ray IS the universal backend for Python distributed computing — the same pattern as Spark for the JVM. The math (task scheduling + actor model + shared memory) IS the same; the language (Python) differs."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Dask vs Ray IS task-graph vs actor-model — and both are valid" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"Dask uses a task graph (build DAG → schedule → execute). Ray uses an actor model (create remote actors → send messages → receive results). Dask's approach is better for data-parallel workloads (groupby, join) where the DAG is known upfront. Ray's approach is better for stateful workloads (RL training, model serving) where the computation is dynamic. The trade-off (static DAG vs dynamic actors) IS the same as Spark vs Flink. Both are valid; the workload determines the winner."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Dask's task graph IS lazy evaluation — and it's the right pattern" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Dask builds a task graph (DAG) when you call df.groupby().mean() — but doesn't execute it. Execution only happens when you call .compute(). This IS the SAME pattern as Spark's lazy evaluation (transformations build the DAG, actions trigger execution). The benefit: the scheduler can optimize the entire DAG before executing — reorder, fuse, prune. Lazy evaluation IS the right pattern for data processing because it enables whole-query optimization."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Ray Serve IS the model serving layer — and it's the production pattern" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Ray Serve deploys ML models as HTTP endpoints. Each model runs as a Ray actor (stateful, auto-scaled). The SAME Ray cluster that trained the model (RLlib/Tune) also serves it (Serve). This IS the SAME pattern as a Kubernetes deployment: the cluster runs both training (jobs) and serving (deployments). Ray IS Kubernetes for Python ML — the pattern (cluster + jobs + deployments) IS the same; the implementation (Ray vs K8s) differs."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[

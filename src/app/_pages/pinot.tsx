@@ -684,21 +684,21 @@ export function PinotPage() {
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Apache Pinot">
-        <DeeperThought title="Apache Pinot IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Apache Pinot is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Apache Pinot connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Apache Pinot sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Pinot">
+        <DeeperThought title="Pinot IS the real-time analytics database — and it's columnar + pre-aggregated" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Pinot combines columnar storage (fast scans) with pre-aggregated star-tree indexes (fast GROUP BY). The star-tree pre-computes aggregations at ingestion time — so a COUNT(*) GROUP BY city query that would scan 1B rows scans only 100 pre-aggregated segments. This IS the SAME trade-off as materialized views in databases: pay the cost at write time to save at query time. Pinot IS materialized views for real-time analytics."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Apache Pinot) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="Pinot's segment IS the immutable unit — and it's the right abstraction" connectedTo="ADR-013 (Delta Lake)">
+          <p>{"Pinot stores data in segments (immutable, compressed, indexed). Each segment IS a self-contained file with its own index. Segments are never updated — new data creates new segments. This IS the SAME pattern as Delta Lake's immutable Parquet files + transaction log. The immutability enables: (1) zero-copy reads (no locks), (2) easy replication (copy files), (3) time travel (old segments preserved). The pattern (immutable segment + append-only) IS event sourcing for analytics."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Pinot's real-time vs batch segments IS the lambda architecture — unified" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"Pinot has two segment types: batch (loaded from offline files) and real-time (consumed from Kafka). Queries read from BOTH simultaneously. This IS the lambda architecture (batch + speed layer) UNIFIED — no separate batch and real-time clusters. The query planner merges results from both layers. The pattern (unified batch + real-time) IS the same as Delta Lake's unified batch + streaming. Pinot IS the unified lambda for analytics."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Pinot's indexes ARE the query plan — and they're multi-dimensional" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"Pinot's index types (inverted, sorted, range, geo, JSON, text) ARE pre-computed query plans. An inverted index on 'city' IS a pre-computed GROUP BY city. A sorted index on 'timestamp' IS a pre-computed ORDER BY timestamp. A range index on 'price' IS a pre-computed WHERE price > 100. The query planner chooses which index to use — like a database query planner chooses which B-tree to scan. The difference: Pinot's indexes are multi-dimensional (you can combine city + timestamp + price). Pinot IS multi-dimensional indexing for real-time analytics."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Pinot IS to analytics what Kafka IS to streaming — the real-time layer" connectedTo="ADR-001 (platform architecture)">
+          <p>{"Kafka IS the real-time data transport (publish-subscribe). Pinot IS the real-time data analytics (query). Together: Kafka → Pinot = real-time pipeline → real-time dashboard. The pattern (transport + analytics) IS the same as the batch pattern (S3 → Snowflake = batch storage → batch analytics). Pinot IS the real-time Snowflake — columnar, indexed, fast — just for streaming data instead of batch data."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[

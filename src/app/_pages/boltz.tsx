@@ -1089,21 +1089,21 @@ export function BoltzPage() {
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="Boltz-1/2">
-        <DeeperThought title="Boltz-1/2 IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about Boltz-1/2 is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. Boltz-1/2 connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where Boltz-1/2 sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Boltz">
+        <DeeperThought title="Boltz IS the open-source protein structure predictor — and it's the right model" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"Boltz (2024) is an open-source protein structure predictor that rivals AlphaFold2. It uses the SAME attention + diffusion architecture — but with open weights and MIT license. The math (Attention + diffusion + SE(3)-equivariance) IS the same. The difference: AlphaFold2 is proprietary (DeepMind); Boltz is open (community). The fold absorbs the implementation; the math stays. Boltz IS the open AlphaFold2."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (Boltz-1/2) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="Boltz's diffusion head IS the SAME as image diffusion — and that's the insight" connectedTo="ADR-027 (diffusion models)">
+          <p>{"Boltz's structure module starts from random 3D coordinates and iteratively denoises them, conditioned on the sequence embedding. This IS the SAME math as DDPM (denoising diffusion probabilistic models) for image generation — just in 3D coordinate space instead of 2D pixel space. The reverse SDE is the same; the noise is 3D Gaussian instead of 2D Gaussian. Boltz IS DDPM for protein structures."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="Boltz's SE(3)-equivariance IS the inductive bias — and it's the right one" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"SE(3)-equivariance means: if you rotate the input, the output rotates the same way. This IS the correct inductive bias for 3D molecular structures — proteins don't have a preferred orientation. An SE(3)-equivariant network learns rotation-invariant features automatically, without data augmentation. This IS the SAME pattern as translation-invariance in CNNs (convolution = translation-equivariant). SE(3)-equivariance IS convolution for 3D rotations."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="Boltz + PoseBusters IS the drug discovery pipeline — and it's open" connectedTo="ADR-036 (molecular modelling)">
+          <p>{"Boltz predicts protein structure; PoseBusters validates ligand poses; the combination enables structure-based drug design without AlphaFold's license. The pipeline: sequence → Boltz structure → docking → PoseBusters validation → hit compound. This IS the SAME pattern as the clinical genomics pipeline (sequence → AlphaMissense → ClinVar → report). Boltz IS the open structure layer in the open drug discovery pipeline."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Boltz's MIT license IS the right choice — and it enables innovation" connectedTo="ADR-001 (platform architecture)">
+          <p>{"AlphaFold2's license restricts commercial use. Boltz's MIT license allows everything. This IS the SAME pattern as open-source vs proprietary software: open enables innovation (researchers build on it), proprietary captures revenue (the owner monetizes). The pattern (open format + paid service) IS the same as Iceberg (open format) + Tabular (paid catalog). Boltz's MIT license IS the open-format strategy for protein structure prediction."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <div className="flex flex-wrap gap-2">

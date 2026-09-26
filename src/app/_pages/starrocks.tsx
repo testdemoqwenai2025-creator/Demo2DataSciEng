@@ -694,21 +694,21 @@ export function StarRocksPage() {
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="StarRocks">
-        <DeeperThought title="StarRocks IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about StarRocks is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. StarRocks connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where StarRocks sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Starrocks">
+        <DeeperThought title="StarRocks IS the real-time data warehouse — and it's the right design" connectedTo="ADR-001 (platform architecture)">
+          <p>{"StarRocks combines: columnar storage (fast scans), vectorized execution (SIMD), real-time ingestion (from Kafka/Flink), and sub-second queries. This IS the SAME pattern as Pinot (real-time analytics) but with full SQL (JOIN, subquery, CTE). StarRocks IS Pinot + full SQL — the pattern (columnar + real-time + SQL) IS the same. The difference: Pinot is OLAP-only (analytics); StarRocks also supports OLTP-like workloads (point queries)."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (StarRocks) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="StarRocks' pipeline engine IS the push-based execution — and it's the right model" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"Traditional query engines use pull-based execution (Volcano model: parent calls next() on child). StarRocks uses push-based execution (pipeline: data flows from source to sink without next() calls). This eliminates function call overhead (millions of next() calls per query) and enables better pipelining. The pattern (push vs pull) IS the same as reactive programming (push: Observable.onNext) vs imperative (pull: Iterator.next). StarRocks IS reactive programming for query engines."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="StarRocks' materialized view IS the pre-computation — and it's the right optimization" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"StarRocks automatically maintains materialized views (pre-computed aggregates). When a query matches a materialized view, the planner rewrites the query to use the view. This IS the SAME pattern as Pinot's star-tree index (pre-compute aggregates at ingestion). The math (query rewriting + view matching) IS the same as the database query optimizer (rule-based + cost-based rewriting). StarRocks' MV IS the star-tree for SQL."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="StarRocks vs ClickHouse IS the SQL vs raw-speed debate" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"ClickHouse is faster for simple scans (10x for SELECT * WHERE x > 10). StarRocks is faster for complex queries (JOIN, subquery, CTE). The trade-off (raw scan speed vs SQL expressiveness) IS the same as NoSQL vs SQL: NoSQL is faster for simple key-value; SQL is more expressive for complex analytics. StarRocks IS SQL-first; ClickHouse IS scan-first. Both are valid; the workload determines the winner."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="StarRocks' data cache IS the local SSD tier — and it's the right caching layer" connectedTo="ADR-001 (platform architecture)">
+          <p>{"StarRocks caches hot data on local NVMe SSD (data cache). When a query needs a block, it checks: local SSD cache → shared storage (S3/HDFS). This IS the SAME pattern as CPU L1/L2/L3 cache hierarchy: L1 = memory, L2 = local SSD, L3 = shared storage. The data cache IS the L2 cache for queries. The pattern (multi-tier cache + locality) IS the same. StarRocks IS multi-tier caching for query engines."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[

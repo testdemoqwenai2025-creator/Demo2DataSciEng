@@ -1033,21 +1033,21 @@ print(f"Distance matrix: {D.shape}, max: {D.max():.2f}")
       </SectionCard>
 
 
-      <DeeperThoughtSection pageTitle="GPU Computing">
-        <DeeperThought title="GPU Computing IS part of a larger system — no page stands alone" connectedTo="ADR-001 (platform architecture)">
-          <p>{"This page about GPU Computing is not an isolated reference — it's a node in a graph. The platform's thesis is that the same math appears across genomics, fintech, maritime, and audio. GPU Computing connects to the elegant-code cards via shared equations, and to the living-equation pages via live demos. The reader who arrives here looking for facts leaves with a map of where GPU Computing sits in the computational-science landscape."}</p>
+      <DeeperThoughtSection pageTitle="Gpu Computing">
+        <DeeperThought title="GPU computing IS SIMD at massive scale — and it's the right hardware" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"A GPU has 10,000+ cores that execute the SAME instruction on DIFFERENT data (SIMD). A CPU has 8-64 cores that execute DIFFERENT instructions (MIMD). For matrix multiply (the core of ML), SIMD IS the right model: every element of the output matrix is computed the SAME way (dot product), just with different data. The GPU's 10,000 cores compute 10,000 dot products simultaneously. GPU IS the hardware that matches the math of matrix multiplication."}</p>
         </DeeperThought>
-        <DeeperThought title="The technology will change; the math won't" connectedTo="ADR-055 (cross-disciplinary scope)">
-          <p>{"In a decade, the specific tools on this page (GPU Computing) may be replaced. But the underlying mathematics — the equations, the distributions, the optimisation rules — will be the same. SVD was invented in 1873 and still runs on NumPy today. Attention was described in 2017 and will run on whatever replaces PyTorch. The platform invests in the MATH, not the tools, because the math is the part that survives technology turnover."}</p>
+        <DeeperThought title="CUDA IS the programming model — and it's C with parallel extensions" connectedTo="ADR-050 (fold-section architecture)">
+          <p>{"CUDA extends C with: thread blocks (groups of threads), shared memory (fast on-chip cache), and synchronization primitives (__syncthreads). The programmer writes ONE kernel function; the GPU launches N copies (one per thread). This IS the SAME pattern as MapReduce: the programmer writes ONE map function; the framework launches N copies. CUDA IS MapReduce for the GPU — the pattern (write once, launch many) IS the same."}</p>
         </DeeperThought>
-        <DeeperThought title="The fold pattern respects the reader's attention" connectedTo="ADR-050 (fold-section architecture)">
-          <p>{"This page has fold sections (collapsed by default) that reveal deeper content on demand — equation family comparisons, LaTeX derivations, production patterns, expected outputs, and citations. The basic content is visible immediately; the deeper phases are there when the reader is ready. Progressive disclosure isn't just UX — it's epistemological. A reader who wants the summary gets it; a reader who wants the derivation clicks to expand. Both are served by the same page."}</p>
+        <DeeperThought title="GPU memory hierarchy IS the optimization — and it's the bottleneck" connectedTo="ADR-022 (pgvector for variant embeddings)">
+          <p>{"GPU has 3 memory tiers: registers (1 cycle, ~256KB), shared memory (5 cycles, ~100KB/SM), global memory (400 cycles, ~24GB). Moving data from global to shared memory IS the optimization. The SAME pattern as CPU cache hierarchy (L1/L2/L3). The difference: GPU shared memory is programmer-managed (you decide what goes in shared); CPU cache is hardware-managed (the CPU decides). GPU computing IS manual cache management for parallel workloads."}</p>
         </DeeperThought>
-        <DeeperThought title="The output IS the proof — not just the equation" connectedTo="ADR-034 (ESM-2 + AlphaFold2 adoption)">
-          <p>{"Where this page has interactive demos (Pyodide + sliders + charts), the visual output IS the argument. Seeing a chart update as you drag a slider communicates the math in a way no formula can. The brain's pattern-recognition system processes the visual output faster than the verbal/analytical pathway. That's why the platform pairs every equation with a live demo — the output plays to a different level of the brain than the prose."}</p>
+        <DeeperThought title="CuPy IS NumPy on GPU — and it's the right abstraction" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"CuPy's API mirrors NumPy — np.array becomes cp.array, np.linalg.svd becomes cp.linalg.svd. The user writes the SAME NumPy code; CuPy runs it on the GPU. 10-100x speedup for matrix operations. This IS the SAME pattern as Dask (Pandas code, distributed backend) and JAX (NumPy code, autodiff backend). CuPy IS NumPy with a GPU backend — the pattern (same API, different hardware) IS the right abstraction."}</p>
         </DeeperThought>
-        <DeeperThought title="In a decade, this page will evolve — and that's the point" connectedTo="ADR-022 (pgvector for variant embeddings)">
-          <p>{"The datasets, libraries, and tools on this page will be updated as technology evolves. The 1000-Genomes Project will become the 10M-Genomes Project. NumPy may be replaced by a WebGPU-native array library. PyTorch may give way to a successor. But the math — SVD, Attention, Poisson, FFT, Bayes, Kalman, GBM — will be the same. The platform is designed for this evolution: the equations are the anchor, the tools are the amplifier, and the fold sections let us update the tools without rewriting the page."}</p>
+        <DeeperThought title="Multi-GPU training IS the next frontier — and it's AllReduce" connectedTo="ADR-034 (ESM-2 + AlphaFold2)">
+          <p>{"Training GPT-4 (175B parameters) requires multiple GPUs (each has 80GB, model needs ~700GB). Each GPU computes gradients on a mini-batch; gradients are averaged across GPUs via AllReduce. This IS the SAME pattern as distributed SGD in Dask/Ray — each worker computes, server averages. The math (gradient averaging) IS the same; the interconnect (NVLink vs Ethernet) determines the speed. Multi-GPU IS distributed SGD over a fast interconnect."}</p>
         </DeeperThought>
       </DeeperThoughtSection>
       <RelatedTopics topics={[
