@@ -4021,3 +4021,57 @@ Stage Summary:
 - All 20 elegant-code cards now have 3 outcome tiles each = 60 total Pyodide-powered analytics demos inside the card modal. Each tile names the skill (e.g., "Marine underwriter") and talent (e.g., "sees freight-rate volatility in option premiums") each sector rewards.
 - /resources now has an interactive D3 skill graph showing which skills are shared across equations. A reader can surf from a skill to all the equations that reward it — discovering where their own talent fits.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: ask-me-anything-talent-search-chart-upgrade
+Agent: Super Z (main)
+Task: Build the AskMeAnything AI expert widget (smart search + external AI platform fallback), TalentSearch on /resources, and the chart-upgrade framework for outcome tiles (refactor PyodideRunner with onOutput callback + OutcomeTile JSON parsing + recharts rendering).
+
+Work Log:
+- Verified Phase K outcomes already present (Black-Scholes, Haversine, Kalman, Monte Carlo, GBM — all 5 cards have outcomes=YES).
+- Built src/app/_components/talent-search.tsx (~155 lines):
+  * Search box on /resources that lets readers type any phrase (skill, talent, science, sector).
+  * Searches all 60 outcome tiles across 20 elegant-code cards.
+  * Returns matching cards with deep-links to /elegant-code#card-N.
+  * 8 suggestion chips above results (autocomplete-style).
+  * When no match, shows CTA to use the AskMeAnything AI expert.
+  * Inserted on /resources between Skill graph and 10-card grid.
+- Built src/app/_components/ask-me-anything.tsx (~310 lines):
+  * Floating 'Brain + Ask me anything' button (bottom-right, z-40).
+  * Added to AppShell next to FloatingLiveButton — appears on EVERY page.
+  * Modal with search box + quick suggestions + in-platform results + external AI platforms.
+  * When user types a question:
+    1. Scores every card on title, subtitle, brief, insight, and each outcome's skill/talent/science/sector/description.
+    2. Returns top-5 in-platform matches with score + matched-fields badges + deep-links to /elegant-code#card-N + 'live demo →' link if a /living-* page exists.
+    3. Shows 7 external AI platforms (Gemini, Grok, Qwen AI, MiniMax, ChatGPT, Claude, Perplexity) as one-click deep-links with the question pre-filled via URL parameter (opens in new tab).
+  * Fully client-side — no backend, no API keys, no data leaves the browser except the URL handoff to the clicked external platform.
+  * Works on static GitHub Pages (no Node backend needed).
+  * Why this approach: z-ai-web-dev-sdk is backend-only, so a real LLM call from the browser isn't possible on a static site. The smart-search + external-link-fallback pattern is the right UX for a static site.
+- Refactored PyodideRunner (src/app/_components/pyodide-runner.tsx) with two new optional props:
+  * onOutput?: (stdout: string) => void — parent receives the final stdout for JSON parsing / chart rendering.
+  * hideTextOutput?: boolean — when true, the text-output panel is hidden (useful when the parent renders a chart instead).
+- Upgraded OutcomeTile (src/app/_components/dataset-cards.tsx):
+  * Added useState for chartData + chartType.
+  * handleOutput callback tries to parse the last stdout line as JSON.
+  * Detects chart shape: array of {x,y} or {label,value} → bar chart; object with "chart_type" field → use that.
+  * If chart detected, renders recharts BarChart or LineChart (180px height, accent-colored) and hides the text output.
+  * If no JSON, keeps the text output (backward-compatible with all 60 existing tiles).
+- Upgraded 5 sample outcome tiles (SVD Genomics, Attention Protein Folding, FFT Audio, Poisson Sequencing, Entropy Information Theory) to add a final 'print(json.dumps([...]))' line at the end of their Python code. These now render as bar charts instead of text when the user clicks "Run analytics":
+  * SVD Genomics: bar chart of PC1 means per population (AFR vs EUR vs EAS vs SAS).
+  * Attention Protein Folding: bar chart of contact pairs found vs missed.
+  * FFT Audio: bar chart of detected vs expected notes (262/330/392 Hz).
+  * Poisson Sequencing: bar chart of P(k) for k=5,10,14,20,25.
+  * Entropy Information Theory: bar chart of top-6 English letter frequencies.
+- The other 55 outcome tiles still render text output (backwards compatible). They can be incrementally upgraded by adding a single 'print(json.dumps([...]))' line at the end of their Python code.
+- Lint clean across all 7 modified/new files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (same count). AskMeAnything verified rendered on home, /elegant-code, /resources, /living-svd (1 occurrence per page in HTML, 2 with RSC payload). TalentSearch verified on /resources.
+- Live verification (after deploy workflow):
+  * /resources/ → HTTP 200, page size 407KB. Contains "Ask me anything" (2x), "Talent search" (2x), "Skill graph" (4x), "sees population" (4x).
+  * The external AI platform names (Gemini, Grok, etc.) only render when the user types a query — that's the correct conditional behavior.
+- Commit 48a09cc pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- /resources now has: TalentSearch + Skill graph + 3 lists (datasets, papers, libraries) + 10-card grid. Readers can search by talent OR visually surf the skill graph OR browse the 10 living-equation pages.
+- Every page on the platform now has the AskMeAnything floating button — searches platform content first, offers one-click deep-links to 7 external AI platforms (Gemini, Grok, Qwen AI, MiniMax, ChatGPT, Claude, Perplexity) with the question pre-filled.
+- Outcome tiles now have a chart-upgrade framework: 5 sample tiles render recharts bar charts when their Python code emits JSON output. The other 55 tiles are backward-compatible (text output) and can be incrementally upgraded.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
