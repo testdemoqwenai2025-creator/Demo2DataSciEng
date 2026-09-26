@@ -5,6 +5,7 @@ import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { SkillGraph } from "../_components/skill-graph";
 import { TalentSearch } from "../_components/talent-search";
 import { SectorIndex } from "../_components/sector-index";
+import { SectorSkills } from "../_components/sector-skills";
 import { SurpriseMe } from "../_components/surprise-me";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
@@ -235,6 +236,16 @@ export function ResourcesPage() {
         badge="reverse index"
       >
         <SectorIndex />
+      </SectionCard>
+
+      {/* Sector → Skills cross-reference */}
+      <SectionCard
+        title="Sector → Skills — which minds each industry requires"
+        description="For each sector, lists the UNIQUE skills that appear across all its cards — with the count of cards where each skill shows up. E.g., Maritime requires: Maritime navigator, Marine underwriter, Maritime analyst, Maritime data engineer, etc. Helps readers see which sectors share skill profiles (e.g., a Quant analyst appears in Fintech + Maritime + Genetics — that's an intersection). Hover or click any skill to see the cards where it appears."
+        icon={<Brain className="h-5 w-5" />}
+        badge="cross-reference"
+      >
+        <SectorSkills />
       </SectionCard>
 
       {/* 10 living pages summary */}

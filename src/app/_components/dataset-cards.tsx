@@ -13,6 +13,7 @@ import {
 import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
 import { SkillConstellation } from "./skill-constellation";
+import { FoldSection, EquationFamilyFold, DeeperMathFold } from "./fold-section";
 
 /**
  * DatasetCards — reusable cards-with-lazy-popups component for showing
@@ -588,7 +589,37 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
                     Skill constellation — where else this card's 3 skills show up
                   </p>
-                  <SkillConstellation cardIndex={openIdx} height={240} />
+                  <SkillConstellation
+                    cardIndex={openIdx}
+                    height={240}
+                    onCardClick={(targetIdx) => {
+                      // Switch the modal to the clicked card (close current + open target).
+                      const targetCard = examples[targetIdx];
+                      if (targetCard) {
+                        setOpenId(targetCard.id);
+                        // Scroll to top of modal so the new card is visible from the start.
+                        setTimeout(() => {
+                          const modal = document.querySelector(".max-h-\\[85vh\\]");
+                          if (modal) modal.scrollTop = 0;
+                        }, 50);
+                      }
+                    }}
+                  />
+                </div>
+              ) : null;
+            })()}
+
+            {/* Fold sections — deeper phases of the repository, revealed on demand.
+                The "fold option" leads for further code examples, mathematics (where
+                needed), and desired or expected output. Collapsed by default; the
+                user clicks to expand. Keeps the basic card content (brief, stats,
+                code, outcomes, constellation, insight) lightweight. */}
+            {(() => {
+              const openIdx = examples.findIndex((e) => e.id === openCard.id);
+              return openIdx >= 0 ? (
+                <div className="space-y-2">
+                  <EquationFamilyFold cardIndex={openIdx} />
+                  <DeeperMathFold cardIndex={openIdx} />
                 </div>
               ) : null;
             })()}

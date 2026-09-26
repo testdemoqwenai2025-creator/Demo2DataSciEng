@@ -5567,8 +5567,14 @@ print(f"  RMSE Kalman:  {rmse_kalman:.5f}°")
 print(f"  Denoise: {(1 - rmse_kalman/rmse_ais)*100:.1f}% improvement")
 print("Insight: Kalman IS vessel tracking (MarineTraffic production)")
 
-# Final line: JSON output for chart rendering
-print(json.dumps([{"label": "N", "value": float(N) if isinstance(N, (int, float)) else 0}, {"label": "sigma_ais", "value": float(sigma_ais) if isinstance(sigma_ais, (int, float)) else 0}, {"label": "rmse_ais", "value": float(rmse_ais) if isinstance(rmse_ais, (int, float)) else 0}, {"label": "rmse_kalman", "value": float(rmse_kalman) if isinstance(rmse_kalman, (int, float)) else 0}]))`,
+# Final line: JSON output for chart rendering (multi-series line chart)
+import json
+kalman_chart_data = []
+for t in range(N):
+    kalman_chart_data.append({"x": t, "y": round(true_lons[t], 5), "series": "True position"})
+    kalman_chart_data.append({"x": t, "y": round(ais_lons[t], 5), "series": "AIS reports"})
+    kalman_chart_data.append({"x": t, "y": round(est_lons[t], 5), "series": "Kalman estimate"})
+print(json.dumps(kalman_chart_data))`,
         description: "Kalman filter on a 50-step AIS vessel track reduces RMSE from ~0.005° (raw AIS) to ~0.002° (Kalman). A maritime data engineer sees: MarineTraffic runs this on 100K vessels × 60s updates — 1.4×10⁸ Kalman iterations/day for smooth tracks and ETA prediction.",
       },
       {
@@ -5612,8 +5618,14 @@ print(f"  RMSE Kalman:    {rmse_kalman:.1f} ft")
 print(f"  Denoise: {(1 - rmse_kalman/rmse_adsb)*100:.1f}% improvement")
 print("Insight: ATC displays use Kalman-smoothed ADS-B (FlightAware production)")
 
-# Final line: JSON output for chart rendering
-print(json.dumps([{"label": "N", "value": float(N) if isinstance(N, (int, float)) else 0}, {"label": "sigma_adsb", "value": float(sigma_adsb) if isinstance(sigma_adsb, (int, float)) else 0}, {"label": "rmse_adsb", "value": float(rmse_adsb) if isinstance(rmse_adsb, (int, float)) else 0}, {"label": "rmse_kalman", "value": float(rmse_kalman) if isinstance(rmse_kalman, (int, float)) else 0}]))`,
+# Final line: JSON output for chart rendering (multi-series line chart)
+import json
+kalman_chart_data = []
+for t in range(N):
+    kalman_chart_data.append({"x": t, "y": round(true_alts[t], 1), "series": "True altitude"})
+    kalman_chart_data.append({"x": t, "y": round(adsb_alts[t], 1), "series": "ADS-B reports"})
+    kalman_chart_data.append({"x": t, "y": round(est_alts[t], 1), "series": "Kalman estimate"})
+print(json.dumps(kalman_chart_data))`,
         description: "Kalman filter on a 100-step ADS-B aircraft track reduces RMSE from ~25 ft (raw ADS-B) to ~5 ft (Kalman). An ATC engineer sees: FlightAware runs this on 100K flights × 1s updates — the SAME filter as MarineTrack's AIS, just different sensor noise.",
       },
       {
@@ -5902,8 +5914,20 @@ bs = S * norm_cdf(d1) - K * math.exp(-r*T) * norm_cdf(d2)
 print(f"\\\\nBlack-Scholes closed-form: \\\${bs:.2f}")
 print("Insight: MC converges at O(1/sqrt(N)) — 100x paths = 10x tighter CI")
 
-# Final line: JSON output for chart rendering
-print(json.dumps([{"label": "N", "value": float(N) if isinstance(N, (int, float)) else 0}, {"label": "mc", "value": float(mc) if isinstance(mc, (int, float)) else 0}, {"label": "bs", "value": float(bs) if isinstance(bs, (int, float)) else 0}]))`,
+# Final line: JSON output for chart rendering (multi-series line chart)
+import json
+mc_chart_data = []
+for n_val in [10, 50, 100, 500, 1000, 5000, 10000]:
+    if n_val > N: break
+    sub_payoffs = payoffs[:n_val]
+    sub_mean = sum(sub_payoffs) / n_val
+    sub_var = sum((p - sub_mean) ** 2 for p in sub_payoffs) / max(n_val - 1, 1)
+    sub_se = math.sqrt(sub_var / n_val) if n_val > 0 else 0
+    mc_chart_data.append({"x": n_val, "y": round(sub_mean, 2), "series": "MC estimate"})
+    mc_chart_data.append({"x": n_val, "y": round(sub_mean - 1.96 * sub_se, 2), "series": "CI low"})
+    mc_chart_data.append({"x": n_val, "y": round(sub_mean + 1.96 * sub_se, 2), "series": "CI high"})
+    mc_chart_data.append({"x": n_val, "y": round(bs_approx, 2), "series": "Black-Scholes"})
+print(json.dumps(mc_chart_data))`,
         description: "Monte Carlo option pricing converges from ±$30 (N=10) to ±$0.30 (N=10⁴). A quant developer sees: convergence rate is O(1/√N) per CLT. CME uses quasi-MC (Sobol sequences) for 100× faster convergence — $10¹⁰ daily notional priced via MC.",
       },
       {
@@ -6004,8 +6028,16 @@ print(f"  Significance at 0.05: {'YES' if p_value < 0.05 else 'NO'}")
 print(f"\\\\nPLINK production: 10^6 SNPs × 10^4 perms = 10^10 ops")
 print("Insight: rare-variant testing IS Monte Carlo on permutations")
 
-# Final line: JSON output for chart rendering
-print(json.dumps([{"label": "n_perms", "value": float(n_perms) if isinstance(n_perms, (int, float)) else 0}, {"label": "observed_stat", "value": float(observed_stat) if isinstance(observed_stat, (int, float)) else 0}, {"label": "p_value", "value": float(p_value) if isinstance(p_value, (int, float)) else 0}, {"label": "analytical_p", "value": float(analytical_p) if isinstance(analytical_p, (int, float)) else 0}]))`,
+# Final line: JSON output for chart rendering (multi-series line chart)
+import json
+mc_chart_data = []
+for n_test in [10, 50, 100, 500, 1000, 5000, 10000]:
+    if n_test > n_perms: break
+    sub_null = null_stats[:n_test]
+    p_val = (sum(1 for s in sub_null if s >= observed_stat) + 1) / (n_test + 1)
+    mc_chart_data.append({"x": n_test, "y": round(p_val, 4), "series": "MC p-value"})
+    mc_chart_data.append({"x": n_test, "y": round(analytical_p, 4), "series": "Analytical p-value"})
+print(json.dumps(mc_chart_data))`,
         description: "Monte Carlo permutation test for rare-variant association: 10⁴ perms estimate p-value vs analytical chi-squared. A statistical geneticist sees: PLINK runs 10⁶ SNPs × 10⁴ perms = 10¹⁰ operations — same Monte Carlo as option pricing, different random variable.",
       },
     ],
@@ -6269,8 +6301,22 @@ print(f"\\\\nFinal price 90% interval: [\\\${p5:.0f}, \\\${p95:.0f}]")
 print(f"  Log-normal: skewed right (a few very high paths)")
 print("Insight: SPX returns ARE GBM (Black-Scholes foundation, 1973 Nobel)")
 
-# Final line: JSON output for chart rendering
-print(json.dumps([{"label": "n_paths", "value": float(n_paths) if isinstance(n_paths, (int, float)) else 0}, {"label": "S0", "value": float(S0) if isinstance(S0, (int, float)) else 0}, {"label": "mu", "value": float(mu) if isinstance(mu, (int, float)) else 0}, {"label": "sigma", "value": float(sigma) if isinstance(sigma, (int, float)) else 0}, {"label": "mean_final", "value": float(mean_final) if isinstance(mean_final, (int, float)) else 0}, {"label": "analytical_mean", "value": float(analytical_mean) if isinstance(analytical_mean, (int, float)) else 0}, {"label": "p5", "value": float(p5) if isinstance(p5, (int, float)) else 0}, {"label": "p95", "value": float(p95) if isinstance(p95, (int, float)) else 0}]))`,
+# Final line: JSON output for chart rendering (multi-series line chart)
+import json
+gbm_chart_data = []
+n_chart_steps = min(20, n_steps + 1)
+step_interval = max(1, (n_steps + 1) // n_chart_steps)
+for t in range(0, n_steps + 1, step_interval):
+    prices_at_t = [p[t] for p in paths]
+    mean_p = sum(prices_at_t) / len(prices_at_t)
+    var_p = sum((p - mean_p) ** 2 for p in prices_at_t) / len(prices_at_t)
+    std_p = math.sqrt(var_p)
+    gbm_chart_data.append({"x": t, "y": round(mean_p, 0), "series": "Mean"})
+    gbm_chart_data.append({"x": t, "y": round(mean_p + std_p, 0), "series": "Mean + 1σ"})
+    gbm_chart_data.append({"x": t, "y": round(mean_p - std_p, 0), "series": "Mean - 1σ"})
+    for path_idx in range(min(3, len(paths))):
+        gbm_chart_data.append({"x": t, "y": round(paths[path_idx][t], 0), "series": "Path " + str(path_idx + 1)})
+print(json.dumps(gbm_chart_data))`,
         description: "100 GBM paths simulate SPX over 1 year. Mean final = $5,415 (analytical $5,415). 90% interval: [$3,800, $7,400]. A quant researcher sees: SPX daily returns follow GBM — Black-Scholes foundation, 1973 Nobel Prize. The same SDE models container dwell and allele drift.",
       },
       {

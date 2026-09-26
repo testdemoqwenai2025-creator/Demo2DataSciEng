@@ -39,9 +39,14 @@ interface SkillConstellationProps {
   /** Index of the currently-open card (the "self" card). */
   cardIndex: number;
   height?: number;
+  /** Optional callback invoked when the user clicks an "other card" node.
+   *  Receives the card index of the clicked node. The parent should
+   *  switch the modal to that card (close current + open the clicked one).
+   */
+  onCardClick?: (cardIndex: number) => void;
 }
 
-export function SkillConstellation({ cardIndex, height = 240 }: SkillConstellationProps) {
+export function SkillConstellation({ cardIndex, height = 240, onCardClick }: SkillConstellationProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(320);
@@ -179,6 +184,26 @@ export function SkillConstellation({ cardIndex, height = 240 }: SkillConstellati
     nodeSel.on("mouseenter", (_e, d) => setHovered(d as ConstNode))
            .on("mouseleave", () => setHovered(null));
 
+    // Click handler: when the user clicks an "other-card" node, navigate
+    // to that card's modal (via the parent's onCardClick callback).
+    nodeSel.on("click", (_e, d) => {
+      const node = d as ConstNode;
+      if (node.type === "other-card") {
+        // Extract the card index from the node id (e.g., "other-12" → 12).
+        const m = node.id.match(/^other-(\d+)$/);
+        if (m && onCardClick) {
+          onCardClick(Number(m[1]));
+        }
+      } else if (node.type === "card" && onCardClick) {
+        // Clicking the self card re-opens it (no-op for parent).
+        // Could be used for "scroll to top of modal" etc.
+      }
+    });
+
+    // Change cursor to pointer on "other-card" nodes (visual cue that they're clickable).
+    nodeSel.filter((d) => (d as ConstNode).type === "other-card")
+           .style("cursor", "pointer");
+
     sim.on("tick", () => {
       linkSel
         .attr("x1", (d) => (d.source as ConstNode).x ?? 0)
@@ -191,7 +216,7 @@ export function SkillConstellation({ cardIndex, height = 240 }: SkillConstellati
     return () => {
       sim.stop();
     };
-  }, [cardIndex, width, height]);
+  }, [cardIndex, width, height, onCardClick]);
 
   return (
     <div ref={containerRef} className="space-y-2">
@@ -216,7 +241,7 @@ export function SkillConstellation({ cardIndex, height = 240 }: SkillConstellati
         ) : (
           <span>
             Center node = this card. Orange nodes = this card's 3 skills. Outer nodes = other cards that share those skills.
-            Drag any node to reposition. Hover to identify.
+            Drag any node to reposition. Hover to identify. <strong className="text-foreground/80">Click any outer card node to navigate to that card's modal directly</strong> — surf the skill-graph by following shared talents.
           </span>
         )}
       </p>

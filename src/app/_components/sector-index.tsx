@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ELEGANT_CODE_CARDS } from "./_elegant_code_cards";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Boxes, ArrowRight } from "lucide-react";
+import { Sparkles, Boxes, ArrowRight, Search, X } from "lucide-react";
 
 /**
  * SectorIndex — a "Sector → Equations" reverse index on /resources.
@@ -143,6 +143,8 @@ const liveMap: Record<number, string> = {
 };
 
 export function SectorIndex() {
+  const [filter, setFilter] = useState("");
+
   // Group all outcome tiles by canonical sector.
   const sectors = useMemo<SectorEntry[]>(() => {
     const sectorMap = new Map<string, SectorEntry>();
@@ -176,6 +178,34 @@ export function SectorIndex() {
     });
   }, []);
 
+  // Filter cards within each sector based on the search query.
+  // The query can match: sector name, sub-sector (outcomeSector), card title,
+  // science, skill, talent. If the filter is empty, show all sectors as-is.
+  const filteredSectors = useMemo(() => {
+    if (!filter.trim()) return sectors;
+    const q = filter.toLowerCase().trim();
+    const out: SectorEntry[] = [];
+    for (const sector of sectors) {
+      // If the sector name itself matches the query, show the whole sector.
+      const sectorNameMatch = sector.sectorName.toLowerCase().includes(q);
+      const filteredCards = sector.cards.filter((c) =>
+        sectorNameMatch ||
+        c.outcomeSector.toLowerCase().includes(q) ||
+        c.cardTitle.toLowerCase().includes(q) ||
+        c.outcomeScience.toLowerCase().includes(q) ||
+        c.outcomeSkill.toLowerCase().includes(q) ||
+        c.outcomeTalent.toLowerCase().includes(q)
+      );
+      if (filteredCards.length > 0) {
+        out.push({ ...sector, cards: filteredCards });
+      }
+    }
+    return out;
+  }, [filter, sectors]);
+
+  // Sectors hidden by the filter (for the "showing X of Y sectors" line).
+  const hiddenCount = sectors.length - filteredSectors.length;
+
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted-foreground leading-relaxed">
@@ -183,8 +213,38 @@ export function SectorIndex() {
         with the science, skill, talent, and live-demo link (if available).
         Click any card name to open the full card on <code>/elegant-code#card-N</code> in a new context.
       </p>
+
+      {/* Filter/search box — narrows the sector list by sub-sector / card title / skill */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter sectors — e.g., 'Lloyd's cargo option', 'AIS', 'Black-Scholes', 'Maritime navigator'"
+          className="w-full pl-10 pr-10 py-2 text-sm rounded-md border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+        />
+        {filter && (
+          <button
+            onClick={() => setFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label="Clear filter"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      {filter.trim() && (
+        <p className="text-xs text-muted-foreground">
+          {hiddenCount > 0
+            ? `Showing ${filteredSectors.length} of ${sectors.length} sectors (${hiddenCount} hidden by filter "${filter}").`
+            : `All ${filteredSectors.length} sectors match "${filter}".`}
+        </p>
+      )}
+
       <div className="grid gap-3 md:grid-cols-2">
-        {sectors.map((sector) => (
+        {filteredSectors.map((sector) => (
           <div
             key={sector.sectorName}
             className="rounded-md border border-border/60 bg-muted/20 p-3"
