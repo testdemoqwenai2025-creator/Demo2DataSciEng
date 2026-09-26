@@ -3934,3 +3934,44 @@ Stage Summary:
   * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-monte-carlo/
   * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/living-gbm/
   * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/resources/
+
+---
+Task ID: elegant-code-rephrase-and-expected-outcomes
+Agent: Super Z (main)
+Task: Rephrase the /elegant-code PageHeader description more elegantly (for smart generalists, not PhDs), and add an "Expected outcomes" option inside each card modal so users can observe the analytics/images/graphs the equation produces in each of its 3 sciences — with skill/talent badges that name what each sector rewards.
+
+Work Log:
+- Rephrased the /elegant-code PageHeader:
+  * Old: academic, explanatory, addressed to PhDs ("This page demonstrates the multi-disciplinary intersection that defines modern computational science...")
+  * New: extrapolative, visceral, addressed to smart generalists ("There is a kind of mathematics that refuses to stay where it was born. The Fourier transform that pulls a C-note out of an audio sample is the same operation that pulls a molecular mass out of a mass spectrometer... Specialisation is cheap. Intersections are rare. The next century of computational science belongs to those who refuse to stay in their lane — who see SVD in a genome and the same SVD in a stock portfolio and know, with a small shock of recognition, that it is the same SVD. That seeing is what this platform builds.")
+  * Also fixed the badge counts (was "5 equations / 12+ sciences"; now "20 equations / 20+ sciences").
+  * Added mention of the new "View expected outcomes" + live demo deep-links.
+- Extended the DatasetExample interface with an optional `outcomes?: ExpectedOutcome[]` field.
+  * Each ExpectedOutcome has: science, sector, skill, talent, code (Python), description.
+- Built OutcomeTile component inside DatasetCards:
+  * Compact 3-tile grid in the modal, between Multi-language code and Insight.
+  * Each tile shows: science name (color-coded), sector description, skill badge + talent badge (italic), compact PyodideRunner with "Run analytics" button, and an interpretation paragraph.
+  * The skill/talent badges make explicit what kind of mind this equation belongs to in each world it walks across — fulfilling the user's request to "discover the correlations of the knowledge, skills and talent required to be part of whatever the chosen sector".
+- Added a "View full live demo →" deep-link button at the top of the modal for cards with a /living-* page:
+  * Uses the existing `liveDemoByIndex` prop (already passed on /elegant-code).
+  * Computed inside the modal by findIndex(openCard.id) in the examples array.
+  * Renders a styled primary-colored banner with Sparkles icon + a description of what the live demo offers.
+- Wrote a Python script (scripts/add_outcomes_to_cards.py, ~280 lines) that adds `outcomes: [...]` to cards idempotently. Each outcome has 3 fields populated: science, sector, skill, talent, code, description.
+- Populated outcomes for 5 cards (SVD, Attention, FFT, Poisson, Entropy) — 3 outcomes per card = 15 outcome tiles total. Each tile runs a real Pyodide computation:
+  * SVD: PCA on 1000-Genomes chr-22 (top-3 PCs separate 4 populations), audio C-major chord separation (3 singular values = 3 notes), Fama-French 3-factor model (top-3 PCs = market/size/value).
+  * Attention: protein MSA contact-map recovery (4 contact pairs found from co-variation), English syntax tree (which words attend to which), ESM-2 masked-LM (4 billion years of evolution = world's largest ML run).
+  * FFT: C-major chord peak finding (262/330/392 Hz), mass-spec compound identification (m/z peaks), 2D DFT for cryo-EM 3D reconstruction (Central Slice Theorem).
+  * Poisson: GATK P(>=10 reads)=95% at lambda=14 (variant-calling threshold), server overload tail risk (1.5× peak capacity), C-14 radiocarbon dating (~5730 year half-life).
+  * Entropy: Shannon H of English letters (~4.18 bits, zip achieves it), Boltzmann S=k·log(W) for 1 mole N2 at STP (~192 J/K·mol, matches experiment), Haldane heterozygosity = genetic entropy (diverse vs clonal pops).
+- Lint clean across all 4 modified/new files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (same count as before). All 5 cards' outcomes data verified in JS bundle (.next/static/chunks/244006c9846ae5bd.js — 5 talent phrases bundled).
+- Live verification (after deploy workflow ran):
+  * https://testdemoqwenai2025-creator.github.io/Demo2DataSciEng/elegant-code/ → HTTP 200, contains 'refuses to stay where it was born', 'Specialisation is cheap', 'Expected outcomes', 'Computational biologist', 'small shock of recognition'.
+- Commit 00b07bb pushed to both private/main AND prev-session/main. Auto-mirrored to public2/main (Demo2DataSciEng) → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- /elegant-code page now speaks to smart generalists with extrapolative prose (not academic-speak for PhDs).
+- 5 of 20 cards (SVD, Attention, FFT, Poisson, Entropy) now have 3 outcome tiles each = 15 new "expected outcome" Pyodide demos inside the card modal.
+- Each tile names the skill (e.g., "Computational biologist") and talent (e.g., "sees population structure in matrices") each sector rewards — so users discover the correlations between the equation, the analytics output, and the human profile that interprets it.
+- "View full live demo" button at the top of every card modal deep-links to the corresponding /living-* page for cards with one (10 of 20 cards).
+- Lint clean, static build clean, all changes pushed and live.
