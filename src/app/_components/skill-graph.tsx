@@ -120,9 +120,51 @@ export function SkillGraph({ height = 600 }: { height?: number }) {
       .attr("cursor", "pointer")
       .call(drag(sim) as any);
 
+    // Draw skill nodes (larger, orange) and card nodes (colored by equation family).
+    // Cards from the same equation family share a color — making the
+    // "equation family" visually obvious on the skill graph.
+    const equationFamilyColor: Record<number, string> = {
+      // Linear algebra family: SVD, FFT, Lloyd's k-means → blue
+      0: "oklch(0.65 0.16 240)",
+      3: "oklch(0.65 0.16 240)",
+      19: "oklch(0.65 0.16 240)",
+      // Deep learning family: Attention, Gradient Descent → purple
+      1: "oklch(0.65 0.16 280)",
+      6: "oklch(0.65 0.16 280)",
+      // Probability family: Poisson, Bayes, Entropy → red
+      2: "oklch(0.65 0.16 0)",
+      7: "oklch(0.65 0.16 0)",
+      9: "oklch(0.65 0.16 0)",
+      // Stochastic processes family: GBM, Monte Carlo, Black-Scholes, Kalman → orange
+      10: "oklch(0.65 0.16 30)",
+      16: "oklch(0.65 0.16 30)",
+      17: "oklch(0.65 0.16 30)",
+      18: "oklch(0.65 0.16 30)",
+      // Numerical methods family: Verlet, Euler → green
+      4: "oklch(0.65 0.16 120)",
+      8: "oklch(0.65 0.16 120)",
+      // Networks family: PageRank, Markov → cyan
+      13: "oklch(0.65 0.16 200)",
+      15: "oklch(0.65 0.16 200)",
+      // Risk family: VaR → magenta
+      14: "oklch(0.65 0.16 300)",
+      // Geometry family: Haversine → amber
+      11: "oklch(0.65 0.16 60)",
+      // Dynamics family: Navier-Stokes → teal
+      5: "oklch(0.65 0.16 160)",
+    };
+    const cardFamilyColor = (cardId: string): string => {
+      const m = cardId.match(/^card-(\d+)$/);
+      if (m) {
+        const idx = Number(m[1]);
+        return equationFamilyColor[idx] ?? "oklch(0.55 0.16 240)";
+      }
+      return "oklch(0.55 0.16 240)";
+    };
+
     nodeSel.append("circle")
       .attr("r", (d) => (d.type === "skill" ? 14 : 9))
-      .attr("fill", (d) => d.type === "skill" ? "oklch(0.65 0.16 60)" : (d.accent ?? "oklch(0.55 0.16 240)"))
+      .attr("fill", (d) => d.type === "skill" ? "oklch(0.65 0.16 60)" : cardFamilyColor(d.id))
       .attr("stroke", "var(--background)")
       .attr("stroke-width", 2);
 

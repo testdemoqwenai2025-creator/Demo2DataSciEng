@@ -78,8 +78,70 @@ export function ElegantCodeGraph({ height = 600 }: { height?: number }) {
       }
     }
 
-    // Color scale by card index (so each card has its own color).
-    const color = (i: number) => `oklch(0.65 0.16 ${(i * 36) % 360})`;
+    // Color scale: color each card by its PRIMARY skill (the skill on its
+    // first outcome tile). Cards that share a primary skill get the same
+    // color — making the "skill family" visually obvious on the graph.
+    // Skills with no duplicate across cards fall back to the index-based
+    // hue so they still get a distinct color.
+    const skillColorMap: Record<string, string> = {
+      // Carefully chosen accent colors for common skills across the 20 cards.
+      "Computational biologist": "oklch(0.65 0.16 0)",       // red
+      "Audio engineer": "oklch(0.65 0.16 120)",              // green
+      "Quant analyst": "oklch(0.65 0.16 30)",                // orange
+      "Structural biologist": "oklch(0.65 0.16 280)",        // purple
+      "NLP researcher": "oklch(0.65 0.16 200)",              // cyan
+      "Bioinformatician": "oklch(0.55 0.16 90)",             // yellow-green
+      "Information theorist": "oklch(0.65 0.16 60)",         // amber
+      "Thermodynamicist": "oklch(0.65 0.16 240)",            // blue
+      "Population geneticist": "oklch(0.65 0.16 300)",        // magenta
+      "Atmospheric scientist": "oklch(0.55 0.16 200)",       // teal
+      "Biomedical engineer": "oklch(0.65 0.16 160)",         // teal-green
+      "Fluid dynamicist": "oklch(0.55 0.16 220)",            // sky blue
+      "ML engineer": "oklch(0.65 0.16 100)",                 // lime
+      "Evolutionary biologist": "oklch(0.65 0.16 50)",       // amber-orange
+      "Statistical mechanicist": "oklch(0.55 0.16 280)",     // indigo
+      "Medical geneticist": "oklch(0.65 0.16 350)",          // rose
+      "Spam filter engineer": "oklch(0.65 0.16 70)",          // yellow
+      "Quantum physicist": "oklch(0.55 0.16 320)",            // violet
+      "Numerical analyst": "oklch(0.65 0.16 180)",            // cyan-teal
+      "Game developer": "oklch(0.65 0.16 140)",              // green-cyan
+      "Quant developer": "oklch(0.55 0.16 25)",              // orange-brown
+      "Risk officer": "oklch(0.65 0.16 0)",                   // red
+      "Marine underwriter": "oklch(0.55 0.16 220)",           // navy
+      "Hydrologist": "oklch(0.65 0.16 190)",                 // sky
+      "Systemic risk analyst": "oklch(0.55 0.16 350)",       // crimson
+      "Trade economist": "oklch(0.65 0.16 110)",             // emerald
+      "Maritime analyst": "oklch(0.55 0.16 200)",             // ocean
+      "Maritime data engineer": "oklch(0.65 0.16 195)",       // teal
+      "Air traffic control engineer": "oklch(0.55 0.16 230)",  // sky
+      "Port operations analyst": "oklch(0.65 0.16 105)",      // chartreuse
+      "Statistical geneticist": "oklch(0.65 0.16 305)",       // fuchsia
+      "Quant researcher": "oklch(0.55 0.16 35)",              // amber-brown
+      "Port operations manager": "oklch(0.65 0.16 95)",       // green
+      "ML biologist": "oklch(0.55 0.16 270)",                // violet
+      "Analytical chemist": "oklch(0.65 0.16 165)",           // emerald-teal
+      "Molecular evolutionist": "oklch(0.55 0.16 55)",       // gold
+      "Credit risk analyst": "oklch(0.65 0.16 15)",           // tomato
+      "Maritime navigator": "oklch(0.55 0.16 210)",           // ocean-blue
+      "Airline dispatcher": "oklch(0.65 0.16 175)",           // cyan
+      "Astronomer": "oklch(0.55 0.16 260)",                   // indigo
+      "Quant trader": "oklch(0.65 0.16 40)",                 // amber-orange
+      "RL researcher": "oklch(0.55 0.16 295)",                // purple-pink
+      "Marine underwriter (cargo)": "oklch(0.55 0.16 220)",   // navy
+      "Trade economist (UN COMTRADE)": "oklch(0.65 0.16 115)",
+      "Systems biologist": "oklch(0.65 0.16 145)",            // green
+      "ML engineer (VQ)": "oklch(0.55 0.16 100)",
+    };
+    const color = (i: number) => {
+      const card = ELEGANT_CODE_MAP[i];
+      // Use the first outcome's skill as the "primary skill" for the card.
+      const primarySkill = card ? (ELEGANT_CODE_CARDS[card.cardIndex]?.outcomes?.[0]?.skill) : undefined;
+      if (primarySkill && skillColorMap[primarySkill]) {
+        return skillColorMap[primarySkill];
+      }
+      // Fallback: index-based hue.
+      return `oklch(0.65 0.16 ${(i * 36) % 360})`;
+    };
 
     // Build the simulation.
     const sim = d3.forceSimulation(nodes)

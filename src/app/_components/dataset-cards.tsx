@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { PyodideRunner } from "./pyodide-runner";
 import { CodeBlock } from "./code-block";
+import { SkillConstellation } from "./skill-constellation";
 
 /**
  * DatasetCards — reusable cards-with-lazy-popups component for showing
@@ -483,6 +484,19 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex
                 </p>
               </div>
             )}
+
+            {/* Skill constellation — where else this card's skills show up */}
+            {openCard.outcomes && openCard.outcomes.length > 0 && (() => {
+              const openIdx = examples.findIndex((e) => e.id === openCard.id);
+              return openIdx >= 0 ? (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                    Skill constellation — where else this card's 3 skills show up
+                  </p>
+                  <SkillConstellation cardIndex={openIdx} height={240} />
+                </div>
+              ) : null;
+            })()}
 
             {/* Insight */}
             <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">

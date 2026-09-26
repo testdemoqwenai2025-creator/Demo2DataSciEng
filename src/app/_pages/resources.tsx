@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SectionCard, PageHeader, KpiCard } from "../_components/section-card";
 import { SkillGraph } from "../_components/skill-graph";
 import { TalentSearch } from "../_components/talent-search";
+import { SectorIndex } from "../_components/sector-index";
 import { RelatedTopics } from "../_components/related-topics";
 import { hrefFor } from "../_lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -213,6 +214,16 @@ export function ResourcesPage() {
         badge="search 60 tiles"
       >
         <TalentSearch />
+      </SectionCard>
+
+      {/* Sector → Equations reverse index */}
+      <SectionCard
+        title="Sector → Equations — find equations by industry"
+        description="For each industry sector (Maritime, Fintech, Genomics, Audio, etc.), lists every elegant-code card whose outcomes touch that sector — with the science, skill, talent, and live-demo link. Helps readers entering from a specific industry find their equations fast. E.g., the Maritime sector lists 9 equations (Haversine, Kalman, Markov, VaR, PageRank, Monte Carlo, GBM, Lloyd's, Black-Scholes)."
+        icon={<Boxes className="h-5 w-5" />}
+        badge="reverse index"
+      >
+        <SectorIndex />
       </SectionCard>
 
       {/* 10 living pages summary */}

@@ -82,6 +82,8 @@ interface LivingEquationRunnerProps {
   preamble?: string;
   /** Auto-run on first mount (default true). */
   autoRun?: boolean;
+  /** Skip the initial auto-run on mount (lazy evaluation — user must click Run first). */
+  lazy?: boolean;
 }
 
 export function LivingEquationRunner({
@@ -91,6 +93,7 @@ export function LivingEquationRunner({
   buttonLabel = "Run live",
   preamble,
   autoRun = true,
+  lazy = true,
 }: LivingEquationRunnerProps) {
   const [sliderValue, setSliderValue] = useState<number>(slider.default);
   const [status, setStatus] = useState<"idle" | "loading" | "running" | "done" | "error">("idle");
@@ -99,6 +102,10 @@ export function LivingEquationRunner({
   const [loadTimeMs, setLoadTimeMs] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstRunRef = useRef(true);
+  // Track whether the user has clicked "Run" at least once — used to gate
+  // slider-driven auto-runs (lazy evaluation: don't load Pyodide until the
+  // user explicitly asks for it).
+  const hasUserClickedRunRef = useRef(false);
 
   // Substitute the slider value into the code template.
   const renderCode = useCallback((value: number) => {
@@ -180,15 +187,22 @@ export function LivingEquationRunner({
     }
   }, [preamble, renderCode]);
 
-  // Auto-run on mount (if autoRun) and on slider change (debounced).
+  // Auto-run on mount (if !lazy and autoRun) and on slider change (debounced,
+  // only after the user has clicked Run at least once).
   useEffect(() => {
     if (firstRunRef.current) {
       firstRunRef.current = false;
-      if (autoRun) {
+      // Lazy evaluation: skip the initial auto-run. The page loads fast (no
+      // Pyodide download); the user clicks "Run live" when ready.
+      if (autoRun && !lazy) {
+        hasUserClickedRunRef.current = true;
         run(sliderValue);
       }
       return;
     }
+    // After the first mount, slider changes trigger re-runs — but only if the
+    // user has already clicked "Run" at least once (lazy gate).
+    if (!hasUserClickedRunRef.current) return;
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
@@ -198,7 +212,7 @@ export function LivingEquationRunner({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [sliderValue, run, autoRun]);
+  }, [sliderValue, run, autoRun, lazy]);
 
   return (
     <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-3">
@@ -239,7 +253,12 @@ export function LivingEquationRunner({
           size="sm"
           variant={status === "running" || status === "loading" ? "outline" : "default"}
           className="gap-1.5"
-          onClick={() => run(sliderValue)}
+          onClick={() => {
+            // Mark that the user has clicked Run — this enables slider-driven
+            // auto-runs (debounced) from now on.
+            hasUserClickedRunRef.current = true;
+            run(sliderValue);
+          }}
           disabled={status === "loading" || status === "running"}
         >
           {status === "loading" || status === "running" ? (
@@ -280,6 +299,12 @@ export function LivingEquationRunner({
           >
             {renderer(result, sliderValue)}
           </motion.div>
+        )}
+        {status === "idle" && (
+          <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 p-2.5 text-xs text-muted-foreground italic">
+            Press <strong className="text-primary not-italic">"{buttonLabel}"</strong> to load Pyodide (~10MB, first run only) and compute the live chart.
+            Subsequent slider drags will auto-update (300ms debounce) — but only after this first click (lazy evaluation: nothing loads until you ask).
+          </div>
         )}
         {status === "loading" && (
           <div className="text-xs text-muted-foreground italic">Loading Pyodide runtime (~10MB, first run only)…</div>
