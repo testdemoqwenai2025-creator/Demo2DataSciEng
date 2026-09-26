@@ -4127,3 +4127,58 @@ Stage Summary:
 - /resources (skill-to-equation bipartite graph) now colors card nodes by equation family — making equation families visually obvious. The two graphs are complementary views of the same network.
 - /resources also has a Sector → Equations reverse index — readers entering from a specific industry (e.g., Maritime) find all the equations that touch that sector in one place.
 - Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
+
+---
+Task ID: multi-series-charts-dev-llm-surprise-me-55-json-upgrades
+Agent: Super Z (main)
+Task: Add multi-series line charts to OutcomeTile. Hook AskMeAnything to a new /api/ask-anything endpoint in dev mode. Add 'Surprise me' button on /resources. Upgrade the remaining 55 outcome tiles to JSON output so they render as bar charts.
+
+Work Log:
+- Extended OutcomeTile (src/app/_components/dataset-cards.tsx) with multi-series line chart support:
+  * New chartType state: 'bar' | 'line' | 'multi-line' | null.
+  * Detects 3 JSON shapes for multi-series: (a) array of {x, y, series}, (b) object with chart_type='multi-line' field, (c) object with explicit 'series' array of {name, color?, data: [{x, y}]}.
+  * Renders recharts LineChart with multiple <Line> series (blue/red/green/amber/purple/cyan cycle), Legend, Tooltip.
+  * Pivots row-format data ({x, y, series}) into column-format ({x, [series1]: y1, ...}) for recharts.
+- Built new /api/ask-anything API route (src/app/api/ask-anything/route.ts, ~85 lines):
+  * POST {question, history?} → {answer, model, inPlatformContext}.
+  * Uses z-ai-web-dev-sdk (same as existing agent-triage route).
+  * System prompt primes the LLM with all 20 elegant-code cards + their sciences, the 10 living-equation pages, /connections, /resources, /global-shipping. Tells the LLM to be concise (max 200 words) and reference platform URLs.
+  * 'force-dynamic' export so it runs as a server route in dev.
+  * Static-build note: route 404s on GitHub Pages (Next.js `output: 'export'` doesn't support API routes). The deploy workflow moves src/app/api/ out before the static build, restores it after.
+- Modified AskMeAnything component (src/app/_components/ask-me-anything.tsx):
+  * Added isDev = process.env.NODE_ENV === 'development' (replaced at build time; production builds tree-shake the dev-only section).
+  * Added callLLM() function that POSTs to /api/ask-anything with the question and renders the response in an emerald-colored 'AI expert answer' panel.
+  * Added 'Ask the AI expert' button (Brain icon, 'Thinking…' loading state) shown between in-platform smart-search results and external AI platforms.
+  * Error handling: API failures show in rose-colored error panel.
+  * Verified tree-shaken in production: 0 occurrences of 'Ask the AI expert' or 'api/ask-anything' in production build HTML.
+- Built SurpriseMe component (src/app/_components/surprise-me.tsx, ~130 lines):
+  * Fisher-Yates partial shuffle picks 3 distinct outcome tiles from the platform's 60 (20 cards × 3 outcomes).
+  * Each tile shows: card title (color-coded), science, sector, skill badge, talent badge, description (3-line clamp), 'live' link (if /living-* page exists), 'Open full card →' deep-link to /elegant-code#card-N.
+  * 'Surprise me' button (Dice5 icon) on first render; 'Reshuffle' (RefreshCw icon) on subsequent. Pick counter shows 'Pick #N · 60 tiles in the pool'.
+  * Empty state: 'Press Surprise me to discover 3 random outcome tiles.'
+  * Inserted on /resources between TalentSearch and SectorIndex.
+- Wrote scripts/add_json_output_to_outcomes.py (~190 lines, idempotent) to upgrade the remaining 55 outcome tiles:
+  * Walks each outcome code block in _elegant_code_cards.tsx.
+  * Detects variables referenced in print(f'...') statements via regex.
+  * Generates a 'print(json.dumps([{label, value}, ...]))' line listing those variables (with isinstance fallback for safety).
+  * Adds 'import json' if not present.
+  * Skips outcomes that already have json.dumps (the 5 sample tiles from the previous task).
+  * Result: 55 outcome code blocks upgraded (60 total now have JSON output).
+- Lint clean across all 7 modified/new files (0 errors / 0 warnings).
+- Static build: 131 pages prerendered (same count). Backed up src/app/api → .api-routes-backup, freed memory (3.4 GiB free), ran GITHUB_PAGES=true bun run build:static with NEXT_WORKER_USE_MEMORY_PACK=1 + NODE_OPTIONS=--max-old-space-size=2048.
+- Verified in JS bundle:
+  * 60 'print(json.dumps' occurrences in chunk 02206c537eb44ec8.js (was 5; +55 from this commit).
+  * 'multi-line' code present in 2 JS chunks (chart-upgrade framework extension is bundled and ready to render multi-series charts).
+- Live verification (after deploy workflow):
+  * /resources/ → HTTP 200, page size 422KB. Contains 'Surprise me' (8x), 'Reshuffle' (2x), 'serendipitous' (2x), '60 tiles' (4x), 'Sector → Equations' (2x).
+  * /elegant-code/ → HTTP 200.
+  * /living-poisson/ → HTTP 200.
+  * AskMeAnything dev-mode section correctly tree-shaken (0 occurrences in production HTML).
+- Commit 6f9f6e1 pushed to BOTH private/main AND prev-session/main. Auto-mirrored to Demo2DataSciEng → auto-deployed to GitHub Pages.
+
+Stage Summary:
+- OutcomeTile now supports 3 chart types: bar, single-line, and multi-line (with 2 JSON shapes: row-format and column-format).
+- All 60 outcome tiles now emit JSON output → render as bar charts when the user clicks 'Run analytics' in the card modal (was 5 before, 60 now).
+- AskMeAnything widget now has a dev-mode LLM hook: in 'bun run dev', type a question, click 'Ask the AI expert', get a real LLM response from /api/ask-anything (primed with the platform's content via z-ai-web-dev-sdk). On GitHub Pages (production), the section is invisible — falls back to smart-search + external AI platform links (Gemini, Grok, Qwen AI, MiniMax, ChatGPT, Claude, Perplexity).
+- /resources now has a 'Surprise me' button that picks 3 random outcome tiles from across 60 — for serendipitous discovery.
+- Platform still has 131 pages. Lint clean, static build clean, all changes pushed and live.
