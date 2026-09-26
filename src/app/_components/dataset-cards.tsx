@@ -55,6 +55,8 @@ interface DatasetCardsProps {
   intro?: string;
   /** Optional: returns the list of host page IDs that the card at this index appears on. */
   hostedOnByIndex?: (index: number) => string[];
+  /** Optional: returns the live-demo URL for the card at this index, or null/undefined if none. */
+  liveDemoByIndex?: (index: number) => string | null | undefined;
   /** Optional: anchor prefix for each card (e.g. "card-" → id="card-0", "card-1", …). */
   anchorPrefix?: string;
 }
@@ -161,7 +163,7 @@ function MultiLangCode({ tabs, runnablePython }: { tabs: LangTab[]; runnablePyth
 // Main component
 // ============================================================
 
-export function DatasetCards({ examples, intro, hostedOnByIndex, anchorPrefix }: DatasetCardsProps) {
+export function DatasetCards({ examples, intro, hostedOnByIndex, liveDemoByIndex, anchorPrefix }: DatasetCardsProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   const openCard = openId ? examples.find((e) => e.id === openId) : null;
 
@@ -180,6 +182,7 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, anchorPrefix }:
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {examples.map((e, idx) => {
           const hostedOn = hostedOnByIndex ? hostedOnByIndex(idx) : [];
+          const liveHref = liveDemoByIndex ? liveDemoByIndex(idx) : null;
           return (
             <motion.button
               key={e.id}
@@ -233,6 +236,16 @@ export function DatasetCards({ examples, intro, hostedOnByIndex, anchorPrefix }:
                   <span>·</span>
                   <span className="font-mono">Scala · Rust · Go · Elixir · Zig</span>
                 </div>
+                {/* Live-demo CTA (only if a live URL is provided for this card) */}
+                {liveHref && (
+                  <a
+                    href={liveHref}
+                    className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline"
+                    onClick={(ev) => ev.stopPropagation()}
+                  >
+                    <Sparkles className="h-3 w-3" /> Run it live →
+                  </a>
+                )}
               </div>
               <div className="h-1" style={{ backgroundColor: e.accent }} />
             </motion.button>

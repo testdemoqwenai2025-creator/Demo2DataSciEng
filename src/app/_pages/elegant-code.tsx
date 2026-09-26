@@ -49,7 +49,18 @@ export function ElegantCodePage() {
           examples={ELEGANT_CODE_CARDS}
           anchorPrefix="card-"
           hostedOnByIndex={(i) => ELEGANT_CODE_MAP[i]?.hostPages ?? []}
-          intro="SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy (Phase J) + Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's (Phase K). Each card shows ONE equation bridging 3+ sciences, with elegant code in Scala/Rust/Go/Elixir/Zig."
+          liveDemoByIndex={(i) => {
+            // Phase K — Living Equations: 5 of 20 cards have live demo pages.
+            const liveMap: Record<number, string> = {
+              0: "/living-svd",
+              1: "/living-attention",
+              2: "/living-poisson",
+              3: "/living-fft",
+              9: "/living-entropy",
+            };
+            return liveMap[i] ?? null;
+          }}
+          intro="SVD, Attention, Poisson, FFT, Verlet, Navier-Stokes, Gradient Descent, Bayes, Euler, Entropy (Phase J) + Black-Scholes, Haversine, Kelly, Markov, VaR, PageRank, Kalman, Monte Carlo, GBM, Lloyd's (Phase K). Each card shows ONE equation bridging 3+ sciences, with elegant code in Scala/Rust/Go/Elixir/Zig. 5 cards have a 'Run it live' CTA — try SVD, Attention, Poisson, FFT, or Entropy for interactive Pyodide demos with sliders."
         />
       </SectionCard>
 

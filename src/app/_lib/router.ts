@@ -124,7 +124,12 @@ export type PageId =
   | "bioinformatics-pipelines"
   | "elegant-code"
   | "connections"
-  | "global-shipping";
+  | "global-shipping"
+  | "living-svd"
+  | "living-attention"
+  | "living-fft"
+  | "living-poisson"
+  | "living-entropy";
 
 export interface PageMeta {
   id: PageId;
@@ -1080,6 +1085,46 @@ export const PAGES: PageMeta[] = [
     group: "Computational Science",
     icon: "Anchor",
     description: "Maritime analytics on 100K vessels × 10⁹ AIS positions: Haversine port-to-port distance, Kalman vessel tracking, PageRank port centrality, Monte Carlo berth congestion, Markov port-state transitions, GBM container dwell times, VaR Solvency II risk, Lloyd's port clustering. The maritime host for cross-disciplinary elegant-code cards.",
+  },
+  {
+    id: "living-svd",
+    label: "Living SVD — Run SVD on 1000-Genomes data in the browser",
+    shortLabel: "Living SVD",
+    group: "Living Equations",
+    icon: "Atom",
+    description: "Live SVD demo: drag k (number of principal components) and watch Out-of-Africa migration pattern emerge from the 1000-Genomes chr-22 allele-frequency matrix. Pyodide runs the SVD in-browser; recharts visualises the top-k PC scatter. Production bridge: np.linalg.svd.",
+  },
+  {
+    id: "living-attention",
+    label: "Living Attention — Run softmax(QK^T/√d_k)×V on a protein MSA",
+    shortLabel: "Living Attention",
+    group: "Living Equations",
+    icon: "Brain",
+    description: "Live Attention demo: drag d_k (head dimension) and watch the attention matrix sharpen from a smear to a contact-map pattern on a UniRef50 multiple sequence alignment. Pyodide computes softmax(QK^T/√d_k)×V in-browser. Production bridge: torch.nn.MultiheadAttention.",
+  },
+  {
+    id: "living-fft",
+    label: "Living FFT — Run np.fft.fft on a C-major chord in the browser",
+    shortLabel: "Living FFT",
+    group: "Living Equations",
+    icon: "Activity",
+    description: "Live FFT demo: drag N (window size) and watch the 3 notes of a C-major chord (C4, E4, G4) resolve from a smear to 3 sharp spikes. Pyodide computes X[k] = Σx[n]·e^(-2πikn/N) in-browser. Production bridge: np.fft.fft / scipy.fft.",
+  },
+  {
+    id: "living-poisson",
+    label: "Living Poisson — Run P(k)=λ^k·e^(-λ)/k! on 1000-Genomes read depth",
+    shortLabel: "Living Poisson",
+    group: "Living Equations",
+    icon: "Sigma",
+    description: "Live Poisson demo: drag λ (mean coverage) and watch P(≥10×) cross 0.95 at λ=14. The Poisson distribution is overlaid on a 1000-Genomes chr-22 read-depth histogram (synthetic). Pyodide computes the PMF and CDF in-browser. Production bridge: scipy.stats.poisson.",
+  },
+  {
+    id: "living-entropy",
+    label: "Living Entropy — Run H=-Σp·log(p) on gnomAD BRCA1 alleles",
+    shortLabel: "Living Entropy",
+    group: "Living Equations",
+    icon: "Sparkles",
+    description: "Live Entropy demo: drag n (number of bins) and watch H converge to its asymptote as the discrete distribution approaches the underlying continuous density. Computed on gnomAD BRCA1 allele-frequency data (synthetic). Pyodide computes H = -Σp·log(p) in-browser. Production bridge: scipy.stats.entropy.",
   },
 ];
 
